@@ -1,0 +1,35 @@
+<html>
+<head>
+  <script>
+      var Module = {
+          onRuntimeInitialized: function() {
+            //console.log('lerp result: ' + Module.standardOnsetRate());
+            alert("essentiamin wasm loaded");
+            console.log("WASM loaded ...");
+          }
+      };
+  </script>
+  <body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="dist/essentiamin.js"></script>
+    <script>
+
+      $(document).ready(function () {
+
+        addElem2Vec = function(vec) {
+            for (var i=1; i<10; i++) {
+              vec.push_back(i/10);
+            }
+        }
+
+        addIntElem2Vec = function(vec, size) {
+            for (var i=0; i<size; i++) {
+              vec.push_back(i);
+            }
+        }
+
+      });
+    </script>
+  </body>
+</head>
+</html>
