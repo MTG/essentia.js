@@ -1,6 +1,7 @@
 
 # essentiamin.js
 
+TODO: 
 
 
 
@@ -19,8 +20,8 @@ Steps
 
 ### Building from source
 
-```
+```bash
 emconfigure sh -c './build_essentia-bindings.sh'
-```·
+```
 
 
