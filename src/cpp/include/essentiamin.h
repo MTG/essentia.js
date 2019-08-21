@@ -7,7 +7,7 @@
 
 class EssentiaMin {
     public:
-        void onsetRate(std::vector<float> audio);
+        std::vector<float> onsetRate(std::vector<float> audio);
         // add your methods here
         void testAlgoFactory();
 };

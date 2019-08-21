@@ -2,14 +2,16 @@
 
 
 class EssentiaMinJs {
-	constructor (name) {
-		this.name = name;
+	constructor (version) {
+		this.version = version;
+		this.audioArray = [];
 	}
 
 	// generic function to loads web audio buffer as a 1D vector matrix for further passing to c++ functions
 	webAudioLoader(blob) {
 
 		const audioVector = blob2ArrayBuffer(blob);
+		this.audioArray = audioVector;
 	    return audioVector;
 	}
 
@@ -22,3 +24,8 @@ const blob2ArrayBuffer = async (blob) => {
 	return arrayBuffer;
 }
 
+
+
+vec2JsArray = function(vec) {
+
+}

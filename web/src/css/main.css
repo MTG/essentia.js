@@ -1,5 +1,5 @@
 body {
-    background-color: rgb(33, 47, 60)!important;
+    background-color: rgb(10, 31, 33)!important;
     height: 80%;
 }
 
@@ -15,12 +15,16 @@ body {
     margin-top: 100px;
 }
 
+#control_btns {
+    width: 25%!important;
+}
+
 .content-container {
-    max-height: 800px;
+    max-height: 550px;
 }
 
 .result-segment {
-    height: 95%;
+    height: 80%;
     background: rgba(0,0,0,0)!important;
 }
 

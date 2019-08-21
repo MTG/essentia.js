@@ -4,11 +4,13 @@
 #include <emscripten/bind.h>
 #include "./include/essentiamin.h"
 
+
 using namespace emscripten;
 
-void standardOnsetRate(std::vector<float> audioVector) {
+
+std::vector<float> standardOnsetRate(std::vector<float> audioVector) {
     EssentiaMin essentiaMin;
-    essentiaMin.onsetRate(audioVector);  
+    return essentiaMin.onsetRate(audioVector);  
 };
 
 

@@ -1,13 +1,13 @@
 <html lang="">
   <script>
     var Module = {
-      onRuntimeInitialized: function() {
-        console.log('squareTest result: ' + Module.squareTest(2));
-        var myVector = new Module.VectorFloat();
-        myVector.push_back(101);
-        console.log('first element vector: ' + myVector.get(0));
-      }
-    }; 
+        onRuntimeInitialized: function() {
+            // testing std vector support
+            var myVector = new Module.VectorFloat();
+            myVector.push_back(111);
+            console.log('first element vector: ' + myVector.get(0));
+        }
+    };
   </script> 
   <head>
     <meta charset="utf-8">
@@ -22,9 +22,9 @@
     <title>wasm-demo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
-    <script src="src/dist/boxnew.js"></script>
+    <script src="dist/essentiamin.js"></script>
     <script src="src/js/bindings.js"></script>
-    <script src="src/js/examples.js"></script>
+    <script src="src/js/utils.js"></script>
     <script>
 
       // 20 mb file upload limit
@@ -66,6 +66,19 @@
             );
 
             // addSourceToAudioPlayer(sampleFreesoundUri);
+
+            addElem2Vec = function(vec) {
+                for (var i=1; i<1000; i++) {
+                  vec.push_back(i/1000);
+                }
+            }
+
+            addIntElem2Vec = function(vec, size) {
+                for (var i=0; i<size; i++) {
+                  vec.push_back(i);
+                }
+            }
+
         });
     </script> 
   </head>
@@ -80,8 +93,8 @@
 
             </div>
 
-            <div class="eight wide centered column" style="margin-bottom: 40px;">
-                <center><h1 class="ui huge header white-text">essentiamin.js demos </h1></center>
+            <div class="eight wide centered column" style="margin-bottom: 60px;">
+                <center><h1 class="ui huge header white-text" style="color: teal;">essentiamin.js demos </h1></center>
             </div>
 
         </div>
@@ -94,8 +107,6 @@
         <div class="ui two column grid container content-container">
 
             <div id="control_btns" class="control_btns six wide left aligned column">
-
-                <div class="ui horizontal divider" style="color: papayawhip;">OR</div>
 
                 <div class="ui basic centered grid">
                     <div class="ui vertical buttons row">

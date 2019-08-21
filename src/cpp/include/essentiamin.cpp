@@ -9,7 +9,15 @@ using namespace essentia;
 using namespace standard;
 
 
-void EssentiaMin::onsetRate(std::vector<float> audio) {
+std::vector<float> EssentiaMin::onsetRate(std::vector<float> audio) {
+
+
+  setDebugLevel(EAll);                     // EAll is a special value that contains all modules
+  unsetDebugLevel(EMemory | EConnectors);
+
+  essentia::warningLevelActive = true; // deactivate warnings
+  essentia::infoLevelActive = true;    // deactivate info
+  essentia::errorLevelActive = true;    // activate error level
 
   printf("trying Essentia init\n");
   essentia::init();
@@ -33,12 +41,23 @@ void EssentiaMin::onsetRate(std::vector<float> audio) {
 
   essentia::shutdown();
 
+  return onsets;
+
 }
 
 
 void EssentiaMin::testAlgoFactory() {
 
+  setDebugLevel(EAll);                     // EAll is a special value that contains all modules
+  unsetDebugLevel(EMemory | EConnectors);
 
+  essentia::warningLevelActive = true; // deactivate warnings
+  essentia::infoLevelActive = true;    // deactivate info
+  essentia::errorLevelActive = true;    // activate error level
+
+  essentia::init();
+
+  printf("start\n");
   AlgorithmFactory& factory = AlgorithmFactory::instance();
   
   printf("instance of factory\n");
