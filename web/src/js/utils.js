@@ -1,4 +1,7 @@
-console.log('utils.js is on');
+/*
+
+
+*/
 
 let context;
 let recording = false;
@@ -10,6 +13,14 @@ let recorder = null;
 let audio = null;
 let audioChunks = [];
 
+
+getTrackFromMedia = function(audioElement) {
+
+    // web audio api audio context
+    const audioContext = new AudioContext();
+    const track = audioContext.createMediaElementSource(audioElement);
+    return track;
+}
 
 
 // adapted from https://gist.github.com/bryanjenningz/f60c42b0a2091c91bad21c91faadc88d
@@ -70,6 +81,16 @@ addToAudioPlayer = function(blob) {
 
     var blobUrl = URL.createObjectURL(blob);
     addSourceToAudioPlayer(blobUrl);
+}
+
+
+getBlobFileContainer = function() {
+    if ($('#file-menu')[0].files.length != 0) {
+        return $("#file-menu")[0].files[0];
+    }
+    else {
+        throw "Couldn't find any files in the filecontainer. Please upload your file again."
+    }
 }
 
 

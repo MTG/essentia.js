@@ -1,4 +1,4 @@
-<html lang="">
+<html lang="en">
   <script>
     var Module = {
         onRuntimeInitialized: function() {
@@ -31,6 +31,9 @@
       FILE_UPLOAD_LIMIT = 20;
 
       $(document).ready(function () {
+
+            const essentia = new EssentiaMinJs();
+
             $('#recordButton').click(function () {
                 recordStop();
             });
@@ -64,8 +67,6 @@
                     }
                 }
             );
-
-            // addSourceToAudioPlayer(sampleFreesoundUri);
 
             addElem2Vec = function(vec) {
                 for (var i=1; i<1000; i++) {

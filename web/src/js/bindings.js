@@ -1,31 +1,38 @@
-//
+/*
+
+
+*/
+
+
+// cahce typed array variable to load the async arraybuffer 
+let AUDIOARRAY;
 
 
 class EssentiaMinJs {
-	constructor (version) {
-		this.version = version;
-		this.audioArray = [];
+	constructor () {
 	}
 
 	// generic function to loads web audio buffer as a 1D vector matrix for further passing to c++ functions
-	webAudioLoader(blob) {
+	webAudioLoader = function (blob) {
+		var myReader = new FileReader();
+		var arrayBuf = myReader.readAsArrayBuffer(blob);
+		console.log("Loading blob into typed array");
+		myReader.onloadend = function(loadEvent) {
+			AUDIOARRAY = new Uint8Array(loadEvent.target.result);
+			console.log("Loaded blob into Uint8 typed array sucessfully...");
+		}
+	}
 
-		const audioVector = blob2ArrayBuffer(blob);
-		this.audioArray = audioVector;
-	    return audioVector;
+	getAudioArray = function() {
+		return AUDIOARRAY.slice();
 	}
 
 	// TODO: bindings for 2D vector reals, int, string
 }
 
 
-const blob2ArrayBuffer = async (blob) => {
-	let arrayBuffer = await new Response(blob).arrayBuffer();
-	return arrayBuffer;
-}
-
-
-
 vec2JsArray = function(vec) {
-
 }
+
+
+

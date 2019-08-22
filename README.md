@@ -4,7 +4,6 @@
 TODO: 
 
 
-
 ## Setup
 
 
@@ -28,11 +27,12 @@ emmake ./waf install
 
 ```
 
-* Complie essentiamin.js bindings
+* Complie essentiamin.js bindings.
 
 ```bash
 emconfigure sh -c './build_essentia-bindings.sh'
 ```
+Check the bash script for the intermediate steps.
 
 
 ## Usage
