@@ -1,9 +1,6 @@
 /*
 
-
 */
-
-let context;
 let recording = false;
 var recordButton = $("recordButton");
 var stopButton = $("stopButton");
@@ -12,12 +9,55 @@ let sampleFreesoundUri = "https://freesound.org/data/previews/0/515_319-lq.mp3";
 let recorder = null;
 let audio = null;
 let audioChunks = [];
+let fileAudioBuffer = null;
+let recAudioBuffer = null;
+let urlAudioBuffer = null;
+var recStream = null;
+
+// Fix up prefixing
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+var audioContext = new AudioContext();
+
+
+
+ function recordAudioWaveSurf() {
+
+    if (!recording) {
+        wavesurfer.microphone.on('deviceReady', function (stream) {
+            recording = true;
+            $('#recordButton').html('Stop &nbsp;&nbsp;<i class="stop icon"></i>');
+            $("#recordButton").prop("disabled", false);
+            console.log('Microphone device ready ..', stream);
+            recStream = stream;
+        });
+        wavesurfer.microphone.start();        
+    }
+    else {
+        wavesurfer.microphone.stopDevice();
+        recording = false;
+        $("#recordButton").prop("disabled", false);
+        $("#recordButton").html('Record &nbsp;&nbsp;<i class="microphone icon"></i>');
+        console.log("Stopped recording and close the device ...");
+    }
+}
+
+
+function loadSoundFromUri(url) {
+    var request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    request.responseType = 'arraybuffer';
+
+    // Decode asynchronously
+    request.onload = function() {
+        audioContext.decodeAudioData(request.response, function(buffer) {
+        urlAudioBuffer = buffer;
+    });
+    }
+    request.send();
+}
 
 
 getTrackFromMedia = function(audioElement) {
-
-    // web audio api audio context
-    const audioContext = new AudioContext();
     const track = audioContext.createMediaElementSource(audioElement);
     return track;
 }

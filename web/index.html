@@ -1,5 +1,6 @@
 <html lang="en">
   <script>
+    /*
     var Module = {
         onRuntimeInitialized: function() {
             // testing std vector support
@@ -8,7 +9,9 @@
             console.log('first element vector: ' + myVector.get(0));
         }
     };
+    */
   </script> 
+  <link rel="shortcut icon" href="src/img/essentia_logo.ico">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -22,20 +25,35 @@
     <title>wasm-demo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+<!--     <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly-basic.min.js"></script> -->
+    <script src="https://unpkg.com/wavesurfer.js"></script>
     <script src="dist/essentiamin.js"></script>
+    <script src="src/js/wavesurfer.microphone.min.js"></script>
     <script src="src/js/bindings.js"></script>
     <script src="src/js/utils.js"></script>
+    <script src="src/js/dataviz.js"></script>
     <script>
 
       // 20 mb file upload limit
       FILE_UPLOAD_LIMIT = 20;
+      var wavesurfer;
 
       $(document).ready(function () {
 
-            const essentia = new EssentiaMinJs();
+            wavesurfer = WaveSurfer.create({
+                container: '#waveform',
+                waveColor: 'violet',
+                progressColor: 'red',
+                audioContext: audioContext,
+                plugins: [
+                    WaveSurfer.microphone.create({
+                        'buffersize': 512
+                    })
+                ]
+            });
 
             $('#recordButton').click(function () {
-                recordStop();
+                recordAudioWaveSurf();
             });
             $('#file-menu').change(function () {
                 uploadAudioFileFromMenu($("#file-menu"), 'popup');
@@ -67,19 +85,6 @@
                     }
                 }
             );
-
-            addElem2Vec = function(vec) {
-                for (var i=1; i<1000; i++) {
-                  vec.push_back(i/1000);
-                }
-            }
-
-            addIntElem2Vec = function(vec, size) {
-                for (var i=0; i<size; i++) {
-                  vec.push_back(i);
-                }
-            }
-
         });
     </script> 
   </head>
@@ -128,10 +133,10 @@
                     <p hidden id="status_demo" class="white-text"><span id="update_status"></span></p>
                 </div>
             </div>
-
             <div id="results" class="ui ten wide column basic segment result-segment">
                 <div class="ui row" style="margin-bottom: 40px;">
                     <center>
+                        <div id="waveform"></div>
                         <audio hidden id="audio-div" controls>
                             <source id="audio-source" src="" type="audio/wav"/>
                         </audio>
