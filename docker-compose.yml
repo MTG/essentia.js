@@ -1,0 +1,10 @@
+version: '2'
+services:
+  web:
+    build: .
+    command: cd web/ && python3 -m http.server 8004 
+    volumes:
+      - ./:/srv/workspace/
+    ports:
+      - "8004:8004"
+    restart: always
