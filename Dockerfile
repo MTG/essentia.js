@@ -15,6 +15,6 @@ RUN emmake ./waf
 RUN emmake ./waf install
 
 # build essentia bindings
-emconfigure sh -c './build_essentia-bindings.sh'
+RUN emconfigure sh -c './build_essentia-bindings.sh'
 
 WORKDIR /srv/workspace/
