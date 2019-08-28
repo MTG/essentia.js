@@ -1,4 +1,6 @@
-
+/*
+ * EssentiaMin.js 
+ */
 
 #include <stdio.h>
 #include <emscripten/bind.h>
@@ -8,44 +10,91 @@
 using namespace emscripten;
 
 
-std::vector<float> standardOnsetRate(std::vector<float> audioVector) {
+void mfcc(std::vector<float>& signal, std::vector<float>& mfccBands, std::vector<float>& mfccCoeffs) {
     
     EssentiaMin essentiaMin;
-    essentiaMin.initState(true);
-    return essentiaMin.onsetRate(audioVector);  
+    essentiaMin.initState(essentiaMin.debugMode);
+    essentiaMin.mfcc(signal, mfccBands, mfccCoeffs);
+    essentiaMin.shutDown();  
 };
 
 
-void testAlgoFact() {
+std::vector<float> logMelBands(std::vector<float>& signal, int frameSize=1024, int hopSize=1024) {
+
     EssentiaMin essentiaMin;
-    essentiaMin.initState(true);
-    essentiaMin.testAlgoFactory();
-}
 
-
-std::vector<int> testVec(std::vector<int> items) {
-
-    std::vector<int> outArray(items.size(), 0);
-
-    for (int i=0; i<items.size(); i++) {
-        outArray[i] = items[i] * items[i];
-        printf("item: %d\n", outArray[i]);
+    if (!essentiaMin.initStatus) {
+        essentiaMin.initState(essentiaMin.debugMode);
     }
-    return outArray;
+    return essentiaMin.logMelBands(signal, frameSize, hopSize);
 }
 
 
-void freeMemory() {
-    printf("TODO:\n");
+std::vector<float> standardOnsetRate(std::vector<float>& signal) {
+    
+    EssentiaMin essentiaMin;
+
+    if (!essentiaMin.initStatus) {
+        essentiaMin.initState(essentiaMin.debugMode);
+    }
+
+    return essentiaMin.onsetRate(signal);  
+};
+
+
+std::vector<float> standardAutoCorrelation(std::vector<float> signal) {
+    
+    EssentiaMin essentiaMin;
+
+    if (!essentiaMin.initStatus) {
+        essentiaMin.initState(essentiaMin.debugMode);
+    }
+
+    return essentiaMin.autoCorrelation(signal);  
+};
+
+
+std::vector<float> envelope(std::vector<float> signal) {
+
+    EssentiaMin essentiaMin;
+
+    if (!essentiaMin.initStatus) {
+        essentiaMin.initState(essentiaMin.debugMode);
+    }
+
+    return essentiaMin.envelope(signal);
+}
+
+
+void initEssentia(bool debugMode) {
+    EssentiaMin essentiaMin;
+    essentiaMin.initState(debugMode);
+}
+
+
+void debuggerEssentia(bool mode=false) {
+    EssentiaMin essentiaMin;
+    essentiaMin.debugMode = mode;
+    essentiaMin.initStatus = mode;
+}
+
+void shutdownEssentia() {
+    EssentiaMin essentiaMin;
+    essentiaMin.shutDown();
 }
 
 
 EMSCRIPTEN_BINDINGS(my_module) {
     // map esszentiamin functions here
+    function("initEssentia", &initEssentia);
+    function("shutdownEssentia", &shutdownEssentia);
+    function("debuggerEssentia", &debuggerEssentia);
+
+    function("envelope", &envelope);
     function("standardOnsetRate", &standardOnsetRate);
-    function("testVec", &testVec);
-    function("testAlgoFact", &testAlgoFact);
-    function("freeMemory", &freeMemory);
+    function("standardAutoCorrelation", &standardAutoCorrelation);
+    function("mfcc", &mfcc);
+    function("logMelBands", &logMelBands);
 
     // map stl datatypes
     register_vector<int>("VectorInt");
