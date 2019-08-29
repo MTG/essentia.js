@@ -1,7 +1,7 @@
 
 # essentiamin.js
 
-TODO: 
+TODO (finish readme)
 
 
 ## Setup
@@ -11,6 +11,11 @@ You can either use the docker or build everything from source on your local syst
 
 ### Using docker
 
+```bash
+docker pull acorreya/essentia-emscripten:initial
+```
+
+TODO: add instructions to use it
 
 OR
 
@@ -42,7 +47,6 @@ emmake ./waf install
 emconfigure sh -c './build_essentia-bindings.sh'
 ```
 Check the bash script for the intermediate steps.
-
 
 
 
