@@ -77,11 +77,9 @@ Eg: The follwing examples demonstrates how to compute log-mel-bands for the the 
             typedFloat32Array2Vec = function(typedArray) {
 
                 var vec = new Module.VectorFloat();
-                var cnt = 0;
                 for (var i=0; i<typedArray.length; i++) {
                     if (typeof typedArray[i] === 'undefined') {
                         vec.push_back(0);
-                        cnt ++;
                     }
                     else {
                         vec.push_back(typedArray[i]);
