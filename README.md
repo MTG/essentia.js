@@ -90,10 +90,14 @@ Eg: The follwing examples demonstrates how to compute log-mel-bands for the the 
 
             var signal = typedFloat32ArrayVec(signalArray);
 
-
             // compute logMelBands for the given audio signal
             var melBands = Module.logMelBands(signal, frameSize, hopSize);
 
+            // if you want to run the algos in essentia debugging mode 
+            Module.debuggerEssentia(true);
+
+            // shutdown the essentia instance if you no longer need.
+            Module.shutdownEssentia();
     
         }
     };
