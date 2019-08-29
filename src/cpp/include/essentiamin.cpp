@@ -1,4 +1,6 @@
-
+/*
+ * EssentiaMin.js 
+ */
 
 #include <stdio.h>
 #include <essentia/algorithmfactory.h>
@@ -22,8 +24,10 @@ void EssentiaMin::initState(bool debugger) {
 		essentia::infoLevelActive = true;    // deactivate info
 		essentia::errorLevelActive = true;    // activate error level
 	}
-	essentia::init();
-	initStatus = true;
+	if (!initStatus || debugMode) {
+        essentia::init();;
+		initStatus = true;
+    }
 }
 
 
@@ -33,13 +37,9 @@ std::vector<float> EssentiaMin::onsetRate(std::vector<float>& signal) {
 	std::vector<float> onsets;
 
 	Algorithm* extractoronsetrate = standard::AlgorithmFactory::create("OnsetRate");
-
 	extractoronsetrate->input("signal").set(signal);
 	extractoronsetrate->output("onsets").set(onsets);
 	extractoronsetrate->output("onsetRate").set(onsetRate);
-
-	std::cout << "onsetRate: " << onsetRate << std::endl;
-	std::cout << "onsetTimes: " << onsets.size() << std::endl;
 
 	delete extractoronsetrate;
 
@@ -52,19 +52,14 @@ std::vector<float> EssentiaMin::autoCorrelation(std::vector<float>& signal) {
 	std::vector<float> ac;
 
 	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-
 	Algorithm* fc      = factory.create("FrameCutter",
 										"frameSize", 1024,
 										"hopSize", 512);
-
 	Algorithm* w       = factory.create("Windowing",
 										"type", "hann");
-
 	Algorithm* autocor = factory.create("AutoCorrelation");
-
-
+	
 	std::vector<float> frame, windowedFrame;
-
 	/////////// CONNECTING THE ALGORITHMS ////////////////
 	std::cout << "-------- connecting algos ---------" << std::endl;
 	fc->input("signal").set(signal);
@@ -88,7 +83,6 @@ std::vector<float> EssentiaMin::envelope(std::vector<float>& signal) {
 	std::vector<float> env;
 
 	Algorithm* envelop = standard::AlgorithmFactory::create("Envelope");
-	
 	envelop->input("signal").set(signal);
 	envelop->output("signal").set(env);
 
@@ -109,19 +103,13 @@ void EssentiaMin::mfcc(std::vector<float>& signal, std::vector<float>& mfccBands
 
 	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
 
-
-	Algorithm* fc    = factory.create("FrameCutter",
-									"frameSize", frameSize,
-									"hopSize", hopSize);
-
-	Algorithm* w     = factory.create("Windowing",
-									"type", "blackmanharris62");
-
-	Algorithm* spec  = factory.create("Spectrum");
-	Algorithm* mfcc  = factory.create("MFCC");
-
-
-
+	Algorithm* fc    = 	factory.create("FrameCutter",
+									   "frameSize", frameSize,
+									   "hopSize", hopSize);
+	Algorithm* w     = 	factory.create("Windowing",
+									   "type", "blackmanharris62");
+	Algorithm* spec  =  factory.create("Spectrum");
+	Algorithm* mfcc  =  factory.create("MFCC");
 
 	/////////// CONNECTING THE ALGORITHMS ////////////////
 	std::cout << "-------- connecting algos ---------" << std::endl;
@@ -148,15 +136,12 @@ void EssentiaMin::mfcc(std::vector<float>& signal, std::vector<float>& mfccBands
 	mfcc->output("mfcc").set(mfccCoeffs);
 
 	while (true) {
-
 		// compute a frame
 		fc->compute();
-
 		// if it was the last one (ie: it was empty), then we're done.
 		if (!frame.size()) {
 			break;
 		}
-
 		// if the frame is silent, just drop it and go on processing
 		if (isSilent(frame)) continue;
 
@@ -184,31 +169,27 @@ std::vector<float> EssentiaMin::logMelBands(std::vector<float>& signal, int fram
 
   	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
 
+  	Algorithm* fc       =  	factory.create("FrameCutter",
+									   	   "frameSize", frameSize,
+									   	   "hopSize", hopSize,
+									       "startFromZero", true);
 
-  	Algorithm* fc    = factory.create("FrameCutter",
-									"frameSize", frameSize,
-									"hopSize", hopSize,
-									"startFromZero", true);
+  	Algorithm* w     	=  	factory.create("Windowing",
+									       "type", "hann",
+									       "zeroPadding", frameSize);
 
-  	Algorithm* w     = factory.create("Windowing",
-									"type", "hann",
-									"zeroPadding", frameSize);
+  	Algorithm* spec  	=  	factory.create("Spectrum",
+									       "size", frameSize);
 
-  	Algorithm* spec  = factory.create("Spectrum",
-									"size", frameSize);
+  	Algorithm* mel  	=   factory.create("MelBands",
+								           "numberBands", 128,
+								           "type", "magnitude");
 
-  	Algorithm* mel  = factory.create("MelBands",
-								   "numberBands", 128,
-								   "type", "magnitude");
-
-  	Algorithm* logNorm  = factory.create("UnaryOperator",
-									   "type", "log");
+  	Algorithm* logNorm  =   factory.create("UnaryOperator",
+									       "type", "log");
 								   
 
   	/////////// STARTING THE ALGORITHMS //////////////////
-  	std::cout << "-------- start computing feature --------" << std::endl;
-
-  		// Audio -> FrameCutter
 	fc->input("signal").set(signal);
 
 	// FrameCutter -> Windowing -> Spectrum
@@ -231,15 +212,12 @@ std::vector<float> EssentiaMin::logMelBands(std::vector<float>& signal, int fram
 	logNorm->output("array").set(melBands);
 
 	while (true) {
-
 		// compute a frame
 		fc->compute();
-
 		// if it was the last one (ie: it was empty), then we're done.
 		if (!frame.size()) {
 			break;
 		}
-
 		// if the frame is silent, just drop it and go on processing
 		if (isSilent(frame)) continue;
 
