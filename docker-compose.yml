@@ -1,8 +1,8 @@
 version: '2'
 services:
   web:
-    build: .
-    command: cd web/ && python3 -m http.server 8004 
+    image: acorreya/essentia-emscripten:initial
+    command: python3 -m http.server 8004 
     volumes:
       - ./:/srv/workspace/
     ports:
