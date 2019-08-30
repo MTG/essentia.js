@@ -52,6 +52,8 @@
                 ]
             });
 
+            $('.menu .item').tab();
+
             $('#recordButton').click(function () {
                 recordAudioWaveSurf();
             });
@@ -94,13 +96,8 @@
 
     <div class="ui header">
         <div class="ui eight column grid">
-
-            <div class="two column row">
-
-            </div>
-
             <div class="eight wide centered column" style="margin-bottom: 60px;">
-                <center><h1 class="ui huge header white-text" style="color: teal;">essentiamin.js demos </h1></center>
+                <center><h1 class="ui huge header white-text">essentiamin.js demos </h1></center>
             </div>
 
         </div>
@@ -142,17 +139,31 @@
                         </audio>
                     </center>
                 </div>
-                <div class="ui row">
-                    <center><p id="results_title" class="large-text white-text"></p></center>
-                    <br>
-                    <div id="loader" class="ui text loader white-text">Loading</div>
-                    <canvas id="myChart"></canvas>
+                <div class="ui top attached tabular menu">
+                    <a class="item active" data-tab="first">Melody Extraction</a>
+                    <a class="item" data-tab="second">Key Detection</a>
+                    <a class="item" data-tab="third">BPM</a>
+                    <a class="item" data-tab="fourth">Loudness Meter</a>
+                    <a class="item" data-tab="fifth">MFCC</a>
+                </div>
+                <div class="ui bottom attached tab segment active" data-tab="first">
+                    Melody Extraction
+                </div>
+                <div class="ui bottom attached tab segment" data-tab="second">
+                    Key Detection
+                    </div>
+                <div class="ui bottom attached tab segment" data-tab="third">
+                    BPM
+                </div>
+                <div class="ui bottom attached tab segment" data-tab="fourth">
+                    Loudness Meter
+                </div>
+                <div class="ui bottom attached tab segment" data-tab="fifth">
+                    MFCC
                 </div>
             </div>
 
         </div>
-
-        <br>
 
         <center>
         <div class="footer">

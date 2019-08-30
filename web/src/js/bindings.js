@@ -36,30 +36,28 @@ function iterateTypedArrayCallback(element, index, array) {
 }
 
 
-
+// copy the contents of a std::vector<float> into a float 32 js typed array. 
 vec2typedFloat32Array = function(vec) {
 	var jsArray = [];
 	for (var i=0; i <= vec.size(); i++) {
 		jsArray[i] = vec[i];
 	}
-	return new Float32Array();
+	return new Float32Array(jsArray);
 }
 
 
+// copy the contents of a float 32 js typed array into a std::vector<float> type. 
 typedFloat32Array2Vec = function(typedArray) {
 
 	var vec = new Module.VectorFloat();
-	var cnt = 0;
 	for (var i=0; i<typedArray.length; i++) {
 		if (typeof typedArray[i] === 'undefined') {
 			vec.push_back(0);
-			cnt ++;
 		}
 		else {
 			vec.push_back(typedArray[i]);
 		}
 	}
-	console.log("Found undefined values -> ", cnt, "/", typedArray.length);
 	return vec;
 }
 

@@ -1,9 +1,12 @@
 body {
-    background-color: rgb(10, 31, 33)!important;
+    background-image: linear-gradient(206deg, #02747a 10%, #087e8b 30%)!important;
     height: 80%;
 }
 
-.header {}
+.header {
+    background-image: linear-gradient(206deg, #203246f1 10%, #002438 30%);
+    margin-top: 40%;
+}
 
 .main_wrapper {
 	display: flex;
@@ -11,8 +14,11 @@ body {
   	height: 100%;
 }
 
+
 .footer {
-    margin-top: 100px;
+    margin-top: 60px;
+    background-image: linear-gradient(244deg, #ff5a5f 3%, #ac4142 90%);
+    height: 14%;
 }
 
 #control_btns {
@@ -24,7 +30,7 @@ body {
 }
 
 .result-segment {
-    height: 80%;
+    height: 90%;
     background: rgba(0,0,0,0)!important;
 }
 
