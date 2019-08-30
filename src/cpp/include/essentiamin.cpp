@@ -23,72 +23,175 @@ void EssentiaMin::initState(bool debugger) {
 		essentia::warningLevelActive = true; // activate warnings
 		essentia::infoLevelActive = true;    // deactivate info
 		essentia::errorLevelActive = true;    // activate error level
+		debugMode = true;
 	}
+
 	if (!initStatus || debugMode) {
-        essentia::init();;
+        essentia::init();
 		initStatus = true;
     }
 }
 
 
-std::vector<float> EssentiaMin::onsetRate(std::vector<float>& signal) {
-
-	float onsetRate;
-	std::vector<float> onsets;
-
-	Algorithm* extractoronsetrate = standard::AlgorithmFactory::create("OnsetRate");
-	extractoronsetrate->input("signal").set(signal);
-	extractoronsetrate->output("onsets").set(onsets);
-	extractoronsetrate->output("onsetRate").set(onsetRate);
-
-	delete extractoronsetrate;
-
-	return onsets;
+void EssentiaMin::shutDown() {
+	essentia::shutdown();
 }
 
 
-std::vector<float> EssentiaMin::autoCorrelation(std::vector<float>& signal) {
-
-	std::vector<float> ac;
+// Check https://essentia.upf.edu/documentation/reference/std_LoudnessVickers.html. Meant to be input by audio frames not the entire audio signal.
+float EssentiaMin::loudnessVickers(std::vector<float>& signalFrame) {
 
 	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	Algorithm* fc      = factory.create("FrameCutter",
-										"frameSize", 1024,
-										"hopSize", 512);
-	Algorithm* w       = factory.create("Windowing",
-										"type", "hann");
-	Algorithm* autocor = factory.create("AutoCorrelation");
-	
-	std::vector<float> frame, windowedFrame;
-	/////////// CONNECTING THE ALGORITHMS ////////////////
-	std::cout << "-------- connecting algos ---------" << std::endl;
-	fc->input("signal").set(signal);
-	fc->output("frame").set(frame);
-	w->input("frame").set(frame);
-	w->output("frame").set(windowedFrame);
-	autocor->input("signal").set(windowedFrame);
-	autocor->output("autoCorrelation").set(ac);
-	std::cout << "-------- done computation ---------" << std::endl;
 
-	delete fc;
-	delete w;
-	delete autocor;
+	Algorithm* loudness = factory.create("LoudnessVickers");
 
-	return ac;
+	float loudnessValue;
+	loudness->input("signal").set(signalFrame);
+	loudness->output("loudness").set(loudnessValue);
+	loudness->compute();
+
+	delete loudness;
+
+	return loudnessValue;
 }
 
 
-std::vector<float> EssentiaMin::envelope(std::vector<float>& signal) {
+// Check https://essentia.upf.edu/documentation/reference/std_ZeroCrossingRate.html
+float EssentiaMin::zeroCrossingRate(std::vector<float>& signal) {
 
-	std::vector<float> env;
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
 
-	Algorithm* envelop = standard::AlgorithmFactory::create("Envelope");
-	envelop->input("signal").set(signal);
-	envelop->output("signal").set(env);
+	Algorithm* zcr = factory.create("ZeroCrossingRate");
 
-	delete envelop;
+	float zcrValue;
+	zcr->input("signal").set(signal);
+	zcr->output("zeroCrossingRate").set(zcrValue);
+	zcr->compute();
 
-	return env;
+	delete zcr;
+
+	return zcrValue;
+}
+
+
+// Check https://essentia.upf.edu/documentation/reference/std_PitchYin.html
+void EssentiaMin::pitchYin(std::vector<float>& signalFrame, float pitch, float pitchConfidence) {
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+
+	Algorithm* pitchyin = factory.create("PitchYin");
+
+	pitchyin->input("signal").set(signalFrame);
+	pitchyin->output("pitch").set(pitch);
+	pitchyin->output("pitchConfidence").set(pitchConfidence);
+	pitchyin->compute();
+
+	delete pitchyin;
+}
+
+
+// Check https://essentia.upf.edu/documentation/reference/std_PercivalBpmEstimator.html for more details.
+float EssentiaMin::percivalBpmEstimator(std::vector<float>& signal, int sampleRate, int frameSize, int hopSize) {
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+
+	Algorithm* percBpm = factory.create("PercivalBpmEstimator",
+										"frameSize", frameSize,
+										"hopSize", hopSize,
+										"sampleRate", sampleRate);
+	
+	float bpm;
+
+	percBpm->input("signal").set(signal);
+	percBpm->output("bpm").set(bpm);
+
+	percBpm->compute();
+
+	delete percBpm;
+
+	return bpm;
+}
+
+
+// Check https://essentia.upf.edu/documentation/reference/std_SuperFluxExtractor.html for more details.
+std::vector<float> EssentiaMin::superFluxExtractor(std::vector<float>& signal, int sampleRate, int frameSize, int hopSize) {
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+
+	Algorithm* superflux = factory.create("SuperFluxExtractor",
+										  "frameSize", frameSize,
+										  "hopSize", hopSize,
+										  "sampleRate", sampleRate);
+	
+	std::vector<float> onsets;
+
+	superflux->input("signal").set(signal);
+	superflux->output("onsets").set(onsets);
+
+	superflux->compute();
+
+	delete superflux;
+
+	return onsets;	
+}
+
+
+// Check https://essentia.upf.edu/documentation/reference/std_KeyExtractor.html for more details
+void EssentiaMin::keyExtractor(std::vector<float>& signal, std::string key, std::string scale, float strength) {
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+
+	Algorithm* keyExt = factory.create("KeyExtractor");
+
+	keyExt->input("signal").set(signal);
+	keyExt->output("key").set(key);
+	keyExt->output("scale").set(scale);
+	keyExt->output("strength").set(strength);
+
+	keyExt->compute();
+
+	delete keyExt;
+}
+
+
+// Check https://essentia.upf.edu/documentation/reference/std_PitchYinProbabilistic.html
+void EssentiaMin::pitchProbabilisticYinExtractor(std::vector<float>& signal, std::vector<float>& pitch, std::vector<float>& voicedProbabilities) {
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+
+	Algorithm* pyYin = factory.create("PitchYinProbabilistic");
+
+	pyYin->input("signal").set(signal);
+	pyYin->output("pitch").set(pitch);
+	pyYin->output("voicedProbabilities").set(voicedProbabilities);
+	pyYin->compute();
+
+	delete pyYin;
+}
+
+
+// Check https://essentia.upf.edu/documentation/reference/std_PredominantPitchMelodia.html
+void EssentiaMin::predominantPitchMelodiaExtractor(std::vector<float>& signal, std::vector<float>& pitch, std::vector<float>& pitchConfidence) {
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+
+	Algorithm* eqloud 		= factory.create("EqualLoudness");
+	Algorithm* predomelodia = factory.create("PredominantPitchMelodia");
+
+	std::vector<float> eqloudSignal;
+
+	eqloud->input("signal").set(signal);
+	eqloud->output("signal").set(eqloudSignal);
+	predomelodia->input("signal").set(eqloudSignal);
+	predomelodia->output("pitch").set(pitch);
+	predomelodia->output("pitchConfidence").set(pitchConfidence);
+
+	eqloud->compute();
+	predomelodia->compute();
+
+	delete eqloud;
+	delete predomelodia;
+
 }
 
 
@@ -156,9 +259,64 @@ void EssentiaMin::mfcc(std::vector<float>& signal, std::vector<float>& mfccBands
 	delete mfcc;
 }
 
+std::vector<float> EssentiaMin::onsetRate(std::vector<float>& signal) {
 
-void EssentiaMin::shutDown() {
-	essentia::shutdown();
+	float onsetRate;
+	std::vector<float> onsets;
+
+	Algorithm* extractoronsetrate = standard::AlgorithmFactory::create("OnsetRate");
+	extractoronsetrate->input("signal").set(signal);
+	extractoronsetrate->output("onsets").set(onsets);
+	extractoronsetrate->output("onsetRate").set(onsetRate);
+
+	delete extractoronsetrate;
+
+	return onsets;
+}
+
+
+std::vector<float> EssentiaMin::autoCorrelation(std::vector<float>& signal) {
+
+	std::vector<float> ac;
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+	Algorithm* fc      = factory.create("FrameCutter",
+										"frameSize", 1024,
+										"hopSize", 512);
+	Algorithm* w       = factory.create("Windowing",
+										"type", "hann");
+	Algorithm* autocor = factory.create("AutoCorrelation");
+	
+	std::vector<float> frame, windowedFrame;
+	/////////// CONNECTING THE ALGORITHMS ////////////////
+	std::cout << "-------- connecting algos ---------" << std::endl;
+	fc->input("signal").set(signal);
+	fc->output("frame").set(frame);
+	w->input("frame").set(frame);
+	w->output("frame").set(windowedFrame);
+	autocor->input("signal").set(windowedFrame);
+	autocor->output("autoCorrelation").set(ac);
+	std::cout << "-------- done computation ---------" << std::endl;
+
+	delete fc;
+	delete w;
+	delete autocor;
+
+	return ac;
+}
+
+
+std::vector<float> EssentiaMin::envelope(std::vector<float>& signal) {
+
+	std::vector<float> env;
+
+	Algorithm* envelop = standard::AlgorithmFactory::create("Envelope");
+	envelop->input("signal").set(signal);
+	envelop->output("signal").set(env);
+
+	delete envelop;
+
+	return env;
 }
 
 
