@@ -20,6 +20,8 @@ class EssentiaMin {
         void shutDown();
 
         // add your essentia example methods here and also in the essentiamin.cpp file
+        std::vector<std::vector<float> > frameCutter(std::vector<float>& signal, int frameSize, int hopeSize, std::string windowType);
+
         float percivalBpmEstimator(std::vector<float>& signal, int sampleRate, int frameSize, int hopSize);
         float loudnessVickers(std::vector<float>& signalFrame);
         float zeroCrossingRate(std::vector<float>& signal);

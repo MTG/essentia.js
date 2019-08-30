@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <essentia/algorithmfactory.h>
 #include <essentia/essentiamath.h>
+#include <essentia/pool.h>
 #include "essentiamin.h"
 //#include <essentia/streaming/algorithms/poolstorage.h>
 //#include <essentia/scheduler/network.h>
@@ -35,6 +36,41 @@ void EssentiaMin::initState(bool debugger) {
 
 void EssentiaMin::shutDown() {
 	essentia::shutdown();
+}
+
+
+std::vector<std::vector<float> > EssentiaMin::frameCutter(std::vector<float>& signal, int frameSize, int hopSize, std::string windowType) {
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+	Algorithm* fc   = factory.create("FrameCutter",
+									 "frameSize", frameSize,
+									 "hopSize", hopSize);
+	Algorithm* w    = factory.create("Windowing",
+									 "type", windowType);
+
+	Pool pool;
+	
+	std::vector<float> frame, windowedFrame;
+	fc->input("signal").set(signal);
+	fc->output("frame").set(frame);
+	w->input("frame").set(frame);
+	w->output("frame").set(windowedFrame);
+
+	while (true) {
+		// compute a frame
+		fc->compute();
+		// if it was the last one (ie: it was empty), then we're done.
+		if (!frame.size()) {
+			break;
+		}
+		// if the frame is silent, just drop it and go on processing
+		if (isSilent(frame)) continue;
+
+		w->compute();
+
+		pool.add("frames", windowedFrame);
+	}
+	return pool.value<std::vector<std::vector<float> > >("frames");
 }
 
 
