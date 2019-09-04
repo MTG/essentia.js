@@ -17,11 +17,10 @@ emcc --emrun --bind ${BINDING_CPP} ${TO_INCLUDE_ESS} -o essentiamin.bc -s EXCEPT
 printf "Linking and compiling the bindings with essentia to js, wasm files ...\n\n"
 
 # without emcc debug mode
-#emcc --emrun --bind -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=2 -s SAFE_HEAP=1 -s EXCEPTION_DEBUG -Oz essentiamin.bc ${LIB_DIR}/essentia.a -o ${APP_BUILD}/essentiamin.js -s WASM=0 -s || exit 1
-emcc --emrun --bind -Oz essentiamin.bc ${LIB_DIR}/essentia.a -o ${APP_BUILD}/essentiamin.js -s WASM=1 -s EXCEPTION_DEBUG -s ASSERTIONS=2 -s DISABLE_EXCEPTION_CATCHING=2 || exit 1
+emcc --emrun --bind -Oz essentiamin.bc ${LIB_DIR}/essentia.a -o ${APP_BUILD}/essentiamin.js -s WASM=1 -s EXCEPTION_DEBUG -s ASSERTIONS=2 -s DISABLE_EXCEPTION_CATCHING=2 -s ALLOW_MEMORY_GROWTH=1 || exit 1
 #EMCC_DEBUG=1 (for compiling in debug mode of emcc compiler)
 
-printf "\nRemoving unnecessary files ...\n"
+printf "Removing unnecessary files ...\n"
 rm essentiamin.bc
 
 printf "\nCopying builds ...\n\n"
