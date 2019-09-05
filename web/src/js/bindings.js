@@ -2,47 +2,52 @@
 
 */
 
-// cahce typed array variable to load the async arraybuffer 
-let AUDIOARRAY;
+class EssentiaJsTools {
 
-
-class EssentiaMinJs {
-
-
-	constructor () {
+	constructor (audioContext) {
+		this.audioContext = audioContext;
+		this.audioSignal = null;
 	}
 
 	// generic function to loads web audio buffer as a 1D vector matrix for further passing to c++ functions
-	webAudioLoader = function (blob) {
-		var myReader = new FileReader();
-		myReader.readAsArrayBuffer(blob);
-		myReader.onloadend = function(loadEvent) {
-			AUDIOARRAY = new Uint16Array(loadEvent.target.result);
-			console.log("Loaded blob into Uint8 typed array sucessfully...");
+	loadAudioDataFromUrl = function(url) {
+		var request = new XMLHttpRequest();
+		request.open('GET', url, true);
+		request.responseType = 'arraybuffer';
+	
+		// Decode asynchronously
+		request.onload = function() {
+			audioContext.decodeAudioData(request.response, function(buffer) {
+			urlAudioBuffer = buffer;
+			// mono signal
+			this.audioSignal = typedFloat32Array2Vec(buffer.getChannelData(0));	
+			});
 		}
+		request.send();
 	}
-
-    // get a copy a audio array
-	getAudioArray = function() {
-		return AUDIOARRAY.slice();
-	}
-
-	// TODO: bindings for 2D vector reals, int, string
 }
 
 
-function iterateTypedArrayCallback(element, index, array) {
-	console.log('a[' + index + '] = ' + element);
+function EssentiaTools(myAudioCtx) {
+	this.audioContext = myAudioCtx;
+	this.audioSignal = null;
 }
 
+EssentiaTools.prototype.loadAudioDataFromUrl = function(url) {
 
-// copy the contents of a std::vector<float> into a float 32 js typed array. 
-vec2typedFloat32Array = function(vec) {
-	var jsArray = [];
-	for (var i=0; i <= vec.size(); i++) {
-		jsArray[i] = vec[i];
+	var request = new XMLHttpRequest();
+	request.open('GET', url, true);
+	request.responseType = 'arraybuffer';
+
+	// Decode asynchronously
+	request.onload = function() {
+		this.audioContext.decodeAudioData(request.response, function(buffer) {
+		urlAudioBuffer = buffer;
+		// mono signal
+		this.audioSignal = typedFloat32Array2Vec(buffer.getChannelData(0));	
+		});
 	}
-	return new Float32Array(jsArray);
+	request.send();
 }
 
 
@@ -62,28 +67,22 @@ typedFloat32Array2Vec = function(typedArray) {
 }
 
 
-
-function floatTo16BitInt(inputArray, startIndex){
-    var output = new Uint16Array(inputArray.length-startIndex);
-    for (var i = 0; i < inputArray.length; i++){
-        var s = Math.max(-1, Math.min(1, inputArray[i]));
-        output[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
-    }
-    return output;
-}
-
-// This is passed in an unsigned 16-bit integer array. It is converted to a 32-bit float array.
-// The first startIndex items are skipped, and only 'length' number of items is converted.
-function int16ToFloat32(inputArray, startIndex, length) {
-    var output = new Float32Array(inputArray.length-startIndex);
-    for (var i = startIndex; i < length; i++) {
-        var int = inputArray[i];
-        // If the high bit is on, then it is a negative number, and actually counts backwards.
-        var float = (int >= 0x8000) ? -(0x10000 - int) / 0x8000 : int / 0x7FFF;
-        output[i] = float;
-    }
-    return output;
+// copy the contents of a std::vector<float> into a float 32 js typed array. 
+vec2typedFloat32Array = function(vec) {
+	const typedArray = new Float32Array(vec.size());
+	for (var i=0; i < vec.size(); i++) {
+		typedArray[i] = vec.get(i);
+	}
+	return typedArray
 }
 
 
+blob2Url = function(blob) {
+	return URL.createObjectURL(blob);
+}
+
+
+function iterateTypedArrayCallback(element, index, array) {
+	console.log('a[' + index + '] = ' + element);
+}
 
