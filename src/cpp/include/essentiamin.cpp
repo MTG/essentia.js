@@ -15,6 +15,7 @@ using namespace essentia::standard;
 //using namespace essentia::streaming;
 //using namespace essentia::scheduler;
 
+bool esInitStatus = true;
 
 void EssentiaMin::initState(bool debugger) {
 
@@ -24,18 +25,18 @@ void EssentiaMin::initState(bool debugger) {
 		essentia::warningLevelActive = true; // activate warnings
 		essentia::infoLevelActive = true;    // deactivate info
 		essentia::errorLevelActive = true;    // activate error level
-		debugMode = true;
 	}
 
-	if (!initStatus || debugMode) {
+	if (esInitStatus) {
         essentia::init();
-		initStatus = true;
+		esInitStatus = false;
     }
 }
 
 
 void EssentiaMin::shutDown() {
 	essentia::shutdown();
+	esInitStatus = true;
 }
 
 
@@ -70,6 +71,10 @@ std::vector<std::vector<float> > EssentiaMin::frameCutter(std::vector<float>& si
 
 		pool.add("frames", windowedFrame);
 	}
+
+	delete fc;
+	delete w;
+
 	return pool.value<std::vector<std::vector<float> > >("frames");
 }
 

@@ -7,12 +7,11 @@
 
 #include <vector>
 
+
 // EssentiaMin class which includes methods of some selected essentia c++ algos
 class EssentiaMin {
 
     public:
-        bool initStatus = false;
-        bool debugMode = false;
 
         // register essentia algos
         void initState(bool debugger);
@@ -49,5 +48,6 @@ std::vector<T> jsArray2Vec(){
     return vec;
 }
 
+extern bool esInitStatus;
 
 #endif  // ESSENTIAMIN_H
