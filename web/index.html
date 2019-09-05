@@ -4,6 +4,7 @@
     var Module = {
         onRuntimeInitialized: function() {
             console.log('essentiamin.js and .wasm files are loaded sucessfully ...');
+            loadSoundFromUri(sampleFreesoundUri);
         }
     };
 
@@ -17,12 +18,14 @@
     <meta name="essentiamin.js" content="WASM demo for essentiamin">
 
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css"/>
     <link rel="stylesheet" type="text/css" href="src/css/main.css"/>
 
     <title>wasm-demo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
-<!--     <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly-basic.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/zeu"></script>
     <script src="https://unpkg.com/wavesurfer.js"></script>
     <script src="dist/essentiamin.js"></script>
     <script src="src/js/wavesurfer.microphone.min.js"></script>
@@ -34,6 +37,7 @@
       // 20 mb file upload limit
       FILE_UPLOAD_LIMIT = 20;
       var wavesurfer;
+      var chartJsCtx;
 
       $(document).ready(function () {
 
@@ -44,7 +48,7 @@
                 audioContext: audioContext,
                 plugins: [
                     WaveSurfer.microphone.create({
-                        'buffersize': 512
+                        'buffersize': 256
                     })
                 ]
             });
@@ -94,7 +98,7 @@
     <div class="ui header">
         <div class="ui eight column grid">
             <div class="eight wide centered column" style="margin-bottom: 60px;">
-                <center><h1 class="ui huge header white-text">essentiamin.js demos </h1></center>
+                <center><h1 class="ui huge header white-text">essentia.js demos </h1></center>
             </div>
 
         </div>
@@ -143,20 +147,15 @@
                     <a class="item" data-tab="fourth">Loudness Meter</a>
                     <a class="item" data-tab="fifth">MFCC</a>
                 </div>
-                <div class="ui bottom attached tab segment active" data-tab="first">
-                    Melody Extraction
+                <div id="melody-div" class="ui bottom attached tab segment active" data-tab="first" style="width: 900px; height: 350px;">
                 </div>
-                <div class="ui bottom attached tab segment" data-tab="second">
-                    Key Detection
-                    </div>
-                <div class="ui bottom attached tab segment" data-tab="third">
-                    BPM
+                <div id="key-div" class="ui bottom attached tab segment" data-tab="second" style="width: 900px; height: 350px;">
                 </div>
-                <div class="ui bottom attached tab segment" data-tab="fourth">
-                    Loudness Meter
+                <div id="bpm-div" class="ui bottom attached tab segment" data-tab="third" style="width: 900px; height: 350px;">
                 </div>
-                <div class="ui bottom attached tab segment" data-tab="fifth">
-                    MFCC
+                <div id="loudness-div" class="ui bottom attached tab segment" data-tab="fourth" style="width: 900px; height: 350px;">
+                </div>
+                <div id="mfcc-div" class="ui bottom attached tab segment" data-tab="fifth" style="width: 900px; height: 350px;">
                 </div>
             </div>
 
@@ -169,7 +168,7 @@
                      style="margin-left: 40px; height: 70px;">
             </a>
             <a target="_blank" href="https://www.upf.edu/web/mtg">
-                <img class="essnt-footer__mtg-logo" src="https://mtg.github.io/assets/img/upflogo.png" alt="mtg logo"
+                <img class="essnt-footer_mtg-logo" src="https://mtg.github.io/assets/img/upflogo.png" alt="mtg logo"
                      style="width:300px; height: 70px;">
             </a>
         </div>
