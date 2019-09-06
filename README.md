@@ -9,25 +9,13 @@ TODO (finish readme)
 You can either use the docker or build everything from source on your local system.
 
 
-### Using docker
-
-```bash
-docker pull acorreya/essentia-emscripten:initial
-```
-
-TODO: add instructions to use it
-
-OR
-
 ### Building from source
 
 
-* Install emscripten
+* Install emscripten https://emscripten.org/docs/getting_started/downloads.html.
 
+* Compile essentia with emscripten compiler. Check essentia documentation https://essentia.upf.edu/documentation/installing.html#compiling-essentia for more details.
 
-* Compile essentia with emscripten compiler.
-
-Check compile instructions for essentia from [here]().
 
 ```bash
 # configure build settings for essentia using kissfft
@@ -48,6 +36,17 @@ emconfigure sh -c './build_essentia-bindings.sh'
 ```
 Check the bash script for the intermediate steps.
 
+
+
+OR 
+
+### Using docker
+
+```bash
+docker pull acorreya/essentia-emscripten:initial
+```
+
+TODO: add instructions to use it
 
 
 ## Usage
@@ -73,21 +72,6 @@ Eg: The follwing examples demonstrates how to compute log-mel-bands for the the 
             var hopSize = 1024;
             var signalArray = new Float32Array(audioBuffer); // get audio buffer from the audio context of web audio api
 
-            // function to convert javascript float 32 typed array to a std::vector<float>
-            typedFloat32Array2Vec = function(typedArray) {
-
-                var vec = new Module.VectorFloat();
-                for (var i=0; i<typedArray.length; i++) {
-                    if (typeof typedArray[i] === 'undefined') {
-                        vec.push_back(0);
-                    }
-                    else {
-                        vec.push_back(typedArray[i]);
-                    }
-                }
-                return vec;
-            }
-
             var signal = typedFloat32ArrayVec(signalArray);
 
             // compute logMelBands for the given audio signal
@@ -104,11 +88,27 @@ Eg: The follwing examples demonstrates how to compute log-mel-bands for the the 
   </script>
   <head>
       <script src="web/dist/essentiamin.js"></script>
+      <script>
+            // function to convert javascript float 32 typed array to a std::vector<float>
+            typedFloat32Array2Vec = function(typedArray) {
+
+                var vec = new Module.VectorFloat();
+                for (var i=0; i<typedArray.length; i++) {
+                    if (typeof typedArray[i] === 'undefined') {
+                        vec.push_back(0);
+                    }
+                    else {
+                        vec.push_back(typedArray[i]);
+                    }
+                }
+                return vec;
+            }
+      </script>
   </head>
 </html>
 ```
 
-- Lauch the web demo
+## Web demos
 
 ```bash
 ./server.sh
