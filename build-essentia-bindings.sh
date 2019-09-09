@@ -11,7 +11,7 @@ mkdir ./build
 
 printf "\nCompiling the bindings to bitcode ... \n\n"
 # compile the app to byte code
-emcc --emrun --bind ${BINDING_CPP} ${TO_INCLUDE_ESS} -o essentiamin.bc -s EXCEPTION_DEBUG -s ASSERTIONS=2 -s DISABLE_EXCEPTION_CATCHING=2 || exit 1
+emcc --emrun --bind -Oz ${BINDING_CPP} ${TO_INCLUDE_ESS} -o essentiamin.bc -s EXCEPTION_DEBUG -s ASSERTIONS=2 -s DISABLE_EXCEPTION_CATCHING=2 || exit 1
 # emcc --bind -Oz $1 ${TO_INCLUDE_ESS} -c || exit 1
 
 printf "Linking and compiling the bindings with essentia to js, wasm files ...\n\n"
