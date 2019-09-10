@@ -2,14 +2,29 @@
 
 */
 
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+var audioContext = new AudioContext(); // web audio api context
+var essentiaAudioBuffer = null; // variable to store the audioBuffer read from audioContext
+
+// just a sample options template for the EssentiaJsTools
+var optionsTemplate = {
+	'sampleRate': 44100,
+	'hopSize': 512,
+	'frameSize': 1024,
+	'window': 'hann',
+};
+
+
+// class for encapsulating all the utility methods for using essentia.js
 class EssentiaJsTools {
 
-	constructor (audioContext) {
-		this.audioContext = audioContext;
-		this.audioSignal = null;
+	constructor (myAudioContext, options) {
+		this.audioContext = myAudioContext;
+		// this.audioSignal = null;
+		this.params = options;
 	}
 
-	// generic function to loads web audio buffer as a 1D vector matrix for further passing to c++ functions
+	// generic function to loads web audio buffer as a 1D vector matrix for further passing to c++ functions of essentia
 	loadAudioDataFromUrl = function(url) {
 		var request = new XMLHttpRequest();
 		request.open('GET', url, true);
@@ -20,34 +35,15 @@ class EssentiaJsTools {
 			audioContext.decodeAudioData(request.response, function(buffer) {
 			urlAudioBuffer = buffer;
 			// mono signal
-			this.audioSignal = typedFloat32Array2Vec(buffer.getChannelData(0));	
+			essentiaAudioBuffer = buffer;	
 			});
 		}
 		request.send();
 	}
-}
 
-
-function EssentiaTools(myAudioCtx) {
-	this.audioContext = myAudioCtx;
-	this.audioSignal = null;
-}
-
-EssentiaTools.prototype.loadAudioDataFromUrl = function(url) {
-
-	var request = new XMLHttpRequest();
-	request.open('GET', url, true);
-	request.responseType = 'arraybuffer';
-
-	// Decode asynchronously
-	request.onload = function() {
-		this.audioContext.decodeAudioData(request.response, function(buffer) {
-		urlAudioBuffer = buffer;
-		// mono signal
-		this.audioSignal = typedFloat32Array2Vec(buffer.getChannelData(0));	
-		});
+	getAudioBufferAsEssentiaArray = function(audioBuffer) {
+		return typedFloat32Array2Vec(audioBuffer.getChannelData(0));
 	}
-	request.send();
 }
 
 

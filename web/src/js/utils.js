@@ -15,9 +15,6 @@ let urlAudioBuffer = null;
 var recStream = null;
 
 
-window.AudioContext = window.AudioContext || window.webkitAudioContext;
-var audioContext = new AudioContext();
-
 function recordAudioWaveSurf() {
 
     if (!recording) {
@@ -215,24 +212,3 @@ deleteCanvas = function() {
     $('canvas:nth-of-type(1)').remove();
 }
 
-
-float2str = function(num){
-
-    var offset = 32;
-    var view = new DataView(new ArrayBuffer(4));
-    view.setFloat32(0,num);
-
-    var fourbits = [];
-    for ( var i = 0; i < 4; i++ ){
-        // split each byte into two 4-bit values
-        fourbits.push(view.getUint8(0) >> 4);
-        fourbits.push(view.getUint8(0) & 15);
-    }
-
-    for ( var i = 0; i < 8; i++ ){
-        // build a string with offset four-bit values
-        fourbits[i] = String.fromCharCode(offset+fourbits[i]);
-    }
-    return fourbits.join('');
-
-};
