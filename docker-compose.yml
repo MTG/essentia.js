@@ -2,7 +2,7 @@ version: '2'
 services:
   web:
     image: acorreya/essentia-emscripten:initial
-    command: python3 -m http.server 8004 
+    command: emrun --port 8081 web/ 
     volumes:
       - ./:/srv/workspace/
     ports:
