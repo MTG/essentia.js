@@ -1,4 +1,4 @@
-FROM apiaryio/emcc
+FROM trzeci/emscripten:1.38.47-ubuntu
 
 ENV LANG C.UTF-8
 
@@ -12,7 +12,7 @@ RUN apt-get update \
     && apt-get install -y build-essential libyaml-dev libfftw3-dev \
        libavcodec-dev libavformat-dev libavutil-dev libavresample-dev \
        libsamplerate0-dev libtag1-dev git-core \
-    && mkdir /essentia && cd /essentia && git clone -b emscripten https://github.com/albincorreya/essentia.git \
+    && mkdir /essentia && cd /essentia && git clone -b emscripten https://github.com/MTG/essentia.git \
     && cd /essentia/essentia \
     && emconfigure sh -c './waf configure --prefix=$EMSCRIPTEN/system/local/ --build-static --fft=KISS --emscripten' \
     && emmake ./waf && emmake ./waf install \
