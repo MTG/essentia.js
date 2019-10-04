@@ -7,47 +7,41 @@
 
 #include <vector>
 
+extern bool esInitStatus;
 
 // EssentiaMin class which includes methods of some selected essentia c++ algos
 class EssentiaMin {
 
     public:
+        // to store the current essentia libray version
+        std::string essentiaVersion;
 
         // register essentia algos
         void initState(bool debugger);
         // shutdown essentia instance
         void shutDown();
 
-        // add your essentia example methods here and also in the essentiamin.cpp file
-        std::vector<std::vector<float> > frameCutter(std::vector<float>& signal, int frameSize, int hopeSize, std::string windowType);
-
-        float percivalBpmEstimator(std::vector<float>& signal, int sampleRate, int frameSize, int hopSize);
+        // add your essentia example methods here and also define the methods in the essentiamin.cpp file 
         float loudnessVickers(std::vector<float>& signalFrame);
         float zeroCrossingRate(std::vector<float>& signal);
+        // std::vector<std::vector<double> > stftExtractor(std::vector<float>& signal, int frameSize, int hopSize);
+        std::string keyExtractor(std::vector<float>& signal);
+
+        std::vector<float> hpcp(std::vector<float>& signalFrame, bool nonLinear);
         std::vector<float> onsetRate(std::vector<float>& signal);
         std::vector<float> autoCorrelation(std::vector<float>& signal);
         std::vector<float> envelope(std::vector<float>& signal);
         std::vector<float> logMelBands(std::vector<float>& signal, int frameSize, int hopSize);
         std::vector<float> superFluxExtractor(std::vector<float>& signal, int sampleRate, int frameSize, int hopSize);
+        std::vector<std::vector<float> > frameGenerator(std::vector<float>& signal, int frameSize, int hopeSize, std::string windowType);
         // if you want multiple returns, add void functions and pass the output vectors as input
         void mfcc(std::vector<float>& signal, std::vector<float>& mfccBands, std::vector<float>& mfccCoeffs);
-        void keyExtractor(std::vector<float>& signal, std::string key, std::string scale, float strength);
         void pitchYin(std::vector<float>& signalFrame, float pitch, float pitchConfidence);
         void pitchProbabilisticYinExtractor(std::vector<float>& signal, std::vector<float>& pitch, std::vector<float>& voicedProbabilities);
         void predominantPitchMelodiaExtractor(std::vector<float>& signal, std::vector<float>& pitch, std::vector<float>& pitchConfidence);
+        void bpmHistogram(std::vector<float>& signal, std::vector<float>& bpmEstimates, std::vector<float>& histogram);
 
-
-        // add your essentia example methods here and also in the essentiamin.cpp file
+        // add your essentia example methods here and also  define the methods in the essentiamin.cpp file
 };
-
-
-// TODO: functions for type conversion 
-template <typename T>
-std::vector<T> jsArray2Vec(){
-    std::vector<T> vec;
-    return vec;
-}
-
-extern bool esInitStatus;
 
 #endif  // ESSENTIAMIN_H

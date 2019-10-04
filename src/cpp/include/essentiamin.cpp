@@ -15,32 +15,39 @@ using namespace essentia::standard;
 //using namespace essentia::streaming;
 //using namespace essentia::scheduler;
 
-bool esInitStatus = true;
 
+// set to false to initialize essentia algo registry for the very first time
+bool esInitStatus = false;
+
+
+// method to instantiate the essentia algo registry with an optional to use debug mode 
 void EssentiaMin::initState(bool debugger) {
-
+	// if true sets essentia debugger active
 	if (debugger) {
-		setDebugLevel(EAll);                     // EAll is a special value that contains all modules
+		setDebugLevel(EAll); // EAll is a special value in essentia that contains all modules
 		unsetDebugLevel(EMemory | EConnectors);
 		essentia::warningLevelActive = true; // activate warnings
-		essentia::infoLevelActive = true;    // deactivate info
+		essentia::infoLevelActive = true;    // activate info
 		essentia::errorLevelActive = true;    // activate error level
 	}
-
-	if (esInitStatus) {
-        essentia::init();
-		esInitStatus = false;
+	// if needed, init essentia algorithm registry
+	if (!esInitStatus) {
+		essentia::init();
+	 	esInitStatus = true;
+		essentiaVersion = essentia::version;
     }
 }
 
 
+// method to shutdown essentia instance
 void EssentiaMin::shutDown() {
 	essentia::shutdown();
-	esInitStatus = true;
+	esInitStatus = false;
 }
 
 
-std::vector<std::vector<float> > EssentiaMin::frameCutter(std::vector<float>& signal, int frameSize, int hopSize, std::string windowType) {
+// Method for frameCutting with windowing from a given audio signal
+std::vector<std::vector<float> > EssentiaMin::frameGenerator(std::vector<float>& signal, int frameSize, int hopSize, std::string windowType) {
 
 	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
 	Algorithm* fc   = factory.create("FrameCutter",
@@ -92,7 +99,6 @@ float EssentiaMin::loudnessVickers(std::vector<float>& signalFrame) {
 	loudness->compute();
 
 	delete loudness;
-
 	return loudnessValue;
 }
 
@@ -131,26 +137,33 @@ void EssentiaMin::pitchYin(std::vector<float>& signalFrame, float pitch, float p
 }
 
 
-// Check https://essentia.upf.edu/documentation/reference/std_PercivalBpmEstimator.html for more details.
-float EssentiaMin::percivalBpmEstimator(std::vector<float>& signal, int sampleRate, int frameSize, int hopSize) {
+// Check https://essentia.upf.edu/documentation/reference/std_RhythmDescriptors.html
+void EssentiaMin::bpmHistogram(std::vector<float>& signal, std::vector<float>& bpmEstimates, std::vector<float>& histogram) {
 
 	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
 
-	Algorithm* percBpm = factory.create("PercivalBpmEstimator",
-										"frameSize", frameSize,
-										"hopSize", hopSize,
-										"sampleRate", sampleRate);
-	
-	float bpm;
+	Algorithm* rhyDesc = factory.create("RhythmDescriptors");
 
-	percBpm->input("signal").set(signal);
-	percBpm->output("bpm").set(bpm);
+	std::vector<float> beatsPosition, bpmIntervals;
+	float bpm, confidence, firstPeakBpm, firstPeakSpread, firstPeakWeight, secondPeakBpm, secondPeakSpread, secondPeakWeight;
 
-	percBpm->compute();
+	rhyDesc->input("signal").set(signal);
+	rhyDesc->output("beats_position").set(beatsPosition);
+	rhyDesc->output("bpm_estimates").set(bpmEstimates);
+	rhyDesc->output("bpm_intervals").set(bpmIntervals);
+	rhyDesc->output("bpm").set(bpm);
+	rhyDesc->output("confidence").set(confidence);
+	rhyDesc->output("histogram").set(histogram);
+	rhyDesc->output("first_peak_bpm").set(firstPeakBpm);
+	rhyDesc->output("first_peak_spread").set(firstPeakSpread);
+	rhyDesc->output("first_peak_weight").set(firstPeakWeight);
+	rhyDesc->output("second_peak_bpm").set(secondPeakBpm);
+	rhyDesc->output("second_peak_spread").set(secondPeakSpread);
+	rhyDesc->output("second_peak_weight").set(secondPeakWeight);
 
-	delete percBpm;
+	rhyDesc->compute();
 
-	return bpm;
+	delete rhyDesc;
 }
 
 
@@ -178,11 +191,14 @@ std::vector<float> EssentiaMin::superFluxExtractor(std::vector<float>& signal, i
 
 
 // Check https://essentia.upf.edu/documentation/reference/std_KeyExtractor.html for more details
-void EssentiaMin::keyExtractor(std::vector<float>& signal, std::string key, std::string scale, float strength) {
+std::string EssentiaMin::keyExtractor(std::vector<float>& signal) {
 
 	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
 
 	Algorithm* keyExt = factory.create("KeyExtractor");
+
+	std::string key, scale;
+	float strength;
 
 	keyExt->input("signal").set(signal);
 	keyExt->output("key").set(key);
@@ -191,7 +207,55 @@ void EssentiaMin::keyExtractor(std::vector<float>& signal, std::string key, std:
 
 	keyExt->compute();
 
+	// format everything to a string (NOTE: this is hacky way. To be replaced in future)
+	std::ostringstream strStream;
+	strStream << strength;
+	std::string streng("_" + strStream.str());
+	std::string out = ((key + "_") + scale) + streng;
+	
 	delete keyExt;
+
+	return out;
+}
+
+
+// check https://essentia.upf.edu/documentation/reference/std_HPCP.html
+std::vector<float> EssentiaMin::hpcp(std::vector<float>& signalFrame, bool nonLinear) {
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+
+	Algorithm* spec  =  factory.create("Spectrum");
+	Algorithm* peaks =  factory.create("SpectralPeaks");
+	Algorithm* white =  factory.create("SpectralWhitening");
+	Algorithm* hpcp  =  factory.create("HPCP",
+									   "nonLinear", nonLinear);
+
+	std::vector<float> spectrum, freqs, mags, whiteMags, hpcpVector;
+	// configure i/o
+	spec->input("frame").set(signalFrame);
+	spec->output("spectrum").set(spectrum);
+	peaks->input("spectrum").set(spectrum);
+	peaks->output("frequencies").set(freqs);
+	peaks->output("magnitudes").set(mags);
+	white->input("spectrum").set(spectrum);
+	white->input("frequencies").set(freqs);
+	white->input("magnitudes").set(mags);
+	white->output("magnitudes").set(whiteMags);
+	hpcp->input("frequencies").set(freqs);
+	hpcp->input("magnitudes").set(whiteMags);
+	hpcp->output("hpcp").set(hpcpVector);
+	// compute
+	spec->compute();
+	peaks->compute();
+	white->compute();
+	hpcp->compute();
+
+	delete spec;
+	delete peaks;
+	delete white;
+	delete hpcp;
+
+	return hpcpVector;
 }
 
 
@@ -503,5 +567,53 @@ void EssentiaMin::streamingLogMelBands(std::vector<float>& signal, std::vector<f
 
 }
 */
+
+// std::vector<std::vector<double> > EssentiaMin::stftExtractor(std::vector<float>& signal, int frameSize, int hopSize) {
+
+// 	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+// 	Algorithm* fc   = factory.create("FrameCutter",
+// 									 "frameSize", frameSize,
+// 									 "hopSize", hopSize,
+// 									 "startFromZero", false);
+// 	Algorithm* w    = factory.create("Windowing",
+// 									 "type", 'hann');
+	
+// 	Algorithm* fft 	= factory.create("FFT",
+// 									 "size", frameSize);
+	
+// 	std::vector<float> frame, windowedFrame, fftFrame;
+
+// 	Pool pool;
+
+// 	fc->input("signal").set(signal);
+// 	fc->output("frame").set(frame);
+// 	w->input("frame").set(frame);
+// 	w->output("frame").set(windowedFrame);
+// 	fft->input("frame").set(windowedFrame);
+// 	fft->output("fft").set(fftFrame);
+
+// 	while (true) {
+// 		// compute a frame
+// 		fc->compute();
+// 		// if it was the last one (ie: it was empty), then we're done.
+// 		if (!frame.size()) {
+// 			break;
+// 		}
+// 		// if the frame is silent, just drop it and go on processing
+// 		if (isSilent(frame)) continue;
+
+// 		w->compute();
+
+// 		fft->compute();
+
+// 		pool.add("fftFrames", fftFrame);
+// 	}
+
+// 	delete fc;
+// 	delete w;
+// 	delete fft;
+
+// 	return pool.value<std::vector<std::vector<double> > >("fftFrames");
+// }
 
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-# env variables
+# EMSCRIPTEN=/Users/apple/myemcc/emsdk/fastcomp/emscripten
+# local-env variables
+ESSENTIAJS_VERSION=0.0.1
 LIB_DIR=$EMSCRIPTEN/system/local/lib
 APP_BUILD=build
 BINDING_CPP=src/cpp/bindings.cpp
@@ -17,13 +19,10 @@ emcc --emrun --bind -Oz ${BINDING_CPP} ${TO_INCLUDE_ESS} -o essentiamin.bc -s EX
 printf "Linking and compiling the bindings with essentia to js, wasm files ...\n\n"
 
 # without emcc debug mode
-emcc --emrun --bind -Oz essentiamin.bc ${LIB_DIR}/essentia.a -o ${APP_BUILD}/essentiamin.js -s WASM=1 -s EXCEPTION_DEBUG -s ASSERTIONS=2 -s DISABLE_EXCEPTION_CATCHING=2 -s ALLOW_MEMORY_GROWTH=1 || exit 1
+emcc --emrun --bind -Oz essentiamin.bc ${LIB_DIR}/essentia.a -o ${APP_BUILD}/essentiamin-${ESSENTIAJS_VERSION}.js -s WASM=1 -s EXCEPTION_DEBUG -s ASSERTIONS=2 -s DISABLE_EXCEPTION_CATCHING=2 -s ALLOW_MEMORY_GROWTH=1 || exit 1
 #EMCC_DEBUG=1 (for compiling in debug mode of emcc compiler)
 
 printf "Removing unnecessary files ...\n"
 rm essentiamin.bc
-
-printf "\nCopying builds ...\n\n"
-cp -rf ${APP_BUILD}/* ./web/dist/
 
 echo " ... Done ..."

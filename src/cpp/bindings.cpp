@@ -11,28 +11,55 @@ using namespace emscripten;
 
 void initEssentia(bool debugMode) {
     EssentiaMin essentiaMin;
-    essentiaMin.initState(false);
+    essentiaMin.initState(debugMode);
 }
 
 
 void shutdownEssentia() {
     EssentiaMin essentiaMin;
-    essentiaMin.initState(false);
     essentiaMin.shutDown();
 }
 
 
-std::vector<std::vector<float> > frameCutter(std::vector<float>& signal, int frameSize, int hopSize, std::string windowType) {
+std::string getEssentiaVersion() {
     EssentiaMin essentiaMin;
     essentiaMin.initState(false);
-    return essentiaMin.frameCutter(signal, frameSize, hopSize, windowType);
+    return essentiaMin.essentiaVersion;
 }
 
 
-void keyExtractor(std::vector<float>& signal, std::string key, std::string scale, float strength) {
+// std::vector<std::vector<double> > stftExtractor(std::vector<float>& signal, int frameSize, int hopSize) {
+//     EssentiaMin essentiaMin;
+//     essentiaMin.initState(false);
+//     return essentiaMin.stftExtractor(signal, frameSize, hopSize);
+// }
+
+
+std::vector<std::vector<float> > frameGenerator(std::vector<float>& signal, int frameSize, int hopSize, std::string windowType) {
     EssentiaMin essentiaMin;
     essentiaMin.initState(false);
-    essentiaMin.keyExtractor(signal, key, scale, strength);
+    return essentiaMin.frameGenerator(signal, frameSize, hopSize, windowType);
+}
+
+
+void bpmHistogram(std::vector<float>& signal, std::vector<float>& bpmEstimates, std::vector<float>& histogram) {
+    EssentiaMin essentiaMin;
+    essentiaMin.initState(false);
+    essentiaMin.bpmHistogram(signal, bpmEstimates, histogram);
+}
+
+
+std::string keyExtractor(std::vector<float>& signal) {
+    EssentiaMin essentiaMin;
+    essentiaMin.initState(false);
+    return essentiaMin.keyExtractor(signal);
+}
+
+
+std::vector<float> hpcp(std::vector<float>& signalFrame, bool nonLinear) {
+    EssentiaMin essentiaMin;
+    essentiaMin.initState(false);
+    return essentiaMin.hpcp(signalFrame, nonLinear);
 }
 
 
@@ -78,13 +105,6 @@ float zeroCrossingRate(std::vector<float>& signal) {
 }
 
 
-float percivalBpmEstimator(std::vector<float>& signal, int sampleRate, int frameSize, int hopSize) {
-    EssentiaMin essentiaMin;
-    essentiaMin.initState(false);
-    return essentiaMin.percivalBpmEstimator(signal, sampleRate, frameSize, hopSize);  
-}
-
-
 std::vector<float> superFluxExtractor(std::vector<float>& signal, int sampleRate, int frameSize, int hopSize) {
     EssentiaMin essentiaMin;
     essentiaMin.initState(false);
@@ -112,11 +132,13 @@ EMSCRIPTEN_BINDINGS(my_module) {
     // map esszentiamin functions here
     function("initEssentia", &initEssentia);
     function("shutdownEssentia", &shutdownEssentia);
+    function("getEssentiaVersion", &getEssentiaVersion);
 
-    function("frameCutter", &frameCutter);
+    // function("stftExtractor", &stftExtractor);
+    function("frameGenerator", &frameGenerator);
     function("loudnessVickers", &loudnessVickers);
     function("zeroCrossingRate", &zeroCrossingRate);
-    function("percivalBpmEstimator", &percivalBpmEstimator);
+    function("hpcp", &hpcp);
     function("pitchYin", &pitchYin);
     function("superFluxExtractor", &superFluxExtractor);
     function("keyExtractor", &keyExtractor);
@@ -125,11 +147,13 @@ EMSCRIPTEN_BINDINGS(my_module) {
     function("envelopeExtractor", &envelopeExtractor);
     function("mfccExtractor", &mfccExtractor);
     function("logMelBandsExtractor", &logMelBandsExtractor);
+    function("bpmHistogram", &bpmHistogram);
 
     // map stl datatypes
     register_vector<int>("VectorInt");
     register_vector<float>("VectorFloat");
     register_vector<double>("VectorDouble");
     register_vector<std::vector<float>>("VectorVectorFloat");
+    // register_vector<std::vector<double>>("VectorVectorDouble");
 }
 
