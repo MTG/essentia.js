@@ -1,9 +1,9 @@
-![alt text](https://raw.githubusercontent.com/albincorreya/essentia.js-examples/blob/master/src/img/essentiajsbanner.png)
+
+![alt text](https://user-images.githubusercontent.com/14850001/66190489-67098d80-e68c-11e9-9a7c-35b82f6635e1.png)
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
-
-[Status]: Under development! Unoptimized, use at your own risk.
+[Status]: Under development, unoptimized and use at your own risk.
 
 
 ## Setup
@@ -18,8 +18,10 @@ If you need to recompile the bindings, you can either use the docker or build ev
 ```bash
 docker pull acorreya/essentia-emscripten:2.1-beta6-dev
 ```
-- Run `build-bindings.sh` inside the docker image.
+- Mount the current directory as volume and run `build-bindings.sh` inside the docker image.
 
+
+OR
 
 ### Building from source
 
@@ -48,10 +50,7 @@ emconfigure sh -c './build-bindings.sh'
 ```
 Check the bash script for the intermediate steps.
 
-
-OR 
-
-
+ 
 ## Usage
 
 ### Examples
@@ -126,10 +125,4 @@ Eg: The follwing code block shows a few examples on how to use essentia.js.
       </script>
   </head>
 </html>
-```
-
-## Web demos
-
-```bash
-./server.sh
 ```
