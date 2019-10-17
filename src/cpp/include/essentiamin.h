@@ -27,11 +27,13 @@ class EssentiaMin {
         // std::vector<std::vector<double> > stftExtractor(std::vector<float>& signal, int frameSize, int hopSize);
         std::string keyExtractor(std::vector<float>& signal);
 
+        std::vector<float> spectrum(std::vector<float>& signalFrame);
+        std::vector<float> spectrumExtractor(std::vector<float>& signal, int frameSize, int hopSize, std::string windowType);
+        std::vector<float> logMelBandsExtractor(std::vector<float>& signal, int numBands, int frameSize, int hopSize, std::string windowType);
         std::vector<float> hpcp(std::vector<float>& signalFrame, bool nonLinear);
         std::vector<float> onsetRate(std::vector<float>& signal);
         std::vector<float> autoCorrelation(std::vector<float>& signal);
         std::vector<float> envelope(std::vector<float>& signal);
-        std::vector<float> logMelBands(std::vector<float>& signal, int frameSize, int hopSize);
         std::vector<float> superFluxExtractor(std::vector<float>& signal, int sampleRate, int frameSize, int hopSize);
         std::vector<std::vector<float> > frameGenerator(std::vector<float>& signal, int frameSize, int hopeSize, std::string windowType);
         // if you want multiple returns, add void functions and pass the output vectors as input
