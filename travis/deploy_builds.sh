@@ -1,10 +1,10 @@
 set -e -x
 
 cd ./builds
-for js in *.js; do
+for js in essentia*.js; do
     curl --upload-file "$js"  https://transfer.sh/"$js" -w "\n"
 done
 
-for wasm in *.wasm; do
-    curl --upload-file "$swasm"  https://transfer.sh/"$swasm" -w "\n"
+for wasmfile in essentia*.wasm; do
+    curl --upload-file "$swasmfile"  https://transfer.sh/"$swasmfile" -w "\n"
 done
