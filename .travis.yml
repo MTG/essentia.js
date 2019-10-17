@@ -13,7 +13,6 @@ install:
 
 script:
   - docker run --rm -v `pwd`:/srv/workspace/ $DOCKER_IMAGE /srv/workspace/build-bindings.sh
-  - travis/deploy_transfer.sh
 
 deploy:
   provider: script
