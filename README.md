@@ -20,6 +20,9 @@ docker pull mtgupf/essentia-emscripten:2.1-beta6-dev
 ```
 - Mount the current directory as volume and run `build-bindings.sh` inside the docker container.
 
+```bash
+docker run --rm -v `pwd`:/srv/workspace/ mtgupf/essentia-emscripten:2.1-beta6-dev /srv/workspace/build-bindings.sh
+```
 
 OR
 
