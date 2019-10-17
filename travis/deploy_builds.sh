@@ -1,4 +1,3 @@
-
 set -e -x
 
 cd ./builds
