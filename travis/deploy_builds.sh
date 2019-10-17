@@ -6,5 +6,5 @@ for js in essentia*.js; do
 done
 
 for wasmfile in essentia*.wasm; do
-    curl --upload-file "$swasmfile"  https://transfer.sh/"$wasmfile" -w "\n"
+    curl --upload-file "$wasmfile"  https://transfer.sh/"$wasmfile" -w "\n"
 done
