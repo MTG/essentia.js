@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+pwd
+echo "........."
 # EMSCRIPTEN=/Users/apple/myemcc/emsdk/fastcomp/emscripten
 # local-env variables
 ESSENTIAJS_VERSION=0.0.1
