@@ -34,4 +34,4 @@ do
     if [[ -f $file ]]; then
         echo file
     fi
-do
+done
