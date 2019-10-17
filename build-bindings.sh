@@ -32,6 +32,6 @@ echo "essentia.js and wasm modules are succesfully built ...."
 for file in ${APP_BUILD}/*
 do
     if [[ -f $file ]]; then
-        echo file
+        echo $file
     fi
 done
