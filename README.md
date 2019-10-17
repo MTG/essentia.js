@@ -8,17 +8,16 @@
 
 ## Setup
 
-You can find the pre-compiled modules in the `build/` directory.
+You can find the pre-compiled modules in the `builds/` directory.
 
 If you need to recompile the bindings, you can either use the docker or build everything from source on your local system.
 
 ### Using docker
 
-
 ```bash
-docker pull acorreya/essentia-emscripten:2.1-beta6-dev
+docker pull mtgupf/essentia-emscripten:2.1-beta6-dev
 ```
-- Mount the current directory as volume and run `build-bindings.sh` inside the docker image.
+- Mount the current directory as volume and run `build-bindings.sh` inside the docker container.
 
 
 OR
@@ -28,7 +27,12 @@ OR
 
 * Install emscripten https://emscripten.org/docs/getting_started/downloads.html.
 
-* Compile essentia library with emscripten compiler. Check essentia documentation https://essentia.upf.edu/documentation/installing.html#compiling-essentia for more details.
+* Clone the `emscripten` branch of essentia repository
+```bash
+git clone -b emscripten https://github.com/MTG/essentia.git
+```
+
+* Compile essentia C++ library with the emscripten compiler. Check essentia [documentation](https://essentia.upf.edu/documentation/installing.html#compiling-essentia) for more details.
 
 
 ```bash
@@ -58,7 +62,7 @@ Check the bash script for the intermediate steps.
 - Usage in JavaScript
 
 
-Eg: The follwing code block shows a few examples on how to use essentia.js. 
+Eg: The follwing code block shows some simple examples on how to use essentia.js in your web page. Here we call the wrapped functions in  essentia.js inside the `onRuntimeInitialized` callback (ie., once the webassembly modules are loaded in the browser). Check https://developer.mozilla.org/en-US/docs/WebAssembly/Loading_and_running for more about loading and running webassembly modules.
 
 ```html
 <html lang="en">
@@ -96,7 +100,7 @@ Eg: The follwing code block shows a few examples on how to use essentia.js.
             // fill the vectors with the output
             Module.predominantPitchMelodiaExtractor(signal, pitches, pitchConfidence);
 
-            // if you want to enable essentia debugging mode 
+            // if you want to enable essentia debugging mode
             Module.initEssentia(true);
 
             // shutdown the essentia instance if you no longer need.
@@ -106,11 +110,10 @@ Eg: The follwing code block shows a few examples on how to use essentia.js.
     };
   </script>
   <head>
-      <script src="web/dist/essentiamin.js"></script>
+      <script src="builds/essentiamin-0.0.1.js"></script>
       <script>
-            // function to convert javascript float 32 typed array to a std::vector<float>
+            // sample function to convert javascript float32 typed array to a std::vector<float>
             typedFloat32Array2Vec = function(typedArray) {
-
                 var vec = new Module.VectorFloat();
                 for (var i=0; i<typedArray.length; i++) {
                     if (typeof typedArray[i] === 'undefined') {
