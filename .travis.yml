@@ -12,7 +12,7 @@ install:
   - docker pull $DOCKER_IMAGE
 
 script:
-  - docker run --rm -v `pwd`:/io $DOCKER_IMAGE /io/build-bindings.sh
+  - docker run --rm -v `pwd`:/srv/workspace/ $DOCKER_IMAGE /srv/workspace/build-bindings.sh
   - travis/deploy_transfer.sh
 
 deploy:
@@ -20,5 +20,5 @@ deploy:
   script:
     travis/deploy_builds.sh
   on:
-    branch: master
-    condition: $TRAVIS_BRANCH == "master" || -n $TRAVIS_TAG
+    branch: ci
+    condition: $TRAVIS_BRANCH == "ci" || -n $TRAVIS_TAG
