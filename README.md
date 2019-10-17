@@ -18,7 +18,7 @@ If you need to recompile the bindings, you can either use the docker or build ev
 ```bash
 docker pull mtgupf/essentia-emscripten:2.1-beta6-dev
 ```
-- Mount the current directory as volume and run `build-bindings.sh` inside the docker container.
+- Mount the current directory as volume and run `build-bindings.sh` inside the docker container and check the new builds at the `builds/` directory.
 
 ```bash
 docker run --rm -v `pwd`:/srv/workspace/ mtgupf/essentia-emscripten:2.1-beta6-dev /srv/workspace/build-bindings.sh
@@ -95,8 +95,9 @@ Eg: The follwing code block shows some simple examples on how to use essentia.js
                 var hpcp = Module.hpcp(frames.get(i), toSmooth);
             }
 
+            var numBands = 128;
             // compute logMelBands for the given audio signal
-            var melBands = Module.logMelBandsExtractor(signal, frameSize, hopSize);
+            var melBands = Module.logMelBandsExtractor(signal, numBands, frameSize, hopSize);
             
             // compute predominant melody contour from monophonic/polyphonic music signal using melodia alogirithm
             var pitches = new Module.VectorFloat();

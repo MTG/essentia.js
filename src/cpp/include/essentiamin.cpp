@@ -425,10 +425,31 @@ std::vector<float> EssentiaMin::envelope(std::vector<float>& signal) {
 }
 
 
-std::vector<float> EssentiaMin::logMelBands(std::vector<float>& signal, int frameSize=1024, int hopSize=1024) {
+// Computes magnitude spectrum of a given audio frame
+std::vector<float> EssentiaMin::spectrum(std::vector<float>& signalFrame) {
 
-  	// we want to compute the MFCC of a file: we need the create the following:
-  	// vector -> framecutter -> windowing -> FFT -> MFCC -> PoolStorage
+	if (signalFrame.size() < 2048) {
+		throw EssentiaException("spectrogram: Size of audio frame is less than the expected size of 2048");
+	}
+  	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+  	Algorithm* spec  	=  	factory.create("Spectrum");
+
+	spec->input("frame").set(signalFrame);
+	std::vector<Real> spectrum;
+	spec->output("spectrum").set(spectrum);
+
+	spec->compute();
+
+	delete spec;
+
+	return spectrum;
+}
+
+
+// Computes magnitude spectrum for each frames of a given audio signal
+std::vector<float> EssentiaMin::spectrumExtractor(std::vector<float>& signal, int frameSize=1024, int hopSize=1024, std::string windowType="hann") {
+
+  	// framecutter -> windowing -> FFT 
 
   	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
 
@@ -444,8 +465,64 @@ std::vector<float> EssentiaMin::logMelBands(std::vector<float>& signal, int fram
   	Algorithm* spec  	=  	factory.create("Spectrum",
 									       "size", frameSize);
 
+	/////////// STARTING THE ALGORITHMS //////////////////
+	fc->input("signal").set(signal);
+
+	// FrameCutter -> Windowing -> Spectrum
+	std::vector<Real> frame, windowedFrame;
+
+	fc->output("frame").set(frame);
+	w->input("frame").set(frame);
+
+	w->output("frame").set(windowedFrame);
+	spec->input("frame").set(windowedFrame);
+
+	std::vector<Real> spectrum;
+	spec->output("spectrum").set(spectrum);
+
+	while (true) {
+		// compute a frame
+		fc->compute();
+		// if it was the last one (ie: it was empty), then we're done.
+		if (!frame.size()) {
+			break;
+		}
+		// if the frame is silent, just drop it and go on processing
+		if (isSilent(frame)) continue;
+
+		w->compute();
+		spec->compute();
+	}
+
+	delete fc;
+	delete w;
+	delete spec;
+
+	return spectrum;
+}
+
+
+std::vector<float> EssentiaMin::logMelBandsExtractor(std::vector<float>& signal, int numBands, int frameSize, int hopSize, std::string windowType) {
+
+  	// we want to compute the MFCC of a file: we need the create the following:
+  	// vector -> framecutter -> windowing -> FFT -> MFCC -> PoolStorage
+
+  	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+
+  	Algorithm* fc       =  	factory.create("FrameCutter",
+									   	   "frameSize", frameSize,
+									   	   "hopSize", hopSize,
+									       "startFromZero", true);
+
+  	Algorithm* w     	=  	factory.create("Windowing",
+									       "type", windowType,
+									       "zeroPadding", frameSize);
+
+  	Algorithm* spec  	=  	factory.create("Spectrum",
+									       "size", frameSize);
+
   	Algorithm* mel  	=   factory.create("MelBands",
-								           "numberBands", 128,
+								           "numberBands", numBands,
 								           "type", "magnitude");
 
   	Algorithm* logNorm  =   factory.create("UnaryOperator",
@@ -492,6 +569,7 @@ std::vector<float> EssentiaMin::logMelBands(std::vector<float>& signal, int fram
 
 	delete fc;
 	delete w;
+	delete spec;
 	delete mel;
 	delete logNorm;
 

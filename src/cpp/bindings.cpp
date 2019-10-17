@@ -112,10 +112,10 @@ std::vector<float> superFluxExtractor(std::vector<float>& signal, int sampleRate
 }
 
 
-std::vector<float> logMelBandsExtractor(std::vector<float>& signal, int frameSize=1024, int hopSize=1024) {
+std::vector<float> logMelBandsExtractor(std::vector<float>& signal, int numBands, int frameSize, int hopSize, std::string windowType) {
     EssentiaMin essentiaMin;
     essentiaMin.initState(false);
-    return essentiaMin.logMelBands(signal, frameSize, hopSize);
+    return essentiaMin.logMelBandsExtractor(signal, numBands,frameSize, hopSize, windowType);
 }
 
 
@@ -123,6 +123,20 @@ std::vector<float> envelopeExtractor(std::vector<float> signal) {
     EssentiaMin essentiaMin;
     essentiaMin.initState(false);
     return essentiaMin.envelope(signal);
+}
+
+
+std::vector<float> spectrum(std::vector<float>& signal) {
+    EssentiaMin essentiaMin;
+    essentiaMin.initState(false);
+    return essentiaMin.spectrum(signal);
+}
+
+
+std::vector<float> spectrumExtractor(std::vector<float>& signal, int frameSize, int hopSize, std::string windowType) {
+    EssentiaMin essentiaMin;
+    essentiaMin.initState(false);
+    return essentiaMin.spectrumExtractor(signal, frameSize, hopSize, windowType);
 }
 
 
@@ -138,6 +152,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
     function("frameGenerator", &frameGenerator);
     function("loudnessVickers", &loudnessVickers);
     function("zeroCrossingRate", &zeroCrossingRate);
+    function("spectrum", &spectrum);
     function("hpcp", &hpcp);
     function("pitchYin", &pitchYin);
     function("superFluxExtractor", &superFluxExtractor);
@@ -145,6 +160,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
     function("pitchProbabilisticYinExtractor", &pitchProbabilisticYinExtractor);
     function("predominantPitchMelodiaExtractor", &predominantPitchMelodiaExtractor);
     function("envelopeExtractor", &envelopeExtractor);
+    function("spectrumExtractor", &spectrumExtractor);
     function("mfccExtractor", &mfccExtractor);
     function("logMelBandsExtractor", &logMelBandsExtractor);
     function("bpmHistogram", &bpmHistogram);
