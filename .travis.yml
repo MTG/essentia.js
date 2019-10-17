@@ -13,11 +13,4 @@ install:
 
 script:
   - docker run --rm -v `pwd`:/srv/workspace/ $DOCKER_IMAGE /srv/workspace/build-bindings.sh
-
-deploy:
-  provider: script
-  script:
-    travis/deploy_builds.sh
-  on:
-    branch: ci
-    condition: $TRAVIS_BRANCH == "ci" || -n $TRAVIS_TAG
+  - travis/deploy_builds.sh
