@@ -81,24 +81,40 @@ Eg: The follwing code block shows some simple examples on how to use essentia.js
 
             var frameSize = 1024;
             var hopSize = 1024;
-            var signalArray = new Float32Array(audioBuffer); // get audio buffer from the audio context of web audio api
 
+            // get audio data from web audio api buffer using getChannelData method
+            var signalArray = audioBuffer.getChannelData(0); 
+
+            // convert to std::vector<float>
             var signal = typedFloat32ArrayVec(signalArray);
 
-            var windowing = "hann";
-            // generate overlapping windows frames of a given audio signal (usefull for framewise processing)
-            var frames = Module.frameGenerator(signal, frameSize, hopSize, windowing);
+            // generate overlapping frames of a given audio signal (usefull for framewise processing)
+            var frames = Module.frameGenerator(signal, frameSize, hopSize);
 
-            var toSmooth = false;
+            // compute log-mel spectrogram 
+            var logMelSpectrogram = [];
+            for (var i=0; i < frames.size(); i++) {
+                var wFrame = Module.windowing(frames.get(i), "hann");
+                var spectrum = Module.spectrum(wFrame);
+                var logBand = Module.logMelBands(spectrum, numBands);
+                var melBandFrame = vec2typedFloat32Array(logBand);
+                logMelSpectrogram.push(melBandFrame);
+            }
+            console.log(logMelSpectrogram);
+
+
             // compute the hpcp chroma features for each audio frame
             for (var i=0; i<frames.size(); i++) {
+                var wFrame = Module.windowing(frames.get(i), "blackmanharris62");
+                var toSmooth = true;
                 var hpcp = Module.hpcp(frames.get(i), toSmooth);
             }
 
+            
             var numBands = 128;
             // compute logMelBands for the given audio signal
             var melBands = Module.logMelBandsExtractor(signal, numBands, frameSize, hopSize);
-            
+
             // compute predominant melody contour from monophonic/polyphonic music signal using melodia alogirithm
             var pitches = new Module.VectorFloat();
             var pitchConfidence = new Module.VectorFloat();
