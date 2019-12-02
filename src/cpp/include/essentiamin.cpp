@@ -577,6 +577,193 @@ std::vector<float> EssentiaMin::logMelBandsExtractor(std::vector<float>& signal,
 }
 
 
+std::vector<int> EssentiaMin::startStopSilence(std::vector<float>& signal) {
+
+    /////// PARAMS //////////////
+    int frameSize = 1024;
+    int hopSize = 512;
+    int staF = 0;
+    int stoF = 0;
+
+    AlgorithmFactory &factory = standard::AlgorithmFactory::instance();
+    Algorithm* fc    = 	factory.create("FrameCutter",
+                                         "frameSize", frameSize,
+                                         "hopSize", hopSize);
+
+    Algorithm* w       = factory.create("Windowing",
+                                        "type", "hann");
+
+    Algorithm* sss = factory.create("StartStopSilence");
+
+    /////////// CONNECTING THE ALGORITHMS ////////////////
+    std::cout << "-------- connecting algos ---------" << std::endl;
+
+    std::vector<int> startStopFrames;
+    std::vector<Real> frame, windowedFrame;
+
+    fc->input("signal").set(signal);
+    fc->output("frame").set(frame);
+
+    w->input("frame").set(frame);
+    w->output("frame").set(windowedFrame);
+
+    sss->input("frame").set(windowedFrame);
+    sss->output("startFrame").set(staF);
+    sss->output("stopFrame").set(stoF);
+
+    /////////// COMPUTING ////////////////
+    std::cout << "-------- computing ---------" << std::endl;
+
+    while (true) {
+        // compute a frame
+        fc->compute();
+
+        // if it was the last one (ie: it was empty), then we're done.
+        if (!frame.size()) {
+            break;
+        }
+        // if the frame is silent, just drop it and go on processing
+//        if (isSilent(frame)){
+//            cout << "silent frame " << endl;
+//            continue;
+//        }
+        w->compute();
+        sss->compute();
+    }
+
+    delete fc;
+    delete w;
+    delete sss;
+
+    startStopFrames.push_back(staF);
+    startStopFrames.push_back(stoF);
+    return startStopFrames;
+}
+
+//Check https://essentia.upf.edu/documentation/reference/std_GapsDetector.html
+void EssentiaMin::gapsDetector(std::vector<float>& signal, std::vector<float>& starts, std::vector<float>& ends) {
+
+    /////// PARAMS //////////////
+    int frameSize = 1024;
+    int hopSize = 512;
+
+    AlgorithmFactory &factory = standard::AlgorithmFactory::instance();
+    Algorithm* fc  = factory.create("FrameCutter",
+                                    "frameSize", frameSize,
+                                    "hopSize", hopSize);
+
+    Algorithm* w  = factory.create("Windowing",
+                                   "type", "hann");
+
+    Algorithm* gd = factory.create("GapsDetector",
+                                   "frameSize", frameSize,
+                                   "hopSize", hopSize,
+                                   "silenceThreshold", -50);
+
+    /////////// CONNECTING THE ALGORITHMS ////////////////
+    std::cout << "-------- connecting algos ---------" << std::endl;
+
+    std::vector<Real> frame, windowedFrame;
+
+    fc->input("signal").set(signal);
+    fc->output("frame").set(frame);
+
+    w->input("frame").set(frame);
+    w->output("frame").set(windowedFrame);
+
+    gd->input("frame").set(windowedFrame);
+    gd->output("starts").set(starts);
+    gd->output("ends").set(ends);
+
+    /////////// COMPUTING ////////////////
+    std::cout << "-------- computing ---------" << std::endl;
+
+    while (true) {
+        // compute a frame
+        fc->compute();
+
+        // if it was the last one (ie: it was empty), then we're done.
+        if (!frame.size()) {
+            break;
+        }
+//        // if the frame is silent, just drop it and go on processing
+//        if (isSilent(frame)){
+//            std::cout << "silent frame " << std::endl;
+//            continue;
+//        }
+        w->compute();
+        gd->compute();
+    }
+
+    delete fc;
+    delete w;
+    delete gd;
+}
+
+
+//Check https://essentia.upf.edu/documentation/reference/std_DiscontinuityDetector.html
+void EssentiaMin::discontinuityDetector(std::vector<float>& signal, std::vector<float>& discontinuityLocations, std::vector<float>& discontinuityAmplitudes) {
+
+    /////// PARAMS //////////////
+    int frameSize = 1024;
+    int hopSize = 512;
+
+    AlgorithmFactory &factory = standard::AlgorithmFactory::instance();
+    Algorithm* fc = factory.create("FrameCutter",
+                                   "frameSize", frameSize,
+                                   "hopSize", hopSize);
+
+    Algorithm* w = factory.create("Windowing",
+                                  "type", "hann");
+
+    Algorithm * dd = factory.create("DiscontinuityDetector",
+                                    "detectionThreshold", 8,
+                                    "frameSize", frameSize,
+                                    "hopSize", hopSize,
+                                    "silenceThreshold", -50);
+
+
+    /////////// CONNECTING THE ALGORITHMS ////////////////
+    std::cout << "-------- connecting algos ---------" << std::endl;
+
+    std::vector<Real> frame, windowedFrame;
+
+    fc->input("signal").set(signal);
+    fc->output("frame").set(frame);
+
+    w->input("frame").set(frame);
+    w->output("frame").set(windowedFrame);
+
+    dd->input("frame").set(windowedFrame);
+    dd->output("discontinuityLocations").set(discontinuityLocations);
+    dd->output("discontinuityAmplitudes").set(discontinuityAmplitudes);
+
+    /////////// COMPUTING ////////////////
+
+    std::cout << "-------- computing ---------" << std::endl;
+    while (true) {
+        // compute a frame
+        fc->compute();
+
+        // if it was the last one (ie: it was empty), then we're done.
+        if (!frame.size()) {
+            break;
+        }
+//        // if the frame is silent, just drop it and go on processing
+        if (isSilent(frame)){
+            std::cout << "silent frame " << std::endl;
+            continue;
+        }
+        w->compute();
+        dd->compute();
+    }
+
+    delete fc;
+    delete w;
+    delete dd;
+}
+
+
 /*
 void EssentiaMin::streamingLogMelBands(std::vector<float>& signal, std::vector<float>& melBands) {
 

@@ -140,6 +140,25 @@ std::vector<float> spectrumExtractor(std::vector<float>& signal, int frameSize, 
 }
 
 
+std::vector<int> startStopSilence(std::vector<float>& signal) {
+    EssentiaMin essentiaMin;
+    essentiaMin.initState(false);
+    return essentiaMin.startStopSilence(signal);
+}
+
+void gapsDetector(std::vector<float>& signal, std::vector<float>& starts, std::vector<float>& ends){
+    EssentiaMin essentiaMin;
+    essentiaMin.initState(false);
+    return essentiaMin.gapsDetector(signal, starts, ends);
+}
+
+
+void discontinuityDetector(std::vector<float>& signal, std::vector<float>& discontinuityLocations, std::vector<float>& discontinuityAmplitudes) {
+    EssentiaMin essentiaMin;
+    essentiaMin.initState(false);
+    return essentiaMin.discontinuityDetector(signal, discontinuityLocations, discontinuityAmplitudes);
+}
+
 // expose cpp functions to js using embind wrappers
 EMSCRIPTEN_BINDINGS(my_module) {
 
@@ -164,6 +183,9 @@ EMSCRIPTEN_BINDINGS(my_module) {
     function("mfccExtractor", &mfccExtractor);
     function("logMelBandsExtractor", &logMelBandsExtractor);
     function("bpmHistogram", &bpmHistogram);
+    function("startStopSilence", &startStopSilence);
+    function("gapsDetector", &gapsDetector);
+    function("discontinuityDetector", &discontinuityDetector);
 
     // map stl datatypes
     register_vector<int>("VectorInt");

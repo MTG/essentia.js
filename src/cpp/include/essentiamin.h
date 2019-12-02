@@ -36,12 +36,15 @@ class EssentiaMin {
         std::vector<float> envelope(std::vector<float>& signal);
         std::vector<float> superFluxExtractor(std::vector<float>& signal, int sampleRate, int frameSize, int hopSize);
         std::vector<std::vector<float> > frameGenerator(std::vector<float>& signal, int frameSize, int hopeSize, std::string windowType);
+        std::vector<int> startStopSilence(std::vector<float>& signal);
         // if you want multiple returns, add void functions and pass the output vectors as input
         void mfcc(std::vector<float>& signal, std::vector<float>& mfccBands, std::vector<float>& mfccCoeffs);
         void pitchYin(std::vector<float>& signalFrame, float pitch, float pitchConfidence);
         void pitchProbabilisticYinExtractor(std::vector<float>& signal, std::vector<float>& pitch, std::vector<float>& voicedProbabilities);
         void predominantPitchMelodiaExtractor(std::vector<float>& signal, std::vector<float>& pitch, std::vector<float>& pitchConfidence);
         void bpmHistogram(std::vector<float>& signal, std::vector<float>& bpmEstimates, std::vector<float>& histogram);
+        void gapsDetector(std::vector<float>& signal, std::vector<float>& starts, std::vector<float>& ends);
+        void discontinuityDetector(std::vector<float>& signal, std::vector<float>& discontinuityLocations, std::vector<float>& discontinuityAmplitudes);
 
         // add your essentia example methods here and also  define the methods in the essentiamin.cpp file
 };
