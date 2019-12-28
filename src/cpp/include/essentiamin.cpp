@@ -47,22 +47,18 @@ void EssentiaMin::shutDown() {
 
 
 // Method for frameCutting with windowing from a given audio signal
-std::vector<std::vector<float> > EssentiaMin::frameGenerator(std::vector<float>& signal, int frameSize, int hopSize, std::string windowType) {
+std::vector<std::vector<float> > EssentiaMin::frameGenerator(std::vector<float>& signal, int frameSize, int hopSize) {
 
 	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
 	Algorithm* fc   = factory.create("FrameCutter",
 									 "frameSize", frameSize,
 									 "hopSize", hopSize);
-	Algorithm* w    = factory.create("Windowing",
-									 "type", windowType);
 
 	Pool pool;
 	
-	std::vector<float> frame, windowedFrame;
+	std::vector<float> frame;
 	fc->input("signal").set(signal);
 	fc->output("frame").set(frame);
-	w->input("frame").set(frame);
-	w->output("frame").set(windowedFrame);
 
 	while (true) {
 		// compute a frame
@@ -74,15 +70,29 @@ std::vector<std::vector<float> > EssentiaMin::frameGenerator(std::vector<float>&
 		// if the frame is silent, just drop it and go on processing
 		if (isSilent(frame)) continue;
 
-		w->compute();
-
-		pool.add("frames", windowedFrame);
+		pool.add("frames", frame);
 	}
 
 	delete fc;
-	delete w;
-
 	return pool.value<std::vector<std::vector<float> > >("frames");
+}
+
+
+// Check https://essentia.upf.edu/documentation/reference/std_Windowing.html
+std::vector<float> EssentiaMin::windowing(std::vector<float>& signalFrame, std::string windowType) {
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+	Algorithm* window = factory.create("Windowing",
+						"type", windowType);
+	
+	std::vector<float> windowedFrame;
+	window->input("frame").set(signalFrame);
+	window->output("frame").set(windowedFrame);
+
+	window->compute();
+	delete window;
+
+	return windowedFrame;
 }
 
 
@@ -118,6 +128,25 @@ float EssentiaMin::zeroCrossingRate(std::vector<float>& signal) {
 	delete zcr;
 
 	return zcrValue;
+}
+
+
+// https://essentia.upf.edu/documentation/reference/std_Danceability.html
+float EssentiaMin::danceability(std::vector<float>& signal) {
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+
+	Algorithm* dance = factory.create("Danceability");
+
+	float danceOut;
+	std::vector<float> dfa;
+	dance->input("signal").set(signal);
+	dance->output("danceability").set(danceOut);
+	dance->output("dfa").set(dfa);
+	dance->compute();
+
+	delete dance;
+	return danceOut;
 }
 
 
@@ -190,6 +219,47 @@ std::vector<float> EssentiaMin::superFluxExtractor(std::vector<float>& signal, i
 }
 
 
+// check https://essentia.upf.edu/documentation/reference/std_ChordsDetection.html
+void EssentiaMin::chordDetection(std::vector<float>& chroma, int hopSize, std::vector<std::string>& chords, std::vector<float>& strength) {
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+	Algorithm* chordsDetect   = factory.create("ChordsDetection",
+											   "hopSize", hopSize);
+	
+	std::vector<std::vector<float> > chromaVector;
+	chromaVector.push_back(chroma);
+
+	chordsDetect->input("pcp").set(chromaVector);
+	chordsDetect->output("chords").set(chords);
+	chordsDetect->output("strength").set(strength);
+
+	chordsDetect->compute();
+	delete chordsDetect;
+}
+
+
+// check https://essentia.upf.edu/documentation/reference/std_Key.html
+void EssentiaMin::key(std::vector<float>& chroma, std::string profileType, std::vector<std::string> keyFeatures, float strength) {
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+	Algorithm* keyAlgo = factory.create("Key",
+										"profileType", profileType,
+										"pcpSize", 12);
+	
+	float nowhere;
+	std::string keyOut, scale;
+	keyAlgo->input("signal").set(chroma);
+	keyAlgo->output("key").set(keyOut);
+	keyAlgo->output("scale").set(scale);
+	keyAlgo->output("strength").set(strength);
+	keyAlgo->output("firstToSecondRelativeStrength").set(nowhere);
+	keyAlgo->compute();
+	keyFeatures.push_back(keyOut);
+	keyFeatures.push_back(scale);
+	delete keyAlgo;
+}
+
+
 // Check https://essentia.upf.edu/documentation/reference/std_KeyExtractor.html for more details
 std::string EssentiaMin::keyExtractor(std::vector<float>& signal) {
 
@@ -259,12 +329,90 @@ std::vector<float> EssentiaMin::hpcp(std::vector<float>& signalFrame, bool nonLi
 }
 
 
+// check https://essentia.upf.edu/documentation/reference/std_OnsetDetectionGlobal.html
+std::vector<float> EssentiaMin::onsetDetectionGlobal(std::vector<float>& signal) {
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+	Algorithm* onsetDetect = factory.create("OnsetDetectionGlobal");
+	std::vector<float> onsets;
+	onsetDetect->input("signal").set(signal);
+	onsetDetect->output("onsetDetections").set(onsets);
+	delete onsetDetect;
+	return onsets;
+}
+
+
+// check https://essentia.upf.edu/documentation/reference/std_NoveltyCurve.html
+std::vector<float> EssentiaMin::noveltyCurve(std::vector<float>& spectrumFrame) {
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+	Algorithm* freqBands = factory.create("FrequencyBands");
+	Algorithm* novelty = factory.create("NoveltyCurve");
+
+	std::vector<float> bands, novCurve;
+
+	freqBands->input("spectrum").set(spectrumFrame);
+	freqBands->output("bands").set(bands);
+	novelty->input("frequencyBands").set(bands);
+	novelty->output("novelty").set(novCurve);
+
+	freqBands->compute();
+	novelty->compute();
+
+	delete freqBands;
+	delete novelty;
+
+	return novCurve;
+}
+
+
+// check https://essentia.upf.edu/documentation/reference/std_SuperFluxNovelty.html
+std::vector<float> EssentiaMin::superfluxNoveltyCurve(std::vector<float>& spectrumFrame) {
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+	Algorithm* freqBands = factory.create("FrequencyBands");
+	Algorithm* fluxNovelty = factory.create("SuperFluxNovelty");
+
+	std::vector<float> bands, novCurve;
+
+	freqBands->input("spectrum").set(spectrumFrame);
+	freqBands->output("bands").set(bands);
+	fluxNovelty->input("frequencyBands").set(bands);
+	fluxNovelty->output("novelty").set(novCurve);
+
+	freqBands->compute();
+	fluxNovelty->compute();
+
+	delete freqBands;
+	delete fluxNovelty;
+
+	return novCurve;
+}
+
+
+// check https://essentia.upf.edu/documentation/reference/std_BeatTrackerMultiFeature.html
+void EssentiaMin::beatTrackerMultiFeature(std::vector<float>& signal, std::vector<float>& ticks, float confidence) {
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+	Algorithm* beatTracker = factory.create("BeatTrackerMultiFeature");
+
+	beatTracker->input("signal").set(signal);
+	beatTracker->output("ticks").set(ticks);
+	beatTracker->output("confidence").set(confidence);
+
+	beatTracker->compute();
+
+	delete beatTracker;
+}
+
+
 // Check https://essentia.upf.edu/documentation/reference/std_PitchYinProbabilistic.html
 void EssentiaMin::pitchProbabilisticYinExtractor(std::vector<float>& signal, std::vector<float>& pitch, std::vector<float>& voicedProbabilities) {
 
 	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
 
-	Algorithm* pyYin = factory.create("PitchYinProbabilistic");
+	Algorithm* pyYin = factory.create("PitchYinProbabilistic",
+									  "outputUnvoiced", "zero");
 
 	pyYin->input("signal").set(signal);
 	pyYin->output("pitch").set(pitch);
@@ -272,6 +420,32 @@ void EssentiaMin::pitchProbabilisticYinExtractor(std::vector<float>& signal, std
 	pyYin->compute();
 
 	delete pyYin;
+}
+
+
+
+// Check https://essentia.upf.edu/documentation/reference/std_PitchMelodia.html
+void EssentiaMin::pitchMelodiaExtractor(std::vector<float>& signal, std::vector<float>& pitch, std::vector<float>& pitchConfidence) {
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+
+	Algorithm* eqloud 		= factory.create("EqualLoudness");
+	Algorithm* melodia = factory.create("PitchMelodia");
+
+	std::vector<float> eqloudSignal;
+
+	eqloud->input("signal").set(signal);
+	eqloud->output("signal").set(eqloudSignal);
+	melodia->input("signal").set(eqloudSignal);
+	melodia->output("pitch").set(pitch);
+	melodia->output("pitchConfidence").set(pitchConfidence);
+
+	eqloud->compute();
+	melodia->compute();
+
+	delete eqloud;
+	delete melodia;
+
 }
 
 
@@ -427,7 +601,6 @@ std::vector<float> EssentiaMin::envelope(std::vector<float>& signal) {
 
 // Computes magnitude spectrum of a given audio frame
 std::vector<float> EssentiaMin::spectrum(std::vector<float>& signalFrame) {
-
 	if (signalFrame.size() < 2048) {
 		throw EssentiaException("spectrogram: Size of audio frame is less than the expected size of 2048");
 	}
@@ -450,7 +623,6 @@ std::vector<float> EssentiaMin::spectrum(std::vector<float>& signalFrame) {
 std::vector<float> EssentiaMin::spectrumExtractor(std::vector<float>& signal, int frameSize=1024, int hopSize=1024, std::string windowType="hann") {
 
   	// framecutter -> windowing -> FFT 
-
   	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
 
   	Algorithm* fc       =  	factory.create("FrameCutter",
@@ -499,6 +671,35 @@ std::vector<float> EssentiaMin::spectrumExtractor(std::vector<float>& signal, in
 	delete spec;
 
 	return spectrum;
+}
+
+
+std::vector<float> EssentiaMin::logMelBands(std::vector<float>& spectrumFrame, int numBands) {
+
+  	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+
+  	Algorithm* mel  	=   factory.create("MelBands",
+								           "numberBands", numBands,
+								           "type", "magnitude");
+
+  	Algorithm* logNorm  =   factory.create("UnaryOperator",
+									       "type", "log");
+				
+  	/////////// STARTING THE ALGORITHMS //////////////////
+	std::vector<Real> mfccBands, melBands;
+
+	mel->input("spectrum").set(spectrumFrame);
+	mel->output("bands").set(mfccBands);
+	logNorm->input("array").set(mfccBands);
+	logNorm->output("array").set(melBands);
+	
+	mel->compute();
+	logNorm->compute();
+
+	delete mel;
+	delete logNorm;
+	
+  	return melBands;
 }
 
 
@@ -577,6 +778,26 @@ std::vector<float> EssentiaMin::logMelBandsExtractor(std::vector<float>& signal,
 }
 
 
+// check https://essentia.upf.edu/documentation/reference/std_LoudnessEBUR128.html
+void EssentiaMin::loudnessEBUR128(std::vector<float>& signal, std::vector<float>& momLoudness, std::vector<float>& shortLoudness, float integrateLoudness, float loudRange) {
+
+	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+	Algorithm* loudnessEbur = factory.create("LoudnessEBUR128");
+
+	std::vector<std::vector<float> > stereoSignal;
+	// hack to work on mono audio signal
+	stereoSignal.push_back(signal);
+	stereoSignal.push_back(signal);
+
+	loudnessEbur->input("signal").set(stereoSignal);
+	loudnessEbur->output("momentaryLoudness").set(momLoudness);
+	loudnessEbur->output("shortTermLoudness").set(shortLoudness);
+	loudnessEbur->output("integratedLoudness").set(integrateLoudness);
+	loudnessEbur->output("loudnessRange").set(loudRange);
+
+	loudnessEbur->compute();
+	delete loudnessEbur;
+}
 /*
 void EssentiaMin::streamingLogMelBands(std::vector<float>& signal, std::vector<float>& melBands) {
 
