@@ -9,9 +9,9 @@
 
 ## Setup
 
-You can find the pre-compiled modules in the `builds/` directory.
+You can find the pre-compiled modules in the `builds/` [directory](builds/) and some live web demos [here](https://mtg.github.io/essentia.js-examples/).
 
-If you need to recompile the bindings, you can either use the docker or build everything from source on your local system.
+If you need to recompile the builds, you can either use the docker or build everything from source on your local system.
 
 ### Using docker
 
@@ -63,10 +63,7 @@ Check the bash script for the intermediate steps.
 
 ### Examples
 
-- Usage in JavaScript
-
-
-Eg: The follwing code block shows some simple examples on how to use essentia.js in your web page. Here we call the wrapped functions in  essentia.js inside the `onRuntimeInitialized` callback (ie., once the webassembly modules are loaded in the browser). Check https://developer.mozilla.org/en-US/docs/WebAssembly/Loading_and_running for more about loading and running webassembly modules.
+- The follwing code block shows some simple examples on how to use essentia.js in your web page. Here we call the wrapped functions in  essentia.js inside the `onRuntimeInitialized` callback (ie., once the webassembly modules are loaded in the browser). Check https://developer.mozilla.org/en-US/docs/WebAssembly/Loading_and_running for more about loading and running webassembly modules.
 
 ```html
 <html lang="en">
@@ -79,6 +76,8 @@ Eg: The follwing code block shows some simple examples on how to use essentia.js
             // get version of essentia used for this build
             console.log(Module.getEssentiaVersion());
 
+            // write your code for essentia processing here
+
             var frameSize = 1024;
             var hopSize = 1024;
 
@@ -86,7 +85,7 @@ Eg: The follwing code block shows some simple examples on how to use essentia.js
             var signalArray = audioBuffer.getChannelData(0); 
 
             // convert to std::vector<float>
-            var signal = typedFloat32ArrayVec(signalArray);
+            var signal = typedFloat32Array2Vec(signalArray);
 
             // generate overlapping frames of a given audio signal (usefull for framewise processing)
             var frames = Module.frameGenerator(signal, frameSize, hopSize);
@@ -101,7 +100,6 @@ Eg: The follwing code block shows some simple examples on how to use essentia.js
                 logMelSpectrogram.push(melBandFrame);
             }
             console.log(logMelSpectrogram);
-
 
             // compute the hpcp chroma features for each audio frame
             for (var i=0; i<frames.size(); i++) {
@@ -120,6 +118,8 @@ Eg: The follwing code block shows some simple examples on how to use essentia.js
             var pitchConfidence = new Module.VectorFloat();
             // fill the vectors with the output
             Module.predominantPitchMelodiaExtractor(signal, pitches, pitchConfidence);
+
+            console.log("PredominantPitchMelodia: ", pitches);
 
             // if you want to enable essentia debugging mode
             Module.initEssentia(true);
@@ -150,3 +150,7 @@ Eg: The follwing code block shows some simple examples on how to use essentia.js
   </head>
 </html>
 ```
+
+
+- You can also find some additional examples [here](https://github.com/MTG/essentia.js-examples/blob/master/src/js/features.js).
+
