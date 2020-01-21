@@ -4,20 +4,34 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>Essentia.js with Audio Worklets example</title>
+    <title>essentia.js with AudioWorklet design pattern example</title>
   </head>
   <body>
-    <div class=""></div>
-    <script type="module">
+    <script>
 
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      audioCtx = new AudioContext();
-      await audioCtx.audioWorklet.addModule('essentia-worklet-processor.js');
-      const oscillator = new OscillatorNode(audioCtx);
-      const bypasser = new AudioWorkletNode(audioCtx, 'essentia-worklet-processor');
-      oscillator.connect(bypasser).connect(audioCtx.destination);
-      oscillator.start();
-  
+      let audioCtx;
+
+      try {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new AudioContext();
+        } 
+        catch (e) {
+          throw 'Could not instantiate AudioContext: ' + e.message;
+      }
+
+      // shows a simple demo on how to use the essentia-worklet-processor.js on your web app
+      const runEssentiaDemoProcess = async () => {
+
+        await audioCtx.audioWorklet.addModule('essentia-worklet-processor.js');
+        const oscillator = new OscillatorNode(audioCtx);
+        const essentiaProcessor = new AudioWorkletNode(audioCtx, 'essentia-worklet-processor');
+        oscillator.connect(essentiaProcessor).connect(audioCtx.destination);
+        oscillator.start();
+      }
+
+      runEssentiaDemoProcess();
+
+      // adapted from https://github.com/GoogleChromeLabs/web-audio-samples/tree/master/audio-worklet/design-pattern/wasm
     </script>
   </body>
 </html>
