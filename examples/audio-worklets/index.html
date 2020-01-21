@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Essentia.js with Audio Worklets example</title>
+  </head>
+  <body>
+    <div class=""></div>
+    <script type="module">
+
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AudioContext();
+      await audioCtx.audioWorklet.addModule('essentia-worklet-processor.js');
+      const oscillator = new OscillatorNode(audioCtx);
+      const bypasser = new AudioWorkletNode(audioCtx, 'essentia-worklet-processor');
+      oscillator.connect(bypasser).connect(audioCtx.destination);
+      oscillator.start();
+  
+    </script>
+  </body>
+</html>
