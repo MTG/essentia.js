@@ -1,8 +1,7 @@
-
 /*
 Class with utility methods to use essentia.js
 */
-class EssentiaJsTools {
+export class EssentiaJsTools {
 
 	constructor(essentiaWasmModule) {
 		this._module = essentiaWasmModule;
@@ -35,6 +34,3 @@ class EssentiaJsTools {
 	// add your essentia.js utility funcs here
 
 }
-
-
-export { EssentiaJsTools };
