@@ -4,8 +4,10 @@ BUILD_DIR_ES=builds
 BINDING_CPP_ES=src/cpp/bindings.cpp
 TO_INCLUDE_ES=src/cpp/include/essentiamin.cpp
 POST_JS_WASM=src/js/wasm.module.post.js
+ESSENTIA_TOOLS_JS=src/js/essentia.jstools.js
 
 build:
+	@rm -rf $(BUILD_DIR_ES) 
 	@mkdir $(BUILD_DIR_ES)
 
 	@echo "Compiling the bindings to bitcode ..."
@@ -25,13 +27,13 @@ build:
 	   -s WASM=1 \
 	   $(BUILD_DIR_ES)/essentiamin.bc ${LIB_DIR_ES}/essentia.a \
 	   -o $(BUILD_DIR_ES)/essentiamin-$(ESSENTIAJS_VERSION)-module.js \
-	   -s EXCEPTION_DEBUG \
-	   -s ASSERTIONS=2 \
-	   -s DISABLE_EXCEPTION_CATCHING=2 \
-	   -s ALLOW_MEMORY_GROWTH=1 \
 	   -s BINARYEN_ASYNC_COMPILATION=0 \
-	   -s SINGLE_FILE=1 \
-	   --post-js $(POST_JS_WASM)  || exit 1
+	   -s ALLOW_MEMORY_GROWTH=1 \
+	   -s SINGLE_FILE=1 || exit 1
+	    
+	@cat $(POST_JS_WASM) >> $(BUILD_DIR_ES)/essentiamin-$(ESSENTIAJS_VERSION)-module.js
+
+	@cp $(ESSENTIA_TOOLS_JS) $(BUILD_DIR_ES)/
 	@echo "Done ..."
 
 	@echo "Removing unnecessary files ..."
