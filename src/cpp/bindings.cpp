@@ -216,7 +216,6 @@ EMSCRIPTEN_BINDINGS(my_module) {
     function("initEssentia", &initEssentia);
     function("shutdownEssentia", &shutdownEssentia);
     function("getEssentiaVersion", &getEssentiaVersion);
-    // function("stftExtractor", &stftExtractor);
     function("windowing", &windowing);
     function("frameGenerator", &frameGenerator);
     function("loudnessVickers", &loudnessVickers);

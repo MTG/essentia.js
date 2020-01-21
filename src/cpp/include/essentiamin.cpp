@@ -798,6 +798,8 @@ void EssentiaMin::loudnessEBUR128(std::vector<float>& signal, std::vector<float>
 	loudnessEbur->compute();
 	delete loudnessEbur;
 }
+
+
 /*
 void EssentiaMin::streamingLogMelBands(std::vector<float>& signal, std::vector<float>& melBands) {
 
