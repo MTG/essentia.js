@@ -1,0 +1,11 @@
+// This is my C++ file.
+...
+/*[[[cog
+import cog
+import essentia.standard as estd
+fnames = estd.algorithmNames()
+
+for fn in fnames:
+    cog.outl("void %s();" % fn)
+]]]*/
+//[[[end]]]
