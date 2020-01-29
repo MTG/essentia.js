@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-
-make build
+make -f Makefile.essentiajs
+make -f Makefile.essentiamin
