@@ -24,27 +24,28 @@
 
 #include <vector>
 
-extern bool esInitStatus;
 
 class EssentiaJS {
+  public:
+    // property to store the current essentia library version
+    std::string essentiaVersion;
+    // constructor for instantiating the essentia algo registry with an optional argument to enable debug mode 
+    EssentiaJS(bool debugger=false);
+    // destructor for shutdown essentia instance
+    ~EssentiaJS();
+    // method for generating frames from a given audio signal
+    std::vector<std::vector<float> > frameGenerator(std::vector<float>& signal, int frameSize, int hopSize);
 
-    public:
-        // to store the current essentia libray version
-        std::string essentiaVersion;
-
-        // register essentia algos
-        void initState(bool debugger);
-        // shutdown essentia instance
-        void shutDown();
-
-        /*[[[cog
-        import cog
-        from .essentia_parser import generate_headers
-        headers = generate_headers()
-        for ln in headers:
-            cog.outl(ln)
-        ]]]*/
-        //[[[end]]]
-}
+    // NOTE: The following code snippets are machine generated. Do not edit.    
+    /*[[[cog
+    import cog
+    from .code_generator import generate_headers
+    headers = generate_headers()
+    cog.outl(" ")
+    for ln in headers:
+      cog.outl("%s;" % ln)
+    ]]]*/
+    //[[[end]]]
+};
 
 #endif  // ESSENTIAJS_H

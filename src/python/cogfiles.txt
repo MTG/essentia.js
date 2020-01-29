@@ -1,1 +1,3 @@
-header.cog -o essentiajs.h
+header.cog -o ../cpp/includes/essentiajs.h
+library.cog -o ../cpp/includes/essentiajs.cpp
+bindings.cog -o ../cpp/bindings_essentiajs.cpp

@@ -28,70 +28,62 @@
 using namespace essentia;
 using namespace essentia::standard;
 
-// set to false to initialize essentia algo registry for the very first time
-bool esInitStatus = false;
 
-// method to instantiate the essentia algo registry with an optional argument to enable debug mode 
-void EssentiaJS::initState(bool debugger) {
-	// if true sets essentia debugger active
-	if (debugger) {
-		setDebugLevel(EAll); // EAll is a special value in essentia that contains all modules
-		unsetDebugLevel(EMemory | EConnectors);
-		essentia::warningLevelActive = true; // activate warnings
-		essentia::infoLevelActive = true;    // activate info
-		essentia::errorLevelActive = true;    // activate error level
-	}
-	// if needed, init essentia algorithm registry
-	if (!esInitStatus) {
-		essentia::init();
-	 	esInitStatus = true;
-		essentiaVersion = essentia::version;
-    }
+// instantiating the essentia algo registry with an optional argument to enable debug mode 
+EssentiaJS::EssentiaJS(bool debugger) {
+  if (debugger) {
+    // if true sets essentia debugger active
+    // EAll is a special value in essentia that contains all modules
+    setDebugLevel(EAll); 
+    unsetDebugLevel(EMemory | EConnectors);
+    // activate warnings
+    essentia::warningLevelActive = true; 
+    // activate info
+    essentia::infoLevelActive = true;
+    // activate error level    
+    essentia::errorLevelActive = true;    
+  }
+  essentia::init();
+  essentiaVersion = essentia::version;
 }
 
-// method to shutdown essentia instance
-void EssentiaJS::shutDown() {
-	essentia::shutdown();
-	esInitStatus = false;
+// shutdown essentia instance
+EssentiaJS::~EssentiaJS() {
+  essentia::shutdown();
 }
 
 // Method for frameCutting the given audio signal
 std::vector<std::vector<float> > EssentiaJS::frameGenerator(std::vector<float>& signal, int frameSize, int hopSize) {
-
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	Algorithm* fc   = factory.create("FrameCutter",
-									 "frameSize", frameSize,
-									 "hopSize", hopSize);
-
-	Pool pool;
-	
-	std::vector<float> frame;
-	fc->input("signal").set(signal);
-	fc->output("frame").set(frame);
-
-	while (true) {
-		// compute a frame
-		fc->compute();
-		// if it was the last one (ie: it was empty), then we're done.
-		if (!frame.size()) {
-			break;
-		}
-		// if the frame is silent, just drop it and go on processing
-		if (isSilent(frame)) continue;
-
-		pool.add("frames", frame);
-	}
-
-	delete fc;
-	return pool.value<std::vector<std::vector<float> > >("frames");
+  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+  Algorithm* fc   = factory.create("FrameCutter",
+                   "frameSize", frameSize,
+                   "hopSize", hopSize);
+  Pool pool;
+  std::vector<float> frame;
+  fc->input("signal").set(signal);
+  fc->output("frame").set(frame);
+  while (true) {
+    // compute a frame
+    fc->compute();
+    // if it was the last one (ie: it was empty), then we're done.
+    if (!frame.size()) {
+      break;
+    }
+    // if the frame is silent, just drop it and go on processing
+    if (isSilent(frame)) continue;
+    pool.add("frames", frame);
+  }
+  delete fc;
+  return pool.value<std::vector<std::vector<float> > >("frames");
 }
 
-
-// TODO
+// NOTE: The following code snippets are machine generated. Do not edit.
 /*[[[cog
 import cog
-from .essentia_parser import generate_algorithms
-algo_dicts = generate_algorithms()
-for ln in algo_dicts:
-	cog.outl(ln)
+from .code_generator import generate_algorithms
+algos = generate_algorithms()
+for algo in algos:
+  for ln in algo:
+    cog.outl(ln)
 ]]]*/
+//[[[end]]]

@@ -21,10 +21,35 @@
 
 #include <stdio.h>
 #include <emscripten/bind.h>
+#include "./includes/essentiajs.h"
+
+using namespace emscripten;
 
 // expose essentiajs class to js using embind wrappers
-EMSCRIPTEN_BINDINGS(CLASS_essentiajs) { 
+EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) { 
+  // NOTE: The following code snippets are machine generated. Do not edit.
+  class_<EssentiaJS>("EssentiaJS")
+    .constructor<bool>()
+    .property("version", &EssentiaJS::essentiaVersion)
+    .function("frameGenerator", &EssentiaJS::frameGenerator)
+    /*[[[cog
+    import logging
+    import cog
+    from .code_generator import TO_INCLUDE_ALGOS
+    logging.basicConfig(level='INFO')
+    logging.info("Generating emscripten bindings for the essentia...")
+    for algo_name in TO_INCLUDE_ALGOS:
+      cog.outl('.function("%s", &EssentiaJS::%s)' % (algo_name, algo_name))
+    cog.out(";")
+    ]]]*/
+    //[[[end]]]
 
-    // TODO:
-
+  // expose stl datatypes to js
+  register_vector<int>("VectorInt");
+  register_vector<float>("VectorFloat");
+  register_vector<double>("VectorDouble");
+  register_vector<std::string>("VectorString");
+  // 2D std vectors
+  register_vector<std::vector<float>>("VectorVectorFloat");
+  register_vector<std::vector<double>>("VectorVectorDouble");
 }
