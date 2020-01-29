@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <emscripten/bind.h>
-#include "./include/essentiamin.h"
+#include "./includes/essentiamin.h"
 
 using namespace emscripten;
 
