@@ -63,7 +63,7 @@ Check the bash script for the intermediate steps.
 
 ### Examples
 
-- The follwing code block shows some simple examples on how to use essentia.js in your web page. Here we call the wrapped functions in  essentia.js inside the `onRuntimeInitialized` callback (ie., once the webassembly modules are loaded in the browser). Check https://developer.mozilla.org/en-US/docs/WebAssembly/Loading_and_running for more about loading and running webassembly modules.
+- The following code block shows some simple examples on how to use essentia.js in your web page. Here we call the wrapped functions in  essentia.js inside the `onRuntimeInitialized` callback (ie., once the webassembly modules are loaded in the browser). Check https://developer.mozilla.org/en-US/docs/WebAssembly/Loading_and_running for more about loading and running webassembly modules.
 
 ```html
 <html lang="en">
@@ -72,7 +72,7 @@ Check the bash script for the intermediate steps.
     var Module = {
         onRuntimeInitialized: function() {
 
-            console.log("Essentia module loaded succesfuly ...");
+            console.log("Essentia module loaded successfully ...");
             // get version of essentia used for this build
             console.log(Module.getEssentiaVersion());
 
@@ -113,7 +113,7 @@ Check the bash script for the intermediate steps.
             // compute logMelBands for the given audio signal
             var melBands = Module.logMelBandsExtractor(signal, numBands, frameSize, hopSize);
 
-            // compute predominant melody contour from monophonic/polyphonic music signal using melodia alogirithm
+            // compute predominant melody contour from monophonic/polyphonic music signal using melodia algorithm
             var pitches = new Module.VectorFloat();
             var pitchConfidence = new Module.VectorFloat();
             // fill the vectors with the output
