@@ -1,3 +1,6 @@
 #!/usr/bin/env bash
-make -f Makefile.essentiajs
-make -f Makefile.essentiamin
+if [ "$#" -ne 1 ]; then
+	echo "USAGE: ./build-bindings.sh <your-make-file> "
+	exit
+fi
+make -f $1

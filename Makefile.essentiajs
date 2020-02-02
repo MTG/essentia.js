@@ -46,7 +46,7 @@ build:
 	    
 	@cat $(POST_JS_WASM) >> $(BUILD_DIR_ES)/essentia-$(ESSENTIAJS_VERSION)-module.js
 
-	@cp $(ESSENTIA_TOOLS_JS) $(BUILD_DIR_ES)/
+	@cp -f $(ESSENTIA_TOOLS_JS) $(BUILD_DIR_ES)/
 	@echo "Done ..."
 
 	@echo "Removing unnecessary files ..."
