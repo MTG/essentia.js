@@ -10,7 +10,7 @@ build:
 	@mkdir -p $(BUILD_DIR_ES)
 
 	@echo "Generating cpp source code from essentia python bindings ..."
-	@cd src/python && ./generate-cpp.sh
+	@cd src/python && python es_configure.py
 	@echo "Done..."
 
 	@echo "Compiling the bindings to bitcode ..."
