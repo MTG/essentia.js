@@ -7,7 +7,7 @@ import essentia.standard as estd
 import argparse
 import logging
 from ast import literal_eval
-from es_configure import TO_INCLUDE_ALGOS, TO_EXCLUDE_ALGOS, read_txt_file
+from configure_bindings import TO_INCLUDE_ALGOS, TO_EXCLUDE_ALGOS, read_txt_file
 
 logging.basicConfig(level='INFO')
 

@@ -10,7 +10,7 @@ build:
 	@mkdir -p $(BUILD_DIR_ES)
 
 	@echo "Generating cpp source code from essentia python bindings ..."
-	@cd src/python && python es_configure.py
+	@cd src/python && python configure_bindings.py
 	@echo "Done..."
 
 	@echo "Compiling the bindings to bitcode ..."
@@ -43,7 +43,7 @@ build:
 	   -s BINARYEN_ASYNC_COMPILATION=0 \
 	   -s ALLOW_MEMORY_GROWTH=1 \
 	   -s SINGLE_FILE=1 || exit 1
-	    
+	      
 	@cat $(POST_JS_WASM) >> $(BUILD_DIR_ES)/essentia-$(ESSENTIAJS_VERSION)-module.js
 
 	@cp -f $(ESSENTIA_TOOLS_JS) $(BUILD_DIR_ES)/
