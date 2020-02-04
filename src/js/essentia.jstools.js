@@ -1,12 +1,10 @@
 /*
 Class with utility methods to use essentia.js
 */
-export class EssentiaJsTools {
-
+export class EssentiaJSTools {
 	constructor(essentiaWasmModule) {
 		this._module = essentiaWasmModule;
 	}
-
 	// copy the contents of a float 32 js typed array into a std::vector<float>.
 	typedFloatArray2Vector = function(typedArray) {
 		let vect = new this._module.VectorFloat();
@@ -20,17 +18,14 @@ export class EssentiaJsTools {
     }
     return vect; 
   }
-
   // copy the contents of a std::vector<float> into a float 32 js typed array. 
 	vector2typedFloat32Array = function(vect) {
-		const typedArray = new Float32Array(vec.size());
+		const typedArray = new Float32Array(vect.size());
 		for (var i=0; i < vect.size(); i++) {
 			typedArray[i] = vect.get(i); 
 			typedArray[i] = parseFloat(typedArray[i].toFixed(2));
 		}
 		return typedArray
 	}
-
 	// add your essentia.js utility funcs here
-
 }
