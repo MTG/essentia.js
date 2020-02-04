@@ -1,6 +1,7 @@
-import Module from '../../builds/essentiamin-0.0.1-module.js';
-import { EssentiaJsTools } from '../../builds/essentia.jstools.js';
+import Module from '../../builds/essentia-0.0.1-module.js';
+import { EssentiaJSTools } from '../../builds/essentia.jstools.js';
 
+let essentia = new Module.EssentiaJS(false);
 
 /**
  * A simple demonstration of using essentia.js wasm modules as AudioWorkletProcessor.
@@ -14,10 +15,10 @@ class EssentiaWorkletProcessor extends AudioWorkletProcessor {
    */
   constructor() {
     super();
-    this.essentiaVersion = Module.getEssentiaVersion();
-    this.utils = new EssentiaJsTools(Module);
+    this.essentia = essentia;
+    this.utils = new EssentiaJSTools(Module);
+    console.log('Essentia:' + this.essentia.version + '- http://essentia.upf.edu'); 
   }
-
   /**
    * System-invoked process callback function.
    * @param  {Array} inputs Incoming audio stream.
@@ -35,18 +36,25 @@ class EssentiaWorkletProcessor extends AudioWorkletProcessor {
     // copy the input audio frame array from channel 0 to a std::vector<float> type for using it in essentia
     let vectorInput = this.utils.typedFloatArray2Vector(input[0]);
 
-    // In this case we are apply a hanning windowing to the input audio frame
-    let windowedFrame = Module.windowing(vectorInput, "hann");
+    // In this case we apply a traingular windowing function to every input audio frame
+    // check https://essentia.upf.edu/reference/std_Windowing.html
+    let windowedFrame = this.essentia.Windowing(vectorInput, // input audio frame
+                                                // parameters
+                                                true, // normalized
+                                                1024, // size
+                                                'triangular', // type
+                                                0, // zeroPadding
+                                                true); // zeroPhase 
 
     // convert the output back to float32 typed array
     let outputArray = this.utils.vector2typedFloat32Array(windowedFrame);
     
+    console.log("input audio frameSize: " + outputArray.length);
     // copy converted array to the output channel 0
     output[0].set(outputArray);
 
     return true;
   }
 }
-
 
 registerProcessor('essentia-worklet-processor', EssentiaWorkletProcessor);

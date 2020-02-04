@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"/>
+    <title>essentia.js with AudioWorket example</title>
+  </head>
+      <body style="background-color:  #000000!important;"">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <div class="ui main_wrapper landing-image">
+        <div class="ui header centered" id="header">
+          <a href="https://github.com/MTG/essentia.js">
+            <img id="header-img" src="../..//src/assets/img/essentiajsbanner.png">
+          </a>
+          <div>
+              <h1 class="ui header white-text" style="color: azure;">WebAudioApi + AudioWorklet example</h1>
+          </div>
+
+          <div class="ui basic large button">
+            <a href="https://github.com/MTG/essentia.js/tree/module/examples/audio-worklets" target="_blank" class="ui small button">Code<i class="right github icon"></i></a>
+          </div>
+
+        </div>
+        <div class="body-container">
+          <div class="ui centered one column grid container">
+            <div class="ui vertical buttons row">
+              <center><button id="recordButton" class="ui red inverted big button record-button">Mic
+                  &nbsp;&nbsp;<i class="microphone icon"></i></button></center>
+            </div>
+
+            <p id="myLog" style="color: azure; font-size: small;"></p>
+
+          </div>
+        </div>
+        <div class="ui diverder" style="height: 50px;"></div>
+        <center>
+        <div class="footer" style="margin-top: 30px; height: 20%;">
+          <a class="demo_logo" target="_blank" href="//essentia.upf.edu">
+            <img id="logo" src="https://essentia.upf.edu/documentation/_static/essentia_logo.svg" alt="MTG Logo"
+              style="margin-left: 40px; height: 70px;">
+          </a>
+          <a target="_blank" href="https://www.upf.edu/web/mtg">
+            <img class="essnt-footer_mtg-logo" src="https://mtg.github.io/assets/img/upflogo.png" alt="mtg logo"
+                style="width:300px; height: 70px;">
+          </a>
+        </div>
+        </center>
+      
+        <script>
+            // global var for web audio api AudioContext
+            let audioCtx;
+            // global getUserMedia stream 
+            let gumStream;
+            // buffer size microphone stream 
+            let bufferSize = 1024;
+            let essentiaWorklet = null;
+
+            // show console.log on html div
+            window.console = {
+              log: function(str){
+                var node = document.createElement("div");
+                node.appendChild(document.createTextNode(str));
+                document.getElementById("myLog").appendChild(node);
+              }
+            }
+
+            try {
+              const AudioContext = window.AudioContext || window.webkitAudioContext;
+              audioCtx = new AudioContext();
+              } 
+            catch (e) {
+              throw 'Could not instantiate AudioContext: ' + e.message;
+            }
+
+            $(document).ready(function () {
+              // record native microphone input and do further audio processing on each audio buffer using the given callback functions
+              async function startMicRecordStream(audioCtx, bufferSize, btnCallback) {
+                // cross-browser support for getUserMedia
+                navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || 
+                                          navigator.mozGetUserMedia || navigator.msGetUserMedia;           
+                window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL
+
+                if (navigator.getUserMedia) {
+                  console.log(".....................");
+                  console.log('Initializing audio...')
+
+                  navigator.getUserMedia({audio: true, video: false}, function(stream) {
+                    gumStream = stream;
+                    if (gumStream.active) {
+                      console.log('Audio context sample rate = ' + audioCtx.sampleRate);
+                      var mic = audioCtx.createMediaStreamSource(stream);
+                      // We need the buffer size that is a power of two 
+                      if (bufferSize % 2) {
+                        throw "Choose a buffer size that is a power of two and greater than 4096"
+                      };
+                      
+                      if (audioCtx.state == 'suspended') {
+                        audioCtx.resume();
+                      }
+
+                      try {
+                        // add the essentia-worklet-processor example
+                        console.log("Loading essentia worklet processor ....");
+                        audioCtx.audioWorklet.addModule('essentia-worklet-processor.js').then(() => {
+                          essentiaWorklet = new AudioWorkletNode(audioCtx, 'essentia-worklet-processor');
+                          //connect mic stream to essentia processer and then to the audio destination.
+                          console.log("Mic => essentiaWorklet => audioContext.destination ....");
+                          console.log("Applying triangular windowing to microphone input ....");
+                          mic.connect(essentiaWorklet).connect(audioCtx.destination);
+                        });
+                      } catch (e) {
+                        this.setState( { moduleLoaded: false });
+                        throw "Failed to load the worklet module" + e;
+                      }  
+
+                      if (btnCallback) { btnCallback() };
+                    } else {throw 'Mic stream not active';}
+                  }, function(message) {
+                    throw 'Could not access microphone - ' + message;
+                  });
+                } else {throw 'Could not access microphone - getUserMedia not available';};
+              }
+
+              function stopMicRecordStream() {
+                console.log("Stopped microphone access ...");
+                // stop mic stream 
+                gumStream.getAudioTracks().forEach(function(track) {
+                  track.stop();
+                });
+                $("#recordButton").removeClass('recording');
+                $("#recordButton").html('Mic &nbsp;&nbsp;<i class="microphone icon"></i>');
+                audioCtx.suspend();
+              }
+
+              // add event listeners to ui objects
+              $('#recordButton').click(function () {
+                var recording = $(this).hasClass('recording');
+                if (!recording) {
+                  $(this).prop("disabled", true);
+                  startMicRecordStream(audioCtx, bufferSize, function() {
+                    // called when the promise fulfilled
+                    $('#recordButton').addClass('recording');
+                    $('#recordButton').html('Stop &nbsp;&nbsp;<i class="stop icon"></i>');
+                    $('#recordButton').prop("disabled", false);
+                  });
+                } else {
+                    stopMicRecordStream();
+                }
+              }); // end recordButton onClick
+                
+            });
+        </script>
+      </body>
+</html>
