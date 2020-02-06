@@ -1,3 +1,3 @@
-import { EssentiaJSTools } from "../../builds/essentia.jstools.js"
+import { EssentiaTools } from "../../dist/essentia.jstools.js"
 
-essentiaTools = new EssentiaJSTools(Module);
+essentiaTools = new EssentiaTools(Module);

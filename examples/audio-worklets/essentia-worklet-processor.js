@@ -1,5 +1,5 @@
-import Module from '../../builds/essentia-0.0.1-module.js';
-import { EssentiaJSTools } from '../../builds/essentia.jstools.js';
+import Module from '../../dist/essentia-module.js';
+import { EssentiaTools } from '../../dist/essentia.jstools.js';
 
 let essentia = new Module.EssentiaJS(false);
 
@@ -16,7 +16,7 @@ class EssentiaWorkletProcessor extends AudioWorkletProcessor {
   constructor() {
     super();
     this.essentia = essentia;
-    this.utils = new EssentiaJSTools(Module);
+    this.utils = new EssentiaTools(Module);
     console.log('Essentia:' + this.essentia.version + '- http://essentia.upf.edu'); 
   }
   /**
