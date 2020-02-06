@@ -1,10 +1,14 @@
 ESSENTIAJS_VERSION=0.0.1
 LIB_DIR_ES=$(EMSCRIPTEN)/system/local/lib
 BUILD_DIR_ES=builds
+DIST_DIR_ES=dist
 BINDING_CPP_ES=src/cpp/bindings_essentiamin.cpp
 TO_INCLUDE_ES=src/cpp/includes/essentiamin.cpp 
 POST_JS_WASM=src/js/wasm.module.post.js
 ESSENTIA_TOOLS_JS=src/js/essentia.jstools.js
+ESSENTIA_JS=$(BUILD_DIR_ES)/essentiamin.js
+ESSENTIA_JS_WASM=$(BUILD_DIR_ES)/essentiamin.wasm
+ESSENTIA_JS_MODULE=$(BUILD_DIR_ES)/essentiamin-module.js
 
 build:
 	@mkdir -p $(BUILD_DIR_ES)
@@ -42,6 +46,11 @@ build:
 	@cat $(POST_JS_WASM) >> $(BUILD_DIR_ES)/essentiamin-$(ESSENTIAJS_VERSION)-module.js
 
 	@cp $(ESSENTIA_TOOLS_JS) $(BUILD_DIR_ES)/
+
+	@cp -f $(ESSENTIA_JS) $(DIST_DIR_ES)/
+	@cp -f $(ESSENTIA_JS_WASM) $(DIST_DIR_ES)/
+	@cp -f $(ESSENTIA_JS_MODULE) $(DIST_DIR_ES)/
+	@cp -f $(ESSENTIA_TOOLS_JS) $(DIST_DIR_ES)/
 	@echo "Done ..."
 
 	@echo "Removing unnecessary files ..."
@@ -50,7 +59,6 @@ build:
 
 	@echo "Builds ..."
 	@ls $(BUILD_DIR_ES)
-
 
 clean:
 	@rm -rf ./builds

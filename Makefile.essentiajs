@@ -1,13 +1,17 @@
-ESSENTIAJS_VERSION=0.0.1
 LIB_DIR_ES=$(EMSCRIPTEN)/system/local/lib
 BUILD_DIR_ES=builds
+DIST_DIR_ES=dist
 BINDING_CPP_ES=src/cpp/bindings_essentiajs.cpp
 TO_INCLUDE_ES=src/cpp/includes/essentiajs.cpp 
 POST_JS_WASM=src/js/wasm.module.post.js
 ESSENTIA_TOOLS_JS=src/js/essentia.jstools.js
+ESSENTIA_JS=$(BUILD_DIR_ES)/essentia.js
+ESSENTIA_JS_WASM=$(BUILD_DIR_ES)/essentia.wasm
+ESSENTIA_JS_MODULE=$(BUILD_DIR_ES)/essentia-module.js
 
 build:
 	@mkdir -p $(BUILD_DIR_ES)
+	@mkdir -p $(DIST_DIR_ES)
 
 	@echo "Generating cpp source code from essentia python bindings ..."
 	@cd src/python && python configure_bindings.py
@@ -30,7 +34,7 @@ build:
 	@emcc --emrun --bind -Oz \
 	   -s WASM=1 \
 	   $(BUILD_DIR_ES)/essentiajs.bc ${LIB_DIR_ES}/essentia.a \
-	   -o $(BUILD_DIR_ES)/essentia-$(ESSENTIAJS_VERSION).js \
+	   -o $(ESSENTIA_JS) \
 	   -s EXCEPTION_DEBUG \
 	   -s ASSERTIONS=2 \
 	   -s ALLOW_MEMORY_GROWTH=1 || exit 1
@@ -39,14 +43,20 @@ build:
 	@emcc --emrun --bind -Oz \
 	   -s WASM=1 \
 	   $(BUILD_DIR_ES)/essentiajs.bc ${LIB_DIR_ES}/essentia.a \
-	   -o $(BUILD_DIR_ES)/essentia-$(ESSENTIAJS_VERSION)-module.js \
+	   -o $(ESSENTIA_JS_MODULE) \
 	   -s BINARYEN_ASYNC_COMPILATION=0 \
 	   -s ALLOW_MEMORY_GROWTH=1 \
 	   -s SINGLE_FILE=1 || exit 1
 	      
-	@cat $(POST_JS_WASM) >> $(BUILD_DIR_ES)/essentia-$(ESSENTIAJS_VERSION)-module.js
+	@cat $(POST_JS_WASM) >> $(ESSENTIA_JS_MODULE)
 
 	@cp -f $(ESSENTIA_TOOLS_JS) $(BUILD_DIR_ES)/
+
+	@cp -f $(ESSENTIA_JS) $(DIST_DIR_ES)/
+	@cp -f $(ESSENTIA_JS_WASM) $(DIST_DIR_ES)/
+	@cp -f $(ESSENTIA_JS_MODULE) $(DIST_DIR_ES)/
+	@cp -f $(ESSENTIA_TOOLS_JS) $(DIST_DIR_ES)/
+
 	@echo "Done ..."
 
 	@echo "Removing unnecessary files ..."
