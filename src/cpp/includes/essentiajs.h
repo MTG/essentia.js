@@ -24,7 +24,6 @@
 
 #include <vector>
 
-
 class EssentiaJS {
   public:
     // property to store the current essentia library version
@@ -34,7 +33,7 @@ class EssentiaJS {
     // destructor for shutdown essentia instance
     ~EssentiaJS();
     // method for generating frames from a given audio signal
-    std::vector<std::vector<float> > frameGenerator(std::vector<float>& signal, int frameSize, int hopSize);
+    std::vector<std::vector<float> > FrameGenerator(std::vector<float>& signal, int frameSize, int hopSize);
 
     // NOTE: The following code snippets are machine generated. Do not edit.    
      

@@ -28,7 +28,6 @@
 using namespace essentia;
 using namespace essentia::standard;
 
-
 // instantiating the essentia algo registry with an optional argument to enable debug mode 
 EssentiaJS::EssentiaJS(bool debugger) {
   if (debugger) {
@@ -53,7 +52,7 @@ EssentiaJS::~EssentiaJS() {
 }
 
 // Method for frameCutting the given audio signal
-std::vector<std::vector<float> > EssentiaJS::frameGenerator(std::vector<float>& signal, int frameSize, int hopSize) {
+std::vector<std::vector<float> > EssentiaJS::FrameGenerator(std::vector<float>& signal, int frameSize, int hopSize) {
   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
   Algorithm* fc   = factory.create("FrameCutter",
                    "frameSize", frameSize,

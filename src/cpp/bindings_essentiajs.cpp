@@ -31,7 +31,7 @@ EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) {
   class_<EssentiaJS>("EssentiaJS")
     .constructor<bool>()
     .property("version", &EssentiaJS::essentiaVersion)
-    .function("frameGenerator", &EssentiaJS::frameGenerator)
+    .function("FrameGenerator", &EssentiaJS::FrameGenerator)
     .function("AfterMaxToBeforeMaxEnergyRatio", &EssentiaJS::AfterMaxToBeforeMaxEnergyRatio)
     .function("AllPass", &EssentiaJS::AllPass)
     .function("AudioOnsetsMarker", &EssentiaJS::AudioOnsetsMarker)
@@ -260,7 +260,6 @@ EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) {
   register_vector<float>("VectorFloat");
   register_vector<double>("VectorDouble");
   register_vector<std::string>("VectorString");
-  // 2D std vectors
   register_vector<std::vector<float>>("VectorVectorFloat");
   register_vector<std::vector<double>>("VectorVectorDouble");
 }
