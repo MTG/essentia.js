@@ -1,4 +1,3 @@
-ESSENTIAJS_VERSION=0.0.1
 LIB_DIR_ES=$(EMSCRIPTEN)/system/local/lib
 BUILD_DIR_ES=builds
 DIST_DIR_ES=dist
@@ -29,7 +28,7 @@ build:
 	@emcc --emrun --bind -Oz \
 	   -s WASM=1 \
 	   $(BUILD_DIR_ES)/essentiamin.bc ${LIB_DIR_ES}/essentia.a \
-	   -o $(BUILD_DIR_ES)/essentiamin-$(ESSENTIAJS_VERSION).js \
+	   -o $(BUILD_DIR_ES)/essentiamin.js \
 	   -s EXCEPTION_DEBUG \
 	   -s ASSERTIONS=2 \
 	   -s ALLOW_MEMORY_GROWTH=1 || exit 1
@@ -38,12 +37,12 @@ build:
 	@emcc --emrun --bind -Oz \
 	   -s WASM=1 \
 	   $(BUILD_DIR_ES)/essentiamin.bc ${LIB_DIR_ES}/essentia.a \
-	   -o $(BUILD_DIR_ES)/essentiamin-$(ESSENTIAJS_VERSION)-module.js \
+	   -o $(BUILD_DIR_ES)/essentiamin-module.js \
 	   -s BINARYEN_ASYNC_COMPILATION=0 \
 	   -s ALLOW_MEMORY_GROWTH=1 \
 	   -s SINGLE_FILE=1 || exit 1
 	    
-	@cat $(POST_JS_WASM) >> $(BUILD_DIR_ES)/essentiamin-$(ESSENTIAJS_VERSION)-module.js
+	@cat $(POST_JS_WASM) >> $(BUILD_DIR_ES)/essentiamin-module.js
 
 	@cp $(ESSENTIA_TOOLS_JS) $(BUILD_DIR_ES)/
 
