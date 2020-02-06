@@ -1,0 +1,47 @@
+{
+  "name": "essentia.js",
+  "version": "0.0.1",
+  "description": "JavaScript port and bindings for essentia C++ music/audio analysis library via Emscripten toolchain and WebAssembly",
+  "homepage": "https://mtg.github.io/essentia.js/",
+  "main": "main.js",
+  "files": [
+    "dist/essentia.js",
+    "dist/essentia.wasm",
+    "dist/essentia-module.js",
+    "dist/essentia.jstools.js",
+    "LICENSE.md",
+    "README.md"
+  ],
+  "directories": {
+    "doc": "docs",
+    "example": "examples",
+    "test": "test"
+  },
+  "devDependencies": {
+    "esm": "*",
+    "mocha": "*",
+    "chai": "*"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MTG/essentia.js.git"
+  },
+  "keywords": [
+    "audio-signal-processing",
+    "music-information-retrieval",
+    "webaudio",
+    "audio",
+    "music",
+    "webassembly",
+    "emscripten",
+    "essentia"
+  ],
+  "author": "Albin Correya <albin.correya@upf.edu> (http://mtg.upf.edu)",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/MTG/essentia.js/issues"
+  }
+}
