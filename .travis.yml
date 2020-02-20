@@ -3,19 +3,11 @@ notifications:
 
 language: cpp
 
-matrix:
-  include:
-    - sudo: required
-      services:
-        - docker
-      env: DOCKER_IMAGE=mtgupf/essentia-emscripten:2.1-beta5-dev
-           ES_MAKE_FILE=Makefile.essentiajs
-
-    - sudo: required
-      services:
-        - docker
-      env: DOCKER_IMAGE=mtgupf/essentia-emscripten:2.1-beta5-dev
-           ES_MAKE_FILE=Makefile.essentiamin
+sudo: required
+services:
+    - docker
+env: DOCKER_IMAGE=mtgupf/essentia-emscripten:2.1-beta5-dev
+     ES_MAKE_FILE=Makefile.essentiajs
 
 install:
   - docker pull $DOCKER_IMAGE
