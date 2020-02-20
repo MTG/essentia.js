@@ -1,6 +1,5 @@
-ESSENTIAJS_VERSION=0.0.9
-#LIB_DIR_ES=$(EMSCRIPTEN)/system/local/lib
-LIB_DIR_ES=/home/albin/Documents/Github/Final_Github/emsdk/upstream/emscripten/system/local/lib
+ESSENTIAJS_VERSION=0.1.0
+LIB_DIR_ES=$(EMSCRIPTEN)/system/local/lib
 BUILD_DIR_ES=builds
 DIST_DIR_ES=dist
 BINDING_CPP_ES=src/cpp/bindings_essentiajs.cpp
