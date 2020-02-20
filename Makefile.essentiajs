@@ -1,13 +1,16 @@
-LIB_DIR_ES=$(EMSCRIPTEN)/system/local/lib
+ESSENTIAJS_VERSION=0.0.9
+#LIB_DIR_ES=$(EMSCRIPTEN)/system/local/lib
+LIB_DIR_ES=/home/albin/Documents/Github/Final_Github/emsdk/upstream/emscripten/system/local/lib
 BUILD_DIR_ES=builds
 DIST_DIR_ES=dist
 BINDING_CPP_ES=src/cpp/bindings_essentiajs.cpp
 TO_INCLUDE_ES=src/cpp/includes/essentiajs.cpp 
-POST_JS_WASM=src/js/wasm.module.post.js
-ESSENTIA_TOOLS_JS=src/js/essentia.jstools.js
 ESSENTIA_JS=$(BUILD_DIR_ES)/essentia.js
 ESSENTIA_JS_WASM=$(BUILD_DIR_ES)/essentia.wasm
 ESSENTIA_JS_MODULE=$(BUILD_DIR_ES)/essentia-module.js
+PRE_JS_WASM=src/js/wasm.module.pre.js
+POST_JS_WASM=src/js/wasm.module.post.js
+ESSENTIA_TOOLS_JS=src/js/essentia.jstools.js
 
 build:
 	@mkdir -p $(BUILD_DIR_ES)
@@ -32,11 +35,12 @@ build:
 	@echo "Linking and compiling the bindings with essentia to js, wasm files ..."
 	@echo "compiling async builds..."
 	@emcc --emrun --bind -Oz \
-	   -s WASM=1 \
 	   $(BUILD_DIR_ES)/essentiajs.bc ${LIB_DIR_ES}/essentia.a \
+	   -s WASM=1 \
 	   -o $(ESSENTIA_JS) \
 	   -s EXCEPTION_DEBUG \
 	   -s ASSERTIONS=2 \
+	   -s ENVIRONMENT=web \
 	   -s ALLOW_MEMORY_GROWTH=1 || exit 1
 
 	@echo "compiling sync builds..."
@@ -47,15 +51,18 @@ build:
 	   -s BINARYEN_ASYNC_COMPILATION=0 \
 	   -s ALLOW_MEMORY_GROWTH=1 \
 	   -s SINGLE_FILE=1 || exit 1
-	      
+
+	@cat $(PRE_JS_WASM) $(ESSENTIA_JS) > $$.tmp && mv $$.tmp $(ESSENTIA_JS)
+	@cat $(PRE_JS_WASM) $(ESSENTIA_JS_MODULE) > $$.tmp && mv $$.tmp $(ESSENTIA_JS_MODULE)
 	@cat $(POST_JS_WASM) >> $(ESSENTIA_JS_MODULE)
 
 	@cp -f $(ESSENTIA_TOOLS_JS) $(BUILD_DIR_ES)/
 
-	@cp -f $(ESSENTIA_JS) $(DIST_DIR_ES)/
-	@cp -f $(ESSENTIA_JS_WASM) $(DIST_DIR_ES)/
-	@cp -f $(ESSENTIA_JS_MODULE) $(DIST_DIR_ES)/
-	@cp -f $(ESSENTIA_TOOLS_JS) $(DIST_DIR_ES)/
+	@mkdir -p $(DIST_DIR_ES)/$(ESSENTIAJS_VERSION)
+	@cp -f $(ESSENTIA_JS) $(DIST_DIR_ES)/$(ESSENTIAJS_VERSION)/
+	@cp -f $(ESSENTIA_JS_WASM) $(DIST_DIR_ES)/$(ESSENTIAJS_VERSION)/
+	@cp -f $(ESSENTIA_JS_MODULE) $(DIST_DIR_ES)/$(ESSENTIAJS_VERSION)/
+	@cp -f $(ESSENTIA_TOOLS_JS) $(DIST_DIR_ES)/$(ESSENTIAJS_VERSION)/
 
 	@echo "Done ..."
 
@@ -65,7 +72,7 @@ build:
 
 	@echo "Builds ..."
 	@ls $(BUILD_DIR_ES)
-
+	@echo "Done ..."
 
 clean:
-	@rm -rf ./builds
+	@rm -rf $(BUILD_DIR_ES)
