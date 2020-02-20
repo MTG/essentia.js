@@ -153,6 +153,7 @@ PowerSpectrum
 RMS
 RawMoments
 ReplayGain
+Resample
 ResampleFFT
 RhythmDescriptors
 RhythmExtractor
@@ -200,8 +201,6 @@ TempoTap
 TempoTapDegara
 TempoTapMaxAgreement
 TempoTapTicks
-TensorflowInputMusiCNN
-TensorflowInputVGGish
 TonalExtractor
 TonicIndianArtMusic
 TriangularBands

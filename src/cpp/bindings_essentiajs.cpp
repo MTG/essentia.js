@@ -31,6 +31,8 @@ EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) {
   class_<EssentiaJS>("EssentiaJS")
     .constructor<bool>()
     .property("version", &EssentiaJS::essentiaVersion)
+    .property("algorithmNames", &EssentiaJS::algorithmNames)
+    .function("shutdown", &EssentiaJS::shutdown)
     .function("FrameGenerator", &EssentiaJS::FrameGenerator)
     .function("AfterMaxToBeforeMaxEnergyRatio", &EssentiaJS::AfterMaxToBeforeMaxEnergyRatio)
     .function("AllPass", &EssentiaJS::AllPass)
@@ -187,6 +189,7 @@ EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) {
     .function("RMS", &EssentiaJS::RMS)
     .function("RawMoments", &EssentiaJS::RawMoments)
     .function("ReplayGain", &EssentiaJS::ReplayGain)
+    .function("Resample", &EssentiaJS::Resample)
     .function("ResampleFFT", &EssentiaJS::ResampleFFT)
     .function("RhythmDescriptors", &EssentiaJS::RhythmDescriptors)
     .function("RhythmExtractor", &EssentiaJS::RhythmExtractor)
@@ -234,8 +237,6 @@ EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) {
     .function("TempoTapDegara", &EssentiaJS::TempoTapDegara)
     .function("TempoTapMaxAgreement", &EssentiaJS::TempoTapMaxAgreement)
     .function("TempoTapTicks", &EssentiaJS::TempoTapTicks)
-    .function("TensorflowInputMusiCNN", &EssentiaJS::TensorflowInputMusiCNN)
-    .function("TensorflowInputVGGish", &EssentiaJS::TensorflowInputVGGish)
     .function("TonalExtractor", &EssentiaJS::TonalExtractor)
     .function("TonicIndianArtMusic", &EssentiaJS::TonicIndianArtMusic)
     .function("TriangularBands", &EssentiaJS::TriangularBands)
@@ -254,7 +255,6 @@ EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) {
     .function("Windowing", &EssentiaJS::Windowing)
     .function("ZeroCrossingRate", &EssentiaJS::ZeroCrossingRate)
     ;
-
   // expose stl datatypes to js
   register_vector<int>("VectorInt");
   register_vector<float>("VectorFloat");

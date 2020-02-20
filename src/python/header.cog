@@ -17,7 +17,7 @@
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
 
-// NOTE: This source code is auto-generated.
+// NOTE: This source code is machine-generated.
 
 #ifndef ESSENTIAJS_H
 #define ESSENTIAJS_H
@@ -30,17 +30,21 @@ class EssentiaJS {
     std::string essentiaVersion;
     // constructor for instantiating the essentia algo registry with an optional argument to enable debug mode 
     EssentiaJS(bool debugger=false);
-    // destructor for shutdown essentia instance
-    ~EssentiaJS();
+    ~EssentiaJS(){};
+    // method for shutdown essentia instance
+    void shutdown();
     // method for generating frames from a given audio signal
     std::vector<std::vector<float> > FrameGenerator(std::vector<float>& signal, int frameSize, int hopSize);
-
     // NOTE: The following code snippets are machine generated. Do not edit.    
     /*[[[cog
     import cog
-    from .code_generator import generate_headers
-    headers = generate_headers()
+    from .code_generator import generate_headers, TO_INCLUDE_ALGOS
     cog.outl(" ")
+    cog.outl("// class property which stores all the list of essentia algorithm names available in essentia.js")
+    c_algo_list = str(TO_INCLUDE_ALGOS)
+    cog.outl('std::string algorithmNames = "%s";' % c_algo_list)
+    cog.outl("// class methods to call various essentia algorithms")
+    headers = generate_headers()
     for ln in headers:
       cog.outl("%s;" % ln)
     ]]]*/

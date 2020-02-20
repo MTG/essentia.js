@@ -31,6 +31,8 @@ EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) {
   class_<EssentiaJS>("EssentiaJS")
     .constructor<bool>()
     .property("version", &EssentiaJS::essentiaVersion)
+    .property("algorithmNames", &EssentiaJS::algorithmNames)
+    .function("shutdown", &EssentiaJS::shutdown)
     .function("FrameGenerator", &EssentiaJS::FrameGenerator)
     /*[[[cog
     import logging
@@ -43,7 +45,6 @@ EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) {
     cog.out(";")
     ]]]*/
     //[[[end]]]
-
   // expose stl datatypes to js
   register_vector<int>("VectorInt");
   register_vector<float>("VectorFloat");

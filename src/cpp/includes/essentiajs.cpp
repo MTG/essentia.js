@@ -17,7 +17,7 @@
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
 
-// NOTE: This source code is auto-generated.
+// NOTE: This source code is machine-generated.
 
 #include <stdio.h>
 #include <essentia/algorithmfactory.h>
@@ -47,7 +47,7 @@ EssentiaJS::EssentiaJS(bool debugger) {
 }
 
 // shutdown essentia instance
-EssentiaJS::~EssentiaJS() {
+void EssentiaJS::shutdown() {
   essentia::shutdown();
 }
 
@@ -1999,6 +1999,18 @@ float EssentiaJS::ReplayGain(std::vector<float>& input_signal, const float sampl
   return output_replayGain;
 }
  
+// check https://essentia.upf.edu/reference/std_Resample.html
+std::vector<float> EssentiaJS::Resample(std::vector<float>& input_signal, const float inputSampleRate, const float outputSampleRate, const int quality) {
+  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+  Algorithm* algoResample = factory.create("Resample", "inputSampleRate", inputSampleRate, "outputSampleRate", outputSampleRate, "quality", quality);
+  algoResample->input("signal").set(input_signal);
+  std::vector<float> output_signal;
+  algoResample->output("signal").set(output_signal);
+  algoResample->compute();
+  delete algoResample;
+  return output_signal;
+}
+ 
 // check https://essentia.upf.edu/reference/std_ResampleFFT.html
 std::vector<float> EssentiaJS::ResampleFFT(std::vector<float>& input_input, const int inSize, const int outSize) {
   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
@@ -2578,30 +2590,6 @@ void EssentiaJS::TempoTapTicks(std::vector<float>& input_periods, std::vector<fl
   algoTempoTapTicks->output("matchingPeriods").set(output_matchingPeriods);
   algoTempoTapTicks->compute();
   delete algoTempoTapTicks;
-}
- 
-// check https://essentia.upf.edu/reference/std_TensorflowInputMusiCNN.html
-std::vector<float> EssentiaJS::TensorflowInputMusiCNN(std::vector<float>& input_frame) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoTensorflowInputMusiCNN = factory.create("TensorflowInputMusiCNN");
-  algoTensorflowInputMusiCNN->input("frame").set(input_frame);
-  std::vector<float> output_bands;
-  algoTensorflowInputMusiCNN->output("bands").set(output_bands);
-  algoTensorflowInputMusiCNN->compute();
-  delete algoTensorflowInputMusiCNN;
-  return output_bands;
-}
- 
-// check https://essentia.upf.edu/reference/std_TensorflowInputVGGish.html
-std::vector<float> EssentiaJS::TensorflowInputVGGish(std::vector<float>& input_frame) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoTensorflowInputVGGish = factory.create("TensorflowInputVGGish");
-  algoTensorflowInputVGGish->input("frame").set(input_frame);
-  std::vector<float> output_bands;
-  algoTensorflowInputVGGish->output("bands").set(output_bands);
-  algoTensorflowInputVGGish->compute();
-  delete algoTensorflowInputVGGish;
-  return output_bands;
 }
  
 // check https://essentia.upf.edu/reference/std_TonalExtractor.html

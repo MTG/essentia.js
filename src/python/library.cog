@@ -17,7 +17,7 @@
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
 
-// NOTE: This source code is auto-generated.
+// NOTE: This source code is machine-generated.
 
 #include <stdio.h>
 #include <essentia/algorithmfactory.h>
@@ -47,7 +47,7 @@ EssentiaJS::EssentiaJS(bool debugger) {
 }
 
 // shutdown essentia instance
-EssentiaJS::~EssentiaJS() {
+void EssentiaJS::shutdown() {
   essentia::shutdown();
 }
 

@@ -19,14 +19,12 @@ TO_INCLUDE_ALGOS_TXT_FILE = "included_algos.md"
 TO_EXCLUDE_ALGOS_TXT_FILE = "excluded_algos.md"
 
 # essentia algorithms that are excluded by default 
-DEFAULT_EXCLUDE_ALGOS = ['MonoLoader', 'AudioLoader', 'EasyLoader', 'ChromaPrint', 'Extractor', 
-                        'PCA', 'PoolAggregator', 'Viterbi', 'YamlInput', 'YamlOutput', 
-                        'FreesoundExtractor', 'MetadataReader', 'MusicExtractor', 'AudioWriter', 
-                        'MonoWriter', 'MonoMixer', 'SilenceRate', 'EqloudLoader', 'IFFTWComplex', 
-                        'FFTAComplex', 'Resample', 'YamlOutput', 'MusicExtractorSVM', 'IFFTAComplex', 
-                        'TensorflowPredict', 'TensorflowPredictMusiCNN', 'GaiaTransform', 
-                        'TensorflowPredictVGGish', 'YamlInput', 'IFFTW', 'FFTW', 'IFFTA', 
-                        'MetadataReader', 'FFTA', 'FFTWComplex']
+DEFAULT_EXCLUDE_ALGOS = ['MonoLoader', 'AudioLoader', 'EasyLoader', 'MonoWriter', 'MonoMixer', 'EqloudLoader', 'AudioWriter',
+                        'ChromaPrint', 'Extractor', 'FreesoundExtractor', 'MusicExtractor', 'MusicExtractorSVM',
+                        'PCA', 'PoolAggregator', 'YamlInput', 'YamlOutput', 'MetadataReader', 'Viterbi', 'SilenceRate',
+                        'FFTW', 'IFFTW', 'IFFTA', 'FFTA', 'FFTWComplex', 'IFFTWComplex', 'FFTAComplex', 'IFFTAComplex',
+                        'GaiaTransform', 'TensorflowPredict', 'TensorflowPredictMusiCNN', 'TensorflowPredictVGGish', 
+                        'TensorflowInputMusiCNN', 'TensorflowInputVGGish']
 
 # create a default file for exclude algo list file in case there is none
 if not os.path.exists(TO_EXCLUDE_ALGOS_TXT_FILE): 
@@ -37,7 +35,7 @@ if not os.path.exists(TO_EXCLUDE_ALGOS_TXT_FILE):
 TO_EXCLUDE_ALGOS = read_txt_file(TO_EXCLUDE_ALGOS_TXT_FILE)
 
 # excluding these algos too temporarily since the current essentia AlgorithmFactory instances has a limitation 
-# on number of parameters (16) that can configure at algorithm creation.
+# on number of parameters (16) that can configure at algorithm creation. See https://github.com/MTG/essentia/pull/957
 # NOTE: these algos should be included once the cpp macros has added in the main essentia repository.
 TO_EXCLUDE_ALGOS.extend(['MultiPitchKlapuri', 'MultiPitchMelodia', 'PitchMelodia', 
                         'PredominantPitchMelodia'])
@@ -80,7 +78,7 @@ if __name__ == '__main__':
         savelist_to_file(DEFAULT_INCLUDE_ALGOS, TO_INCLUDE_ALGOS_TXT_FILE)
 
     if cmd_args.exclude_algos:
-        # here instead replcing our defaults, we extend it with the defaults
+        # here instead replacing our defaults, we extend it with the defaults
         if os.path.exists(cmd_args.exclude_algos):
             extend_algos = read_txt_file(str(cmd_args.exclude_algos))
             TO_EXCLUDE_ALGOS.extend(extend_algos)
@@ -95,3 +93,4 @@ if __name__ == '__main__':
     
     # now spawn a subshell to run our code generator
     subprocess.call("cog -d -D version=3.4.1 @cogfiles.txt", shell=True)
+    
