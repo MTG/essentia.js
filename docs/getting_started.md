@@ -1,8 +1,8 @@
-# How to use essentia.js?
+# Getting started
 
-## Loading essentia.js
+## Loading `essentia.js`
 
-### HTML `<script>` tag
+- ### HTML `<script>` tag
 
 ```html
 <script src="dist/essentia.js"></script>
@@ -10,26 +10,38 @@
 Check out this [example](../examples/script-node-processor/example.html). There many ways for loading WebAssembly modules. Check https://developer.mozilla.org/en-US/docs/WebAssembly/Loading_and_running.
 
 
-### ES6 style import
+- ### ES6 style import
 
 ```javascript
 import Module from 'dist/essentia-module.js';
 
-let essentiaJs = new Module.EssentiaJS(false);
+let essentia = new Module.EssentiaJS(false);
+
+// prints version of essentia
+console.log(essentia.version)
+
+// prints all the available algorithm methods in EssentiaJS
+console.log(essentia.algorithmNames)
 ```
 Check out this [example](../examples/audio-worklets/essentia-worklet-processor.js).
 
-### NPM users
+ - ### NPM users
 
 ```bash
 npm install essentia.js
 ```
 
 ```javascript
-var pkg = require('essentia.js');
+var esModule = require('essentia.js');
 
 // NOTE: In npm dist 'Module.EssentiaJS' => 'Essentia.EssentiaJS'
-let essentiaJs = pkg.Essentia.EssentiaJS(false);
+let essentia = esModule.EssentiaJS(false);
+
+// prints version of essentia
+console.log(essentia.version)
+
+// prints all the available algorithm methods in EssentiaJS
+console.log(essentia.algorithmNames)
 ```
 
 ## Usages in Javscript

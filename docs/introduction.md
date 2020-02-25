@@ -12,7 +12,7 @@ You can find pre-compiled builds [here](https://github.com/MTG/essentia.js/tree/
 - `essentia.wasm` - Asynchronous WASM build of generic javascript bindings for essentia C++ library. 
 - `essentia.js` - JS glue code for loading `essentia.wasm` (can be used with HTML `<script>` tag).
 - `essentia-module.js` - Synchronous build of generic javascript bindings for essentia C++ library (ES6 import/export and AudioWorklet support).
-- `essentia.jstools.js` - Utility methods for converting JS typed arrays to and from essentia input types.
+- `essentia.tools.js` - Utility methods for converting JS typed arrays to and from essentia input types.
 
 
 &nbsp;
