@@ -14,16 +14,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <style>
       /* Edit your header styles here */
-      header { font-family: sans-serif; font-size: 25px; text-align: center; position: fixed; width: 100%; line-height: 42px; top: 0; left: 0; background-color: black; color: white; }
+      header { font-family: sans-serif; font-size: 25px; text-align: center; position: fixed; z-index:30; width: 100%; line-height: 42px; top: 0; left: 0; background-color: black; color: white; }
       body { box-sizing: border-box; min-width: 200px; max-width: 980px; margin: 76px auto 0 auto; padding: 55px; }
       @media (max-width: 767px) {
         header { font-size: 15px; }
         body { padding: 15px; }
       }
+      footer { font-family: sans-serif; font-size: 25px; text-align: center; position: fixed; width: 100%; line-height: 42px; bottom: 0; left: 0; background-color: black; color: white; }
     </style>
   </head>
   <body>
-    <header class="header">essentia.js Documentation</header>
+    <header class="header">Documentation</header>
 
     <!-- Edit your Markdown URL file location here -->
     <zero-md id="section1" manual-render src="introduction.md"></zero-md>
@@ -31,6 +32,21 @@
     <zero-md id="section2" manual-render src="getting_started.md"></zero-md>
 
     <zero-md id="section3" manual-render src="building_installing.md"></zero-md>
+
+    <footer class="footer">
+      <center>
+        <div style="margin-top: 30px; height: 20%;">
+          <a target="_blank" href="//essentia.upf.edu">
+            <img id="logo" src="https://essentia.upf.edu/documentation/_static/essentia_logo.svg" alt="MTG Logo"
+              style="margin-left: 40px; height: 70px;">
+          </a>
+          <a target="_blank" href="https://www.upf.edu/web/mtg">
+            <img class="essnt-footer_mtg-logo" src="https://mtg.github.io/assets/img/upflogo.png" alt="mtg logo"
+                style="width:300px; height: 70px;">
+          </a>
+        </div>
+      </center>
+    </footer>
 
     <script>
       $(document).ready(function () {

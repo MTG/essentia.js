@@ -1,59 +1,76 @@
 
 # Building and installing essentia.js from source
 
-You can find pre-compiled builds [here](https://github.com/MTG/essentia.js/tree/module/dist).
+You can find pre-compiled builds of `essentia.js` [here](https://unpkg.com/browse/essentia.js@0.0.8/dist/).
+
+In order to build the associate `essentia.js` builds we need to first compile essentia C++ library using emscripten compiler.
+
+If you need to recompile the builds yourself, you can either use the [docker](https://docs.docker.com/install/) (recommended) or build everything from source on your local system.
 
 
-## Compiling essentia using emscripten
+## Using docker
 
-If you need to recompile the builds, you can either use the [docker](https://docs.docker.com/install/) (recommended) or build everything from source on your local system.
+  - Pull the official [`essentia-emscripten`](https://hub.docker.com/r/mtgupf/essentia-emscripten) docker image.
+    ```bash
+    docker pull mtgupf/essentia-emscripten:2.1-beta5-dev
+    ```
 
+  - Clone or download the [essentia.js](https://github.com/MTG/essentia.js) repo.
 
-### Using docker
+  - `cd` to repo and mount the current directory as volume and run `build-bindings.sh` inside the docker container and check the new builds at the `dist/` directory.
 
-```bash
-docker pull mtgupf/essentia-emscripten:2.1-beta5-dev
-```
-- Mount the current directory as volume and run `build-bindings.sh` inside the docker container and check the new builds at the `dist/` directory.
-
-```bash
-docker run --rm -v `pwd`:/srv/workspace/ \
-                mtgupf/essentia-emscripten:2.1-beta5-dev \
-                /srv/workspace/build-bindings.sh \
-                Makefile.essentiajs
-```
+    ```bash
+    docker run --rm -v `pwd`:/srv/workspace/ \
+                    mtgupf/essentia-emscripten:2.1-beta5-dev \
+                    /srv/workspace/build-bindings.sh \
+                    Makefile.essentiajs
+    ```
 
 OR 
 
-### Building from source
+## Building from source locally
 
 
 * Install [emscripten](https://emscripten.org/docs/getting_started/downloads.html).
 
-* Clone the `emscripten` branch of essentia repository
-```bash
-git clone -b emscripten https://github.com/MTG/essentia.git
-```
+* Clone the [essentia](https://github.com/MTG/essentia.git) repository.
+  ```bash
+  git clone https://github.com/MTG/essentia.git
+  ```
+
+* Install the required 3rd party dependencies for essentia. Check the instructions [here](https://essentia.upf.edu/installing.html#installing-dependencies-on-linux).
 
 * Compile essentia C++ library with the emscripten compiler. Check essentia [documentation](https://essentia.upf.edu/documentation/installing.html#compiling-essentia) for more details.
 
 
-```bash
-# configure build settings for essentia using kissfft
-emconfigure sh -c './waf configure --prefix=$EMSCRIPTEN/system/local/ --build-static --lightweight= --fft=KISS --emscripten'
+  ```bash
+  # configure build settings for essentia using kissfft
+  emconfigure sh -c './waf configure --prefix=$EMSCRIPTEN/system/local/ --build-static --lightweight= --fft=KISS --emscripten'
 
-# compile and build essentia
-emmake ./waf
+  # compile and build essentia
+  emmake ./waf
 
-# (you might need sudo rights)
-emmake ./waf install
-```
+  # (you might need sudo rights)
+  emmake ./waf install
+  ```
 
-* Build essentia.js.
+* Clone or download the [essentia.js](https://github.com/MTG/essentia.js) repo.
 
-```bash
-emconfigure sh -c './build-bindings.sh Makefile.essentiajs'
-```
+* Finally, `cd` to repo and build the `essentia.js` bindings using one of the following commands. Check the new builds at the `dist/` directory.
+ 
+  Spawn a subshell inside the emscripten `emconfigure` in order to properlly access the emscripten variables.
+
+  ```bash
+  emconfigure sh -c './build-bindings.sh Makefile.essentiajs'
+  ```
+
+  OR 
+
+  You can also run it from node
+  ```bash
+  npm run build
+  ```
+  > Note: make you added the emscripten env variables to your bash profile.
 
 
 ## Customizing your essentia.js builds
@@ -64,14 +81,18 @@ You can make customised builds of essentia.js for only a set of selected essenti
 
 ```bash
 cd src/python
+
 # configure default list of algorithms for creating the js bindings
 python configure_bindings.py 
+
 # OR
 # specify a list of algorithms for which you need to create the js bindings
 python configure_bindings.py -i "['Key', 'HPCP']"
+
 # OR
 # you can also specify the algorithm list by a txt file
 python configure_bindings.py -i your_included_algos_list.txt
+
 # for more cli options
  python configure_bindings.py -h
 ```
@@ -183,5 +204,6 @@ You could also write  your own customised [essentia feature extractor](https://e
                                     2048, // hopSize
                                     'hann'); // windowType
   ```
+
 
 &nbsp;

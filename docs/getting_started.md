@@ -25,36 +25,36 @@ console.log(essentia.algorithmNames)
 
 The following CDN links are available for `essentia.js`.
   
-  - #### HTML `<script>` tag
+- #### HTML `<script>` tag
 
-  ```html
-  <script src="https://unpkg.com/essentia.js@0.0.8/dist/essentia.js"></script>
-  ```
-  Check out this [example](../examples/script-node-processor/example.html). 
+```html
+<script src="https://unpkg.com/essentia.js@0.0.8/dist/essentia.js"></script>
+```
+Check out this [example](../examples/script-node-processor/example.html). 
 
 
-  - #### ES6 style import
+- #### ES6 style import
 
-  ```javascript
-  import Module from 'https://unpkg.com/essentia.js@0.0.8/dist/essentia-module.js';
+```javascript
+import Module from 'https://unpkg.com/essentia.js@0.0.8/dist/essentia-module.js';
   
-  // import essentia.tools.js (includes utility funcs for essentia.js)
-  import { EssentiaTools } from 'https://unpkg.com/essentia.js@0.0.8/dist/essentia.tools.js';
+// import essentia.tools.js (includes utility funcs for essentia.js)
+import { EssentiaTools } from 'https://unpkg.com/essentia.js@0.0.8/dist/essentia.tools.js';
 
-  let essentia = new Module.EssentiaJS(false);
+let essentia = new Module.EssentiaJS(false);
 
-  // prints version of essentia
-  console.log(essentia.version)
+// prints version of essentia
+console.log(essentia.version)
 
-  // prints all the available algorithm methods in EssentiaJS
-  console.log(essentia.algorithmNames)
+// prints all the available algorithm methods in EssentiaJS
+console.log(essentia.algorithmNames)
 
-  // create an instance of EssentiaTools
-  let essentiaTools = new EssentiaTools(Module);
+// create an instance of EssentiaTools
+let essentiaTools = new EssentiaTools(Module);
   ```
-  Check out this [example](../examples/audio-worklets/essentia-worklet-processor.js).
+Check out this [example](../examples/audio-worklets/essentia-worklet-processor.js).
 
-  > Note: You shouldn't import the `essentia-module.js` on the main thread.
+> Note: You shouldn't import the `essentia-module.js` on the main thread.
 
   There are also some other ways for loading WebAssembly modules. Check https://developer.mozilla.org/en-US/docs/WebAssembly/Loading_and_running.
 
