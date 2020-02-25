@@ -1,29 +1,39 @@
 {
   "name": "essentia.js",
-  "version": "0.0.1",
-  "description": "JavaScript port and bindings for essentia C++ music/audio analysis library via Emscripten toolchain and WebAssembly",
+  "version": "0.0.8",
+  "description": "JavaScript port and bindings for essentia C++ music/audio analysis and processing library via Emscripten and WebAssembly",
   "homepage": "https://mtg.github.io/essentia.js/",
-  "main": "main.js",
+  "author": "Albin Correya <albin.correya@upf.edu> (http://mtg.upf.edu)",
+  "license": "AGPL-3.0",
+  "main": "index.js",
   "files": [
-    "dist/essentia.js",
-    "dist/essentia.wasm",
-    "dist/essentia-module.js",
-    "dist/essentia.jstools.js",
+    "dist/*",
+    "index.js",
     "LICENSE.md",
     "README.md"
   ],
+  "scripts": {
+    "build": "make -f Makefile.essentiajs",
+    "test": "mocha"
+  },
   "directories": {
     "doc": "docs",
     "example": "examples",
-    "test": "test"
+    "test": "tests"
   },
+  "dependencies": {
+    "esm": "3.2.25"
+  },
+  "bundledDependencies": [
+    "esm"
+  ],
   "devDependencies": {
-    "esm": "*",
-    "mocha": "*",
-    "chai": "*"
-  },
-  "scripts": {
-    "test": "mocha"
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "chai": "^4.2.0",
+    "mocha": "^6.1.4",
+    "esm": "^3.2.25"
   },
   "repository": {
     "type": "git",
@@ -39,8 +49,6 @@
     "emscripten",
     "essentia"
   ],
-  "author": "Albin Correya <albin.correya@upf.edu> (http://mtg.upf.edu)",
-  "license": "AGPL-3.0",
   "bugs": {
     "url": "https://github.com/MTG/essentia.js/issues"
   }
