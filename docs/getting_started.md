@@ -2,29 +2,6 @@
 
 ## Loading `essentia.js`
 
-- ### HTML `<script>` tag
-
-```html
-<script src="dist/essentia.js"></script>
-```
-Check out this [example](../examples/script-node-processor/example.html). There many ways for loading WebAssembly modules. Check https://developer.mozilla.org/en-US/docs/WebAssembly/Loading_and_running.
-
-
-- ### ES6 style import
-
-```javascript
-import Module from 'dist/essentia-module.js';
-
-let essentia = new Module.EssentiaJS(false);
-
-// prints version of essentia
-console.log(essentia.version)
-
-// prints all the available algorithm methods in EssentiaJS
-console.log(essentia.algorithmNames)
-```
-Check out this [example](../examples/audio-worklets/essentia-worklet-processor.js).
-
  - ### NPM users
 
 ```bash
@@ -43,6 +20,44 @@ console.log(essentia.version)
 // prints all the available algorithm methods in EssentiaJS
 console.log(essentia.algorithmNames)
 ```
+
+- ### Using CDN 
+
+The following CDN links are available for `essentia.js`.
+  
+  - #### HTML `<script>` tag
+
+  ```html
+  <script src="https://unpkg.com/essentia.js@0.0.8/dist/essentia.js"></script>
+  ```
+  Check out this [example](../examples/script-node-processor/example.html). 
+
+
+  - #### ES6 style import
+
+  ```javascript
+  import Module from 'https://unpkg.com/essentia.js@0.0.8/dist/essentia-module.js';
+  
+  // import essentia.tools.js (includes utility funcs for essentia.js)
+  import { EssentiaTools } from 'https://unpkg.com/essentia.js@0.0.8/dist/essentia.tools.js';
+
+  let essentia = new Module.EssentiaJS(false);
+
+  // prints version of essentia
+  console.log(essentia.version)
+
+  // prints all the available algorithm methods in EssentiaJS
+  console.log(essentia.algorithmNames)
+
+  // create an instance of EssentiaTools
+  let essentiaTools = new EssentiaTools(Module);
+  ```
+  Check out this [example](../examples/audio-worklets/essentia-worklet-processor.js).
+
+  > Note: You shouldn't import the `essentia-module.js` on the main thread.
+
+  There are also some other ways for loading WebAssembly modules. Check https://developer.mozilla.org/en-US/docs/WebAssembly/Loading_and_running.
+
 
 ## Usages in Javscript
 
@@ -115,7 +130,7 @@ Similarly, you could use any of the algorithms specified in the [essentia algori
     };
   </script>
   <head>
-    <script src="dist/essentia.js"></script>
+    <script src="https://unpkg.com/essentia.js@0.0.8/dist/essentia.js"></script>
   </head>
 </html>
 ```
