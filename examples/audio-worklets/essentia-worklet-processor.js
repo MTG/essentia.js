@@ -1,5 +1,5 @@
-import Module from '../../dist/essentia-module.js';
-import { EssentiaTools } from '../../dist/essentia.tools.js';
+import Module from 'https://unpkg.com/essentia.js@0.0.8/dist/essentia-module.js';
+import { EssentiaTools } from 'https://unpkg.com/essentia.js@0.0.8/dist/essentia.tools.js';
 
 let essentia = new Module.EssentiaJS(false);
 
