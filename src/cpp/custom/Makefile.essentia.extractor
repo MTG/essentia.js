@@ -1,0 +1,54 @@
+ESSENTIAJS_VERSION=0.1.0
+LIB_DIR_ES=$(EMSCRIPTEN)/system/local/lib
+BUILD_DIR_ES=builds
+BINDING_CPP_ES=bindings_essentia_extractor.cpp
+TO_INCLUDE_ES=essentia_extractor.cpp 
+POST_JS_WASM=../../js/wasm.module.post.js
+ESSENTIA_JS=$(BUILD_DIR_ES)/essentia-extractor.js
+ESSENTIA_JS_WASM=$(BUILD_DIR_ES)/essentia-extractor.wasm
+ESSENTIA_JS_MODULE=$(BUILD_DIR_ES)/essentia-extractor-module.js
+
+build:
+	@mkdir -p $(BUILD_DIR_ES)
+
+	@echo "Compiling the bindings to bitcode ..."
+
+	@emcc --bind -Oz \
+	   $(BINDING_CPP_ES) \
+	   $(TO_INCLUDE_ES) \
+	   -o $(BUILD_DIR_ES)/essentiamin.bc \
+	   -s EXCEPTION_DEBUG \
+	   -s ASSERTIONS=2 \
+	   -s DISABLE_EXCEPTION_CATCHING=2 || exit 1
+	@echo "Done ..."
+
+	@echo "Linking and compiling the bindings with essentia to js, wasm files ..."
+	@echo "compiling async builds..."
+	@emcc --emrun --bind -Oz \
+	   -s WASM=1 \
+	   $(BUILD_DIR_ES)/essentiamin.bc ${LIB_DIR_ES}/essentia.a \
+	   -o $(ESSENTIA_JS) \
+	   -s EXCEPTION_DEBUG \
+	   -s ASSERTIONS=2 \
+	   -s ALLOW_MEMORY_GROWTH=1 || exit 1
+
+	@echo "compiling sync builds..."
+	@emcc --emrun --bind -Oz \
+	   -s WASM=1 \
+	   $(BUILD_DIR_ES)/essentiamin.bc ${LIB_DIR_ES}/essentia.a \
+	   -o $(ESSENTIA_JS_MODULE) \
+	   -s BINARYEN_ASYNC_COMPILATION=0 \
+	   -s ALLOW_MEMORY_GROWTH=1 \
+	   -s SINGLE_FILE=1 || exit 1
+	    
+	@cat $(POST_JS_WASM) >> $(ESSENTIA_JS_MODULE)
+
+	@echo "Removing unnecessary files ..."
+	@rm $(BUILD_DIR_ES)/essentiamin.bc
+	@echo "Done ..."
+
+	@echo "Builds ..."
+	@ls $(BUILD_DIR_ES)
+
+clean:
+	@rm -rf $(BUILD_DIR_ES)

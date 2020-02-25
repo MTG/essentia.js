@@ -1,0 +1,3 @@
+cogapp
+# (remove this when official mtg-emscripten docker already has essentia python bindings installed)
+essentia==2.1b5

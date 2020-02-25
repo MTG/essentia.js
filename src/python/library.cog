@@ -1,0 +1,88 @@
+/*
+ * Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra
+ *
+ * This file is part of Essentia
+ *
+ * Essentia is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation (FSF), either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the Affero GNU General Public License
+ * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
+ */
+
+// NOTE: This source code is machine-generated.
+
+#include <stdio.h>
+#include <essentia/algorithmfactory.h>
+#include <essentia/essentiamath.h>
+#include <essentia/pool.h>
+#include "essentiajs.h"
+
+using namespace essentia;
+using namespace essentia::standard;
+
+// instantiating the essentia algo registry with an optional argument to enable debug mode 
+EssentiaJS::EssentiaJS(bool debugger) {
+  if (debugger) {
+    // if true sets essentia debugger active
+    // EAll is a special value in essentia that contains all modules
+    setDebugLevel(EAll); 
+    unsetDebugLevel(EMemory | EConnectors);
+    // activate warnings
+    essentia::warningLevelActive = true; 
+    // activate info
+    essentia::infoLevelActive = true;
+    // activate error level    
+    essentia::errorLevelActive = true;    
+  }
+  essentia::init();
+  essentiaVersion = essentia::version;
+}
+
+// shutdown essentia instance
+void EssentiaJS::shutdown() {
+  essentia::shutdown();
+}
+
+// Method for frameCutting the given audio signal
+std::vector<std::vector<float> > EssentiaJS::FrameGenerator(std::vector<float>& signal, int frameSize, int hopSize) {
+  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+  Algorithm* fc   = factory.create("FrameCutter",
+                   "frameSize", frameSize,
+                   "hopSize", hopSize);
+  Pool pool;
+  std::vector<float> frame;
+  fc->input("signal").set(signal);
+  fc->output("frame").set(frame);
+  while (true) {
+    // compute a frame
+    fc->compute();
+    // if it was the last one (ie: it was empty), then we're done.
+    if (!frame.size()) {
+      break;
+    }
+    // if the frame is silent, just drop it and go on processing
+    if (isSilent(frame)) continue;
+    pool.add("frames", frame);
+  }
+  delete fc;
+  return pool.value<std::vector<std::vector<float> > >("frames");
+}
+
+// NOTE: The following code snippets are machine generated. Do not edit.
+/*[[[cog
+import cog
+from .code_generator import generate_algorithms
+algos = generate_algorithms()
+for algo in algos:
+  for ln in algo:
+    cog.outl(ln)
+]]]*/
+//[[[end]]]

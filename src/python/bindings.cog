@@ -1,0 +1,55 @@
+/*
+ * Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra
+ *
+ * This file is part of Essentia
+ *
+ * Essentia is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation (FSF), either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the Affero GNU General Public License
+ * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
+ */
+
+// NOTE: This source code is auto-generated.
+
+#include <stdio.h>
+#include <emscripten/bind.h>
+#include "./includes/essentiajs.h"
+
+using namespace emscripten;
+
+// expose essentiajs class to js using embind wrappers
+EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) { 
+  // NOTE: The following code snippets are machine generated. Do not edit.
+  class_<EssentiaJS>("EssentiaJS")
+    .constructor<bool>()
+    .property("version", &EssentiaJS::essentiaVersion)
+    .property("algorithmNames", &EssentiaJS::algorithmNames)
+    .function("shutdown", &EssentiaJS::shutdown)
+    .function("FrameGenerator", &EssentiaJS::FrameGenerator)
+    /*[[[cog
+    import logging
+    import cog
+    from .code_generator import TO_INCLUDE_ALGOS
+    logging.basicConfig(level='INFO')
+    logging.info("Generating emscripten bindings for the essentia...")
+    for algo_name in TO_INCLUDE_ALGOS:
+      cog.outl('.function("%s", &EssentiaJS::%s)' % (algo_name, algo_name))
+    cog.out(";")
+    ]]]*/
+    //[[[end]]]
+  // expose stl datatypes to js
+  register_vector<int>("VectorInt");
+  register_vector<float>("VectorFloat");
+  register_vector<double>("VectorDouble");
+  register_vector<std::string>("VectorString");
+  register_vector<std::vector<float>>("VectorVectorFloat");
+  register_vector<std::vector<double>>("VectorVectorDouble");
+}

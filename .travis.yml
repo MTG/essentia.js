@@ -6,11 +6,12 @@ language: cpp
 sudo: required
 services:
     - docker
-env: DOCKER_IMAGE=mtgupf/essentia-emscripten:2.1-beta6-dev
+env: DOCKER_IMAGE=mtgupf/essentia-emscripten:2.1-beta5-dev
+     ES_MAKE_FILE=Makefile.essentiajs
 
 install:
   - docker pull $DOCKER_IMAGE
 
 script:
-  - docker run --rm -v `pwd`:/srv/workspace/ $DOCKER_IMAGE /srv/workspace/build-bindings.sh
+  - docker run --rm -v `pwd`:/srv/workspace/ $DOCKER_IMAGE /srv/workspace/build-bindings.sh $ES_MAKE_FILE
   - travis/deploy_builds.sh
