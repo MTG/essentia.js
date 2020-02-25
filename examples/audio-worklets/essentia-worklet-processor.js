@@ -1,10 +1,10 @@
 import Module from '../../dist/essentia-module.js';
-import { EssentiaTools } from '../../dist/essentia.jstools.js';
+import { EssentiaTools } from '../../dist/essentia.tools.js';
 
 let essentia = new Module.EssentiaJS(false);
 
 /**
- * A simple demonstration of using essentia.js wasm modules as AudioWorkletProcessor.
+ * A simple demonstration of using essentia.js wasm  Modules as AudioWorkletProcessor.
  *
  * @class EssentiaWorkletProcessor
  * @extends AudioWorkletProcessor
@@ -34,7 +34,7 @@ class EssentiaWorkletProcessor extends AudioWorkletProcessor {
     // Write your essentia.js processing code here
      
     // copy the input audio frame array from channel 0 to a std::vector<float> type for using it in essentia
-    let vectorInput = this.utils.typedFloatArray2Vector(input[0]);
+    let vectorInput = this.utils.arrayToVector(input[0]);
 
     // In this case we apply a traingular windowing function to every input audio frame
     // check https://essentia.upf.edu/reference/std_Windowing.html
@@ -47,7 +47,7 @@ class EssentiaWorkletProcessor extends AudioWorkletProcessor {
                                                 true); // zeroPhase 
 
     // convert the output back to float32 typed array
-    let outputArray = this.utils.vector2typedFloat32Array(windowedFrame);
+    let outputArray = this.utils.vectorToArray(windowedFrame);
     
     console.log("input audio frameSize: " + outputArray.length);
     // copy converted array to the output channel 0

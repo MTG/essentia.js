@@ -75,7 +75,7 @@ function stopMicRecordStream() {
 // ScriptNodeProcessor callback function to extract Danceability feature using essentia.js and plotting it on the front-end
 function onRecordEssentiaFeatureExtractor(event) {
   // convert the float32 audio data into std::vector<float> for using essentia algos 
-  var bufferSignal = essentiaTools.typedFloatArray2Vector(event.inputBuffer.getChannelData(0));
+  var bufferSignal = essentiaTools.arrayToVector(event.inputBuffer.getChannelData(0));
   if (!bufferSignal) { throw "onRecordingError: empty audio signal input found!"};
   
   // create empty std::vector<float> vector for populating the output of essentia.PitchYinProbabilistic algorithm
@@ -96,9 +96,13 @@ function onRecordEssentiaFeatureExtractor(event) {
                                 audioCtx.sampleRate); //sampleRate
 
   // convert the output to js arrray
-  var pitchValues = essentiaTools.vector2typedFloat32Array(pitches);
+  var pitchValues = essentiaTools.vectorToArray(pitches);
   // here we call the plotting function to display realtime feature extraction results
   plotMelodyContour(pitchValues, plotContainerId, 'PitchYinProbabilistic');
+
+  // fallback to free the vectors
+  pitches.resize(0, 1);
+  voicedProbabilities.resize(0, 1);
 }
 
 
