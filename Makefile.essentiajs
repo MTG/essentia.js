@@ -1,4 +1,4 @@
-ESSENTIAJS_VERSION=0.1.0
+ESSENTIAJS_VERSION=0.0.8
 LIB_DIR_ES=$(EMSCRIPTEN)/system/local/lib
 BUILD_DIR_ES=builds
 DIST_DIR_ES=dist
@@ -9,11 +9,10 @@ ESSENTIA_JS_WASM=$(BUILD_DIR_ES)/essentia.wasm
 ESSENTIA_JS_MODULE=$(BUILD_DIR_ES)/essentia-module.js
 PRE_JS_WASM=src/js/wasm.module.pre.js
 POST_JS_WASM=src/js/wasm.module.post.js
-ESSENTIA_TOOLS_JS=src/js/essentia.jstools.js
+ESSENTIA_TOOLS_JS=src/js/essentia.tools.js
 
 build:
 	@mkdir -p $(BUILD_DIR_ES)
-	@mkdir -p $(DIST_DIR_ES)
 
 	@echo "Generating cpp source code from essentia python bindings ..."
 	@cd src/python && python configure_bindings.py
@@ -57,11 +56,11 @@ build:
 
 	@cp -f $(ESSENTIA_TOOLS_JS) $(BUILD_DIR_ES)/
 
-	@mkdir -p $(DIST_DIR_ES)/$(ESSENTIAJS_VERSION)
-	@cp -f $(ESSENTIA_JS) $(DIST_DIR_ES)/$(ESSENTIAJS_VERSION)/
-	@cp -f $(ESSENTIA_JS_WASM) $(DIST_DIR_ES)/$(ESSENTIAJS_VERSION)/
-	@cp -f $(ESSENTIA_JS_MODULE) $(DIST_DIR_ES)/$(ESSENTIAJS_VERSION)/
-	@cp -f $(ESSENTIA_TOOLS_JS) $(DIST_DIR_ES)/$(ESSENTIAJS_VERSION)/
+	@mkdir -p $(DIST_DIR_ES)
+	@cp -f $(ESSENTIA_JS) $(DIST_DIR_ES)/
+	@cp -f $(ESSENTIA_JS_WASM) $(DIST_DIR_ES)/
+	@cp -f $(ESSENTIA_JS_MODULE) $(DIST_DIR_ES)/
+	@cp -f $(ESSENTIA_TOOLS_JS) $(DIST_DIR_ES)/
 
 	@echo "Done ..."
 
