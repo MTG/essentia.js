@@ -23,6 +23,9 @@
 #define ESSENTIAJS_H
 
 #include <vector>
+#include <emscripten/bind.h>
+
+using namespace emscripten;
 
 class EssentiaJS {
   public:

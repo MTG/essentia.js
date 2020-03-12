@@ -7,13 +7,17 @@ import essentia.standard as estd
 import argparse
 import logging
 from ast import literal_eval
-from configure_bindings import TO_INCLUDE_ALGOS, TO_EXCLUDE_ALGOS, read_txt_file
+from configure_bindings import TO_INCLUDE_ALGOS, TO_EXCLUDE_ALGOS
 
 logging.basicConfig(level='INFO')
 
 # prefix that we add to the input and output variable names of essentia algorithms to avoid compilation erros
 INPUT_PREFIX_ES = "input_"
 OUTPUT_PREFIX_ES = "output_"
+
+# By default we return a JS object for every essentia algorithm bindings 
+# using emscripten::val class (https://emscripten.org/docs/api_reference/val.h.html)
+FUNC_RETURN_TYPE = "val"
 
 logging.info("Generating essentia.js cpp source code and binding files ....")
 logging.info("Excluding the following %s algorithms while generating bindings ..." % len(TO_EXCLUDE_ALGOS))
@@ -67,6 +71,7 @@ def parse_algorithm_info(algorithm_name, target="header"):
 	param_dict = dict()
 	output_dict['outputs'] = []
 	param_dict['params'] = []
+	output_var_names = list()
 	# create the algorithm object
 	algo = getattr(estd, algorithm_name)()
 	doc_dict = algo.getStruct()
@@ -109,7 +114,9 @@ def parse_algorithm_info(algorithm_name, target="header"):
 				output_var = "%s %s%s" % (map_types_to_cpp(out['type']), 
 										OUTPUT_PREFIX_ES, 
 										out['name'])
+				
 				outputs.append(output_var)
+				output_var_names.append("%s%s" % (OUTPUT_PREFIX_ES, out['name']))
 				output_dict['outputs'].append('  %s->output("%s").set(%s%s);' % (algo_obj, 
 																			out['name'], 
 																			OUTPUT_PREFIX_ES, 
@@ -119,70 +126,37 @@ def parse_algorithm_info(algorithm_name, target="header"):
 		for out in doc_dict['outputs']:
 			output_var = "%s %s%s" % (map_types_to_cpp(out['type']), OUTPUT_PREFIX_ES, out['name'])
 			outputs.append(output_var)
+			output_var_names.append("%s%s" % (OUTPUT_PREFIX_ES, out['name']))
 			output_dict['outputs'].append('  %s->output("%s").set(%s%s);' % (algo_obj, 
 																			out['name'], 
 																			OUTPUT_PREFIX_ES, 
 																			out['name']))
 		
-	# create function declaration string
-	if func_return_type != 'void':
-		func_str = "%s %s(%s, %s)" % (func_return_type, 
-									algorithm_name, 
-									', '.join(inputs),  
-									', '.join(parameters))
-	else:
-		func_str = "%s %s(%s, %s, %s)" % (func_return_type, 
-										algorithm_name, 
-										', '.join(inputs), 
-										', '.join(outputs), 
-										', '.join(parameters))
+	# Default function declaration string
+	func_str = "%s %s(%s, %s)" % (FUNC_RETURN_TYPE, 
+								algorithm_name, 
+								', '.join(inputs),  
+								', '.join(parameters))
+
+	# Update the func_str if either inputs or parameters 
+	# are not specified for a particular algorithms
 
 	if not inputs:
-		if func_return_type != 'void':
-			func_str = "%s %s(%s)" % (func_return_type, algorithm_name,  
-									', '.join(parameters))
-		else:
-			func_str = "%s %s(%s, %s)" % (func_return_type, 
-										algorithm_name, 
-										', '.join(outputs), 
-										', '.join(parameters))
 
-		if not inputs and not outputs:
-			func_str = "%s %s(%s)" % (func_return_type, 
-									algorithm_name, 
-									', '.join(parameters))
+		func_str = "%s %s(%s)" % (FUNC_RETURN_TYPE, 
+								algorithm_name,  
+								', '.join(parameters))
 
-		if not inputs and not parameters:
-			if func_return_type == 'void':
-				func_str = "%s %s(%s)" % (func_return_type, 
-										algorithm_name, 
-										', '.join(outputs))
-			else:
-				raise IOError("No inputs, outputs or parameters found for the algorithm - '%s'" 
-								% algorithm_name)
-
-	if not outputs:
-		func_str = "%s %s(%s, %s)" % (func_return_type, 
-									algorithm_name, 
-									', '.join(inputs), 
-									', '.join(parameters))
-
-		if not outputs and not parameters:
-			func_str = "%s %s(%s)" % (func_return_type, 
-									algorithm_name, 
-									', '.join(inputs))
+		if not parameters and not outputs:
+			raise IOError("No inputs, outputs or parameters found for the algorithm - '%s'" 
+							% algorithm_name)
 	
 	if not parameters:
-		if func_return_type != 'void':
-			func_str = "%s %s(%s)" % (func_return_type, 
-									algorithm_name, 
-									', '.join(inputs))
-		else:
-			func_str = "%s %s(%s, %s)" % (func_return_type, 
-										algorithm_name, 
-										', '.join(inputs), 
-										', '.join(outputs))
-	
+
+		func_str = "%s %s(%s)" % (FUNC_RETURN_TYPE, 
+								algorithm_name, 
+								', '.join(inputs))
+
 	# return function declaration string if target is for header file
 	if target == "header":
 		return func_str
@@ -198,14 +172,12 @@ def parse_algorithm_info(algorithm_name, target="header"):
 
 		arg_parse_str = " %s" % algorithm_name
 		
-		if func_return_type != "void":
-			algorithm.append("%s %s::%s%s {" % (func_return_type.replace('&', ''), 
-												class_name, 
-												algorithm_name, 
-												func_str.split(arg_parse_str)[1]))
-		else:
-			algorithm.append("void %s::%s%s {" % (class_name, algorithm_name, 
-												func_str.split(arg_parse_str)[1]))
+
+		algorithm.append("%s %s::%s%s {" % (FUNC_RETURN_TYPE, 
+											class_name, 
+											algorithm_name, 
+											func_str.split(arg_parse_str)[1]))
+
 			
 		algorithm.append("  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();")
 
@@ -216,31 +188,34 @@ def parse_algorithm_info(algorithm_name, target="header"):
 		else:
 			algorithm.append('  Algorithm* %s = factory.create("%s");' % (algo_obj, algorithm_name))
 
+		# set inputs to the algorithm
 		for inp in doc_dict['inputs']:
 			inp_str = '  %s->input("%s").set(%s%s);' % (algo_obj, inp['name'], 
 													INPUT_PREFIX_ES, 
 													inp['name'])
 			algorithm.append(inp_str)
 
-		if func_return_type != 'void':
-			for out in outputs:
-				algorithm.append("  %s;" % out.replace('&', ''))
+		for out in outputs:
+			algorithm.append("  %s;" % out.replace('&', ''))
 
+		# set outputs to the algorithm
 		if output_dict['outputs']:
 			for out in output_dict['outputs']:
 				algorithm.append(out)
 		else:
-			raise IOError("Not found output variable in the algo '%s'" % algorithm_name)
+			raise IOError("No output variable found in the algo '%s'" % algorithm_name)
 
 		algorithm.append("  %s->compute();" % algo_obj)
-		algorithm.append("  delete %s;" % algo_obj)
 
-		if func_return_type != "void":
-			if len(outputs[0].split(' ')) > 2:
-				algorithm.append("  return %s;" % outputs[0].split(' ')[2])
-			else:
-				algorithm.append("  return %s;" % outputs[0].split(' ')[1])
-		
+		algorithm.append("  val output%s(val::object());" % algorithm_name)
+
+		for out_var in output_var_names:
+			algorithm.append('  output%s.set("%s", %s);' % (algorithm_name,
+														out_var.replace(OUTPUT_PREFIX_ES, ''),
+														out_var))
+
+		algorithm.append("  delete %s;" % algo_obj)	
+		algorithm.append("  return output%s;" % algorithm_name)	
 		algorithm.append("}")
 		return algorithm
 
