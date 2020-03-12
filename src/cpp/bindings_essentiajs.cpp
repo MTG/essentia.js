@@ -23,13 +23,14 @@
 #include "./includes/essentiajs.h"
 
 // convert a Float32 JS typed array into std::vector<float>
+// https://github.com/emscripten-core/emscripten/issues/5519#issuecomment-589702756
 std::vector<float> arrayToVector(const val &arr) {
   unsigned int length = arr["length"].as<unsigned int>();
   std::vector<float> vec(length);
   val heap = val::module_property("HEAPU8");
   val memory = heap["buffer"];
   val memoryView = val::global("Float32Array").new_(memory, reinterpret_cast<std::uintptr_t>(vec.data()), length);
-
+  // https://github.com/emscripten-core/emscripten/issues/5519#issuecomment-333302296
   vec.reserve(length);
   memoryView.call<void>("set", arr);
   return vec;
