@@ -17,30 +17,7 @@ export class EssentiaTools {
   }
 
   /**
-   * Copy the contents of a float 32 JS typed array into a std::vector<float>.
-   * @method
-   * @param {Float32Array} typedArray
-   * @returns {VectorFloat}
-   * @memberof EssentiaTools
-   */
-  arrayToVector(typedArray) {
-    if (!typedArray) { throw "Null input"};
-    if (typedArray.length == 0) { throw "Empty array input"};
-    let vect = new this._module.VectorFloat();
-    for (let i=0; i<typedArray.length; i++) {
-      if (typeof typedArray[i] === 'undefined') {
-        vect.push_back(0);
-      }
-      else {
-        vect.push_back(typedArray[i]);
-      }
-    }
-    return vect; 
-  }
-
-  /**
    * Copy the contents of a std::vector<float> into a float 32 JS typed array. 
-   * @static
    * @method
    * @param {VectorFloat} vect
    * @returns {Float32Array}
