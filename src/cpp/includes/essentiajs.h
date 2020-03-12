@@ -37,7 +37,7 @@ class EssentiaJS {
     // method for shutdown essentia instance
     void shutdown();
     // method for generating frames from a given audio signal
-    std::vector<std::vector<float> > FrameGenerator(std::vector<float>& signal, int frameSize, int hopSize);
+    std::vector<std::vector<float> > FrameGenerator(const val& signalArray, int frameSize, int hopSize);
     // NOTE: The following code snippets are machine generated. Do not edit.    
      
     // class property which stores all the list of essentia algorithm names available in essentia.js
@@ -264,5 +264,8 @@ class EssentiaJS {
     val Windowing(std::vector<float>& input_frame, const bool normalized=true, const int size=1024, const std::string& type="hann", const int zeroPadding=0, const bool zeroPhase=true);
     val ZeroCrossingRate(std::vector<float>& input_signal, const float threshold=0);
 };
+
+// convert a Float32 JS typed array into std::vector<float>
+std::vector<float> float32ArrayToVector(const val &arr);
 
 #endif  // ESSENTIAJS_H

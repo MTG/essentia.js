@@ -28,6 +28,20 @@
 using namespace essentia;
 using namespace essentia::standard;
 
+// convert a Float32 JS typed array into std::vector<float>
+// https://github.com/emscripten-core/emscripten/issues/5519#issuecomment-589702756
+std::vector<float> float32ArrayToVector(const val &arr) {
+  unsigned int length = arr["length"].as<unsigned int>();
+  std::vector<float> vec(length);
+  val heap = val::module_property("HEAPU8");
+  val memory = heap["buffer"];
+  val memoryView = val::global("Float32Array").new_(memory, reinterpret_cast<std::uintptr_t>(vec.data()), length);
+  // https://github.com/emscripten-core/emscripten/issues/5519#issuecomment-333302296
+  vec.reserve(length);
+  memoryView.call<void>("set", arr);
+  return vec;
+}
+
 // instantiating the essentia algo registry with an optional argument to enable debug mode 
 EssentiaJS::EssentiaJS(bool debugger) {
   if (debugger) {
@@ -52,7 +66,10 @@ void EssentiaJS::shutdown() {
 }
 
 // Method for frameCutting the given audio signal
-std::vector<std::vector<float> > EssentiaJS::FrameGenerator(std::vector<float>& signal, int frameSize, int hopSize) {
+std::vector<std::vector<float> > EssentiaJS::FrameGenerator(const val& signalArray, int frameSize, int hopSize) {
+  // convert JS typed typed float 32 array to std::vector<float>
+  std::vector<float> signal = float32ArrayToVector(signalArray);
+  // create algorithm instances
   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
   Algorithm* fc   = factory.create("FrameCutter",
                    "frameSize", frameSize,
