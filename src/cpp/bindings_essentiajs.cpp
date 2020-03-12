@@ -20,10 +20,20 @@
 // NOTE: This source code is auto-generated.
 
 #include <stdio.h>
-#include <emscripten/bind.h>
 #include "./includes/essentiajs.h"
 
-using namespace emscripten;
+// convert a Float32 JS typed array into std::vector<float>
+std::vector<float> arrayToVector(const val &arr) {
+  unsigned int length = arr["length"].as<unsigned int>();
+  std::vector<float> vec(length);
+  val heap = val::module_property("HEAPU8");
+  val memory = heap["buffer"];
+  val memoryView = val::global("Float32Array").new_(memory, reinterpret_cast<std::uintptr_t>(vec.data()), length);
+
+  vec.reserve(length);
+  memoryView.call<void>("set", arr);
+  return vec;
+}
 
 // expose essentiajs class to js using embind wrappers
 EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) { 
@@ -255,6 +265,8 @@ EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) {
     .function("Windowing", &EssentiaJS::Windowing)
     .function("ZeroCrossingRate", &EssentiaJS::ZeroCrossingRate)
     ;
+  // utility function to convert a Float32 JS typed array into std::vector<float>
+  function("arrayToVector", &arrayToVector);
   // expose stl datatypes to js
   register_vector<int>("VectorInt");
   register_vector<float>("VectorFloat");
