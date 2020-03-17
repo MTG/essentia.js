@@ -1,0 +1,130 @@
+/*
+ * Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra
+ *
+ * This file is part of Essentia
+ *
+ * Essentia is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation (FSF), either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the Affero GNU General Public License
+ * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
+ */
+// NOTE: The following code snippets are machine generated. Do not edit.
+/**
+ * @class essentia.js JavaScript interface
+ */
+class Essentia {
+  /** 
+  * @property {EssentiaEmscriptenModule} this.module 
+  * @property {string} this.version 
+  * @property {string} this.algorithmNames 
+  */
+  private algorithms: any;
+  module: any;
+  version: string;
+  algorithmNames: string;
+  /** 
+  * @constructor 
+  * @param {EssentiaEmscriptenModule} 
+  * @param {boolean} [isDebug=false]
+  * @memberof Essentia
+  */
+  constructor(public EssentiaModule: any, public isDebug: boolean=false) {
+    this.algorithms = new EssentiaModule.EssentiaJS(isDebug);
+    this.module = EssentiaModule;
+    this.version = this.algorithms.version;
+    this.algorithmNames = this.algorithms.algorithmNames;
+  }
+
+  /**
+   *Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API
+   * @async
+   * @method
+   * @param {string} audioURL web url or blob uri of a audio file
+   * @param {AudioContext} webAudioCtx an instance of WebAudioApi `AudioContext`
+   * @param {number} [channel=0] audio channel number
+   * @returns {Float32Array} decode and returns the audio data as Float32 array for the given channel
+   * @memberof Essentia
+   */
+  async getAudioChannelDataFromURL(audioURL: string, webAudioCtx: AudioContext, channel: number=0) {
+    const response = await fetch(audioURL);
+    const arrayBuffer = await response.arrayBuffer();
+    const audioBuffer = await webAudioCtx.decodeAudioData(arrayBuffer);
+    return audioBuffer.getChannelData(channel);
+  }
+
+  /**
+   * Shutdown essentia algorithm instance to free memory
+   * @method
+   * @memberof Essentia
+   */
+  shutdown() {
+    this.algorithms.shutdown();
+  }
+
+  /**
+   * Method for re-instantiating this.algorithms instance after using the this.shutdown method
+   * @method
+   * @memberof Essentia
+   */
+  reinstantiate() {
+    this.algorithms = new this.module.EssentiaJS(this.isDebug);
+  }
+
+  /**
+   * Convert an input JS array into VectorFloat by accessing raw pointers
+   * @method
+   * @param {Float32Array} inpurtArray input JS typed array
+   * @returns {VectorFloat} returns vector float
+   * @memberof Essentia
+   */
+  arrayToVector(inpurtArray: any) {
+    return this.module.arrayToVector(inpurtArray);
+  }
+
+  /**
+   * Convert an input VectorFloat array into typed Float32Array by copying it's element
+   * @method 
+   * @param {VectorFloat} inputVector input VectorFloat
+   * @returns {Float32Array} returns converted JS typed array
+   * @memberof Essentia
+   */
+  vectorToArray(inputVector: any) {
+    return this.module.vectorToArray(inputVector);
+  }
+
+  /**
+   *
+   * @method
+   * @param {Float32Array} inputAudioData a single channel audio channel data
+   * @param {number} [frameSize=2048] frame size for cutting the audio signal
+   * @param {number} [hopSize=1024] size of overlapping frame 
+   * @returns {VectorVectorFloat} Returns a 2D vector float of sliced audio frames 
+   * @memberof Essentia
+   */
+  FrameGenerator(inputAudioData: Float32Array, frameSize: number=2048, hopSize: number=1024) {
+    return this.algorithms.FrameGenerator(inputAudioData, frameSize, hopSize);
+  }
+
+  // NOTE: The following code snippets are machine generated. Do not edit.
+  /*[[[cog
+  import cog
+  from .code_generator import generate_typescript_wrapper
+  algos = generate_typescript_wrapper()
+  for algo in algos:
+    for ln in algo:
+      cog.outl(ln)
+    cog.outl(' ')
+  ]]]*/
+  //[[[end]]]
+
+}
+
+export default Essentia;
