@@ -5,15 +5,31 @@
 [![npm version](https://badge.fury.io/js/essentia.js.svg)](https://badge.fury.io/js/essentia.js)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
-[essentia.js](https://essentia.upf.edu/essentiajs) enables state-of-the-art audio/music analysis algorithms on your web-client. Currently, [essentia.js](https://essentia.upf.edu/essentiajs) builds only support essentia standard mode algorithms besides the ones that are listed [here](src/python/excluded_algos.md).
+[essentia.js](https://essentia.upf.edu/essentiajs) enables state-of-the-art music/audio analysis algorithms on your web-client and/or Node JS applications. 
+
+You can find the latest releases on [Github](https://github.com/MTG/essentia.js/releases) or on [npm](https://www.npmjs.com/package/essentia.js).
 
 
-You can find pre-compiled builds [here](https://github.com/MTG/essentia.js/releases).
+## Sub-modules
 
-- `essentia.wasm` - Asynchronous WASM build of generic javascript bindings for essentia C++ library. 
-- `essentia.js` - JS glue code for loading `essentia.wasm` (can be used with HTML `<script>` tag).
-- `essentia-module.js` - Synchronous build of generic javascript bindings for essentia C++ library (ES6 import/export and AudioWorklet support).
-- `essentia.tools.js` - Utility methods for using `essentia.js` such as converting JS typed arrays to and from essentia input types, load audio from urls etc.
+### Core JS Interface
+
+- `essentia.js-core-web.js` - `Essentia` main JS interface for web browsers.
+- `essentia.js-core-module.js` - `Essentia` main JS interface for module imports.
+
+### WASM modules 
+
+Imports an [Emscripten WASM Module](https://emscripten.org/docs/api_reference/module.html) object to global namespace which has JS bindings to essentia C++ library WASM back-end.
+
+- `essentia-wasm-web.wasm` - Asynchronous build of essentia C++ library WASM back-end. 
+- `essentia-wasm-web.js` - JS glue code for loading `essentia-wasm-web.wasm` (can be used with HTML `<script>` tag).
+- `essentia-wasm-module.js` - Synchronous build of essentia C++ library back-end (ES6 import/export and AudioWorklet support).
+  
+  
+### Additional JS modules
+
+- `essentia.js-plot-web.js` - `EssentiaPlot` import for  web browsers
+- `essentia.js-plot-module.js` - `EssentiaPlot` for module imports.
 
 
 &nbsp;

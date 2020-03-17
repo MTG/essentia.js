@@ -5,16 +5,17 @@
 [![npm version](https://badge.fury.io/js/essentia.js.svg)](https://badge.fury.io/js/essentia.js)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
-JavaScript port and bindings for [essentia C++ music/audio analysis library](https://essentia.upf.edu) using [Emscripten](https://emscripten.org/) toolchain and [WebAssembly](https://webassembly.org/). Currently, essentia.js builds only support essentia standard mode algorithms besides the ones that are listed [here](src/python/excluded_algos.md). [essentia.js](https://essentia.upf.edu/essentiajs) enables state-of-the-art audio/music analysis algorithms on your web-client and nodejs applications.
+JavaScript library for music/audio analysis and processing for both real-time and offline use-cases. The core of [`essentia.js`](/) is powered by [essentia C++ library](https://essentia.upf.edu) back-end using [Emscripten](https://emscripten.org/) toolchain and [WebAssembly](https://webassembly.org/). ie, Now you can run state-of-the-art music/audio processing and analysis algorithms on your web-browser or Node JS applications with near native speed. `essentia.js` also provides high-level abstract interfaces for plotting common music processing features directly into your HTML web page.
 
-- Documentation: [https://mtg.github.io/essentia.js/docs](https://mtg.github.io/essentia.js/docs)
+- Repository: [https://github.com/MTG/essentia.js](https://github.com/MTG/essentia.js)
 
-- Interactive demos: [https://mtg.github.io/essentia.js/examples](https://mtg.github.io/essentia.js/examples)
-
-- Repository: [https://github.com/MTG/essentia.js](https://mtg.github.io/essentia.js)
-
-- Releases: [https://github.com/MTG/essentia.js/releases](https://mtg.github.io/essentia.js/releases)
+- Releases: [https://github.com/MTG/essentia.js/releases](https://github.com/MTG/essentia.js/releases)
 
 - License: [https://essentia.upf.edu/licensing_information.html](https://essentia.upf.edu/licensing_information.html)
+
+- Documentation: [https://mtg.github.io/essentia.js/docs](https://mtg.github.io/essentia.js/docs)
+  
+- Interactive demos: [https://mtg.github.io/essentia.js/examples](https://mtg.github.io/essentia.js/examples)
+
 
 > NOTE: Currently under active-development, some of the algorithms are not yet manually tested on the JavaScript front. Please submit the issues at https://github.com/MTG/essentia.js/issues.

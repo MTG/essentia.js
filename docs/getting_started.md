@@ -9,71 +9,74 @@ npm install essentia.js
 ```
 
 ```javascript
-var esModule = require('essentia.js');
+var esentia = require('essentia.js');
 
-// NOTE: In npm dist 'Module.EssentiaJS' => 'Essentia.EssentiaJS'
-let essentia = esModule.EssentiaJS(false);
-
-// prints version of essentia
+// prints version of the essentia wasm backend
 console.log(essentia.version)
 
-// prints all the available algorithm methods in EssentiaJS
+// prints all the available algorithm methods in Essentia
 console.log(essentia.algorithmNames)
+
+let randomAudioData = [0.1, 0.023, -1 , 1, 0.5, 0.6];
+
+let vectorData = essentia.arrayToVector(randomAudioData);
+
+let output = essentia.LogAttackTime(vectorData);
+
+// prints outputs of the algorithm
+console.log(output.logAttackTime);
+console.log(output.attackStop);
+console.log(output.attackStop);
 ```
 
 - ### Using CDN 
 
-The following CDN links are available for `essentia.js`.
+The following CDN links are available for `essentia.js`. You can also find the latest releases [here](https://github.com/MTG/essentia.js/releases).
   
 - #### HTML `<script>` tag
 
 ```html
-<script src="https://unpkg.com/essentia.js@0.0.8/dist/essentia.js"></script>
+<script src="https://unpkg.com/essentia.js@0.0.9-dev/dist/essentia-web-wasm.js"></script>
+<script src="https://unpkg.com/essentia.js@0.0.9-dev/dist/essentia.js-core.js"></script>
 ```
 Check out this [example](../examples/script-node-processor/example.html). 
-
 
 - #### ES6 style import
 
 ```javascript
-import Module from 'https://unpkg.com/essentia.js@0.0.8/dist/essentia-module.js';
+import Essentia from 'https://unpkg.com/essentia.js@0.0.9-dev/dist/essentia.js-core-module.js';
+// import essentia-wasm-module
+import { EssentiaModule } from 'https://unpkg.com/essentia.js@0.0.9-dev/dist/essentia-wasm-module.js';
   
-// import essentia.tools.js (includes utility funcs for essentia.js)
-import { EssentiaTools } from 'https://unpkg.com/essentia.js@0.0.8/dist/essentia.tools.js';
+let essentia = new Essentia(EssentiaModule);
 
-let essentia = new Module.EssentiaJS(false);
-
-// prints version of essentia
+// prints version of essentia wasm backend
 console.log(essentia.version)
 
-// prints all the available algorithm methods in EssentiaJS
+// prints all the available algorithm methods in Essentia
 console.log(essentia.algorithmNames)
+```
 
-// create an instance of EssentiaTools
-let essentiaTools = new EssentiaTools(Module);
-  ```
 Check out this [example](../examples/audio-worklets/essentia-worklet-processor.js).
 
-> Note: You shouldn't import the `essentia-module.js` on the main thread.
+> NOTE: You shouldn't import the `essentia-wasm-module.js` on the main thread. The ideal way is to use it along with AudioWorklet design pattern.
 
   There are also some other ways for loading WebAssembly modules. Check https://developer.mozilla.org/en-US/docs/WebAssembly/Loading_and_running.
 
 
 ## Usages in Javscript
 
-After succesfully loading essentia.js on the JavaScript end, the typical usage would be like,
+After succesfully loading `essentia.js-core**` and `essentia-**-wasm` on the JavaScript end, a typical usage would be like the following.
 
 ```javascript
 // create essentia object with all the methods to run various algorithms
 // here we set essentia debug mode = false
-let essentia = new Module.EssentiaJS(false);
-// if you use from npm it will be Essentia.EssentiaJS instead of Module.EssentiaJS
+let essentia = new Essentia(EssentiaModule);
 
-// for algorithms with single output
-let yourOutputVar = essentia.'<your-essentia-algo>'(<inputs> ..., <parameters> ...);
+// run an specific algorithm
+let yourOutput = essentia.'<your-essentia-algo>'(<inputs> ..., <parameters> (optional)...);
 
-// for algorithms with multiple outputs
-essentia.'<your-essentia-algo>'(<inputs> ..., <outputs> ..., <parameters> ...);
+yourOutput.'<your_output-key>'
 ```
 
 As you can see, in contrary to essentia python bindings there are no seperate `configure` and `compute` methods in essentia.js since we bind both methods of essentia algorithms into one.
@@ -81,59 +84,63 @@ As you can see, in contrary to essentia python bindings there are no seperate `c
 For example in real use-cases, it will look like below,
 
 ```javascript
-
-// Computing ReplayGain from an input audio signal
+// Computing ReplayGain from an input audio signal vector
 // The algorithm return float type
 // check https://essentia.upf.edu/reference/std_ReplayGain.html
-let replaygain = essentia.ReplayGain(inputSignalVector, // input
-                                     44100); // sampleRate (parameter)
+let outputAlgo = essentia.ReplayGain(inputSignalVector, // input
+                                    44100); // sampleRate (parameter optional)
 
-// Running PitchYinProbabilistic algorithm on an input audio signal
-// create empty std::vector<float> vector for populating the output of 
-// essentia.PitchYinProbabilistic algorithm
-var pitches = new Module.VectorFloat();
-var voicedProbabilities = new Module.VectorFloat();
 
+console.log(outputAlgo.replayGain);
+
+// Running PitchYinProbabilistic algorithm on an input audio signal vector
 // check https://essentia.upf.edu/reference/std_PitchYinProbabilistic.html
-essentia.PitchYinProbabilistic(inputSignalVector, // input_1
-                               pitches, // output_1
-                               voicedProbabilities, // output_2
-                               // parameters
-                               4096, // frameSize
-                               256, // hopSize
-                               0.1, // lowRMSThreshold
-                               'zero', // outputUnvoiced,
-                               false, // preciseTime
-                               44100); //sampleRate
+let output = essentia.PitchYinProbabilistic(inputSignalVector, // input
+                                        // parameters (optional)
+                                        4096, // frameSize
+                                        256, // hopSize
+                                        0.1, // lowRMSThreshold
+                                        'zero', // outputUnvoiced,
+                                        false, // preciseTime
+                                        44100); //sampleRate
+
+console.log(output);
+
+let pitches = essentia.vectorToArray(output.pitch);
+let voicedProbabilities = essentia.vectorToArray(output.voicedProbabilities);
+
+console.log(pitch);
+console.log(voicedProbabilities);
 ```
 
-Similarly, you could use any of the algorithms specified in the [essentia algorithm reference](https://essentia.upf.edu/algorithms_reference.html) besides the algorithms listed [here](../src/python/excluded_algos.md).
-
-
-> NOTE: In order to run a essentia standard algorithm, you need to specify value for all of it's parameters. The current essentia.js bindings doesn't bind the default parameter values provided in the essentia [documentation](https://essentia.upf.edu/algorithms_reference.html).
+Similarly, you could use any of the algorithms specified in the [Essentia JS API]().
 
 
 ## Examples
 
-### Simple example 
+### Simple web example 
 
 ```html
 <html lang="en">
-  <script>
-    var Module = {
-      onRuntimeInitialized: function() {
-        console.log('essentia.js loaded sucessfully ...');
-        essentia = new Module.EssentiaJS(false);
-        console.log('Essentia:', essentia.version);
-        // your essentia feature extractor here
-      }
-    };
-  </script>
   <head>
     <script src="https://unpkg.com/essentia.js@0.0.8/dist/essentia.js"></script>
+    <script>
+      let essentia;
+
+      EssentiaModule.then( function(EssentiaWasMModule) {
+        essentia = new Essentia(EssentiaWasmModule);
+        // prints version of the essentia wasm backend
+        console.log(essentia.version)
+        // prints all the available algorithms in essentia.js 
+        console.log(essentia.algorithmNames);
+
+        // add your custom audio feature extraction callbacks here
+      });
+    </script>
   </head>
 </html>
 ```
+> NOTE: The above code pattern runs the process on the main UI thread. For costly algorithms, we recommend you to use AudioWorklets instead. 
 
 ### Interactive demos: https://mtg.github.io/essentia.js/examples
 
