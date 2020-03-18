@@ -5,7 +5,7 @@ export default [{
   input: 'src/typescript/core_api.ts', // our source file
   output: [
     {
-    file: 'dist/essentia.js-core-module.js',
+    file: 'dist/essentia.js-core.es.js',
     format: 'es' // the preferred format
     },
     {
@@ -24,7 +24,7 @@ export default [{
  input: 'src/typescript/plot.ts', // our source file
  output: [
   {
-   file: 'dist/essentia.js-plot-module.js',
+   file: 'dist/essentia.js-plot.es.js',
    format: 'es' // the preferred format
   },
   {
@@ -43,7 +43,7 @@ export default [{
   input: 'src/typescript/models.ts', // our source file
   output: [
    {
-    file: 'dist/essentia.js-models-module.js',
+    file: 'dist/essentia.js-models.es.js',
     format: 'es' // the preferred format
    },
    {
