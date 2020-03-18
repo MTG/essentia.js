@@ -14,22 +14,22 @@ You can find the latest releases on [Github](https://github.com/MTG/essentia.js/
 
 ### Core JS Interface
 
-- `essentia.js-core-web.js` - `Essentia` main JS interface for web browsers.
-- `essentia.js-core-module.js` - `Essentia` main JS interface for module imports.
+- `essentia.js-core.js` - `Essentia` main JS interface for web browsers.
+- `essentia.js-core.es.js` - `Essentia` main JS interface for module imports.
 
 ### WASM modules 
 
 Imports an [Emscripten WASM Module](https://emscripten.org/docs/api_reference/module.html) object to global namespace which has JS bindings to essentia C++ library WASM back-end.
 
-- `essentia-wasm-web.wasm` - Asynchronous build of essentia C++ library WASM back-end. 
-- `essentia-wasm-web.js` - JS glue code for loading `essentia-wasm-web.wasm` (can be used with HTML `<script>` tag).
-- `essentia-wasm-module.js` - Synchronous build of essentia C++ library back-end (ES6 import/export and AudioWorklet support).
+- `essentia-wasm.web.wasm` - Asynchronous build of essentia C++ library WASM back-end. 
+- `essentia-wasm.web.js` - JS glue code for loading `essentia-wasm-web.wasm` (can be used with HTML `<script>` tag).
+- `essentia-wasm.module.js` - Synchronous build of essentia C++ library back-end (ES6 import/export and AudioWorklet support).
   
   
 ### Additional JS modules
 
-- `essentia.js-plot-web.js` - `EssentiaPlot` import for  web browsers
-- `essentia.js-plot-module.js` - `EssentiaPlot` for module imports.
+- `essentia.js-plot.js` - `EssentiaPlot` import for  web browsers
+- `essentia.js-plot.es.js` - `EssentiaPlot` for module imports.
 
 
 &nbsp;

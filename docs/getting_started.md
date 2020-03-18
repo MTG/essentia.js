@@ -36,7 +36,7 @@ The following CDN links are available for `essentia.js`. You can also find the l
 - #### HTML `<script>` tag
 
 ```html
-<script src="https://unpkg.com/essentia.js@0.0.9-dev/dist/essentia-web-wasm.js"></script>
+<script src="https://unpkg.com/essentia.js@0.0.9-dev/dist/essentia-web.wasm.js"></script>
 <script src="https://unpkg.com/essentia.js@0.0.9-dev/dist/essentia.js-core.js"></script>
 ```
 Check out this [example](../examples/script-node-processor/example.html). 
@@ -44,9 +44,9 @@ Check out this [example](../examples/script-node-processor/example.html).
 - #### ES6 style import
 
 ```javascript
-import Essentia from 'https://unpkg.com/essentia.js@0.0.9-dev/dist/essentia.js-core-module.js';
+import Essentia from 'https://unpkg.com/essentia.js@0.0.9-dev/dist/essentia.js-core.esjs';
 // import essentia-wasm-module
-import { EssentiaModule } from 'https://unpkg.com/essentia.js@0.0.9-dev/dist/essentia-wasm-module.js';
+import { EssentiaModule } from 'https://unpkg.com/essentia.js@0.0.9-dev/dist/essentia-wasm.module.js';
   
 let essentia = new Essentia(EssentiaModule);
 
@@ -59,14 +59,14 @@ console.log(essentia.algorithmNames)
 
 Check out this [example](../examples/audio-worklets/essentia-worklet-processor.js).
 
-> NOTE: You shouldn't import the `essentia-wasm-module.js` on the main thread. The ideal way is to use it along with AudioWorklet design pattern.
+> NOTE: You shouldn't import the `essentia-wasm.module.js` on the main thread. The ideal way is to use it along with AudioWorklet design pattern.
 
   There are also some other ways for loading WebAssembly modules. Check https://developer.mozilla.org/en-US/docs/WebAssembly/Loading_and_running.
 
 
 ## Usages in Javscript
 
-After succesfully loading `essentia.js-core**` and `essentia-**-wasm` on the JavaScript end, a typical usage would be like the following.
+After succesfully loading `essentia.js-core**` and `essentia-wasm.**` files on the JavaScript end, a typical usage would be like the following.
 
 ```javascript
 // create essentia object with all the methods to run various algorithms
@@ -123,7 +123,8 @@ Similarly, you could use any of the algorithms specified in the [Essentia JS API
 ```html
 <html lang="en">
   <head>
-    <script src="https://unpkg.com/essentia.js@0.0.8/dist/essentia.js"></script>
+    <script src="https://unpkg.com/essentia.js@0.0.9-dev/dist/essentia-wasm.web.js"></script>
+    <script src="https://unpkg.com/essentia.js@0.0.9-dev/dist/essentia.js-core.js"></script>
     <script>
       let essentia;
 

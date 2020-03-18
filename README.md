@@ -5,7 +5,7 @@
 [![npm version](https://badge.fury.io/js/essentia.js.svg)](https://badge.fury.io/js/essentia.js)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
-JavaScript library for music/audio analysis and processing for both real-time and offline use-cases. The core of [`essentia.js`](/) is powered by [essentia C++ library](https://essentia.upf.edu) back-end using [Emscripten](https://emscripten.org/) toolchain and [WebAssembly](https://webassembly.org/). ie, Now you can run state-of-the-art music/audio processing and analysis algorithms on your web-browser or Node JS applications with near native speed. `essentia.js` also provides high-level abstract interfaces for plotting common music processing features directly into your HTML web page.
+JavaScript library for music/audio signal analysis and processing for both real-time and offline use-cases. The core of [`essentia.js`](/) is powered by [essentia C++ library](https://essentia.upf.edu) back-end using [Emscripten](https://emscripten.org/) toolchain and [WebAssembly](https://webassembly.org/) along with a high-level JS API and utility functions (`Essentia`). ie, Now you can run state-of-the-art music/audio processing and analysis algorithms on your web-browser or Node JS applications with ease-of-use and computational speed. `essentia.js` also provides additional high-level abstract interfaces for plotting common music processing features directly into your HTML web page (`EssentiaPlot`) and also for loading selected pre-trained tensorflow.js machine learning models for audio/music analysis from [MTG](https://www.upf.edu/web/mtg/) (`EssentiaModels`).
 
 - Repository: [https://github.com/MTG/essentia.js](https://github.com/MTG/essentia.js)
 
@@ -15,7 +15,7 @@ JavaScript library for music/audio analysis and processing for both real-time an
 
 - Documentation: [https://mtg.github.io/essentia.js/docs](https://mtg.github.io/essentia.js/docs)
   
-- Interactive demos: [https://mtg.github.io/essentia.js/examples](https://mtg.github.io/essentia.js/examples)
+- Examples: [https://mtg.github.io/essentia.js/examples](https://mtg.github.io/essentia.js/examples)
 
 
 > NOTE: Currently under active-development, some of the algorithms are not yet manually tested on the JavaScript front. Please submit the issues at https://github.com/MTG/essentia.js/issues.
