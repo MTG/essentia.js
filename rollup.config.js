@@ -2,7 +2,7 @@ import typescript from 'rollup-plugin-typescript2';
 import {terser} from "rollup-plugin-terser";
 
 export default [{
-  input: 'src/typescript/essentia.js.core.ts', // our source file
+  input: 'src/typescript/core_api.ts', // our source file
   output: [
     {
     file: 'dist/essentia.js-core-module.js',
@@ -21,7 +21,7 @@ export default [{
     terser() // minifies generated bundles
   ]
 }, {
- input: 'src/typescript/essentia.js.plot.ts', // our source file
+ input: 'src/typescript/plot.ts', // our source file
  output: [
   {
    file: 'dist/essentia.js-plot-module.js',
@@ -40,7 +40,7 @@ export default [{
   terser() // minifies generated bundles
  ]
 }, {
-  input: 'src/typescript/essentia.js.models.ts', // our source file
+  input: 'src/typescript/models.ts', // our source file
   output: [
    {
     file: 'dist/essentia.js-models-module.js',
