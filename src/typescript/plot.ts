@@ -135,6 +135,8 @@ class PlotMelodyContour extends EssentiaPlot {
    */
   destroy() {
     this.Plotly.deleteTraces(this.divId, 0);  
+    this.isPlotting = false;
+    this.startTimeIndex = 0;
   }
 }
 
