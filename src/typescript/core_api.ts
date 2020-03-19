@@ -31,7 +31,7 @@ class Essentia {
   version: string;
   algorithmNames: string;
   /** 
-  * @constructor 
+  * @constructor#instanceMember 
   * @param {EssentiaEmscriptenModule} 
   * @param {boolean} [isDebug=false]
   * @memberof Essentia
@@ -101,7 +101,7 @@ class Essentia {
   }
 
   /**
-   *
+   * Cuts an audio signal data into overlapping frames given frame size and hop size 
    * @method
    * @param {Float32Array} inputAudioData a single channel audio channel data
    * @param {number} [frameSize=2048] frame size for cutting the audio signal
