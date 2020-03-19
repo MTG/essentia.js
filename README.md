@@ -13,7 +13,7 @@ JavaScript library for music/audio signal analysis and processing for both real-
 
 - License: [https://essentia.upf.edu/licensing_information.html](https://essentia.upf.edu/licensing_information.html)
 
-- Documentation: [https://mtg.github.io/essentia.js/docs](https://mtg.github.io/essentia.js/docs)
+- Documentation: [https://mtg.github.io/essentia.js/docs/out/essentia.js/0.0.9-dev/](https://mtg.github.io/essentia.js/docs/out/essentia.js/0.0.9-dev/)
   
 - Examples: [https://mtg.github.io/essentia.js/examples](https://mtg.github.io/essentia.js/examples)
 
