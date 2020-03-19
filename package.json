@@ -1,25 +1,30 @@
 {
   "name": "essentia.js",
-  "version": "0.0.8",
-  "description": "JavaScript port and bindings for essentia C++ music/audio analysis and processing library via Emscripten and WebAssembly",
+  "version": "0.0.9-dev",
+  "description": "JavaScript library for music/audio analysis and processing for both real-time and offline use-cases, powered by WebAssembly",
   "homepage": "https://mtg.github.io/essentia.js/",
   "author": "Albin Correya <albin.correya@upf.edu> (http://mtg.upf.edu)",
   "license": "AGPL-3.0",
   "main": "index.js",
   "files": [
     "dist/*",
+    "src/js/es6module.main.js",
     "index.js",
     "LICENSE.md",
-    "README.md"
+    "README.md",
+    "AUTHORS"
   ],
   "scripts": {
-    "build": "make -f Makefile.essentiajs",
+    "gen-code": "make -f Makefile.essentiajs codegen",
+    "build-wasm": "make -f Makefile.essentiajs build",
+    "build-js-api": "rollup --config",
+    "build-api-docs": "cd docs && jsdoc --readme index.md -u tutorials/ -P ../package.json -c jsdoc.config.json",
     "test": "mocha"
   },
   "directories": {
     "doc": "docs",
     "example": "examples",
-    "test": "tests"
+    "test": "test"
   },
   "dependencies": {
     "esm": "3.2.25"
@@ -32,8 +37,12 @@
     "@babel/core": "^7.4.5",
     "@babel/preset-env": "^7.4.5",
     "chai": "^4.2.0",
+    "esm": "^3.2.25",
     "mocha": "^6.1.4",
-    "esm": "^3.2.25"
+    "rollup": "^2.0.6",
+    "rollup-plugin-terser": "^5.3.0",
+    "rollup-plugin-typescript2": "^0.26.0",
+    "typescript": "^3.8.3"
   },
   "repository": {
     "type": "git",

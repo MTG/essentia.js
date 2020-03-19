@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "ES2015",
+    "declaration": true,
+    "outDir": "./dist",
+    "strict": true,
+    "noEmitHelpers": true,
+  },
+  "include": ["src/typescript"],
+  "exclude": ["node_modules", "**/__tests__/*"]
+}

@@ -1,7 +1,11 @@
-import Module from 'https://unpkg.com/essentia.js@0.0.8/dist/essentia-module.js';
-import { EssentiaTools } from 'https://unpkg.com/essentia.js@0.0.8/dist/essentia.tools.js';
+// import Module from 'https://unpkg.com/essentia.js@0.0.8/dist/essentia-module.js';
+import { EssentiaModule } from "../../dist/essentia-wasm-module.js";
+// import Essentia JS API interface
+import Essentia from "../../dist/essentia.js-core-module.js";
+// Tools for sending audio interleaved audio frames between threads, wait-free from the ringbuf.js package
+// import { RingBuffer, AudioReader, ParameterReader } from "https://unpkg.com/browse/ringbuf.js@0.1.0/dist/index.es.js";
 
-let essentia = new Module.EssentiaJS(false);
+let essentia = new Essentia(EssentiaModule);
 
 /**
  * A simple demonstration of using essentia.js wasm  Modules as AudioWorkletProcessor.
@@ -16,8 +20,17 @@ class EssentiaWorkletProcessor extends AudioWorkletProcessor {
   constructor() {
     super();
     this.essentia = essentia;
-    this.utils = new EssentiaTools(Module);
-    console.log('Essentia:' + this.essentia.version + '- http://essentia.upf.edu'); 
+    console.log('Backend - essentia:' + this.essentia.version + '- http://essentia.upf.edu'); 
+    // this.port.onmessage = e => {
+    //   this._size = 128;
+    //   if (e.data.type === "recv-audio-queue") {
+    //     this._audio_reader = new AudioReader(new RingBuffer(e.data.data, Float32Array));
+    //   } else if (e.data.type === "recv-param-queue") {
+    //     this._param_reader = new ParameterReader(new RingBuffer(e.data.data, Uint8Array));
+    //   } else {
+    //     throw "unexpected.";
+    //   }
+    // };
   }
   /**
    * System-invoked process callback function.
@@ -33,8 +46,8 @@ class EssentiaWorkletProcessor extends AudioWorkletProcessor {
 
     // Write your essentia.js processing code here
      
-    // copy the input audio frame array from channel 0 to a std::vector<float> type for using it in essentia
-    let vectorInput = this.utils.arrayToVector(input[0]);
+    // convert the input audio frame array from channel 0 to a std::vector<float> type for using it in essentia
+    let vectorInput = this.essentia.arrayToVector(input[0]);
 
     // In this case we apply a traingular windowing function to every input audio frame
     // check https://essentia.upf.edu/reference/std_Windowing.html
@@ -46,15 +59,27 @@ class EssentiaWorkletProcessor extends AudioWorkletProcessor {
                                                 0, // zeroPadding
                                                 true); // zeroPhase 
 
-    // convert the output back to float32 typed array
-    let outputArray = this.utils.vectorToArray(windowedFrame);
     
-    console.log("input audio frameSize: " + outputArray.length);
+    // check https://essentia.upf.edu/reference/std_PitchYinProbabilistic.html
+    // let algoOutput = essentia.PitchYinProbabilistic(vectorInput, // input_1
+    //                                               // parameters (optional)
+    //                                               4096, // frameSize
+    //                                               256, // hopSize
+    //                                               0.1, // lowRMSThreshold
+    //                                               'zero', // outputUnvoiced,
+    //                                               false, // preciseTime
+    //                                               audioCtx.sampleRate); //sampleRate
+
+    // convert the output back to float32 typed array
+    let outputArray = this.essentia.vectorToArray(windowedFrame.frame);
+    
     // copy converted array to the output channel 0
     output[0].set(outputArray);
 
     return true;
   }
+
+
 }
 
 registerProcessor('essentia-worklet-processor', EssentiaWorkletProcessor);

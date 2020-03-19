@@ -20,10 +20,8 @@
 // NOTE: This source code is auto-generated.
 
 #include <stdio.h>
-#include <emscripten/bind.h>
 #include "./includes/essentiajs.h"
 
-using namespace emscripten;
 
 // expose essentiajs class to js using embind wrappers
 EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) { 
@@ -255,6 +253,8 @@ EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) {
     .function("Windowing", &EssentiaJS::Windowing)
     .function("ZeroCrossingRate", &EssentiaJS::ZeroCrossingRate)
     ;
+  // utility function to convert a Float32 JS typed array into std::vector<float>
+  function("arrayToVector", &float32ArrayToVector);
   // expose stl datatypes to js
   register_vector<int>("VectorInt");
   register_vector<float>("VectorFloat");

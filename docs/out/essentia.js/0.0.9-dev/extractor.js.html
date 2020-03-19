@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: extractor.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: extractor.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
+/*
+ * Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra
+ *
+ * This file is part of Essentia
+ *
+ * Essentia is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation (FSF), either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the Affero GNU General Public License
+ * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
+ */
+var __extends = (this &amp;&amp; this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array &amp;&amp; function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+exports.__esModule = true;
+var core_api_1 = require("./core_api");
+/**
+ *
+ * @class EssentiaExtractor
+ * @extends {Essentia}
+ */
+var EssentiaExtractor = /** @class */ (function (_super) {
+    __extends(EssentiaExtractor, _super);
+    /**
+     *Creates an instance of EssentiaExtractor.
+    * @param {*} EssentiaModule
+    * @param {boolean} [isDebug=false]
+    * @memberof EssentiaExtractor
+    */
+    function EssentiaExtractor(EssentiaModule, isDebug) {
+        if (isDebug === void 0) { isDebug = false; }
+        var _this = _super.call(this, EssentiaModule, isDebug) || this;
+        _this.EssentiaModule = EssentiaModule;
+        _this.isDebug = isDebug;
+        _this.sampleRate = 44100;
+        _this.frameSize = 4096;
+        _this.hopSize = 2048;
+        _this.profile = {
+            Windowing: {
+                normalized: true,
+                size: _this.frameSize,
+                type: "blackmanharris62",
+                zeroPadding: _this.frameSize,
+                zeroPhase: true
+            },
+            Spectrum: {
+                size: _this.frameSize
+            },
+            MelBands: {
+                highFrequencyBound: 22050,
+                inputSize: _this.frameSize,
+                log: false,
+                lowFrequencyBound: 0,
+                normalize: 'unit_sum',
+                numberBands: 128,
+                sampleRate: _this.sampleRate,
+                type: 'power',
+                warpingFormula: 'htkMel',
+                weighting: 'warping'
+            },
+            SpectralPeaks: {
+                magnitudeThreshold: 0,
+                maxFrequency: 4500,
+                maxPeaks: 100,
+                minFrequency: 80,
+                orderBy: 'frequency',
+                sampleRate: _this.sampleRate
+            },
+            SpectralWhitening: {
+                maxFrequency: 4500,
+                sampleRate: _this.sampleRate
+            },
+            HPCP: {
+                bandPreset: true,
+                bandSplitFrequency: 500,
+                harmonics: 0,
+                maxFrequency: 4500,
+                maxShifted: false,
+                minFrequency: 80,
+                nonLinear: false,
+                normalized: 'unitMax',
+                referenceFrequency: 440,
+                sampleRate: _this.sampleRate,
+                size: 12,
+                weightType: 'squaredCosine',
+                windowSize: 1
+            },
+            UnaryOperator: {
+                scale: 1,
+                shift: 0,
+                type: 'log'
+            }
+        };
+        return _this;
+    }
+    /**
+     * Compute mel spectrogram for a given audio data along with an optional extractor profile configuration
+     * @method
+     * @param {Float32Array} audioData
+     * @param {*} [config=this.profile]
+     * @returns
+     * @memberof EssentiaExtractor
+     */
+    EssentiaExtractor.prototype.melSpectrogram = function (audioData, config) {
+        if (config === void 0) { config = this.profile; }
+        // cut audio data into overlapping frames
+        var frames = this.FrameGenerator(audioData, this.frameSize, this.hopSize);
+        var logMelbandFrames = [];
+        for (var i = 0; i &lt; frames.size(); i++) {
+            // we need to compute the following signal process chain 
+            // audio frame => windowing => spectrum => mel bands => log scale
+            var windowOut = this.Windowing(frames.get(i), config.Windowing.normalized, this.frameSize, config.Windowing.type, this.frameSize, config.Windowing.zeroPhase);
+            var spectrumOut = this.Spectrum(windowOut.frame, this.frameSize);
+            var melOut = this.MelBands(spectrumOut.spectrum, config.MelBands.highFrequencyBound, this.frameSize, config.MelBands.log, config.MelBands.lowFrequencyBound, config.MelBands.normalize, config.MelBands.numberBands, this.sampleRate, config.MelBands.type, config.MelBands.warpingFormula, config.MelBands.weighting);
+            var logNorm = this.UnaryOperator(melOut.bands, config.UnaryOperator.scale, config.UnaryOperator.shift, config.UnaryOperator.type);
+            // convert type to JS array
+            var melBandFrame = this.vectorToArray(logNorm.array);
+            logMelbandFrames.push(melBandFrame);
+        }
+        // fallback to free the std vectors
+        windowOut.frame.resize(0, 1);
+        spectrumOut.spectrum.resize(0, 1);
+        melOut.bands.resize(0, 1);
+        return logMelbandFrames;
+    };
+    /**
+     * Compute frame-wise HPCP chroma feature for a given audio data along with an optional extractor profile configuration
+     * @method
+     * @param {Float32Array} audioData
+     * @param {*} [config=this.profile]
+     * @returns
+     * @memberof EssentiaExtractor
+     */
+    EssentiaExtractor.prototype.hpcpgram = function (audioData, config) {
+        if (config === void 0) { config = this.profile; }
+        // cut audio data into overlapping frames
+        var frames = this.FrameGenerator(audioData, this.frameSize, this.hopSize);
+        var hpcpGram = [];
+        for (var i = 0; i &lt; frames.size(); i++) {
+            // we need to compute the following signal process chain 
+            // audio frame => windowing => spectrum => spectral peak => spectral whitening => HPCP
+            var windowOut = this.Windowing(frames.get(i), config.Windowing.normalized, this.frameSize, config.Windowing.type, this.frameSize, config.Windowing.zeroPhase);
+            var spectrumOut = this.Spectrum(windowOut.frame, this.frameSize);
+            var peaksOut = this.SpectralPeaks(spectrumOut.spectrum, config.SpectralPeaks.magnitudeThreshold, config.SpectralPeaks.maxFrequency, config.SpectralPeaks.maxPeaks, config.SpectralPeaks.minFrequency, config.SpectralPeaks.orderBy, this.sampleRate);
+            var whiteningOut = this.SpectralWhitening(spectrumOut.spectrum, peaksOut.frequencies, peaksOut.magnitudes, config.SpectralWhitening.maxFrequency, this.sampleRate);
+            var hpcpOut = this.HPCP(peaksOut.frequencies, whiteningOut.magnitudes, config.HPCP.bandPreset, config.HPCP.bandSplitFrequency, config.HPCP.harmonics, config.HPCP.maxFrequency, config.HPCP.maxShifted, config.HPCP.minFrequency, config.HPCP.nonLinear, config.HPCP.normalized, config.HPCP.referenceFrequency, this.sampleRate, config.HPCP.size, config.HPCP.weightType, config.HPCP.windowSize);
+            var hpcpFrame = this.vectorToArray(hpcpOut.hpcp);
+            hpcpGram.push(hpcpFrame);
+        }
+        // fallback to free the std vectors
+        windowOut.frame.resize(0, 1);
+        spectrumOut.spectrum.resize(0, 1);
+        peaksOut.frequencies.resize(0, 1);
+        peaksOut.magnitudes.resize(0, 1);
+        whiteningOut.magnitudes.resize(0, 1);
+        hpcpOut.hpcp.resize(0, 1);
+        return hpcpGram;
+    };
+    return EssentiaExtractor;
+}(core_api_1["default"]));
+exports["default"] = EssentiaExtractor;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Essentia.html">Essentia</a></li><li><a href="EssentiaExtractor.html">EssentiaExtractor</a></li><li><a href="EssentiaPlot.html">EssentiaPlot</a></li><li><a href="PlotHeatmap.html">PlotHeatmap</a></li><li><a href="PlotMelodyContour.html">PlotMelodyContour</a></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-1. Getting Started.html">1. Getting Started</a></li><li><a href="tutorial-2. Building and Installing.html">2. Building and Installing</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Mar 19 2020 18:06:43 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

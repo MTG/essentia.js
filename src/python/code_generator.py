@@ -1,19 +1,26 @@
 # -*- coding: utf-8 -*-
 """
-A simple ugly python script for generating essentia.js cpp source files from the essentia library documentation using python bindings.
+A simple python script for generating essentia.js cpp source files and typescript wrappr from the essentia library documentation using its python bindings.
 Designed to use along with the cog python library (https://nedbatchelder.com/code/cog/).
 """
 import essentia.standard as estd
 import argparse
 import logging
 from ast import literal_eval
-from configure_bindings import TO_INCLUDE_ALGOS, TO_EXCLUDE_ALGOS, read_txt_file
+from configure_bindings import TO_INCLUDE_ALGOS, TO_EXCLUDE_ALGOS
 
 logging.basicConfig(level='INFO')
 
 # prefix that we add to the input and output variable names of essentia algorithms to avoid compilation erros
 INPUT_PREFIX_ES = "input_"
 OUTPUT_PREFIX_ES = "output_"
+
+# By default we return a JS object for every essentia algorithm bindings 
+# using emscripten::val class (https://emscripten.org/docs/api_reference/val.h.html)
+FUNC_RETURN_TYPE = "val"
+
+# namespace where EssentiaJS class methods are exposed in the typescript wrapper
+JS_ALGORITHMS_RETURN_NAMESPACE = "this.algorithms"
 
 logging.info("Generating essentia.js cpp source code and binding files ....")
 logging.info("Excluding the following %s algorithms while generating bindings ..." % len(TO_EXCLUDE_ALGOS))
@@ -67,6 +74,7 @@ def parse_algorithm_info(algorithm_name, target="header"):
 	param_dict = dict()
 	output_dict['outputs'] = []
 	param_dict['params'] = []
+	output_var_names = list()
 	# create the algorithm object
 	algo = getattr(estd, algorithm_name)()
 	doc_dict = algo.getStruct()
@@ -109,7 +117,9 @@ def parse_algorithm_info(algorithm_name, target="header"):
 				output_var = "%s %s%s" % (map_types_to_cpp(out['type']), 
 										OUTPUT_PREFIX_ES, 
 										out['name'])
+				
 				outputs.append(output_var)
+				output_var_names.append("%s%s" % (OUTPUT_PREFIX_ES, out['name']))
 				output_dict['outputs'].append('  %s->output("%s").set(%s%s);' % (algo_obj, 
 																			out['name'], 
 																			OUTPUT_PREFIX_ES, 
@@ -119,70 +129,37 @@ def parse_algorithm_info(algorithm_name, target="header"):
 		for out in doc_dict['outputs']:
 			output_var = "%s %s%s" % (map_types_to_cpp(out['type']), OUTPUT_PREFIX_ES, out['name'])
 			outputs.append(output_var)
+			output_var_names.append("%s%s" % (OUTPUT_PREFIX_ES, out['name']))
 			output_dict['outputs'].append('  %s->output("%s").set(%s%s);' % (algo_obj, 
 																			out['name'], 
 																			OUTPUT_PREFIX_ES, 
 																			out['name']))
 		
-	# create function declaration string
-	if func_return_type != 'void':
-		func_str = "%s %s(%s, %s)" % (func_return_type, 
-									algorithm_name, 
-									', '.join(inputs),  
-									', '.join(parameters))
-	else:
-		func_str = "%s %s(%s, %s, %s)" % (func_return_type, 
-										algorithm_name, 
-										', '.join(inputs), 
-										', '.join(outputs), 
-										', '.join(parameters))
+	# Default function declaration string
+	func_str = "%s %s(%s, %s)" % (FUNC_RETURN_TYPE, 
+								algorithm_name, 
+								', '.join(inputs),  
+								', '.join(parameters))
+
+	# Update the func_str if either inputs or parameters 
+	# are not specified for a particular algorithms
 
 	if not inputs:
-		if func_return_type != 'void':
-			func_str = "%s %s(%s)" % (func_return_type, algorithm_name,  
-									', '.join(parameters))
-		else:
-			func_str = "%s %s(%s, %s)" % (func_return_type, 
-										algorithm_name, 
-										', '.join(outputs), 
-										', '.join(parameters))
 
-		if not inputs and not outputs:
-			func_str = "%s %s(%s)" % (func_return_type, 
-									algorithm_name, 
-									', '.join(parameters))
+		func_str = "%s %s(%s)" % (FUNC_RETURN_TYPE, 
+								algorithm_name,  
+								', '.join(parameters))
 
-		if not inputs and not parameters:
-			if func_return_type == 'void':
-				func_str = "%s %s(%s)" % (func_return_type, 
-										algorithm_name, 
-										', '.join(outputs))
-			else:
-				raise IOError("No inputs, outputs or parameters found for the algorithm - '%s'" 
-								% algorithm_name)
-
-	if not outputs:
-		func_str = "%s %s(%s, %s)" % (func_return_type, 
-									algorithm_name, 
-									', '.join(inputs), 
-									', '.join(parameters))
-
-		if not outputs and not parameters:
-			func_str = "%s %s(%s)" % (func_return_type, 
-									algorithm_name, 
-									', '.join(inputs))
+		if not parameters and not outputs:
+			raise IOError("No inputs, outputs or parameters found for the algorithm - '%s'" 
+							% algorithm_name)
 	
 	if not parameters:
-		if func_return_type != 'void':
-			func_str = "%s %s(%s)" % (func_return_type, 
-									algorithm_name, 
-									', '.join(inputs))
-		else:
-			func_str = "%s %s(%s, %s)" % (func_return_type, 
-										algorithm_name, 
-										', '.join(inputs), 
-										', '.join(outputs))
-	
+
+		func_str = "%s %s(%s)" % (FUNC_RETURN_TYPE, 
+								algorithm_name, 
+								', '.join(inputs))
+
 	# return function declaration string if target is for header file
 	if target == "header":
 		return func_str
@@ -198,14 +175,12 @@ def parse_algorithm_info(algorithm_name, target="header"):
 
 		arg_parse_str = " %s" % algorithm_name
 		
-		if func_return_type != "void":
-			algorithm.append("%s %s::%s%s {" % (func_return_type.replace('&', ''), 
-												class_name, 
-												algorithm_name, 
-												func_str.split(arg_parse_str)[1]))
-		else:
-			algorithm.append("void %s::%s%s {" % (class_name, algorithm_name, 
-												func_str.split(arg_parse_str)[1]))
+
+		algorithm.append("%s %s::%s%s {" % (FUNC_RETURN_TYPE, 
+											class_name, 
+											algorithm_name, 
+											func_str.split(arg_parse_str)[1]))
+
 			
 		algorithm.append("  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();")
 
@@ -216,31 +191,34 @@ def parse_algorithm_info(algorithm_name, target="header"):
 		else:
 			algorithm.append('  Algorithm* %s = factory.create("%s");' % (algo_obj, algorithm_name))
 
+		# set inputs to the algorithm
 		for inp in doc_dict['inputs']:
 			inp_str = '  %s->input("%s").set(%s%s);' % (algo_obj, inp['name'], 
 													INPUT_PREFIX_ES, 
 													inp['name'])
 			algorithm.append(inp_str)
 
-		if func_return_type != 'void':
-			for out in outputs:
-				algorithm.append("  %s;" % out.replace('&', ''))
+		for out in outputs:
+			algorithm.append("  %s;" % out.replace('&', ''))
 
+		# set outputs to the algorithm
 		if output_dict['outputs']:
 			for out in output_dict['outputs']:
 				algorithm.append(out)
 		else:
-			raise IOError("Not found output variable in the algo '%s'" % algorithm_name)
+			raise IOError("No output variable found in the algo '%s'" % algorithm_name)
 
 		algorithm.append("  %s->compute();" % algo_obj)
-		algorithm.append("  delete %s;" % algo_obj)
 
-		if func_return_type != "void":
-			if len(outputs[0].split(' ')) > 2:
-				algorithm.append("  return %s;" % outputs[0].split(' ')[2])
-			else:
-				algorithm.append("  return %s;" % outputs[0].split(' ')[1])
-		
+		algorithm.append("  val output%s(val::object());" % algorithm_name)
+
+		for out_var in output_var_names:
+			algorithm.append('  output%s.set("%s", %s);' % (algorithm_name,
+														out_var.replace(OUTPUT_PREFIX_ES, ''),
+														out_var))
+
+		algorithm.append("  delete %s;" % algo_obj)	
+		algorithm.append("  return output%s;" % algorithm_name)	
 		algorithm.append("}")
 		return algorithm
 
@@ -269,4 +247,174 @@ def generate_algorithms(algorithms=TO_INCLUDE_ALGOS):
 		logging.info(algo_name)
 		algos.append(parse_algorithm_info(algo_name, target="algorithm"))
 	logging.info("Finished generating cpp source code for %s essentia algorithms" % len(algorithms))
+	return algos
+
+
+def map_types_to_js(es_type):
+	if es_type in ['vector_real', 
+					'vector_complex', 
+					'matrix_real', 
+					'vector_string']:
+		return "any[]"
+	elif es_type in ['vector_vector_real', 'vector_vector_complex', 'vector_stereosample']:
+		return "VectorVectorFloat"
+	elif es_type == 'string':
+		return "string"
+	elif es_type in ['integer', 'real']:
+		return "number"
+	elif es_type == 'bool':
+		return "boolean"
+	else:
+		raise NotImplementedError("Cannot find the correspoding type for '%s'" % es_type)
+
+
+def parse_to_typescript(algorithm_name):
+	inputs = list()
+	parameters = list()
+	param_converted = list()
+	return_inputs = list()
+	return_parameters = list()	
+	comments = list()
+	algorithm = list()
+	# create the algorithm object
+	algo = getattr(estd, algorithm_name)()
+	doc_dict = algo.getStruct()
+
+	doc_link = " Check https://essentia.upf.edu/reference/std_%s.html for more details." % algorithm_name
+	# We do a shim of algorithm description for prettifying the doc
+	algo_description = doc_dict['description'].split('\n\n')[0] + doc_link
+	# add jsdoc string
+	comments.append("/**")
+	comments.append("* %s" % algo_description)
+	comments.append("* @method")
+
+	param_prefix = "* @param"
+	return_prefix = "* @returns"
+
+	# parse input variables
+	for inp in doc_dict['inputs']:
+
+		if inp['type'] in ['vector_real', 
+						'vector_complex', 
+						'matrix_real', 
+						'vector_string',
+						'vector_vector_real', 
+						'vector_vector_complex', 
+						'vector_stereosample']:
+
+			inputs.append("%s: any" % inp['name'])	
+
+			if inp['type'] in ['vector_real', 'vector_complex', 'matrix_real']:
+				comments.append("%s {VectorFloat} [%s] %s" % (param_prefix,
+												inp['name'],
+												inp['description']))
+			
+			elif inp['type'] == "vector_string":
+				comments.append("%s {VectorString} [%s] %s" % (param_prefix,
+															inp['name'],
+															inp['description']))
+
+			else:
+				comments.append("%s {VectorVectorFloat} [%s] %s" % (param_prefix,
+																inp['name'],
+																inp['description']))		
+		else:
+			inputs.append("%s: %s" % (inp['name'], map_types_to_js(inp['type'])))
+
+			comments.append("%s {%s} [%s] %s" % (param_prefix,
+												map_types_to_js(inp['type']),
+												inp['name'],
+												inp['description']))
+
+		return_inputs.append(inp['name'])
+		
+	# parse parameter variables
+	for param in doc_dict['parameters']:
+
+		comments.append("%s {%s} [%s=%s] %s" % (param_prefix, 
+												map_types_to_js(param['type']), 
+												param['name'], 
+												param['default'],
+												param['description']))
+
+		if param['type'] in ['vector_real', 'vector_complex', 'matrix_real']:
+			param_converted.append("  let vec%s = new this.module.VectorFloat();" % param['name'])
+			param_converted.append("  for (var i=0; i<vec%s.size(); i++) {" %  param['name'])
+			param_converted.append("    vec%s.push_back(%s[i]);" % (param['name'], param['name']))
+			param_converted.append("  }")
+
+			parameters.append("%s: %s=%s" % (param['name'],
+											map_types_to_js(param['type']),
+											param['default']))
+
+			return_parameters.append("vec%s" % param['name'])
+
+		elif param['type'] in ['vector_string']:
+			param_converted.append("  let vec%s = new this.module.VectorString();" % param['name'])
+			param_converted.append("  for (var i=0; i<vec%s.size(); i++) {" % param['name'])
+			param_converted.append("    vec%s.push_back(%s[i]);" % param['name'])
+			param_converted.append("  }")
+
+			parameters.append("%s: %s=%s" % (param['name'],
+											map_types_to_js(param['type']),
+											param['default']))
+
+			return_parameters.append("vec%s" % param['name'])
+
+		elif param['type'] == 'string':
+			parameters.append("%s: %s='%s'" % (param['name'],
+											map_types_to_js(param['type']),
+											param['default']))
+
+			return_parameters.append(param['name'])
+		else:
+			parameters.append("%s: %s=%s" % (param['name'],
+											map_types_to_js(param['type']),
+											param['default']))
+
+			return_parameters.append(param['name'])
+	
+	# parse output variables
+	outs = list()
+	for out in doc_dict['outputs']:
+		outs.append("%s: '%s'" % (out['name'], out['description']))
+	comments.append("%s {object} {%s}" % (return_prefix, ', '.join(outs)))
+
+	comments.append("* @memberof Essentia")
+	comments.append("*/")
+
+	if inputs and parameters:
+		func_definition = "%s(%s, %s)" % (algorithm_name, ', '.join(inputs), ', '.join(parameters))
+		return_definition = "return %s.%s(%s, %s);" % (JS_ALGORITHMS_RETURN_NAMESPACE, 
+													algorithm_name, 
+													', '.join(return_inputs), 
+													', '.join(return_parameters))
+	elif inputs:
+		func_definition = "%s(%s)" % (algorithm_name, ', '.join(inputs))
+		return_definition = "return %s.%s(%s);" % (JS_ALGORITHMS_RETURN_NAMESPACE, 
+												algorithm_name, 
+												', '.join(return_inputs))
+	else:
+		func_definition = "%s(%s)" % (algorithm_name, ', '.join(parameters))
+		return_definition = "return %s.%s(%s);" % (JS_ALGORITHMS_RETURN_NAMESPACE, 
+												algorithm_name, 
+												', '.join(return_parameters))
+
+	algorithm.extend(comments)
+	algorithm.append("%s {" % func_definition)
+
+	if param_converted:
+		algorithm.extend(param_converted)
+
+	algorithm.append("  %s" % return_definition)  
+	algorithm.append("}")
+	return algorithm
+
+
+def generate_typescript_wrapper(algorithms=TO_INCLUDE_ALGOS):
+	algos = list()
+	logging.info("Generating typescript wrapper ...")
+	for algo_name in algorithms:
+		algos.append(parse_to_typescript(algo_name))
+	logging.info("Finished generating typescript wrapper for %s essentia algorithms" % len(algorithms))
 	return algos

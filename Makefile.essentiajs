@@ -1,26 +1,25 @@
-ESSENTIAJS_VERSION=0.0.8
+ESSENTIAJS_VERSION=0.0.9-dev
 LIB_DIR_ES=$(EMSCRIPTEN)/system/local/lib
 BUILD_DIR_ES=builds
 DIST_DIR_ES=dist
 BINDING_CPP_ES=src/cpp/bindings_essentiajs.cpp
 TO_INCLUDE_ES=src/cpp/includes/essentiajs.cpp 
-ESSENTIA_JS=$(BUILD_DIR_ES)/essentia.js
-ESSENTIA_JS_WASM=$(BUILD_DIR_ES)/essentia.wasm
-ESSENTIA_JS_MODULE=$(BUILD_DIR_ES)/essentia-module.js
+ESSENTIA_JS_WEB=$(BUILD_DIR_ES)/essentia-wasm.web.js
+ESSENTIA_JS_WEB_WASM=$(BUILD_DIR_ES)/essentia-wasm.web.wasm
+ESSENTIA_JS_MODULE=$(BUILD_DIR_ES)/essentia-wasm.module.js
 PRE_JS_WASM=src/js/wasm.module.pre.js
-POST_JS_WASM=src/js/wasm.module.post.js
-ESSENTIA_TOOLS_JS=src/js/essentia.tools.js
+POST_JS_WEB_WASM=src/js/wasm.webmodule.post.js
+POST_JS_ES6_WASM=src/js/wasm.es6module.post.js
+
+codegen:
+	@echo "Generating cpp source code from essentia python bindings ..."
+	@cd src/python && python configure_bindings.py
 
 build:
 	@mkdir -p $(BUILD_DIR_ES)
 
-	@echo "Generating cpp source code from essentia python bindings ..."
-	@cd src/python && python configure_bindings.py
-	@echo "Done..."
+	@echo "Compiling the emscripten embind cpp bindings to bitcode ..."
 
-	@echo "Compiling the bindings to bitcode ..."
-
-	@cd ../../
 	@emcc --bind -Oz \
 	   $(BINDING_CPP_ES) \
 	   $(TO_INCLUDE_ES) \
@@ -32,17 +31,20 @@ build:
 
 	@echo "Linking and compiling the bindings with essentia to js, wasm files ..."
 	@echo "compiling async builds..."
-	@emcc --emrun --bind -Oz \
+	@emcc --bind -Oz \
 	   $(BUILD_DIR_ES)/essentiajs.bc ${LIB_DIR_ES}/essentia.a \
 	   -s WASM=1 \
-	   -o $(ESSENTIA_JS) \
+	   -o $(ESSENTIA_JS_WEB) \
 	   -s EXCEPTION_DEBUG \
 	   -s ASSERTIONS=2 \
 	   -s ENVIRONMENT=web \
+	   -s MODULARIZE=1 \
+	   -s EXPORT_NAME="EssentiaModule" \
+	   --post-js $(POST_JS_WEB_WASM) \
 	   -s ALLOW_MEMORY_GROWTH=1 || exit 1
 
 	@echo "compiling sync builds..."
-	@emcc --emrun --bind -Oz \
+	@emcc --bind -Oz \
 	   -s WASM=1 \
 	   $(BUILD_DIR_ES)/essentiajs.bc ${LIB_DIR_ES}/essentia.a \
 	   -o $(ESSENTIA_JS_MODULE) \
@@ -50,17 +52,14 @@ build:
 	   -s ALLOW_MEMORY_GROWTH=1 \
 	   -s SINGLE_FILE=1 || exit 1
 
-	@cat $(PRE_JS_WASM) $(ESSENTIA_JS) > $$.tmp && mv $$.tmp $(ESSENTIA_JS)
+	@cat $(PRE_JS_WASM) $(ESSENTIA_JS_WEB) > $$.tmp && mv $$.tmp $(ESSENTIA_JS_WEB)
 	@cat $(PRE_JS_WASM) $(ESSENTIA_JS_MODULE) > $$.tmp && mv $$.tmp $(ESSENTIA_JS_MODULE)
-	@cat $(POST_JS_WASM) >> $(ESSENTIA_JS_MODULE)
-
-	@cp -f $(ESSENTIA_TOOLS_JS) $(BUILD_DIR_ES)/
+	@cat $(POST_JS_ES6_WASM) >> $(ESSENTIA_JS_MODULE)
 
 	@mkdir -p $(DIST_DIR_ES)
-	@cp -f $(ESSENTIA_JS) $(DIST_DIR_ES)/
-	@cp -f $(ESSENTIA_JS_WASM) $(DIST_DIR_ES)/
+	@cp -f $(ESSENTIA_JS_WEB) $(DIST_DIR_ES)/
+	@cp -f $(ESSENTIA_JS_WEB_WASM) $(DIST_DIR_ES)/
 	@cp -f $(ESSENTIA_JS_MODULE) $(DIST_DIR_ES)/
-	@cp -f $(ESSENTIA_TOOLS_JS) $(DIST_DIR_ES)/
 
 	@echo "Done ..."
 
