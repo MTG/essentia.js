@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: plot.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: plot.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
+/*
+ * Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra
+ *
+ * This file is part of Essentia
+ *
+ * Essentia is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation (FSF), either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the Affero GNU General Public License
+ * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
+ */
+var __extends = (this &amp;&amp; this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array &amp;&amp; function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+exports.__esModule = true;
+// default plot config for EssentiaPlot base class
+var PlotConfig = {
+    isPlotting: false,
+    startTimeIndex: 0
+};
+exports.PlotConfig = PlotConfig;
+// default layout settings for melody contour plots
+var LayoutMelodyContourPlot = {
+    title: "Melody Contour",
+    plot_bgcolor: "transparent",
+    paper_bgcolor: "#FCF7F7",
+    autosize: false,
+    width: 670,
+    height: 300,
+    xaxis: {
+        type: "time",
+        title: "Time"
+    },
+    yaxis: {
+        autorange: false,
+        range: [30, 3000],
+        type: "linear",
+        title: "Frequency (Hz)"
+    }
+};
+exports.LayoutMelodyContourPlot = LayoutMelodyContourPlot;
+// default layout settings for chroma heatmap plot
+var LayoutChromaPlot = {
+    title: "",
+    plot_bgcolor: "transparent",
+    paper_bgcolor: "#FCF7F7",
+    autosize: false,
+    width: 670,
+    height: 300,
+    xaxis: {
+        autorange: true,
+        time: 'Time',
+        title: 'Time'
+    },
+    yaxis: {
+        title: 'Chroma Bins',
+        range: [0, 11]
+    }
+};
+exports.LayoutChromaPlot = LayoutChromaPlot;
+// default layout settings for spectrogram heatmap plot
+var LayoutSpectrogramPlot = {
+    title: "",
+    plot_bgcolor: "transparent",
+    paper_bgcolor: "#FCF7F7",
+    autosize: false,
+    width: 670,
+    height: 300,
+    xaxis: {
+        title: 'Time',
+        autorange: true,
+        time: 'Time'
+    },
+    yaxis: {
+        title: 'Bands',
+        range: null,
+        type: 'linear'
+    }
+};
+exports.LayoutSpectrogramPlot = LayoutSpectrogramPlot;
+/**
+ * @class Base class for essentia plot
+ */
+var EssentiaPlot = /** @class */ (function () {
+    /**
+     *Creates an instance of EssentiaPlot.
+    * @param {*} Plotly
+    * @param {*} [options=CONFIG]
+    * @memberof EssentiaPlot
+    */
+    function EssentiaPlot(Plotly, options) {
+        if (options === void 0) { options = PlotConfig; }
+        this.Plotly = Plotly;
+        this.options = options;
+        this.isPlotting = options.isPlotting;
+        this.startTimeIndex = options.startTimeIndex;
+    }
+    /**
+     * Return evenly spaced numbers over a specified interval
+     * Returns num evenly spaced samples, calculated over the interval [start, stop].
+     * @param {*} start The starting value of the sequence.
+     * @param {*} stop The end value of the sequence
+     * @param {*} num Number of samples to generate. Must be non-negative
+     * @returns
+     * @memberof EssentiaPlot
+     */
+    EssentiaPlot.prototype.makeLinearSpace = function (start, stop, num) {
+        if (typeof num === "undefined")
+            num = Math.max(Math.round(stop - start) + 1, 1);
+        if (num &lt; 2) {
+            return num === 1 ? [start] : [];
+        }
+        var i, ret = Array(num);
+        num--;
+        for (i = num; i >= 0; i--) {
+            ret[i] = (i * stop + (num - i) * start) / num;
+        }
+        return ret;
+    };
+    return EssentiaPlot;
+}());
+exports.EssentiaPlot = EssentiaPlot;
+/**
+ * @class PlotMelodyContour
+ * @extends {EssentiaPlot}
+ */
+var PlotMelodyContour = /** @class */ (function (_super) {
+    __extends(PlotMelodyContour, _super);
+    /**
+     *Creates an instance of PlotMelodyContour.
+     * @param {string} divId
+     * @param {*} [plotLayout=LayoutMelodyContour]
+     * @memberof PlotMelodyContour
+     */
+    function PlotMelodyContour(Plotly, divId, plotLayout) {
+        if (plotLayout === void 0) { plotLayout = LayoutMelodyContourPlot; }
+        var _this = _super.call(this, Plotly) || this;
+        _this.Plotly = Plotly;
+        _this.divId = divId;
+        _this.plotLayout = plotLayout;
+        return _this;
+    }
+    /**
+     * Create the melody contour plot given inputs using Plotly.js
+     * @method
+     * @param {Float32Array} featureArray
+     * @param {string} plotTitle
+     * @param {number} audioFrameSize
+     * @param {number} audioSampleRate
+     * @memberof PlotMelodyContour
+     */
+    PlotMelodyContour.prototype.create = function (featureArray, plotTitle, audioFrameSize, audioSampleRate) {
+        this.plotLayout.title = plotTitle;
+        // time axis
+        var timeAxis = this.makeLinearSpace(this.startTimeIndex, audioFrameSize / audioSampleRate, featureArray.length);
+        // Create a plotly plot instance if a plot hasn't been created before
+        if (!this.isPlotting) {
+            this.Plotly.newPlot(this.divId, [{
+                    x: timeAxis,
+                    y: featureArray,
+                    mode: 'lines',
+                    line: { color: '#2B6FAC', width: 2 }
+                }], this.plotLayout);
+            this.isPlotting = true;
+            this.startTimeIndex = timeAxis[timeAxis.length - 1];
+        }
+        else {
+            timeAxis = this.makeLinearSpace(this.startTimeIndex, this.startTimeIndex + (audioFrameSize / audioSampleRate), featureArray.length);
+            this.startTimeIndex = timeAxis[timeAxis.length - 1];
+            this.Plotly.extendTraces(this.divId, {
+                x: [timeAxis],
+                y: [featureArray]
+            }, [0]);
+        }
+    };
+    /**
+     * Remove the existing Plotly plot
+     * @method
+     * @memberof PlotMelodyContour
+     */
+    PlotMelodyContour.prototype.destroy = function () {
+        this.Plotly.deleteTraces(this.divId, 0);
+        this.isPlotting = false;
+        this.startTimeIndex = 0;
+    };
+    return PlotMelodyContour;
+}(EssentiaPlot));
+exports.PlotMelodyContour = PlotMelodyContour;
+/**
+ * @class PlotHeatmap
+ * @extends {EssentiaPlot}
+ */
+var PlotHeatmap = /** @class */ (function (_super) {
+    __extends(PlotHeatmap, _super);
+    /**
+     *Creates an instance of PlotHeatmap.
+    * @param {*} Plotly
+    * @param {string} divId
+    * @param {string} [plotType='chroma']
+    * @param {*} [plotLayout=LayoutChromaHeatmap]
+    * @memberof PlotHeatmap
+    */
+    function PlotHeatmap(Plotly, divId, plotType, plotLayout) {
+        if (plotType === void 0) { plotType = "chroma"; }
+        var _this = _super.call(this, Plotly) || this;
+        _this.Plotly = Plotly;
+        _this.divId = divId;
+        _this.plotType = plotType;
+        _this.plotLayout = plotLayout;
+        if (plotType === "chroma") {
+            // we set chroma bin labels as yAxis for the heatmap
+            _this.yAxis = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        }
+        else if (plotType === "spectrogram") {
+            _this.yAxis = null;
+        }
+        else {
+            throw "Invalid value for argument 'plotType'. Should be either 'chroma' or 'spectrogram'";
+        }
+        return _this;
+    }
+    /**
+     * Create Plotly.js heatmap plot with given input array and type
+     * @param {Array} featureArray
+     * @param {string} plotTitle
+     * @param {*} audioFrameSize
+     * @param {*} audioSampleRate
+     * @param {string} [colorscale='Jet']
+     * @memberof PlotChromaHeatmap
+     */
+    PlotHeatmap.prototype.create = function (featureArray, plotTitle, audioFrameSize, audioSampleRate, colorscale) {
+        if (colorscale === void 0) { colorscale = 'Jet'; }
+        this.plotLayout.title = plotTitle;
+        if (this.plotType === "spectrogram") {
+            var numBands = featureArray[0].length;
+            this.plotLayout.yaxis.range = [0, numBands + 1];
+        }
+        var timeAxis = this.makeLinearSpace(this.startTimeIndex, audioFrameSize / audioSampleRate, featureArray.length);
+        var data = {
+            x: timeAxis,
+            y: this.yAxis,
+            z: featureArray,
+            colorscale: colorscale,
+            type: 'heatmap',
+            transpose: true
+        };
+        if (!this.isPlotting) {
+            this.Plotly.newPlot(this.divId, [data], this.plotLayout);
+            this.startTimeIndex = timeAxis[timeAxis.length - 1];
+        }
+        else {
+            timeAxis = this.makeLinearSpace(this.startTimeIndex, this.startTimeIndex + (audioFrameSize / audioSampleRate), featureArray.length);
+            this.startTimeIndex = timeAxis[timeAxis.length - 1];
+            this.Plotly.extendTraces(this.divId, {
+                x: [timeAxis],
+                z: [featureArray]
+            }, [0]);
+        }
+    };
+    /**
+     * Remove the existing Plotly plot
+     * @method
+     * @memberof PlotHeatmap
+     */
+    PlotHeatmap.prototype.destroy = function () {
+        this.Plotly.deleteTraces(this.divId, 0);
+        this.isPlotting = false;
+        this.startTimeIndex = 0;
+    };
+    return PlotHeatmap;
+}(EssentiaPlot));
+exports.PlotHeatmap = PlotHeatmap;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Essentia.html">Essentia</a></li><li><a href="EssentiaExtractor.html">EssentiaExtractor</a></li><li><a href="EssentiaPlot.html">EssentiaPlot</a></li><li><a href="PlotHeatmap.html">PlotHeatmap</a></li><li><a href="PlotMelodyContour.html">PlotMelodyContour</a></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-1. Getting Started.html">1. Getting Started</a></li><li><a href="tutorial-2. Building and Installing.html">2. Building and Installing</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Mar 19 2020 18:06:43 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

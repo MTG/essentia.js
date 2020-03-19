@@ -9,8 +9,8 @@
 
 You can find the latest releases on [Github](https://github.com/MTG/essentia.js/releases) or on [npm](https://www.npmjs.com/package/essentia.js).
 
+## JS API Reference
 
-## Sub-modules
 
 ### Core JS Interface
 
@@ -24,12 +24,15 @@ Imports an [Emscripten WASM Module](https://emscripten.org/docs/api_reference/mo
 - `essentia-wasm.web.wasm` - Asynchronous build of essentia C++ library WASM back-end. 
 - `essentia-wasm.web.js` - JS glue code for loading `essentia-wasm-web.wasm` (can be used with HTML `<script>` tag).
 - `essentia-wasm.module.js` - Synchronous build of essentia C++ library back-end (ES6 import/export and AudioWorklet support).
+
+Essentia WASM backend algorithms reference can be found [here](https://essentia.upf.edu/algorithms_reference.html) 
   
   
 ### Additional JS modules
 
 - `essentia.js-plot.js` - `EssentiaPlot` import for  web browsers
 - `essentia.js-plot.es.js` - `EssentiaPlot` for module imports.
-
+- `essentia.js-extractor.js` - `EssentiaExtractor` import for  web browsers
+- `essentia.js-extractor.es.js` - `EssentiaExtractor` for module imports.
 
 &nbsp;
