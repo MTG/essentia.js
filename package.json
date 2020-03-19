@@ -18,7 +18,7 @@
     "gen-code": "make -f Makefile.essentiajs codegen",
     "build-wasm": "make -f Makefile.essentiajs build",
     "build-js-api": "rollup --config",
-    "build-api-docs": "jsdoc -d docs/api_reference/",
+    "build-api-docs": "cd docs && jsdoc --readme index.md -u tutorials/ -P ../package.json -c jsdoc.config.json",
     "test": "mocha"
   },
   "directories": {

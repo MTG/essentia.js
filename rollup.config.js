@@ -58,5 +58,24 @@ export default [{
    }),
    terser() // minifies generated bundles
   ]
+ }, {
+  input: 'src/typescript/extractor.ts', // our source file
+  output: [
+   {
+    file: 'dist/essentia.js-extractor.es.js',
+    format: 'es' // the preferred format
+   },
+   {
+    file: 'dist/essentia.js-extractor.js',
+    format: 'iife',
+    name: 'EssentiaExtractor' // the global which can be used in a browser
+   }
+  ],
+  plugins: [
+   typescript({
+    typescript: require('typescript'),
+   }),
+   terser() // minifies generated bundles
+  ]
  },
 ];
