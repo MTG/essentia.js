@@ -16,23 +16,26 @@
  * You should have received a copy of the Affero GNU General Public License
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
+
 // NOTE: The following code snippets are machine generated. Do not edit.
+
 /**
- * @class essentia.js JavaScript interface
+ * @class essentia.js core JS API
  */
 class Essentia {
   /** 
-  * @property {EssentiaEmscriptenModule} this.module 
-  * @property {string} this.version 
-  * @property {string} this.algorithmNames 
+  * @property {EssentiaEmscriptenModule} this.module Essentia emcripten global module object 
+  * @property {string} this.version Essentia WASM backend version
+  * @property {string} this.algorithmNames List of available Essentia alogrithms from the WASM backend
   */
   private algorithms: any;
   module: any;
   version: string;
   algorithmNames: string;
+
   /** 
   * @constructor 
-  * @param {EssentiaEmscriptenModule} 
+  * @param {EssentiaEmscriptenModule} EssentiaModule Essentia emcripten global module object which is loaded from 'essentia-wasm.*.js file'
   * @param {boolean} [isDebug=false]
   * @memberof Essentia
   */
@@ -44,11 +47,11 @@ class Essentia {
   }
 
   /**
-   *Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API
+   * Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API. (NOTE: only works on modern web-browsers)
    * @async
    * @method
    * @param {string} audioURL web url or blob uri of a audio file
-   * @param {AudioContext} webAudioCtx an instance of WebAudioApi `AudioContext`
+   * @param {AudioContext} webAudioCtx an instance of Web Audio API `AudioContext`
    * @param {number} [channel=0] audio channel number
    * @returns {Float32Array} decode and returns the audio data as Float32 array for the given channel
    * @memberof Essentia
@@ -61,7 +64,7 @@ class Essentia {
   }
 
   /**
-   * Shutdown essentia algorithm instance to free memory
+   * Method to shutdown essentia algorithm instance after it's use
    * @method
    * @memberof Essentia
    */
@@ -70,7 +73,7 @@ class Essentia {
   }
 
   /**
-   * Method for re-instantiating this.algorithms instance after using the this.shutdown method
+   * Method for re-instantiating essentia algorithms instance after using the shutdown method
    * @method
    * @memberof Essentia
    */

@@ -305,23 +305,23 @@ def parse_to_typescript(algorithm_name):
 			inputs.append("%s: any" % inp['name'])	
 
 			if inp['type'] in ['vector_real', 'vector_complex', 'matrix_real']:
-				comments.append("%s {VectorFloat} [%s] %s" % (param_prefix,
+				comments.append("%s {VectorFloat} %s %s" % (param_prefix,
 												inp['name'],
 												inp['description']))
 			
 			elif inp['type'] == "vector_string":
-				comments.append("%s {VectorString} [%s] %s" % (param_prefix,
+				comments.append("%s {VectorString} %s %s" % (param_prefix,
 															inp['name'],
 															inp['description']))
 
 			else:
-				comments.append("%s {VectorVectorFloat} [%s] %s" % (param_prefix,
+				comments.append("%s {VectorVectorFloat} %s %s" % (param_prefix,
 																inp['name'],
 																inp['description']))		
 		else:
 			inputs.append("%s: %s" % (inp['name'], map_types_to_js(inp['type'])))
 
-			comments.append("%s {%s} [%s] %s" % (param_prefix,
+			comments.append("%s {%s} %s %s" % (param_prefix,
 												map_types_to_js(inp['type']),
 												inp['name'],
 												inp['description']))
