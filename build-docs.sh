@@ -10,4 +10,6 @@ node node_modules/jsdoc/jsdoc.js \
 
 mkdir -p docs/api
 cp -rf out/. docs/api/
-rm -rf ./out
+rm -rf out
+
+find src/typescript/ -maxdepth 1 -type f -name "*.js" -delete 
