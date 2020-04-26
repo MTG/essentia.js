@@ -1,7 +1,7 @@
 {
   "name": "essentia.js",
-  "version": "0.0.9-dev",
-  "description": "JavaScript library for music/audio analysis and processing for both real-time and offline use-cases, powered by WebAssembly",
+  "version": "0.0.9",
+  "description": "JavaScript library for music/audio analysis and processing for both real-time and offline audio feature extraction, powered by WebAssembly",
   "homepage": "https://mtg.github.io/essentia.js/",
   "author": "Albin Correya <albin.correya@upf.edu> (http://mtg.upf.edu)",
   "license": "AGPL-3.0",
@@ -18,7 +18,7 @@
     "gen-code": "make -f Makefile.essentiajs codegen",
     "build-wasm": "make -f Makefile.essentiajs build",
     "build-js-api": "rollup --config",
-    "build-api-docs": "cd docs && jsdoc --readme index.md -u tutorials/ -P ../package.json -c jsdoc.config.json",
+    "build-api-docs": "./build-docs.sh",
     "test": "mocha"
   },
   "directories": {
@@ -38,7 +38,8 @@
     "@babel/preset-env": "^7.4.5",
     "chai": "^4.2.0",
     "esm": "^3.2.25",
-    "mocha": "^6.1.4",
+    "foodoc": "0.0.9",
+    "jsdoc": "^3.6.3",
     "rollup": "^2.0.6",
     "rollup-plugin-terser": "^5.3.0",
     "rollup-plugin-typescript2": "^0.26.0",

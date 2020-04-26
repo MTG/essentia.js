@@ -1,0 +1,29 @@
+{
+    "plugins": [
+      "plugins/markdown"
+    ], 
+    "recurseDepth": 10,
+    "source": {
+        "include": ["src/typescript/core_api.js", 
+          "src/typescript/extractor.js",
+          "src/typescript/plot.js"
+        ],
+        "includePattern": ".+\\.js(doc|x)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "sourceType": "module",
+    "tags": {
+        "allowUnknownTags": true,
+        "dictionaries": ["jsdoc","closure"]
+    },
+    "templates": {
+        "cleverLinks": true,
+        "monospaceLinks": false,
+        "systemName": "essentia.js",
+        "systemSummary"         : "JavaScript library for Music/Audio analysis, powered by WebAssembly.",
+        "systemColor"           : "black",
+        "footer"                : "https://essentia.upf.edu",
+        "copyright"             : "Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra",
+        "search": false
+    }
+}
