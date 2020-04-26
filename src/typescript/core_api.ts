@@ -20,7 +20,16 @@
 // NOTE: The following code snippets are machine generated. Do not edit.
 
 /**
- * @class essentia.js core JS API
+ * @fileOverview Essentia high-level core interface
+ * @author <a href="mailto:albin.correya@upf.edu">Albin Correya</a>
+ * @version 0.0.9
+ */
+
+/**
+ * essentia.js-core JS API
+ * @class 
+ * @example
+ * const essentia = new Essentia(EssentiaModule)
  */
 class Essentia {
   /** 
@@ -29,15 +38,14 @@ class Essentia {
   * @property {string} this.algorithmNames List of available Essentia alogrithms from the WASM backend
   */
   private algorithms: any;
-  module: any;
-  version: string;
-  algorithmNames: string;
+  public module: any;
+  public version: string;
+  public algorithmNames: string;
 
-  /** 
-  * @constructor 
+  /**  
+  * @constructs
   * @param {EssentiaEmscriptenModule} EssentiaModule Essentia emcripten global module object which is loaded from 'essentia-wasm.*.js file'
   * @param {boolean} [isDebug=false]
-  * @memberof Essentia
   */
   constructor(public EssentiaModule: any, public isDebug: boolean=false) {
     this.algorithms = new EssentiaModule.EssentiaJS(isDebug);
@@ -82,20 +90,20 @@ class Essentia {
   }
 
   /**
-   * Convert an input JS array into VectorFloat by accessing raw pointers
+   * Convert an input JS array into VectorFloat type
    * @method
-   * @param {Float32Array} inpurtArray input JS typed array
+   * @param {Float32Array} inputArray input JS typed array
    * @returns {VectorFloat} returns vector float
    * @memberof Essentia
    */
-  arrayToVector(inpurtArray: any) {
-    return this.module.arrayToVector(inpurtArray);
+  arrayToVector(inputArray: any) {
+    return this.module.arrayToVector(inputArray);
   }
 
   /**
-   * Convert an input VectorFloat array into typed Float32Array by copying it's element
+   * Convert an input VectorFloat array into typed JS Float32Array 
    * @method 
-   * @param {VectorFloat} inputVector input VectorFloat
+   * @param {VectorFloat} inputVector input VectorFloat array
    * @returns {Float32Array} returns converted JS typed array
    * @memberof Essentia
    */
@@ -3661,4 +3669,7 @@ class Essentia {
 
 }
 
+/*
+@exports
+*/
 export default Essentia;

@@ -20,8 +20,8 @@
 import Essentia from "./core_api";
 
 /**
- * 
- * @class EssentiaExtractor
+ * EssentiaExtractor Base Class
+ * @class 
  * @extends {Essentia}
  */
 class EssentiaExtractor extends Essentia {
@@ -91,7 +91,7 @@ class EssentiaExtractor extends Essentia {
    *Creates an instance of EssentiaExtractor.
   * @param {*} EssentiaModule
   * @param {boolean} [isDebug=false]
-  * @memberof EssentiaExtractor
+  * @constructs
   */
   constructor(public EssentiaModule: any, public isDebug: boolean=false) {
     super(EssentiaModule, isDebug);
@@ -102,7 +102,7 @@ class EssentiaExtractor extends Essentia {
    * @method
    * @param {Float32Array} audioData
    * @param {*} [config=this.profile]
-   * @returns
+   * @returns {Array} Frame-wise Mel Spectrogram
    * @memberof EssentiaExtractor
    */
   melSpectrogram(audioData: Float32Array, config: any=this.profile) {
@@ -139,18 +139,20 @@ class EssentiaExtractor extends Essentia {
       logMelbandFrames.push(melBandFrame);
     }
     // fallback to free the std vectors
-    windowOut.frame.resize(0, 1);
-    spectrumOut.spectrum.resize(0, 1);
-    melOut.bands.resize(0, 1);
+    delete windowOut.frame;
+    delete spectrumOut.spectrum;
+    delete melOut.bands;
+    delete logNorm.array;
 
     return logMelbandFrames;
   }
+  
   /**
    * Compute frame-wise HPCP chroma feature for a given audio data along with an optional extractor profile configuration
    * @method
    * @param {Float32Array} audioData
    * @param {*} [config=this.profile]
-   * @returns
+   * @returns {Array} Frame-wise HPCP
    * @memberof EssentiaExtractor
    */
   hpcpgram(audioData: Float32Array, config: any=this.profile) {
@@ -203,12 +205,12 @@ class EssentiaExtractor extends Essentia {
       hpcpGram.push(hpcpFrame);
     }
     // fallback to free the std vectors
-    windowOut.frame.resize(0, 1);
-    spectrumOut.spectrum.resize(0, 1);
-    peaksOut.frequencies.resize(0, 1);
-    peaksOut.magnitudes.resize(0, 1);
-    whiteningOut.magnitudes.resize(0, 1);
-    hpcpOut.hpcp.resize(0, 1);
+    delete windowOut.frame;
+    delete spectrumOut.spectrum;
+    delete peaksOut.frequencies;
+    delete peaksOut.magnitudes;
+    delete whiteningOut.magnitudes;
+    delete hpcpOut.hpcp;
 
     return hpcpGram;
   }
