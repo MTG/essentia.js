@@ -6,6 +6,7 @@
     "outDir": "./dist",
     "strict": true,
     "noEmitHelpers": true,
+    "sourceMap": true,
   },
   "include": ["src/typescript"],
   "exclude": ["node_modules", "**/__tests__/*"]
