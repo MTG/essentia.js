@@ -24,6 +24,7 @@
         "systemColor": "black",
         "footer": "https://essentia.upf.edu",
         "copyright": "Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra",
+        "includeDate": false,
         "search": false
     }
 }
