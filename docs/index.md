@@ -25,7 +25,7 @@ Imports an [Emscripten WASM Module](https://emscripten.org/docs/api_reference/mo
 - `essentia-wasm.web.js` - JS glue code for loading `essentia-wasm-web.wasm` (can be used with HTML `<script>` tag).
 - `essentia-wasm.module.js` -  essentia WASM back-end for synchronous imports (ES6 style import and AudioWorklet support).
 
-The documentation for essentia C++ algorithms can be found [here](https://essentia.upf.edu/algorithms_reference.html) 
+The documentation for essentia C++ algorithms can be found [here](https://essentia.upf.edu/algorithms_reference.html).
   
   
 ### Add-on JS modules
@@ -44,6 +44,3 @@ The essentia WASM back-end allows us to use all the [essentia standard mode](htt
 ### Typescript interface
 
 essentia.js also provides a typscript programming interface which can be found [here](https://github.com/MTG/essentia.js/tree/master/src/typescript).
-
-
-&nbsp;
