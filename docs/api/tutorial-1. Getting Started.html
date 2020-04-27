@@ -67,14 +67,9 @@
 									<a href="list_class.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 									<ul class="dropdown-menu">
 											<li><a href="Essentia.html">Essentia</a></li>
-											<li><a href="Essentia.html">Essentia</a></li>
-											<li><a href="EssentiaExtractor.html">EssentiaExtractor</a></li>
 											<li><a href="EssentiaExtractor.html">EssentiaExtractor</a></li>
 											<li><a href="EssentiaPlot.html">EssentiaPlot</a></li>
-											<li><a href="EssentiaPlot.html">EssentiaPlot</a></li>
 											<li><a href="PlotHeatmap.html">PlotHeatmap</a></li>
-											<li><a href="PlotHeatmap.html">PlotHeatmap</a></li>
-											<li><a href="PlotMelodyContour.html">PlotMelodyContour</a></li>
 											<li><a href="PlotMelodyContour.html">PlotMelodyContour</a></li>
 									</ul>
 								</li>
@@ -212,8 +207,8 @@ let outputPyYin = essentia.PitchYinProbabilistic(inputSignalVector, // input
                                           false, // preciseTime
                                           44100); //sampleRate
 
-let pitches = essentia.vectorToArray(output.pitch);
-let voicedProbabilities = essentia.vectorToArray(output.voicedProbabilities);
+let pitches = essentia.vectorToArray(outputPyYin.pitch);
+let voicedProbabilities = essentia.vectorToArray(outputPyYin.voicedProbabilities);
 
 console.log(pitch);
 console.log(voicedProbabilities);
