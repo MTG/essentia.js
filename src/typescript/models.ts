@@ -17,14 +17,15 @@
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
 
-// essentia.js interface to pre-trained Tensorflow JS and ONNX.js Machine Learning models
+// essentia.js interface to pre-trained Tensorflow JS or ONNX.js Machine Learning models
 import Essentia from "./core_api";
 
-class EssentiaModels extends Essentia {
+// TODO
+class EssentiaModel extends Essentia {
   constructor(public EssentiaModule: any) {
     super(EssentiaModule);
   }
   // TODO
 }
 
-export { EssentiaModels };
+export { EssentiaModel };

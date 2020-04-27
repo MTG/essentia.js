@@ -58,14 +58,14 @@ let LayoutChromaPlot = {
       title: 'Time'
   },
   yaxis: {
-      title: 'Chroma Bins',
+      title: 'Bins',
       range: [0, 11]
   },
 };
 
 
 // default layout settings for spectrogram heatmap plot
-var LayoutSpectrogramPlot = {
+let LayoutSpectrogramPlot = {
   title: "",
   plot_bgcolor: "transparent",
   paper_bgcolor:"#FCF7F7",
@@ -85,17 +85,18 @@ var LayoutSpectrogramPlot = {
 };
 
 /**
- * @class Base class for essentia plot
+ * Base class for essentia.js-plot*
+ * @class 
  */
 class EssentiaPlot {
 
-  isPlotting: boolean;
-  startTimeIndex: number;
+  public isPlotting: boolean;
+  public startTimeIndex: number;
   /**
    *Creates an instance of EssentiaPlot.
-  * @param {*} Plotly 
-  * @param {*} [options=CONFIG]
-  * @memberof EssentiaPlot
+  * @param {*} Plotly plotly.js global import object (see https://plotly.com/javascript/)
+  * @param {*} [options=CONFIG] config options for the plot
+  * @constructs
   */
   constructor(public Plotly: any, public options: any = PlotConfig) {
     this.isPlotting = options.isPlotting;
@@ -103,12 +104,11 @@ class EssentiaPlot {
   }
 
   /**
-   * Return evenly spaced numbers over a specified interval
-   * Returns num evenly spaced samples, calculated over the interval [start, stop].
+   * Returns evenly spaced samples, calculated over the interval [start, stop].
    * @param {*} start The starting value of the sequence.
    * @param {*} stop The end value of the sequence
-   * @param {*} num Number of samples to generate. Must be non-negative
-   * @returns
+   * @param {*} num Number of samples to generate. Must be non-negative.
+   * @returns {Array}
    * @memberof EssentiaPlot
    */
   makeLinearSpace(start:any, stop:any, num:any) {
@@ -130,24 +130,25 @@ class EssentiaPlot {
 class PlotMelodyContour extends EssentiaPlot {
   
   /**
-   *Creates an instance of PlotMelodyContour.
-   * @param {string} divId
+   * Creates an instance of PlotMelodyContour
+   * @param {*} Plotly plotly.js global object import (see https://plotly.com/javascript/)
+   * @param {string} divId HTML div container id
    * @param {*} [plotLayout=LayoutMelodyContour]
-   * @memberof PlotMelodyContour
+   * @constructs
    */
   constructor(public Plotly: any,
-              public divId: string, 
+              public divId: string,
               public plotLayout: any = LayoutMelodyContourPlot) {
     super(Plotly);
   }
 
   /**
-   * Create the melody contour plot given inputs using Plotly.js
+   * Create the single line plot with the given input array using Plotly.js
    * @method
-   * @param {Float32Array} featureArray
-   * @param {string} plotTitle
-   * @param {number} audioFrameSize
-   * @param {number} audioSampleRate
+   * @param {Float32Array} featureArray 1D feature input array
+   * @param {string} plotTitle title of the plot
+   * @param {number} audioFrameSize length of input audio data in samples
+   * @param {number} audioSampleRate sample rate of input audio 
    * @memberof PlotMelodyContour
    */
   create(featureArray: Float32Array,  
@@ -176,20 +177,20 @@ class PlotMelodyContour extends EssentiaPlot {
                                     
     } else {
       timeAxis = this.makeLinearSpace(this.startTimeIndex,
-                                      this.startTimeIndex + (audioFrameSize / audioSampleRate), 
-                                      featureArray.length);
+        this.startTimeIndex + (audioFrameSize / audioSampleRate), 
+      featureArray.length);
       
       this.startTimeIndex = timeAxis[timeAxis.length-1];
-                                   
+
       this.Plotly.extendTraces(this.divId, {
-                                  x: [timeAxis],
-                                  y: [featureArray],
-                                }, [0]);
+        x: [timeAxis],
+        y: [featureArray],
+      }, [0]);
     }
   }
 
   /**
-   * Remove the existing Plotly plot  
+   * Destroy the existing Plotly traces  
    * @method
    * @memberof PlotMelodyContour
    */
@@ -206,16 +207,22 @@ class PlotMelodyContour extends EssentiaPlot {
  * @extends {EssentiaPlot}
  */
 class PlotHeatmap extends EssentiaPlot {
-  yAxis: any;
+  
+  public yAxis: any;
+
   /**
-   *Creates an instance of PlotHeatmap.
-  * @param {*} Plotly
-  * @param {string} divId
-  * @param {string} [plotType='chroma']
-  * @param {*} [plotLayout=LayoutChromaHeatmap]
-  * @memberof PlotHeatmap
+   *Creates an instance of PlotHeatmap
+  * @param {*} Plotly plotly.js global object import (see https://plotly.com/javascript/)
+  * @param {string} divId HTML div container id
+  * @param {string} [plotType='chroma'] type of plot to configure the y-axis
+  * @param {*} [plotLayout=LayoutSpectrogramPlot]
+  * @constructs
   */
-  constructor(public Plotly: any, public divId: string, public plotType: string="chroma", public plotLayout: any) {
+  constructor(public Plotly: any, 
+              public divId: string, 
+              public plotType: string="chroma",
+              public plotLayout: any=LayoutSpectrogramPlot) {
+
     super(Plotly);
     if (plotType === "chroma") {
       // we set chroma bin labels as yAxis for the heatmap
@@ -229,12 +236,12 @@ class PlotHeatmap extends EssentiaPlot {
 
   /**
    * Create Plotly.js heatmap plot with given input array and type
-   * @param {Array} featureArray
-   * @param {string} plotTitle
-   * @param {*} audioFrameSize
-   * @param {*} audioSampleRate
+   * @param {Array} featureArray 2D feature array where 'x' axis denotes temporal evolution of features
+   * @param {string} plotTitle title of the plot
+   * @param {*} audioFrameSize length of input audio data in samples
+   * @param {*} audioSampleRate sample rate of input audio
    * @param {string} [colorscale='Jet']
-   * @memberof PlotChromaHeatmap
+   * @memberof PlotHeatmap
    */
   create(featureArray: any,  
         plotTitle: string,
@@ -249,33 +256,34 @@ class PlotHeatmap extends EssentiaPlot {
       this.plotLayout.yaxis.range = [0, numBands + 1];
     } 
      
-    let timeAxis = this.makeLinearSpace(this.startTimeIndex, 
-                                      audioFrameSize / audioSampleRate, 
-                                      featureArray.length);
-    let data = {
+    if (!this.isPlotting) {
+      let timeAxis = this.makeLinearSpace(this.startTimeIndex, audioFrameSize / audioSampleRate, featureArray.length);
+      let data = {
         x: timeAxis,
         y: this.yAxis,
         z: featureArray,
         colorscale: colorscale,
         type: 'heatmap',
         transpose: true,
-    };
-    if (!this.isPlotting) {
-        this.Plotly.newPlot(this.divId, [data], this.plotLayout)
-        this.startTimeIndex = timeAxis[timeAxis.length-1];
+      };
+      this.Plotly.newPlot(this.divId, [data], this.plotLayout);
+      this.isPlotting = true;
+      this.startTimeIndex = timeAxis[timeAxis.length-1];
+
     } else {
-      timeAxis = this.makeLinearSpace(this.startTimeIndex,
-                                  this.startTimeIndex + (audioFrameSize / audioSampleRate), 
-                                  featureArray.length);
-      this.startTimeIndex = timeAxis[timeAxis.length-1];   
+      // realtime mode
+      let timeAxis = this.makeLinearSpace(this.startTimeIndex, this.startTimeIndex + (audioFrameSize / audioSampleRate), featureArray.length);
+      this.startTimeIndex = timeAxis[timeAxis.length-1]; 
+      // realtime mode  
       this.Plotly.extendTraces(this.divId, {
           x: [timeAxis],
           z: [featureArray],
       }, [0]);
     }
   }
+
   /**
-   * Remove the existing Plotly plot  
+   * Destroy the existing Plotly plot traces 
    * @method
    * @memberof PlotHeatmap
    */

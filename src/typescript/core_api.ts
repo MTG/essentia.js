@@ -16,25 +16,36 @@
  * You should have received a copy of the Affero GNU General Public License
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
+
 // NOTE: The following code snippets are machine generated. Do not edit.
+
 /**
- * @class essentia.js JavaScript interface
+ * @fileOverview Essentia high-level core interface
+ * @author <a href="mailto:albin.correya@upf.edu">Albin Correya</a>
+ * @version 0.0.9
+ */
+
+/**
+ * essentia.js-core JS API
+ * @class 
+ * @example
+ * const essentia = new Essentia(EssentiaModule)
  */
 class Essentia {
   /** 
-  * @property {EssentiaEmscriptenModule} this.module 
-  * @property {string} this.version 
-  * @property {string} this.algorithmNames 
+  * @property {EssentiaEmscriptenModule} this.module Essentia emcripten global module object 
+  * @property {string} this.version Essentia WASM backend version
+  * @property {string} this.algorithmNames List of available Essentia alogrithms from the WASM backend
   */
   private algorithms: any;
-  module: any;
-  version: string;
-  algorithmNames: string;
-  /** 
-  * @constructor#instanceMember 
-  * @param {EssentiaEmscriptenModule} 
+  public module: any;
+  public version: string;
+  public algorithmNames: string;
+
+  /**  
+  * @constructs
+  * @param {EssentiaEmscriptenModule} EssentiaModule Essentia emcripten global module object which is loaded from 'essentia-wasm.*.js file'
   * @param {boolean} [isDebug=false]
-  * @memberof Essentia
   */
   constructor(public EssentiaModule: any, public isDebug: boolean=false) {
     this.algorithms = new EssentiaModule.EssentiaJS(isDebug);
@@ -44,11 +55,11 @@ class Essentia {
   }
 
   /**
-   *Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API
+   * Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API. (NOTE: only works on modern web-browsers)
    * @async
    * @method
    * @param {string} audioURL web url or blob uri of a audio file
-   * @param {AudioContext} webAudioCtx an instance of WebAudioApi `AudioContext`
+   * @param {AudioContext} webAudioCtx an instance of Web Audio API `AudioContext`
    * @param {number} [channel=0] audio channel number
    * @returns {Float32Array} decode and returns the audio data as Float32 array for the given channel
    * @memberof Essentia
@@ -61,7 +72,7 @@ class Essentia {
   }
 
   /**
-   * Shutdown essentia algorithm instance to free memory
+   * Method to shutdown essentia algorithm instance after it's use
    * @method
    * @memberof Essentia
    */
@@ -70,7 +81,7 @@ class Essentia {
   }
 
   /**
-   * Method for re-instantiating this.algorithms instance after using the this.shutdown method
+   * Method for re-instantiating essentia algorithms instance after using the shutdown method
    * @method
    * @memberof Essentia
    */
@@ -79,20 +90,20 @@ class Essentia {
   }
 
   /**
-   * Convert an input JS array into VectorFloat by accessing raw pointers
+   * Convert an input JS array into VectorFloat type
    * @method
-   * @param {Float32Array} inpurtArray input JS typed array
+   * @param {Float32Array} inputArray input JS typed array
    * @returns {VectorFloat} returns vector float
    * @memberof Essentia
    */
-  arrayToVector(inpurtArray: any) {
-    return this.module.arrayToVector(inpurtArray);
+  arrayToVector(inputArray: any) {
+    return this.module.arrayToVector(inputArray);
   }
 
   /**
-   * Convert an input VectorFloat array into typed Float32Array by copying it's element
+   * Convert an input VectorFloat array into typed JS Float32Array 
    * @method 
-   * @param {VectorFloat} inputVector input VectorFloat
+   * @param {VectorFloat} inputVector input VectorFloat array
    * @returns {Float32Array} returns converted JS typed array
    * @memberof Essentia
    */
@@ -117,7 +128,7 @@ class Essentia {
   /**
   * This algorithm computes the ratio between the pitch energy after the pitch maximum and the pitch energy before the pitch maximum. Sounds having an monotonically ascending pitch or one unique pitch will show a value of (0,1], while sounds having a monotonically descending pitch will show a value of [1,inf). In case there is no energy before the max pitch, the algorithm will return the energy after the maximum pitch. Check https://essentia.upf.edu/reference/std_AfterMaxToBeforeMaxEnergyRatio.html for more details.
   * @method
-  * @param {VectorFloat} [pitch] the array of pitch values [Hz]
+  * @param {VectorFloat} pitch the array of pitch values [Hz]
   * @returns {object} {afterMaxToBeforeMaxEnergyRatio: 'the ratio between the pitch energy after the pitch maximum to the pitch energy before the pitch maximum'}
   * @memberof Essentia
   */
@@ -128,7 +139,7 @@ class Essentia {
   /**
   * This algorithm implements a IIR all-pass filter of order 1 or 2. Because of its dependence on IIR, IIR's requirements are inherited. Check https://essentia.upf.edu/reference/std_AllPass.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {number} [bandwidth=500] the bandwidth of the filter [Hz] (used only for 2nd-order filters)
   * @param {number} [cutoffFrequency=1500] the cutoff frequency for the filter [Hz]
   * @param {number} [order=1] the order of the filter
@@ -143,7 +154,7 @@ class Essentia {
   /**
   * This algorithm creates a wave file in which a given audio signal is mixed with a series of time onsets. The sonification of the onsets can be heard as beeps, or as short white noise pulses if configured to do so. Check https://essentia.upf.edu/reference/std_AudioOnsetsMarker.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {any[]} [onsets=[]] the list of onset locations [s]
   * @param {number} [sampleRate=44100] the sampling rate of the output signal [Hz]
   * @param {string} [type=beep] the type of sound to be added on the event
@@ -163,7 +174,7 @@ class Essentia {
   It uses the version most commonly used in signal processing, which doesn't remove the mean from the observations.
   Using the 'generalized' option this algorithm computes autocorrelation as described in [3]. Check https://essentia.upf.edu/reference/std_AutoCorrelation.html for more details.
   * @method
-  * @param {VectorFloat} [array] the array to be analyzed
+  * @param {VectorFloat} array the array to be analyzed
   * @param {number} [frequencyDomainCompression=0.5] factor at which FFT magnitude is compressed (only used if 'generalized' is set to true, see [3])
   * @param {boolean} [generalized=false] bool value to indicate whether to compute the 'generalized' autocorrelation as described in [3]
   * @param {string} [normalization=standard] type of normalization to compute: either 'standard' (default) or 'unbiased'
@@ -178,7 +189,7 @@ class Essentia {
   * This algorithm computes the bark-frequency cepstrum coefficients of a spectrum. Bark bands and their subsequent usage in cepstral analysis have shown to be useful in percussive content [1, 2]
   This algorithm is implemented using the Bark scaling approach in the Rastamat version of the MFCC algorithm and in a similar manner to the MFCC-FB40 default specs: Check https://essentia.upf.edu/reference/std_BFCC.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the audio spectrum
+  * @param {VectorFloat} spectrum the audio spectrum
   * @param {number} [dctType=2] the DCT type
   * @param {number} [highFrequencyBound=11000] the upper bound of the frequency range [Hz]
   * @param {number} [inputSize=1025] the size of input spectrum
@@ -201,7 +212,7 @@ class Essentia {
   /**
   * This algorithm implements a break point function which linearly interpolates between discrete xy-coordinates to construct a continuous function. Check https://essentia.upf.edu/reference/std_BPF.html for more details.
   * @method
-  * @param {number} [x] the input coordinate (x-axis)
+  * @param {number} x the input coordinate (x-axis)
   * @param {any[]} [xPoints=[0, 1]] the x-coordinates of the points forming the break-point function (the points must be arranged in ascending order and cannot contain duplicates)
   * @param {any[]} [yPoints=[0, 1]] the y-coordinates of the points forming the break-point function
   * @returns {object} {y: 'the output coordinate (y-axis)'}
@@ -222,7 +233,7 @@ class Essentia {
   /**
   * This algorithm implements a 2nd order IIR band-pass filter. Because of its dependence on IIR, IIR's requirements are inherited. Check https://essentia.upf.edu/reference/std_BandPass.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input audio signal
+  * @param {VectorFloat} signal the input audio signal
   * @param {number} [bandwidth=500] the bandwidth of the filter [Hz]
   * @param {number} [cutoffFrequency=1500] the cutoff frequency for the filter [Hz]
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
@@ -236,7 +247,7 @@ class Essentia {
   /**
   * This algorithm implements a 2nd order IIR band-reject filter. Because of its dependence on IIR, IIR's requirements are inherited. Check https://essentia.upf.edu/reference/std_BandReject.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {number} [bandwidth=500] the bandwidth of the filter [Hz]
   * @param {number} [cutoffFrequency=1500] the cutoff frequency for the filter [Hz]
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
@@ -250,7 +261,7 @@ class Essentia {
   /**
   * This algorithm computes energy in Bark bands of a spectrum. The band frequencies are: [0.0, 50.0, 100.0, 150.0, 200.0, 300.0, 400.0, 510.0, 630.0, 770.0, 920.0, 1080.0, 1270.0, 1480.0, 1720.0, 2000.0, 2320.0, 2700.0, 3150.0, 3700.0, 4400.0, 5300.0, 6400.0, 7700.0, 9500.0, 12000.0, 15500.0, 20500.0, 27000.0]. The first two Bark bands [0,100] and [100,200] have been split in half for better resolution (because of an observed better performance in beat detection). For each bark band the power-spectrum (mag-squared) is summed. Check https://essentia.upf.edu/reference/std_BarkBands.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the input spectrum
+  * @param {VectorFloat} spectrum the input spectrum
   * @param {number} [numberBands=27] the number of desired barkbands
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @returns {object} {bands: 'the energy of the bark bands'}
@@ -263,7 +274,7 @@ class Essentia {
   /**
   * This algorithm estimates the beat positions given an input signal. It computes 'complex spectral difference' onset detection function and utilizes the beat tracking algorithm (TempoTapDegara) to extract beats [1]. The algorithm works with the optimized settings of 2048/1024 frame/hop size for the computation of the detection function, with its posterior x2 resampling.) While it has a lower accuracy than BeatTrackerMultifeature (see the evaluation results in [2]), its computational speed is significantly higher, which makes reasonable to apply this algorithm for batch processings of large amounts of audio signals. Check https://essentia.upf.edu/reference/std_BeatTrackerDegara.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the audio input signal
+  * @param {VectorFloat} signal the audio input signal
   * @param {number} [maxTempo=208] the fastest tempo to detect [bpm]
   * @param {number} [minTempo=40] the slowest tempo to detect [bpm]
   * @returns {object} {ticks: ' the estimated tick locations [s]'}
@@ -281,7 +292,7 @@ class Essentia {
     - beat emphasis function (see 'beat_emphasis' method in OnsetDetectionGlobal algorithm, 2048/512)
     - spectral flux between histogrammed spectrum frames, measured by the modified information gain (see 'infogain' method in OnsetDetectionGlobal algorithm, 2048/512) Check https://essentia.upf.edu/reference/std_BeatTrackerMultiFeature.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the audio input signal
+  * @param {VectorFloat} signal the audio input signal
   * @param {number} [maxTempo=208] the fastest tempo to detect [bpm]
   * @param {number} [minTempo=40] the slowest tempo to detect [bpm]
   * @returns {object} {ticks: ' the estimated tick locations [s]', confidence: 'confidence of the beat tracker [0, 5.32]'}
@@ -295,8 +306,8 @@ class Essentia {
   * This algorithm filters the loudness matrix given by BeatsLoudness algorithm in order to keep only the most salient beat band representation.
   This algorithm has been found to be useful for estimating time signatures. Check https://essentia.upf.edu/reference/std_Beatogram.html for more details.
   * @method
-  * @param {VectorFloat} [loudness] the loudness at each beat
-  * @param {VectorVectorFloat} [loudnessBandRatio] matrix of loudness ratios at each band and beat
+  * @param {VectorFloat} loudness the loudness at each beat
+  * @param {VectorVectorFloat} loudnessBandRatio matrix of loudness ratios at each band and beat
   * @param {number} [size=16] number of beats for dynamic filtering
   * @returns {object} {beatogram: 'filtered matrix loudness'}
   * @memberof Essentia
@@ -308,7 +319,7 @@ class Essentia {
   /**
   * This algorithm computes the spectrum energy of beats in an audio signal given their positions. The energy is computed both on the whole frequency range and for each of the specified frequency bands. See the SingleBeatLoudness algorithm for a more detailed explanation. Check https://essentia.upf.edu/reference/std_BeatsLoudness.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input audio signal
+  * @param {VectorFloat} signal the input audio signal
   * @param {number} [beatDuration=0.05] the duration of the window in which the beat will be restricted [s]
   * @param {number} [beatWindowDuration=0.1] the duration of the window in which to look for the beginning of the beat (centered around the positions in 'beats') [s]
   * @param {any[]} [beats=[]] the list of beat positions (each position is in seconds)
@@ -335,8 +346,8 @@ class Essentia {
     - using this algorithm in streaming mode can cause diamond shape graphs which have not been tested with the current scheduler. There is NO GUARANTEE of its correct work for diamond shape graphs.
     - for y<0, x/y is invalid Check https://essentia.upf.edu/reference/std_BinaryOperator.html for more details.
   * @method
-  * @param {VectorFloat} [array1] the first operand input array
-  * @param {VectorFloat} [array2] the second operand input array
+  * @param {VectorFloat} array1 the first operand input array
+  * @param {VectorFloat} array2 the second operand input array
   * @param {string} [type=add] the type of the binary operator to apply to the input arrays
   * @returns {object} {array: 'the array containing the result of binary operation'}
   * @memberof Essentia
@@ -351,8 +362,8 @@ class Essentia {
     - using this algorithm in streaming mode can cause diamond shape graphs which have not been tested with the current scheduler. There is NO GUARANTEE of its correct work for diamond shape graphs.
     - for y<0, x/y is invalid Check https://essentia.upf.edu/reference/std_BinaryOperatorStream.html for more details.
   * @method
-  * @param {VectorFloat} [array1] the first operand input array
-  * @param {VectorFloat} [array2] the second operand input array
+  * @param {VectorFloat} array1 the first operand input array
+  * @param {VectorFloat} array2 the second operand input array
   * @param {string} [type=add] the type of the binary operator to apply to the input arrays
   * @returns {object} {array: 'the array containing the result of binary operation'}
   * @memberof Essentia
@@ -364,7 +375,7 @@ class Essentia {
   /**
   * This algorithm analyzes predominant periodicities in a signal given its novelty curve [1] (see NoveltyCurve algorithm) or another onset detection function (see OnsetDetection and OnsetDetectionGlobal). It estimates pulse BPM values and time positions together with a half-wave rectified sinusoid whose peaks represent the pulses present in the audio signal and their magnitudes. The analysis is based on the FFT of the input novelty curve from which salient periodicities are detected by thresholding. Temporal evolution of these periodicities is output in the "tempogram". Candidate BPMs are then detected based on a histogram of the observed periodicities weighted by their energy in the tempogram. The sinusoidal model is constructed based on the observed periodicities and their magnitudes with the estimated overall BPM as a reference. Check https://essentia.upf.edu/reference/std_BpmHistogram.html for more details.
   * @method
-  * @param {VectorFloat} [novelty] the novelty curve
+  * @param {VectorFloat} novelty the novelty curve
   * @param {number} [bpm=0] bpm to induce a certain tempo tracking. Zero if unknown
   * @param {boolean} [constantTempo=false] whether to consider constant tempo. Set to true when inducina specific tempo
   * @param {number} [frameRate=86.1328] the sampling rate of the novelty curve [frame/s]
@@ -388,7 +399,7 @@ class Essentia {
   * This algorithm computes beats per minute histogram and its statistics for the highest and second highest peak.
   Note: histogram vector contains occurance frequency for each bpm value, 0-th element corresponds to 0 bpm value. Check https://essentia.upf.edu/reference/std_BpmHistogramDescriptors.html for more details.
   * @method
-  * @param {VectorFloat} [bpmIntervals] the list of bpm intervals [s]
+  * @param {VectorFloat} bpmIntervals the list of bpm intervals [s]
   * @returns {object} {firstPeakBPM: 'value for the highest peak [bpm]', firstPeakWeight: 'weight of the highest peak', firstPeakSpread: 'spread of the highest peak', secondPeakBPM: 'value for the second highest peak [bpm]', secondPeakWeight: 'weight of the second highest peak', secondPeakSpread: 'spread of the second highest peak', histogram: 'bpm histogram [bpm]'}
   * @memberof Essentia
   */
@@ -399,7 +410,7 @@ class Essentia {
   /**
   * This algorithm extracts the locations of large tempo changes from a list of beat ticks. Check https://essentia.upf.edu/reference/std_BpmRubato.html for more details.
   * @method
-  * @param {VectorFloat} [beats] list of detected beat ticks [s]
+  * @param {VectorFloat} beats list of detected beat ticks [s]
   * @param {number} [longRegionsPruningTime=20] time for the longest constant tempo region inside a rubato region [s]
   * @param {number} [shortRegionsMergingTime=4] time for the shortest constant tempo region from one tempo region to another [s]
   * @param {number} [tolerance=0.08] minimum tempo deviation to look for
@@ -416,7 +427,7 @@ class Essentia {
       where x = Real part, y = Imaginary part,
       and |z| = modulus = magnitude, α = phase in (-pi,pi] Check https://essentia.upf.edu/reference/std_CartesianToPolar.html for more details.
   * @method
-  * @param {VectorFloat} [complex] the complex input vector
+  * @param {VectorFloat} complex the complex input vector
   * @returns {object} {magnitude: 'the magnitude vector', phase: 'the phase vector'}
   * @memberof Essentia
   */
@@ -427,7 +438,7 @@ class Essentia {
   /**
   * This algorithm extracts the 0th, 1st, 2nd, 3rd and 4th central moments of an array. It returns a 5-tuple in which the index corresponds to the order of the moment. Check https://essentia.upf.edu/reference/std_CentralMoments.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @param {string} [mode=pdf] compute central moments considering array values as a probability density function over array index or as sample points of a distribution
   * @param {number} [range=1] the range of the input array, used for normalizing the results in the 'pdf' mode
   * @returns {object} {centralMoments: 'the central moments of the input array'}
@@ -440,7 +451,7 @@ class Essentia {
   /**
   * This algorithm computes the centroid of an array. The centroid is normalized to a specified range. This algorithm can be used to compute spectral centroid or temporal centroid. Check https://essentia.upf.edu/reference/std_Centroid.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @param {number} [range=1] the range of the input array, used for normalizing the results
   * @returns {object} {centroid: 'the centroid of the array'}
   * @memberof Essentia
@@ -456,9 +467,9 @@ class Essentia {
     - key and scale are taken from the most frequent chord. In the case where multiple chords are equally frequent, the chord is hierarchically chosen from the circle of fifths.
     - chords should follow this name convention `<A-G>[<#/b><m>]` (i.e. C, C# or C#m are valid chords). Chord names not fitting this convention will throw an exception. Check https://essentia.upf.edu/reference/std_ChordsDescriptors.html for more details.
   * @method
-  * @param {VectorString} [chords] the chord progression
-  * @param {string} [key] the key of the whole song, from A to G
-  * @param {string} [scale] the scale of the whole song (major or minor)
+  * @param {VectorString} chords the chord progression
+  * @param {string} key the key of the whole song, from A to G
+  * @param {string} scale the scale of the whole song (major or minor)
   * @returns {object} {chordsHistogram: 'the normalized histogram of chords', chordsNumberRate: 'the ratio of different chords from the total number of chords in the progression', chordsChangesRate: 'the rate at which chords change in the progression', chordsKey: 'the most frequent chord of the progression', chordsScale: 'the scale of the most frequent chord of the progression (either 'major' or 'minor')'}
   * @memberof Essentia
   */
@@ -469,7 +480,7 @@ class Essentia {
   /**
   * This algorithm estimates chords given an input sequence of harmonic pitch class profiles (HPCPs). It finds the best matching major or minor triad and outputs the result as a string (e.g. A#, Bm, G#m, C). This algorithm uses the Sharp versions of each Flatted note (i.e. Bb -> A#). Check https://essentia.upf.edu/reference/std_ChordsDetection.html for more details.
   * @method
-  * @param {VectorVectorFloat} [pcp] the pitch class profile from which to detect the chord
+  * @param {VectorVectorFloat} pcp the pitch class profile from which to detect the chord
   * @param {number} [hopSize=2048] the hop size with which the input PCPs were computed
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @param {number} [windowSize=2] the size of the window on which to estimate the chords [s]
@@ -485,8 +496,8 @@ class Essentia {
     - 'interbeat_median', each resulting chroma vector component is a median of all the component values in the segment
     - 'starting_beat', chroma vector is sampled from the start of the segment (that is, its starting beat position) using its first frame. It makes sense if chroma is preliminary smoothed. Check https://essentia.upf.edu/reference/std_ChordsDetectionBeats.html for more details.
   * @method
-  * @param {VectorVectorFloat} [pcp] the pitch class profile from which to detect the chord
-  * @param {VectorFloat} [ticks] the list of beat positions (in seconds)
+  * @param {VectorVectorFloat} pcp the pitch class profile from which to detect the chord
+  * @param {VectorFloat} ticks the list of beat positions (in seconds)
   * @param {string} [chromaPick=interbeat_median] method of calculating singleton chroma for interbeat interval
   * @param {number} [hopSize=2048] the hop size with which the input PCPs were computed
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
@@ -500,8 +511,8 @@ class Essentia {
   /**
   * This algorithm computes a binary cross similarity matrix from two chromagam feature vectors of a query and reference song. Check https://essentia.upf.edu/reference/std_ChromaCrossSimilarity.html for more details.
   * @method
-  * @param {VectorVectorFloat} [queryFeature] frame-wise chromagram of the query song (e.g., a HPCP)
-  * @param {VectorVectorFloat} [referenceFeature] frame-wise chromagram of the reference song (e.g., a HPCP)
+  * @param {VectorVectorFloat} queryFeature frame-wise chromagram of the query song (e.g., a HPCP)
+  * @param {VectorVectorFloat} referenceFeature frame-wise chromagram of the reference song (e.g., a HPCP)
   * @param {number} [binarizePercentile=0.095] maximum percent of distance values to consider as similar in each row and each column
   * @param {number} [frameStackSize=9] number of input frames to stack together and treat as a feature vector for similarity computation. Choose 'frameStackSize=1' to use the original input frames without stacking
   * @param {number} [frameStackStride=1] stride size to form a stack of frames (e.g., 'frameStackStride'=1 to use consecutive frames; 'frameStackStride'=2 for using every second frame)
@@ -520,7 +531,7 @@ class Essentia {
   * This algorithm computes the Constant-Q chromagram using FFT. See ConstantQ algorithm for more details.
    Check https://essentia.upf.edu/reference/std_Chromagram.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input audio frame
+  * @param {VectorFloat} frame the input audio frame
   * @param {number} [binsPerOctave=12] number of bins per octave
   * @param {number} [minFrequency=32.7] minimum frequency [Hz]
   * @param {number} [minimumKernelSize=4] minimum size allowed for frequency kernels
@@ -541,7 +552,7 @@ class Essentia {
   /**
   * This algorithm computes the fingerprint of the input signal using Chromaprint algorithm. It is a wrapper of the Chromaprint library [1,2]. The chromaprints are returned as base64-encoded strings. Check https://essentia.upf.edu/reference/std_Chromaprinter.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input audio signal
+  * @param {VectorFloat} signal the input audio signal
   * @param {number} [maxLength=0] use the first 'maxLength' seconds to compute the chromaprint. 0 to use the full audio length [s]
   * @param {number} [sampleRate=44100] the input audio sampling rate [Hz]
   * @returns {object} {fingerprint: 'the chromaprint as a base64-encoded string'}
@@ -554,7 +565,7 @@ class Essentia {
   /**
   * This algorithm detects the locations of impulsive noises (clicks and pops) on the input audio frame. It relies on LPC coefficients to inverse-filter the audio in order to attenuate the stationary part and enhance the prediction error (or excitation noise)[1]. After this, a matched filter is used to further enhance the impulsive peaks. The detection threshold is obtained from a robust estimate of the excitation noise power [2] plus a parametric gain value. Check https://essentia.upf.edu/reference/std_ClickDetector.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input frame (must be non-empty)
+  * @param {VectorFloat} frame the input frame (must be non-empty)
   * @param {number} [detectionThreshold=30] 'detectionThreshold' the threshold is based on the instant power of the noisy excitation signal plus detectionThreshold dBs
   * @param {number} [frameSize=512] the expected size of the input audio signal (this is an optional parameter to optimize memory allocation)
   * @param {number} [hopSize=256] hop size used for the analysis. This parameter must be set correctly as it cannot be obtained from the input data
@@ -572,7 +583,7 @@ class Essentia {
   /**
   * This algorithm clips the input signal to fit its values into a specified interval. Check https://essentia.upf.edu/reference/std_Clipper.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {number} [max=1] the maximum value above which the signal will be clipped
   * @param {number} [min=-1] the minimum value below which the signal will be clipped
   * @returns {object} {signal: 'the output signal with the added noise'}
@@ -585,7 +596,7 @@ class Essentia {
   /**
   * This algorithm computes Constant Q Transform using the FFT for fast calculation. It transforms a windowed audio frame into the log frequency domain. Check https://essentia.upf.edu/reference/std_ConstantQ.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the windowed input audio frame
+  * @param {VectorFloat} frame the windowed input audio frame
   * @param {number} [binsPerOctave=12] number of bins per octave
   * @param {number} [minFrequency=32.7] minimum frequency [Hz]
   * @param {number} [minimumKernelSize=4] minimum size allowed for frequency kernels
@@ -605,7 +616,7 @@ class Essentia {
   /**
   * This algorithm computes a cover song similiarity measure from an input cross similarity matrix of two chroma vectors of a query and reference song using various alignment constraints of smith-waterman local-alignment algorithm. Check https://essentia.upf.edu/reference/std_CoverSongSimilarity.html for more details.
   * @method
-  * @param {VectorVectorFloat} [inputArray]  a 2D binary cross-similarity matrix between two audio chroma vectors (query vs reference song) (refer 'ChromaCrossSimilarity' algorithm').
+  * @param {VectorVectorFloat} inputArray  a 2D binary cross-similarity matrix between two audio chroma vectors (query vs reference song) (refer 'ChromaCrossSimilarity' algorithm').
   * @param {string} [alignmentType=serra09] choose either one of the given local-alignment constraints for smith-waterman algorithm as described in [2] or [3] respectively.
   * @param {number} [disExtension=0.5] penalty for disruption extension
   * @param {number} [disOnset=0.5] penalty for disruption onset
@@ -620,7 +631,7 @@ class Essentia {
   /**
   * This algorithm computes the crest of an array. The crest is defined as the ratio between the maximum value and the arithmetic mean of an array. Typically it is used on the magnitude spectrum. Check https://essentia.upf.edu/reference/std_Crest.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array (cannot contain negative values, and must be non-empty)
+  * @param {VectorFloat} array the input array (cannot contain negative values, and must be non-empty)
   * @returns {object} {crest: 'the crest of the input array'}
   * @memberof Essentia
   */
@@ -631,8 +642,8 @@ class Essentia {
   /**
   * This algorithm computes the cross-correlation vector of two signals. It accepts 2 parameters, minLag and maxLag which define the range of the computation of the innerproduct. Check https://essentia.upf.edu/reference/std_CrossCorrelation.html for more details.
   * @method
-  * @param {VectorFloat} [arrayX] the first input array
-  * @param {VectorFloat} [arrayY] the second input array
+  * @param {VectorFloat} arrayX the first input array
+  * @param {VectorFloat} arrayY the second input array
   * @param {number} [maxLag=1] the maximum lag to be computed between the two vectors
   * @param {number} [minLag=0] the minimum lag to be computed between the two vectors
   * @returns {object} {crossCorrelation: 'the cross-correlation vector between the two input arrays (its size is equal to maxLag - minLag + 1)'}
@@ -645,8 +656,8 @@ class Essentia {
   /**
   * This algorithm computes a euclidean cross-similarity matrix of two sequences of frame features. Similarity values can be optionally binarized Check https://essentia.upf.edu/reference/std_CrossSimilarityMatrix.html for more details.
   * @method
-  * @param {VectorVectorFloat} [queryFeature] input frame features of the query song (e.g., a chromagram)
-  * @param {VectorVectorFloat} [referenceFeature] input frame features of the reference song (e.g., a chromagram)
+  * @param {VectorVectorFloat} queryFeature input frame features of the query song (e.g., a chromagram)
+  * @param {VectorVectorFloat} referenceFeature input frame features of the reference song (e.g., a chromagram)
   * @param {boolean} [binarize=false] whether to binarize the euclidean cross-similarity matrix
   * @param {number} [binarizePercentile=0.095] maximum percent of distance values to consider as similar in each row and each column
   * @param {number} [frameStackSize=1] number of input frames to stack together and treat as a feature vector for similarity computation. Choose 'frameStackSize=1' to use the original input frames without stacking
@@ -669,7 +680,7 @@ class Essentia {
     [1] Spline interpolation - Wikipedia, the free encyclopedia,
     http://en.wikipedia.org/wiki/Spline_interpolation Check https://essentia.upf.edu/reference/std_CubicSpline.html for more details.
   * @method
-  * @param {number} [x] the input coordinate (x-axis)
+  * @param {number} x the input coordinate (x-axis)
   * @param {number} [leftBoundaryFlag=0] type of boundary condition for the left boundary
   * @param {number} [leftBoundaryValue=0] the value to be used in the left boundary, when leftBoundaryFlag is 1 or 2
   * @param {number} [rightBoundaryFlag=0] type of boundary condition for the right boundary
@@ -694,7 +705,7 @@ class Essentia {
   /**
   * This algorithm removes the DC offset from a signal using a 1st order IIR highpass filter. Because of its dependence on IIR, IIR's requirements are inherited. Check https://essentia.upf.edu/reference/std_DCRemoval.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input audio signal
+  * @param {VectorFloat} signal the input audio signal
   * @param {number} [cutoffFrequency=40] the cutoff frequency for the filter [Hz]
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @returns {object} {signal: 'the filtered signal, with the DC component removed'}
@@ -708,7 +719,7 @@ class Essentia {
   * This algorithm computes the Discrete Cosine Transform of an array.
   It uses the DCT-II form, with the 1/sqrt(2) scaling factor for the first coefficient. Check https://essentia.upf.edu/reference/std_DCT.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @param {number} [dctType=2] the DCT type
   * @param {number} [inputSize=10] the size of the input array
   * @param {number} [liftering=0] the liftering coefficient. Use '0' to bypass it
@@ -723,7 +734,7 @@ class Essentia {
   /**
   * This algorithm estimates danceability of a given audio signal. The algorithm is derived from Detrended Fluctuation Analysis (DFA) described in [1]. The parameters minTau and maxTau are used to define the range of time over which DFA will be performed. The output of this algorithm is the danceability of the audio signal. These values usually range from 0 to 3 (higher values meaning more danceable). Check https://essentia.upf.edu/reference/std_Danceability.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {number} [maxTau=8800] maximum segment length to consider [ms]
   * @param {number} [minTau=310] minimum segment length to consider [ms]
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
@@ -742,7 +753,7 @@ class Essentia {
     [1] Least Squares Fitting -- from Wolfram MathWorld,
     http://mathworld.wolfram.com/LeastSquaresFitting.html Check https://essentia.upf.edu/reference/std_Decrease.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @param {number} [range=1] the range of the input array, used for normalizing the results
   * @returns {object} {decrease: 'the decrease of the input array'}
   * @memberof Essentia
@@ -754,7 +765,7 @@ class Essentia {
   /**
   * This algorithm returns the first-order derivative of an input signal. That is, for each input value it returns the value minus the previous one. Check https://essentia.upf.edu/reference/std_Derivative.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @returns {object} {signal: 'the derivative of the input signal'}
   * @memberof Essentia
   */
@@ -765,7 +776,7 @@ class Essentia {
   /**
   * This algorithm computes two descriptors that are based on the derivative of a signal envelope. Check https://essentia.upf.edu/reference/std_DerivativeSFX.html for more details.
   * @method
-  * @param {VectorFloat} [envelope] the envelope of the signal
+  * @param {VectorFloat} envelope the envelope of the signal
   * @returns {object} {derAvAfterMax: 'the weighted average of the derivative after the maximum amplitude', maxDerBeforeMax: 'the maximum derivative before the maximum amplitude'}
   * @memberof Essentia
   */
@@ -776,7 +787,7 @@ class Essentia {
   /**
   * This algorithm uses LPC and some heuristics to detect discontinuities in an audio signal. [1]. Check https://essentia.upf.edu/reference/std_DiscontinuityDetector.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input frame (must be non-empty)
+  * @param {VectorFloat} frame the input frame (must be non-empty)
   * @param {number} [detectionThreshold=8] 'detectionThreshold' times the standard deviation plus the median of the frame is used as detection threshold
   * @param {number} [energyThreshold=-60] threshold in dB to detect silent subframes
   * @param {number} [frameSize=512] the expected size of the input audio signal (this is an optional parameter to optimize memory allocation)
@@ -800,8 +811,8 @@ class Essentia {
     Bandwidth," The Journal of the Acoustical Society of America, vol. 38,
     no. 4, pp. 548–560, 1965. Check https://essentia.upf.edu/reference/std_Dissonance.html for more details.
   * @method
-  * @param {VectorFloat} [frequencies] the frequencies of the spectral peaks (must be sorted by frequency)
-  * @param {VectorFloat} [magnitudes] the magnitudes of the spectral peaks (must be sorted by frequency
+  * @param {VectorFloat} frequencies the frequencies of the spectral peaks (must be sorted by frequency)
+  * @param {VectorFloat} magnitudes the magnitudes of the spectral peaks (must be sorted by frequency
   * @returns {object} {dissonance: 'the dissonance of the audio signal (0 meaning completely consonant, and 1 meaning completely dissonant)'}
   * @memberof Essentia
   */
@@ -813,7 +824,7 @@ class Essentia {
   * This algorithm computes the spread (variance), skewness and kurtosis of an array given its central moments. The extracted features are good indicators of the shape of the distribution. For the required input see CentralMoments algorithm.
   The size of the input array must be at least 5. An exception will be thrown otherwise. Check https://essentia.upf.edu/reference/std_DistributionShape.html for more details.
   * @method
-  * @param {VectorFloat} [centralMoments] the central moments of a distribution
+  * @param {VectorFloat} centralMoments the central moments of a distribution
   * @returns {object} {spread: 'the spread (variance) of the distribution', skewness: 'the skewness of the distribution', kurtosis: 'the kurtosis of the distribution'}
   * @memberof Essentia
   */
@@ -824,7 +835,7 @@ class Essentia {
   /**
   * This algorithm outputs the total duration of an audio signal. Check https://essentia.upf.edu/reference/std_Duration.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @returns {object} {duration: 'the duration of the signal [s]'}
   * @memberof Essentia
@@ -836,7 +847,7 @@ class Essentia {
   /**
   * This algorithm computes the dynamic complexity defined as the average absolute deviation from the global loudness level estimate on the dB scale. It is related to the dynamic range and to the amount of fluctuation in loudness present in a recording. Silence at the beginning and at the end of a track are ignored in the computation in order not to deteriorate the results. Check https://essentia.upf.edu/reference/std_DynamicComplexity.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input audio signal
+  * @param {VectorFloat} signal the input audio signal
   * @param {number} [frameSize=0.2] the frame size [s]
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @returns {object} {dynamicComplexity: 'the dynamic complexity coefficient', loudness: 'an estimate of the loudness [dB]'}
@@ -849,7 +860,7 @@ class Essentia {
   /**
   * This algorithm computes energies/magnitudes in ERB bands of a spectrum. The Equivalent Rectangular Bandwidth (ERB) scale is used. The algorithm applies a frequency domain filterbank using gammatone filters. Adapted from matlab code in:  D. P. W. Ellis (2009). 'Gammatone-like spectrograms', web resource [1]. Check https://essentia.upf.edu/reference/std_ERBBands.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the audio spectrum
+  * @param {VectorFloat} spectrum the audio spectrum
   * @param {number} [highFrequencyBound=22050] an upper-bound limit for the frequencies to be included in the bands
   * @param {number} [inputSize=1025] the size of the spectrum
   * @param {number} [lowFrequencyBound=50] a lower-bound limit for the frequencies to be included in the bands
@@ -872,7 +883,7 @@ class Essentia {
     (similarity and classification) in the CUIDADO project," CUIDADO I.S.T.
     Project Report, 2004 Check https://essentia.upf.edu/reference/std_EffectiveDuration.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @param {number} [thresholdRatio=0.4] the ratio of the envelope maximum to be used as the threshold
   * @returns {object} {effectiveDuration: 'the effective duration of the signal [s]'}
@@ -885,7 +896,7 @@ class Essentia {
   /**
   * This algorithm computes the energy of an array. Check https://essentia.upf.edu/reference/std_Energy.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @returns {object} {energy: 'the energy of the input array'}
   * @memberof Essentia
   */
@@ -897,7 +908,7 @@ class Essentia {
   * This algorithm computes energy in a given frequency band of a spectrum including both start and stop cutoff frequencies.
   Note that exceptions will be thrown when input spectrum is empty and if startCutoffFrequency is greater than stopCutoffFrequency. Check https://essentia.upf.edu/reference/std_EnergyBand.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the input frequency spectrum
+  * @param {VectorFloat} spectrum the input frequency spectrum
   * @param {number} [sampleRate=44100] the audio sampling rate [Hz]
   * @param {number} [startCutoffFrequency=0] the start frequency from which to sum the energy [Hz]
   * @param {number} [stopCutoffFrequency=100] the stop frequency to which to sum the energy [Hz]
@@ -911,7 +922,7 @@ class Essentia {
   /**
   * This algorithm computes the ratio of the spectral energy in the range [startFrequency, stopFrequency] over the total energy. Check https://essentia.upf.edu/reference/std_EnergyBandRatio.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the input audio spectrum
+  * @param {VectorFloat} spectrum the input audio spectrum
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @param {number} [startFrequency=0] the frequency from which to start summing the energy [Hz]
   * @param {number} [stopFrequency=100] the frequency up to which to sum the energy [Hz]
@@ -925,7 +936,7 @@ class Essentia {
   /**
   * This algorithm computes the Shannon entropy of an array. Entropy can be used to quantify the peakiness of a distribution. This has been used for voiced/unvoiced decision in automatic speech recognition.  Check https://essentia.upf.edu/reference/std_Entropy.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array (cannot contain negative values, and must be non-empty)
+  * @param {VectorFloat} array the input array (cannot contain negative values, and must be non-empty)
   * @returns {object} {entropy: 'the entropy of the input array'}
   * @memberof Essentia
   */
@@ -936,7 +947,7 @@ class Essentia {
   /**
   * This algorithm computes the envelope of a signal by applying a non-symmetric lowpass filter on a signal. By default it rectifies the signal, but that is optional. Check https://essentia.upf.edu/reference/std_Envelope.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {boolean} [applyRectification=true] whether to apply rectification (envelope based on the absolute value of signal)
   * @param {number} [attackTime=10] the attack time of the first order lowpass in the attack phase [ms]
   * @param {number} [releaseTime=1500] the release time of the first order lowpass in the release phase [ms]
@@ -951,7 +962,7 @@ class Essentia {
   /**
   * This algorithm implements an equal-loudness filter. The human ear does not perceive sounds of all frequencies as having equal loudness, and to account for this, the signal is filtered by an inverted approximation of the equal-loudness curves. Technically, the filter is a cascade of a 10th order Yulewalk filter with a 2nd order Butterworth high pass filter. Check https://essentia.upf.edu/reference/std_EqualLoudness.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @returns {object} {signal: 'the filtered signal'}
   * @memberof Essentia
@@ -964,7 +975,7 @@ class Essentia {
   * This algorithm computes the positive complex short-term Fourier transform (STFT) of an array using the FFT algorithm. The resulting fft has a size of (s/2)+1, where s is the size of the input frame.
   At the moment FFT can only be computed on frames which size is even and non zero, otherwise an exception is thrown. Check https://essentia.upf.edu/reference/std_FFT.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input audio frame
+  * @param {VectorFloat} frame the input audio frame
   * @param {number} [size=1024] the expected size of the input frame. This is purely optional and only targeted at optimizing the creation time of the FFT object
   * @returns {object} {fft: 'the FFT of the input frame'}
   * @memberof Essentia
@@ -977,7 +988,7 @@ class Essentia {
   * This algorithm computes the complex short-term Fourier transform (STFT) of a complex array using the FFT algorithm. If the `negativeFrequencies` flag is set on, the resulting fft has a size of (s/2)+1, where s is the size of the input frame. Otherwise, output matches the input size.
   At the moment FFT can only be computed on frames which size is even and non zero, otherwise an exception is thrown. Check https://essentia.upf.edu/reference/std_FFTC.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input frame (complex)
+  * @param {VectorFloat} frame the input frame (complex)
   * @param {boolean} [negativeFrequencies=false] returns the full spectrum or just the positive frequencies
   * @param {number} [size=1024] the expected size of the input frame. This is purely optional and only targeted at optimizing the creation time of the FFT object
   * @returns {object} {fft: 'the FFT of the input frame'}
@@ -990,7 +1001,7 @@ class Essentia {
   /**
   * This algorithm detects fade-in and fade-outs time positions in an audio signal given a sequence of RMS values. It outputs two arrays containing the start/stop points of fade-ins and fade-outs. The main hypothesis for the detection is that an increase or decrease of the RMS over time in an audio file corresponds to a fade-in or fade-out, repectively. Minimum and maximum mean-RMS-thresholds are used to define where fade-in and fade-outs occur. Check https://essentia.upf.edu/reference/std_FadeDetection.html for more details.
   * @method
-  * @param {VectorFloat} [rms] rms values array
+  * @param {VectorFloat} rms rms values array
   * @param {number} [cutoffHigh=0.85] fraction of the average RMS to define the maximum threshold
   * @param {number} [cutoffLow=0.2] fraction of the average RMS to define the minimum threshold
   * @param {number} [frameRate=4] the rate of frames used in calculation of the RMS [frames/s]
@@ -1005,7 +1016,7 @@ class Essentia {
   /**
   * This algorithm detects if a stereo track has duplicated channels (false stereo).It is based on the Pearson linear correlation coefficient and thus it is robust scaling and shifting between channels. Check https://essentia.upf.edu/reference/std_FalseStereoDetector.html for more details.
   * @method
-  * @param {VectorVectorFloat} [frame] the input frame (must be non-empty)
+  * @param {VectorVectorFloat} frame the input frame (must be non-empty)
   * @param {number} [correlationThreshold=0.9995] threshold to activate the isFalseStereo flag
   * @param {number} [silenceThreshold=-70] Silent frames will be skkiped.
   * @returns {object} {isFalseStereo: 'a flag indicating if the frame channes are simmilar', correlation: 'correlation betweeen the input channels'}
@@ -1018,7 +1029,7 @@ class Essentia {
   /**
   * This algorithm computes the flatness of an array, which is defined as the ratio between the geometric mean and the arithmetic mean. Check https://essentia.upf.edu/reference/std_Flatness.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @returns {object} {flatness: 'the flatness (ratio between the geometric and the arithmetic mean of the input array)'}
   * @memberof Essentia
   */
@@ -1029,7 +1040,7 @@ class Essentia {
   /**
   * This algorithm computes the flatness of an array, which is defined as the ratio between the geometric mean and the arithmetic mean converted to dB scale. Check https://essentia.upf.edu/reference/std_FlatnessDB.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @returns {object} {flatnessDB: 'the flatness dB'}
   * @memberof Essentia
   */
@@ -1040,7 +1051,7 @@ class Essentia {
   /**
   * This algorithm calculates the flatness coefficient of a signal envelope. Check https://essentia.upf.edu/reference/std_FlatnessSFX.html for more details.
   * @method
-  * @param {VectorFloat} [envelope] the envelope of the signal
+  * @param {VectorFloat} envelope the envelope of the signal
   * @returns {object} {flatness: 'the flatness coefficient'}
   * @memberof Essentia
   */
@@ -1051,7 +1062,7 @@ class Essentia {
   /**
   * This algorithm computes the spectral flux of a spectrum. Flux is defined as the L2-norm [1] or L1-norm [2] of the difference between two consecutive frames of the magnitude spectrum. The frames have to be of the same size in order to yield a meaningful result. The default L2-norm is used more commonly. Check https://essentia.upf.edu/reference/std_Flux.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the input spectrum
+  * @param {VectorFloat} spectrum the input spectrum
   * @param {boolean} [halfRectify=false] half-rectify the differences in each spectrum bin
   * @param {string} [norm=L2] the norm to use for difference computation
   * @returns {object} {flux: 'the spectral flux of the input spectrum'}
@@ -1064,7 +1075,7 @@ class Essentia {
   /**
   * This algorithm slices the input buffer into frames. It returns a frame of a constant size and jumps a constant amount of samples forward in the buffer on every compute() call until no more frames can be extracted; empty frame vectors are returned afterwards. Incomplete frames (frames starting before the beginning of the input buffer or going past its end) are zero-padded or dropped according to the "validFrameThresholdRatio" parameter. Check https://essentia.upf.edu/reference/std_FrameCutter.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the buffer from which to read data
+  * @param {VectorFloat} signal the buffer from which to read data
   * @param {number} [frameSize=1024] the output frame size
   * @param {number} [hopSize=512] the hop size between frames
   * @param {boolean} [lastFrameToEndOfFile=false] whether the beginning of the last frame should reach the end of file. Only applicable if startFromZero is true
@@ -1080,7 +1091,7 @@ class Essentia {
   /**
   * This algorithm converts a sequence of input audio signal frames into a sequence of audio samples. Check https://essentia.upf.edu/reference/std_FrameToReal.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input audio frame
+  * @param {VectorFloat} signal the input audio frame
   * @param {number} [frameSize=2048] the frame size for computing the overlap-add process
   * @param {number} [hopSize=128] the hop size with which the overlap-add function is computed
   * @returns {object} {signal: 'the output audio samples'}
@@ -1093,7 +1104,7 @@ class Essentia {
   /**
   * This algorithm computes energy in rectangular frequency bands of a spectrum. The bands are non-overlapping. For each band the power-spectrum (mag-squared) is summed. Check https://essentia.upf.edu/reference/std_FrequencyBands.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the input spectrum (must be greater than size one)
+  * @param {VectorFloat} spectrum the input spectrum (must be greater than size one)
   * @param {any[]} [frequencyBands=[0, 50, 100, 150, 200, 300, 400, 510, 630, 770, 920, 1080, 1270, 1480, 1720, 2000, 2320, 2700, 3150, 3700, 4400, 5300, 6400, 7700, 9500, 12000, 15500, 20500, 27000]] list of frequency ranges in to which the spectrum is divided (these must be in ascending order and connot contain duplicates)
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @returns {object} {bands: 'the energy in each band'}
@@ -1110,7 +1121,7 @@ class Essentia {
   /**
   * This algorithm computes the Gammatone-frequency cepstral coefficients of a spectrum. This is an equivalent of MFCCs, but using a gammatone filterbank (ERBBands) scaled on an Equivalent Rectangular Bandwidth (ERB) scale. Check https://essentia.upf.edu/reference/std_GFCC.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the audio spectrum
+  * @param {VectorFloat} spectrum the audio spectrum
   * @param {number} [dctType=2] the DCT type
   * @param {number} [highFrequencyBound=22050] the upper bound of the frequency range [Hz]
   * @param {number} [inputSize=1025] the size of input spectrum
@@ -1132,7 +1143,7 @@ class Essentia {
   * This algorithm uses energy and time thresholds to detect gaps in the waveform. A median filter is used to remove spurious silent samples. The power of a small audio region before the detected gaps (prepower) is thresholded to detect intentional pauses as described in [1]. This technique isextended to the region after the gap.
   The algorithm was designed for a framewise use and returns the start and end timestamps related to the first frame processed. Call configure() or reset() in order to restart the count. Check https://essentia.upf.edu/reference/std_GapsDetector.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input frame (must be non-empty)
+  * @param {VectorFloat} frame the input frame (must be non-empty)
   * @param {number} [attackTime=0.05] the attack time of the first order lowpass in the attack phase [ms]
   * @param {number} [frameSize=2048] frame size used for the analysis. Should match the input frame size. Otherwise, an exception will be thrown
   * @param {number} [hopSize=1024] hop size used for the analysis
@@ -1155,7 +1166,7 @@ class Essentia {
   /**
   * This algorithm computes the geometric mean of an array of positive values. Check https://essentia.upf.edu/reference/std_GeometricMean.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @returns {object} {geometricMean: 'the geometric mean of the input array'}
   * @memberof Essentia
   */
@@ -1169,7 +1180,7 @@ class Essentia {
     - 'Jensen' which does: sum |X(n)|*k^2
     - 'Brossier' which does: sum |X(n)|*k Check https://essentia.upf.edu/reference/std_HFC.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the input audio spectrum
+  * @param {VectorFloat} spectrum the input audio spectrum
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @param {string} [type=Masri] the type of HFC coefficient to be computed
   * @returns {object} {hfc: 'the high-frequency coefficient'}
@@ -1182,8 +1193,8 @@ class Essentia {
   /**
   * Computes a Harmonic Pitch Class Profile (HPCP) from the spectral peaks of a signal. HPCP is a k*12 dimensional vector which represents the intensities of the twelve (k==1) semitone pitch classes (corresponsing to notes from A to G#), or subdivisions of these (k>1). Check https://essentia.upf.edu/reference/std_HPCP.html for more details.
   * @method
-  * @param {VectorFloat} [frequencies] the frequencies of the spectral peaks [Hz]
-  * @param {VectorFloat} [magnitudes] the magnitudes of the spectral peaks
+  * @param {VectorFloat} frequencies the frequencies of the spectral peaks [Hz]
+  * @param {VectorFloat} magnitudes the magnitudes of the spectral peaks
   * @param {boolean} [bandPreset=true] enables whether to use a band preset
   * @param {number} [bandSplitFrequency=500] the split frequency for low and high bands, not used if bandPreset is false [Hz]
   * @param {number} [harmonics=0] number of harmonics for frequency contribution, 0 indicates exclusive fundamental frequency contribution
@@ -1209,7 +1220,7 @@ class Essentia {
   The algorithm assumes a certain bpm is harmonically related to parameter bpm, when the greatest common divisor between both bpms is greater than threshold.
   The 'tolerance' parameter is needed in order to consider if two bpms are related. For instance, 120, 122 and 236 may be related or not depending on how much tolerance is given Check https://essentia.upf.edu/reference/std_HarmonicBpm.html for more details.
   * @method
-  * @param {VectorFloat} [bpms] list of bpm candidates
+  * @param {VectorFloat} bpms list of bpm candidates
   * @param {number} [bpm=60] the bpm used to find its harmonics
   * @param {number} [threshold=20] bpm threshold below which greatest common divisors are discarded
   * @param {number} [tolerance=5] percentage tolerance to consider two bpms are equal or equal to a harmonic
@@ -1224,8 +1235,8 @@ class Essentia {
   * This algorithm applies a spectral mask to remove a pitched source component from the signal. It computes first an harmonic mask corresponding to the input pitch and applies the mask to the input FFT to remove that pitch. The bin width determines how many spectral bins are masked per harmonic partial. 
   An attenuation value in dB determines the amount of suppression of the pitched component w.r.t the background for the case of muting. A negative attenuation value allows soloing the pitched component.  Check https://essentia.upf.edu/reference/std_HarmonicMask.html for more details.
   * @method
-  * @param {VectorFloat} [fft] the input frame
-  * @param {number} [pitch] an estimate of the fundamental frequency of the signal [Hz]
+  * @param {VectorFloat} fft the input frame
+  * @param {number} pitch an estimate of the fundamental frequency of the signal [Hz]
   * @param {number} [attenuation=-200] attenuation in dB's of the muted pitched component. If value is positive the pitched component is attenuated (muted), if the value is negative the pitched component is soloed (i.e. background component is attenuated).
   * @param {number} [binWidth=4] number of bins per harmonic partials applied to the mask. This will depend on the internal FFT size
   * @param {number} [sampleRate=44100] the audio sampling rate [Hz]
@@ -1239,8 +1250,8 @@ class Essentia {
   /**
   * This algorithm computes the harmonic model analysis. Check https://essentia.upf.edu/reference/std_HarmonicModelAnal.html for more details.
   * @method
-  * @param {VectorFloat} [fft] the input fft
-  * @param {number} [pitch] external pitch input [Hz].
+  * @param {VectorFloat} fft the input fft
+  * @param {number} pitch external pitch input [Hz].
   * @param {number} [freqDevOffset=20] minimum frequency deviation at 0Hz
   * @param {number} [freqDevSlope=0.01] slope increase of minimum frequency deviation
   * @param {number} [harmDevSlope=0.01] slope increase of minimum frequency deviation
@@ -1269,9 +1280,9 @@ class Essentia {
   This algorithm is intended to receive its "frequencies" and "magnitudes" inputs from the SpectralPeaks algorithm.
     - When input vectors differ in size or are empty, an exception is thrown. Input vectors must be ordered by ascending frequency excluding DC components and not contain duplicates, otherwise an exception is thrown. Check https://essentia.upf.edu/reference/std_HarmonicPeaks.html for more details.
   * @method
-  * @param {VectorFloat} [frequencies] the frequencies of the spectral peaks [Hz] (ascending order)
-  * @param {VectorFloat} [magnitudes] the magnitudes of the spectral peaks (ascending frequency order)
-  * @param {number} [pitch] an estimate of the fundamental frequency of the signal [Hz]
+  * @param {VectorFloat} frequencies the frequencies of the spectral peaks [Hz] (ascending order)
+  * @param {VectorFloat} magnitudes the magnitudes of the spectral peaks (ascending frequency order)
+  * @param {number} pitch an estimate of the fundamental frequency of the signal [Hz]
   * @param {number} [maxHarmonics=20] the number of harmonics to return including F0
   * @param {number} [tolerance=0.2] the allowed ratio deviation from ideal harmonics
   * @returns {object} {harmonicFrequencies: 'the frequencies of harmonic peaks [Hz]', harmonicMagnitudes: 'the magnitudes of harmonic peaks'}
@@ -1284,7 +1295,7 @@ class Essentia {
   /**
   * This algorithm implements a 1st order IIR high-pass filter. Because of its dependence on IIR, IIR's requirements are inherited. Check https://essentia.upf.edu/reference/std_HighPass.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input audio signal
+  * @param {VectorFloat} signal the input audio signal
   * @param {number} [cutoffFrequency=1500] the cutoff frequency for the filter [Hz]
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @returns {object} {signal: 'the filtered signal'}
@@ -1298,7 +1309,7 @@ class Essentia {
   * This algorithm computes high-resolution chroma features from an HPCP vector. The vector's size must be a multiple of 12 and it is recommended that it be larger than 120. In otherwords, the HPCP's resolution should be 10 Cents or more.
   The high-resolution features being computed are: Check https://essentia.upf.edu/reference/std_HighResolutionFeatures.html for more details.
   * @method
-  * @param {VectorFloat} [hpcp] the HPCPs, preferably of size >= 120
+  * @param {VectorFloat} hpcp the HPCPs, preferably of size >= 120
   * @param {number} [maxPeaks=24] maximum number of HPCP peaks to consider when calculating outputs
   * @returns {object} {equalTemperedDeviation: 'measure of the deviation of HPCP local maxima with respect to equal-tempered bins', nonTemperedEnergyRatio: 'ratio between the energy on non-tempered bins and the total energy', nonTemperedPeaksEnergyRatio: 'ratio between the energy on non-tempered peaks and the total energy'}
   * @memberof Essentia
@@ -1310,7 +1321,7 @@ class Essentia {
   /**
   * This algorithm computes a histogram. Values outside the range are ignored Check https://essentia.upf.edu/reference/std_Histogram.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @param {number} [maxValue=1] the max value of the histogram
   * @param {number} [minValue=0] the min value of the histogram
   * @param {string} [normalize=none] the normalization setting.
@@ -1325,8 +1336,8 @@ class Essentia {
   /**
   * This algorithm computes the harmonic plus residual model analysis. Check https://essentia.upf.edu/reference/std_HprModelAnal.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input frame
-  * @param {number} [pitch] external pitch input [Hz].
+  * @param {VectorFloat} frame the input frame
+  * @param {number} pitch external pitch input [Hz].
   * @param {number} [fftSize=2048] the size of the internal FFT size (full spectrum size)
   * @param {number} [freqDevOffset=20] minimum frequency deviation at 0Hz
   * @param {number} [freqDevSlope=0.01] slope increase of minimum frequency deviation
@@ -1351,8 +1362,8 @@ class Essentia {
   /**
   * This algorithm computes the harmonic plus stochastic model analysis.  Check https://essentia.upf.edu/reference/std_HpsModelAnal.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input frame
-  * @param {number} [pitch] external pitch input [Hz].
+  * @param {VectorFloat} frame the input frame
+  * @param {number} pitch external pitch input [Hz].
   * @param {number} [fftSize=2048] the size of the internal FFT size (full spectrum size)
   * @param {number} [freqDevOffset=20] minimum frequency deviation at 0Hz
   * @param {number} [freqDevSlope=0.01] slope increase of minimum frequency deviation
@@ -1377,7 +1388,7 @@ class Essentia {
   /**
   * This algorithm detects low frequency tonal noises in the audio signal. First, the steadiness of the Power Spectral Density (PSD) of the signal is computed by measuring the quantile ratios as described in [1]. After this, the PitchContours algorithm is used to keep track of the humming tones [2]. Check https://essentia.upf.edu/reference/std_HumDetector.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input audio signal
+  * @param {VectorFloat} signal the input audio signal
   * @param {number} [Q0=0.1] low quantile
   * @param {number} [Q1=0.55] high quatile
   * @param {number} [detectionThreshold=5] the detection threshold for the peaks of the r matrix
@@ -1401,7 +1412,7 @@ class Essentia {
   * This algorithm computes the Inverse Discrete Cosine Transform of an array.
   It can be configured to perform the inverse DCT-II form, with the 1/sqrt(2) scaling factor for the first coefficient or the inverse DCT-III form based on the HTK implementation. Check https://essentia.upf.edu/reference/std_IDCT.html for more details.
   * @method
-  * @param {VectorFloat} [dct] the discrete cosine transform
+  * @param {VectorFloat} dct the discrete cosine transform
   * @param {number} [dctType=2] the DCT type
   * @param {number} [inputSize=10] the size of the input array
   * @param {number} [liftering=0] the liftering coefficient. Use '0' to bypass it
@@ -1416,7 +1427,7 @@ class Essentia {
   /**
   * This algorithm calculates the inverse short-term Fourier transform (STFT) of an array of complex values using the FFT algorithm. The resulting frame has a size of (s-1)*2, where s is the size of the input fft frame. The inverse Fourier transform is not defined for frames which size is less than 2 samples. Otherwise an exception is thrown. Check https://essentia.upf.edu/reference/std_IFFT.html for more details.
   * @method
-  * @param {VectorFloat} [fft] the input frame
+  * @param {VectorFloat} fft the input frame
   * @param {boolean} [normalize=true] wheter to normalize the output by the FFT length.
   * @param {number} [size=1024] the expected size of the input frame. This is purely optional and only targeted at optimizing the creation time of the FFT object
   * @returns {object} {frame: 'the IFFT of the input frame'}
@@ -1429,7 +1440,7 @@ class Essentia {
   /**
   * This algorithm calculates the inverse short-term Fourier transform (STFT) of an array of complex values using the FFT algorithm. The resulting frame has a size equal to the input fft frame size. The inverse Fourier transform is not defined for frames which size is less than 2 samples. Otherwise an exception is thrown. Check https://essentia.upf.edu/reference/std_IFFTC.html for more details.
   * @method
-  * @param {VectorFloat} [fft] the input frame
+  * @param {VectorFloat} fft the input frame
   * @param {boolean} [normalize=true] wheter to normalize the output by the FFT length.
   * @param {number} [size=1024] the expected size of the input frame. This is purely optional and only targeted at optimizing the creation time of the FFT object
   * @returns {object} {frame: 'the complex IFFT of the input frame'}
@@ -1442,7 +1453,7 @@ class Essentia {
   /**
   * This algorithm implements a standard IIR filter. It filters the data in the input vector with the filter described by parameter vectors 'numerator' and 'denominator' to create the output filtered vector. In the litterature, the numerator is often referred to as the 'B' coefficients and the denominator as the 'A' coefficients. Check https://essentia.upf.edu/reference/std_IIR.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {any[]} [denominator=[1]] the list of coefficients of the denominator. Often referred to as the A coefficient vector.
   * @param {any[]} [numerator=[1]] the list of coefficients of the numerator. Often referred to as the B coefficient vector.
   * @returns {object} {signal: 'the filtered signal'}
@@ -1463,8 +1474,8 @@ class Essentia {
   /**
   * This algorithm calculates the inharmonicity of a signal given its spectral peaks. The inharmonicity value is computed as an energy weighted divergence of the spectral components from their closest multiple of the fundamental frequency. The fundamental frequency is taken as the first spectral peak from the input. The inharmonicity value ranges from 0 (purely harmonic signal) to 1 (inharmonic signal). Check https://essentia.upf.edu/reference/std_Inharmonicity.html for more details.
   * @method
-  * @param {VectorFloat} [frequencies] the frequencies of the harmonic peaks [Hz] (in ascending order)
-  * @param {VectorFloat} [magnitudes] the magnitudes of the harmonic peaks (in frequency ascending order
+  * @param {VectorFloat} frequencies the frequencies of the harmonic peaks [Hz] (in ascending order)
+  * @param {VectorFloat} magnitudes the magnitudes of the harmonic peaks (in frequency ascending order
   * @returns {object} {inharmonicity: 'the inharmonicity of the audio signal'}
   * @memberof Essentia
   */
@@ -1475,7 +1486,7 @@ class Essentia {
   /**
   * This algorithm computes the instant power of an array. That is, the energy of the array over its size. Check https://essentia.upf.edu/reference/std_InstantPower.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @returns {object} {power: 'the instant power of the input array'}
   * @memberof Essentia
   */
@@ -1486,7 +1497,7 @@ class Essentia {
   /**
   * This algorithm classifies the input audio signal as either relaxed (-1), moderate (0), or aggressive (1). Check https://essentia.upf.edu/reference/std_Intensity.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input audio signal
+  * @param {VectorFloat} signal the input audio signal
   * @param {number} [sampleRate=44100] the input audio sampling rate [Hz]
   * @returns {object} {intensity: 'the intensity value'}
   * @memberof Essentia
@@ -1498,7 +1509,7 @@ class Essentia {
   /**
   * This algorithm computes key estimate given a pitch class profile (HPCP). The algorithm was severely adapted and changed from the original implementation for readability and speed. Check https://essentia.upf.edu/reference/std_Key.html for more details.
   * @method
-  * @param {VectorFloat} [pcp] the input pitch class profile
+  * @param {VectorFloat} pcp the input pitch class profile
   * @param {number} [numHarmonics=4] number of harmonics that should contribute to the polyphonic profile (1 only considers the fundamental harmonic)
   * @param {number} [pcpSize=36] number of array elements used to represent a semitone times 12 (this parameter is only a hint, during computation, the size of the input PCP is used instead)
   * @param {string} [profileType=bgate] the type of polyphic profile to use for correlation calculation
@@ -1516,7 +1527,7 @@ class Essentia {
   /**
   * This algorithm extracts key/scale for an audio signal. It computes HPCP frames for the input signal and applies key estimation using the Key algorithm. Check https://essentia.upf.edu/reference/std_KeyExtractor.html for more details.
   * @method
-  * @param {VectorFloat} [audio] the audio input signal
+  * @param {VectorFloat} audio the audio input signal
   * @param {boolean} [averageDetuningCorrection=true] shifts a pcp to the nearest tempered bin
   * @param {number} [frameSize=4096] the framesize for computing tonal features
   * @param {number} [hopSize=4096] the hopsize for computing tonal features
@@ -1541,7 +1552,7 @@ class Essentia {
   /**
   * This algorithm computes Linear Predictive Coefficients and associated reflection coefficients of a signal. Check https://essentia.upf.edu/reference/std_LPC.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input audio frame
+  * @param {VectorFloat} frame the input audio frame
   * @param {number} [order=10] the order of the LPC analysis (typically [8,14])
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @param {string} [type=regular] the type of LPC (regular or warped)
@@ -1555,7 +1566,7 @@ class Essentia {
   /**
   * This algorithm estimates the long-term loudness of an audio signal. The LARM model is based on the asymmetrical low-pass filtering of the Peak Program Meter (PPM), combined with Revised Low-frequency B-weighting (RLB) and power mean calculations. LARM has shown to be a reliable and objective loudness estimate of music and speech. Check https://essentia.upf.edu/reference/std_Larm.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the audio input signal
+  * @param {VectorFloat} signal the audio input signal
   * @param {number} [attackTime=10] the attack time of the first order lowpass in the attack phase [ms]
   * @param {number} [power=1.5] the power used for averaging
   * @param {number} [releaseTime=1500] the release time of the first order lowpass in the release phase [ms]
@@ -1571,7 +1582,7 @@ class Essentia {
   * This algorithm computes the Equivalent sound level (Leq) of an audio signal. The Leq measure can be derived from the Revised Low-frequency B-weighting (RLB) or from the raw signal as described in [1]. If the signal contains no energy, Leq defaults to essentias definition of silence which is -90dB.
   This algorithm will throw an exception on empty input. Check https://essentia.upf.edu/reference/std_Leq.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal (must be non-empty)
+  * @param {VectorFloat} signal the input signal (must be non-empty)
   * @returns {object} {leq: 'the equivalent sound level estimate [dB]'}
   * @memberof Essentia
   */
@@ -1582,7 +1593,7 @@ class Essentia {
   /**
   * This algorithm extracts the loudness of an audio signal in frames using Loudness algorithm. Check https://essentia.upf.edu/reference/std_LevelExtractor.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the audio input signal
+  * @param {VectorFloat} signal the audio input signal
   * @param {number} [frameSize=88200] frame size to compute loudness
   * @param {number} [hopSize=44100] hop size to compute loudness
   * @returns {object} {loudness: 'the loudness values'}
@@ -1595,7 +1606,7 @@ class Essentia {
   /**
   * This algorithm computes the log (base 10) of the attack time of a signal envelope. The attack time is defined as the time duration from when the sound becomes perceptually audible to when it reaches its maximum intensity. By default, the start of the attack is estimated as the point where the signal envelope reaches 20% of its maximum value in order to account for possible noise presence. Also by default, the end of the attack is estimated as as the point where the signal envelope has reached 90% of its maximum value, in order to account for the possibility that the max value occurres after the logAttack, as in trumpet sounds. Check https://essentia.upf.edu/reference/std_LogAttackTime.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal envelope (must be non-empty)
+  * @param {VectorFloat} signal the input signal envelope (must be non-empty)
   * @param {number} [sampleRate=44100] the audio sampling rate [Hz]
   * @param {number} [startAttackThreshold=0.2] the percentage of the input signal envelope at which the starting point of the attack is considered
   * @param {number} [stopAttackThreshold=0.9] the percentage of the input signal envelope at which the ending point of the attack is considered
@@ -1609,7 +1620,7 @@ class Essentia {
   /**
   * This algorithm computes spectrum with logarithmically distributed frequency bins. This code is ported from NNLS Chroma [1, 2].This algorithm also returns a local tuning that is retrieved for input frame and a global tuning that is updated with a moving average. Check https://essentia.upf.edu/reference/std_LogSpectrum.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] spectrum frame
+  * @param {VectorFloat} spectrum spectrum frame
   * @param {number} [binsPerSemitone=3]  bins per semitone
   * @param {number} [frameSize=1025] the input frame size of the spectrum vector
   * @param {number} [rollOn=0] this removes low-frequency noise - useful in quiet recordings
@@ -1624,8 +1635,8 @@ class Essentia {
   /**
   * This algorithm takes an audio signal and a BPM estimate for that signal and predicts the reliability of the BPM estimate in a value from 0 to 1. The audio signal is assumed to be a musical loop with constant tempo. The confidence returned is based on comparing the duration of the signal with multiples of the BPM estimate (see [1] for more details). Check https://essentia.upf.edu/reference/std_LoopBpmConfidence.html for more details.
   * @method
-  * @param {VectorFloat} [signal] loop audio signal
-  * @param {number} [bpmEstimate] estimated BPM for the audio signal
+  * @param {VectorFloat} signal loop audio signal
+  * @param {number} bpmEstimate estimated BPM for the audio signal
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @returns {object} {confidence: 'confidence value for the BPM estimation'}
   * @memberof Essentia
@@ -1637,7 +1648,7 @@ class Essentia {
   /**
   * This algorithm estimates the BPM of audio loops. It internally uses PercivalBpmEstimator algorithm to produce a BPM estimate and LoopBpmConfidence to asses the reliability of the estimate. If the provided estimate is below the given confidenceThreshold, the algorithm outputs a BPM 0.0, otherwise it outputs the estimated BPM. For more details on the BPM estimation method and the confidence measure please check the used algorithms. Check https://essentia.upf.edu/reference/std_LoopBpmEstimator.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {number} [confidenceThreshold=0.95] confidence threshold below which bpm estimate will be considered unreliable
   * @returns {object} {bpm: 'the estimated bpm (will be 0 if unsure)'}
   * @memberof Essentia
@@ -1649,7 +1660,7 @@ class Essentia {
   /**
   * This algorithm computes the loudness of an audio signal defined by Steven's power law. It computes loudness as the energy of the signal raised to the power of 0.67. Check https://essentia.upf.edu/reference/std_Loudness.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @returns {object} {loudness: 'the loudness of the input signal'}
   * @memberof Essentia
   */
@@ -1660,7 +1671,7 @@ class Essentia {
   /**
   * This algorithm computes the EBU R128 loudness descriptors of an audio signal. Check https://essentia.upf.edu/reference/std_LoudnessEBUR128.html for more details.
   * @method
-  * @param {VectorVectorFloat} [signal] the input stereo audio signal
+  * @param {VectorVectorFloat} signal the input stereo audio signal
   * @param {number} [hopSize=0.1] the hop size with which the loudness is computed [s]
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @param {boolean} [startAtZero=false] start momentary/short-term loudness estimation at time 0 (zero-centered loudness estimation windows) if true; otherwise start both windows at time 0 (time positions for momentary and short-term values will not be syncronized)
@@ -1674,7 +1685,7 @@ class Essentia {
   /**
   * This algorithm computes Vickers's loudness of an audio signal. Currently, this algorithm only works for signals with a 44100Hz sampling rate. This algorithm is meant to be given frames of audio as input (not entire audio signals). The algorithm described in the paper performs a weighted average of the loudness value computed for each of the given frames, this step is left as a post processing step and is not performed by this algorithm. Check https://essentia.upf.edu/reference/std_LoudnessVickers.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {number} [sampleRate=44100] the audio sampling rate of the input signal which is used to create the weight vector [Hz] (currently, this algorithm only works on signals with a sampling rate of 44100Hz)
   * @returns {object} {loudness: 'the Vickers loudness [dB]'}
   * @memberof Essentia
@@ -1686,7 +1697,7 @@ class Essentia {
   /**
   * This algorithm extracts a set of level spectral features for which it is recommended to apply a preliminary equal-loudness filter over an input audio signal (according to the internal evaluations conducted at Music Technology Group). To this end, you are expected to provide the output of EqualLoudness algorithm as an input for this algorithm. Still, you are free to provide an unprocessed audio input in the case you want to compute these features without equal-loudness filter. Check https://essentia.upf.edu/reference/std_LowLevelSpectralEqloudExtractor.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input audio signal
+  * @param {VectorFloat} signal the input audio signal
   * @param {number} [frameSize=2048] the frame size for computing low level features
   * @param {number} [hopSize=1024] the hop size for computing low level features
   * @param {number} [sampleRate=44100] the audio sampling rate
@@ -1700,7 +1711,7 @@ class Essentia {
   /**
   * This algorithm extracts all low-level spectral features, which do not require an equal-loudness filter for their computation, from an audio signal Check https://essentia.upf.edu/reference/std_LowLevelSpectralExtractor.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the audio input signal
+  * @param {VectorFloat} signal the audio input signal
   * @param {number} [frameSize=2048] the frame size for computing low level features
   * @param {number} [hopSize=1024] the hop size for computing low level features
   * @param {number} [sampleRate=44100] the audio sampling rate
@@ -1717,7 +1728,7 @@ class Essentia {
     [1] U. Zölzer, DAFX - Digital Audio Effects, p. 40,
     John Wiley & Sons, 2002 Check https://essentia.upf.edu/reference/std_LowPass.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input audio signal
+  * @param {VectorFloat} signal the input audio signal
   * @param {number} [cutoffFrequency=1500] the cutoff frequency for the filter [Hz]
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @returns {object} {signal: 'the filtered signal'}
@@ -1734,7 +1745,7 @@ class Essentia {
     - DCT of the 40 bands down to 13 mel coefficients
   There is a paper describing various MFCC implementations [1]. Check https://essentia.upf.edu/reference/std_MFCC.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the audio spectrum
+  * @param {VectorFloat} spectrum the audio spectrum
   * @param {number} [dctType=2] the DCT type
   * @param {number} [highFrequencyBound=11000] the upper bound of the frequency range [Hz]
   * @param {number} [inputSize=1025] the size of input spectrum
@@ -1759,7 +1770,7 @@ class Essentia {
   /**
   * This algorithm computes the absolute value of each element in a vector of complex numbers. Check https://essentia.upf.edu/reference/std_Magnitude.html for more details.
   * @method
-  * @param {VectorFloat} [complex] the input vector of complex numbers
+  * @param {VectorFloat} complex the input vector of complex numbers
   * @returns {object} {magnitude: 'the magnitudes of the input vector'}
   * @memberof Essentia
   */
@@ -1770,7 +1781,7 @@ class Essentia {
   /**
   * This algorithm implements a maximum filter for 1d signal using van Herk/Gil-Werman (HGW) algorithm. Check https://essentia.upf.edu/reference/std_MaxFilter.html for more details.
   * @method
-  * @param {VectorFloat} [signal] signal to be filtered
+  * @param {VectorFloat} signal signal to be filtered
   * @param {boolean} [causal=true] use casual filter (window is behind current element otherwise it is centered around)
   * @param {number} [width=3] the window size, has to be odd if the window is centered
   * @returns {object} {signal: 'filtered output'}
@@ -1784,7 +1795,7 @@ class Essentia {
   * This algorithm computes the frequency with the largest magnitude in a spectrum.
   Note that a spectrum must contain at least two elements otherwise an exception is thrown Check https://essentia.upf.edu/reference/std_MaxMagFreq.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the input spectrum (must have more than 1 element)
+  * @param {VectorFloat} spectrum the input spectrum (must have more than 1 element)
   * @param {number} [sampleRate=44100] the audio sampling rate [Hz]
   * @returns {object} {maxMagFreq: 'the frequency with the largest magnitude [Hz]'}
   * @memberof Essentia
@@ -1796,7 +1807,7 @@ class Essentia {
   /**
   * This algorithm computes the ratio between the index of the maximum value of the envelope of a signal and the total length of the envelope. This ratio shows how much the maximum amplitude is off-center. Its value is close to 0 if the maximum is close to the beginning (e.g. Decrescendo or Impulsive sounds), close to 0.5 if it is close to the middle (e.g. Delta sounds) and close to 1 if it is close to the end of the sound (e.g. Crescendo sounds). This algorithm is intended to be fed by the output of the Envelope algorithm Check https://essentia.upf.edu/reference/std_MaxToTotal.html for more details.
   * @method
-  * @param {VectorFloat} [envelope] the envelope of the signal
+  * @param {VectorFloat} envelope the envelope of the signal
   * @returns {object} {maxToTotal: 'the maximum amplitude position to total length ratio'}
   * @memberof Essentia
   */
@@ -1807,7 +1818,7 @@ class Essentia {
   /**
   * This algorithm computes the mean of an array. Check https://essentia.upf.edu/reference/std_Mean.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @returns {object} {mean: 'the mean of the input array'}
   * @memberof Essentia
   */
@@ -1818,7 +1829,7 @@ class Essentia {
   /**
   * This algorithm computes the median of an array. When there is an odd number of numbers, the median is simply the middle number. For example, the median of 2, 4, and 7 is 4. When there is an even number of numbers, the median is the mean of the two middle numbers. Thus, the median of the numbers 2, 4, 7, 12 is (4+7)/2 = 5.5. See [1] for more info. Check https://essentia.upf.edu/reference/std_Median.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array (must be non-empty)
+  * @param {VectorFloat} array the input array (must be non-empty)
   * @returns {object} {median: 'the median of the input array'}
   * @memberof Essentia
   */
@@ -1829,7 +1840,7 @@ class Essentia {
   /**
   * This algorithm computes the median filtered version of the input signal giving the kernel size as detailed in [1]. Check https://essentia.upf.edu/reference/std_MedianFilter.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array (must be non-empty)
+  * @param {VectorFloat} array the input array (must be non-empty)
   * @param {number} [kernelSize=11] scalar giving the size of the median filter window. Must be odd
   * @returns {object} {filteredArray: 'the median-filtered input array'}
   * @memberof Essentia
@@ -1841,7 +1852,7 @@ class Essentia {
   /**
   * This algorithm computes energy in mel bands of a spectrum. It applies a frequency-domain filterbank (MFCC FB-40, [1]), which consists of equal area triangular filters spaced according to the mel scale. The filterbank is normalized in such a way that the sum of coefficients for every filter equals one. It is recommended that the input "spectrum" be calculated by the Spectrum algorithm. Check https://essentia.upf.edu/reference/std_MelBands.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the audio spectrum
+  * @param {VectorFloat} spectrum the audio spectrum
   * @param {number} [highFrequencyBound=22050] an upper-bound limit for the frequencies to be included in the bands
   * @param {number} [inputSize=1025] the size of the spectrum
   * @param {boolean} [log=false] compute log-energies (log10 (1 + energy))
@@ -1862,7 +1873,7 @@ class Essentia {
   /**
   * This algorithm estimates the time signature of a given beatogram by finding the highest correlation between beats. Check https://essentia.upf.edu/reference/std_Meter.html for more details.
   * @method
-  * @param {VectorVectorFloat} [beatogram] filtered matrix loudness
+  * @param {VectorVectorFloat} beatogram filtered matrix loudness
   * @returns {object} {meter: 'the time signature'}
   * @memberof Essentia
   */
@@ -1874,7 +1885,7 @@ class Essentia {
   * This algorithm calculates the minimum or maximum value of an array.
   If the array has more than one minimum or maximum value, the index of the first one is returned Check https://essentia.upf.edu/reference/std_MinMax.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @param {string} [type=min] the type of the operation
   * @returns {object} {real: 'the minimum or maximum of the input array, according to the type parameter', int: 'the index of the value'}
   * @memberof Essentia
@@ -1886,7 +1897,7 @@ class Essentia {
   /**
   * This algorithm computes the ratio between the index of the minimum value of the envelope of a signal and the total length of the envelope. Check https://essentia.upf.edu/reference/std_MinToTotal.html for more details.
   * @method
-  * @param {VectorFloat} [envelope] the envelope of the signal
+  * @param {VectorFloat} envelope the envelope of the signal
   * @returns {object} {minToTotal: 'the minimum amplitude position to total length ratio'}
   * @memberof Essentia
   */
@@ -1897,7 +1908,7 @@ class Essentia {
   /**
   * This algorithm implements a FIR Moving Average filter. Because of its dependece on IIR, IIR's requirements are inherited. Check https://essentia.upf.edu/reference/std_MovingAverage.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input audio signal
+  * @param {VectorFloat} signal the input audio signal
   * @param {number} [size=6] the size of the window [audio samples]
   * @returns {object} {signal: 'the filtered signal'}
   * @memberof Essentia
@@ -1926,9 +1937,9 @@ class Essentia {
   This code is ported from NNLS Chroma [1, 2]. To achieve similar results follow this processing chain:
   frame slicing with sample rate = 44100, frame size = 16384, hop size = 2048 -> Windowing with Hann and no normalization -> Spectrum -> LogSpectrum. Check https://essentia.upf.edu/reference/std_NNLSChroma.html for more details.
   * @method
-  * @param {VectorVectorFloat} [logSpectrogram] log spectrum frames
-  * @param {VectorFloat} [meanTuning] mean tuning frames
-  * @param {VectorFloat} [localTuning] local tuning frames
+  * @param {VectorVectorFloat} logSpectrogram log spectrum frames
+  * @param {VectorFloat} meanTuning mean tuning frames
+  * @param {VectorFloat} localTuning local tuning frames
   * @param {string} [chromaNormalization=none] determines whether or how the chromagrams are normalised
   * @param {number} [frameSize=1025] the input frame size of the spectrum vector
   * @param {number} [sampleRate=44100] the input sample rate
@@ -1949,7 +1960,7 @@ class Essentia {
   References:
     [1] Schörkhuber, C., Klapuri, A., Holighaus, N., & Dörfler, M. (n.d.). A Matlab Toolbox for Efficient Perfect Reconstruction Time-Frequency Transforms with Log-Frequency Resolution. Check https://essentia.upf.edu/reference/std_NSGConstantQ.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input frame (vector)
+  * @param {VectorFloat} frame the input frame (vector)
   * @param {number} [binsPerOctave=48] the number of bins per octave
   * @param {number} [gamma=0] The bandwidth of each filter is given by Bk = 1/Q * fk + gamma
   * @param {number} [inputSize=4096] the size of the input
@@ -1975,9 +1986,9 @@ class Essentia {
   References:
     [1] Schörkhuber, C., Klapuri, A., Holighaus, N., & Dörfler, M. (n.d.). A Matlab Toolbox for Efficient Perfect Reconstruction Time-Frequency Transforms with Log-Frequency Resolution. Check https://essentia.upf.edu/reference/std_NSGIConstantQ.html for more details.
   * @method
-  * @param {VectorVectorFloat} [constantq] the constant Q transform of the input frame
-  * @param {VectorFloat} [constantqdc] the DC band transform of the input frame
-  * @param {VectorFloat} [constantqnf] the Nyquist band transform of the input frame
+  * @param {VectorVectorFloat} constantq the constant Q transform of the input frame
+  * @param {VectorFloat} constantqdc the DC band transform of the input frame
+  * @param {VectorFloat} constantqnf the Nyquist band transform of the input frame
   * @param {number} [binsPerOctave=48] the number of bins per octave
   * @param {number} [gamma=0] The bandwidth of each filter is given by Bk = 1/Q * fk + gamma
   * @param {number} [inputSize=4096] the size of the input
@@ -2000,7 +2011,7 @@ class Essentia {
   /**
   * This algorithm adds noise to an input signal. The average energy of the noise in dB is defined by the level parameter, and is generated using the Mersenne Twister random number generator. Check https://essentia.upf.edu/reference/std_NoiseAdder.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {boolean} [fixSeed=false] if true, 0 is used as the seed for generating random values
   * @param {number} [level=-100] power level of the noise generator [dB]
   * @returns {object} {signal: 'the output signal with the added noise'}
@@ -2013,7 +2024,7 @@ class Essentia {
   /**
   * This algorithm detects noise bursts in the waveform by thresholding  the peaks of the second derivative. The threshold is computed using an Exponential Moving Average filter over the RMS of the second derivative of the input frame. Check https://essentia.upf.edu/reference/std_NoiseBurstDetector.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input frame (must be non-empty)
+  * @param {VectorFloat} frame the input frame (must be non-empty)
   * @param {number} [alpha=0.9] alpha coefficient for the Exponential Moving Average threshold estimation.
   * @param {number} [silenceThreshold=-50] threshold to skip silent frames
   * @param {number} [threshold=8] factor to control the dynamic theshold
@@ -2027,7 +2038,7 @@ class Essentia {
   /**
   * This algorithm computes the "novelty curve" (Grosche & Müller, 2009) onset detection function. The algorithm expects as an input a frame-wise sequence of frequency-bands energies or spectrum magnitudes as originally proposed in [1] (see FrequencyBands and Spectrum algorithms). Novelty in each band (or frequency bin) is computed as a derivative between log-compressed energy (magnitude) values in consequent frames. The overall novelty value is then computed as a weighted sum that can be configured using 'weightCurve' parameter. The resulting novelty curve can be used for beat tracking and onset detection (see BpmHistogram and Onsets). Check https://essentia.upf.edu/reference/std_NoveltyCurve.html for more details.
   * @method
-  * @param {VectorVectorFloat} [frequencyBands] the frequency bands
+  * @param {VectorVectorFloat} frequencyBands the frequency bands
   * @param {number} [frameRate=344.531] the sampling rate of the input audio
   * @param {boolean} [normalize=false] whether to normalize each band's energy
   * @param {any[]} [weightCurve=[]] vector containing the weights for each frequency band. Only if weightCurveType==supplied
@@ -2046,7 +2057,7 @@ class Essentia {
   /**
   * This algorithm outputs a histogram of the most probable bpms assuming the signal has constant tempo given the novelty curve. This algorithm is based on the autocorrelation of the novelty curve (see NoveltyCurve algorithm) and should only be used for signals that have a constant tempo or as a first tempo estimator to be used in conjunction with other algorithms such as BpmHistogram.It is a simplified version of the algorithm described in [1] as, in order to predict the best BPM candidate,  it computes autocorrelation of the entire novelty curve instead of analyzing it on frames and histogramming the peaks over frames. Check https://essentia.upf.edu/reference/std_NoveltyCurveFixedBpmEstimator.html for more details.
   * @method
-  * @param {VectorFloat} [novelty] the novelty curve of the audio signal
+  * @param {VectorFloat} novelty the novelty curve of the audio signal
   * @param {number} [hopSize=512] the hopSize used to computeh the novelty curve from the original signal
   * @param {number} [maxBpm=560] the maximum bpm to look for
   * @param {number} [minBpm=30] the minimum bpm to look for
@@ -2064,8 +2075,8 @@ class Essentia {
   In the case when the even energy is zero, which may happen when only even harmonics where found or when only one peak was found, the algorithm outputs the maximum real number possible. Therefore, this algorithm should be used in conjunction with the harmonic peaks algorithm.
   If no peaks are supplied, the algorithm outputs a value of one, assuming either the spectrum was flat or it was silent. Check https://essentia.upf.edu/reference/std_OddToEvenHarmonicEnergyRatio.html for more details.
   * @method
-  * @param {VectorFloat} [frequencies] the frequencies of the harmonic peaks (at least two frequencies in frequency ascending order)
-  * @param {VectorFloat} [magnitudes] the magnitudes of the harmonic peaks (at least two magnitudes in frequency ascending order)
+  * @param {VectorFloat} frequencies the frequencies of the harmonic peaks (at least two frequencies in frequency ascending order)
+  * @param {VectorFloat} magnitudes the magnitudes of the harmonic peaks (at least two magnitudes in frequency ascending order)
   * @returns {object} {oddToEvenHarmonicEnergyRatio: 'the ratio between the odd and even harmonic energies of the given harmonic peaks'}
   * @memberof Essentia
   */
@@ -2083,8 +2094,8 @@ class Essentia {
     - 'melflux', the spectral difference function, similar to spectral flux, but using half-rectified energy changes in Mel-frequency bands of the spectrum [3].
     - 'rms', the difference function, measuring the half-rectified change of the RMS of the magnitude spectrum (i.e., measuring overall energy flux) [4]. Check https://essentia.upf.edu/reference/std_OnsetDetection.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the input spectrum
-  * @param {VectorFloat} [phase] the phase vector corresponding to this spectrum (used only by the "complex" method)
+  * @param {VectorFloat} spectrum the input spectrum
+  * @param {VectorFloat} phase the phase vector corresponding to this spectrum (used only by the "complex" method)
   * @param {string} [method=hfc] the method used for onset detection
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @returns {object} {onsetDetection: 'the value of the detection function in the current frame'}
@@ -2104,7 +2115,7 @@ class Essentia {
     - 'beat_emphasis' is optimized for a fixed resolution of 11.6ms, which corresponds to the default sampleRate=44100Hz, frameSize=1024, hopSize=512.
     Optimal performance of beat detection with TempoTapDegara is not guaranteed for other settings. Check https://essentia.upf.edu/reference/std_OnsetDetectionGlobal.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {number} [frameSize=2048] the frame size for computing onset detection function
   * @param {number} [hopSize=512] the hop size for computing onset detection function
   * @param {string} [method=infogain] the method used for onset detection
@@ -2121,7 +2132,7 @@ class Essentia {
   Please note that due to a dependence on the Onsets algorithm, this algorithm is only valid for audio signals with a sampling rate of 44100Hz.
   This algorithm throws an exception if the input signal is empty. Check https://essentia.upf.edu/reference/std_OnsetRate.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @returns {object} {onsets: 'the positions of detected onsets [s]', onsetRate: 'the number of onsets per second'}
   * @memberof Essentia
   */
@@ -2132,8 +2143,8 @@ class Essentia {
   /**
   * This algorithm computes onset positions given various onset detection functions. Check https://essentia.upf.edu/reference/std_Onsets.html for more details.
   * @method
-  * @param {VectorFloat} [detections] matrix containing onset detection functions--rows represent the values of different detection functions and columns represent different frames of audio (i.e. detections[i][j] represents the value of the ith detection function for the jth frame of audio)
-  * @param {VectorFloat} [weights] the weighting coefficicients for each detection function, must be the same as the first dimension of "detections"
+  * @param {VectorFloat} detections matrix containing onset detection functions--rows represent the values of different detection functions and columns represent different frames of audio (i.e. detections[i][j] represents the value of the ith detection function for the jth frame of audio)
+  * @param {VectorFloat} weights the weighting coefficicients for each detection function, must be the same as the first dimension of "detections"
   * @param {number} [alpha=0.1] the proportion of the mean included to reject smaller peaks--filters very short onsets
   * @param {number} [delay=5] the number of frames used to compute the threshold--size of short-onset filter
   * @param {number} [frameRate=86.1328] frames per second
@@ -2148,7 +2159,7 @@ class Essentia {
   /**
   * This algorithm returns the output of an overlap-add process for a sequence of frames of an audio signal. It considers that the input audio frames are windowed audio signals. Giving the size of the frame and the hop size, overlapping and adding consecutive frames will produce a continuous signal. A normalization gain can be passed as a parameter. Check https://essentia.upf.edu/reference/std_OverlapAdd.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the windowed input audio frame
+  * @param {VectorFloat} signal the windowed input audio frame
   * @param {number} [frameSize=2048] the frame size for computing the overlap-add process
   * @param {number} [gain=1] the normalization gain that scales the output signal. Useful for IFFT output
   * @param {number} [hopSize=128] the hop size with which the overlap-add function is computed
@@ -2162,8 +2173,8 @@ class Essentia {
   /**
   * This algorithm characterizes panorama distribution by comparing spectra from the left and right channels. The panning coefficients are extracted by: Check https://essentia.upf.edu/reference/std_Panning.html for more details.
   * @method
-  * @param {VectorFloat} [spectrumLeft] left channel's spectrum
-  * @param {VectorFloat} [spectrumRight] right channel's spectrum
+  * @param {VectorFloat} spectrumLeft left channel's spectrum
+  * @param {VectorFloat} spectrumRight right channel's spectrum
   * @param {number} [averageFrames=43] number of frames to take into account for averaging
   * @param {number} [numBands=1] number of mel bands
   * @param {number} [numCoeffs=20] number of coefficients used to define the panning curve at each frame
@@ -2182,7 +2193,7 @@ class Essentia {
   It optionally interpolates using parabolic curve fitting.
   When two consecutive peaks are closer than the `minPeakDistance` parameter, the smallest one is discarded. A value of 0 bypasses this feature. Check https://essentia.upf.edu/reference/std_PeakDetection.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @param {boolean} [interpolate=true] boolean flag to enable interpolation
   * @param {number} [maxPeaks=100] the maximum number of returned peaks
   * @param {number} [maxPosition=1] the maximum value of the range to evaluate
@@ -2201,7 +2212,7 @@ class Essentia {
   /**
   * This algorithm estimates the tempo in beats per minute (BPM) from an input signal as described in [1]. Check https://essentia.upf.edu/reference/std_PercivalBpmEstimator.html for more details.
   * @method
-  * @param {VectorFloat} [signal] input signal
+  * @param {VectorFloat} signal input signal
   * @param {number} [frameSize=1024] frame size for the analysis of the input signal
   * @param {number} [frameSizeOSS=2048] frame size for the analysis of the Onset Strength Signal
   * @param {number} [hopSize=128] hop size for the analysis of the input signal
@@ -2220,7 +2231,7 @@ class Essentia {
   * This algorithm implements the 'Enhance Harmonics' step as described in [1].Given an input autocorrelation signal, two time-stretched versions of it (by factors of 2 and 4) are added to the original.In this way, peaks with an harmonic relation are boosted.
   For more details check the referenced paper. Check https://essentia.upf.edu/reference/std_PercivalEnhanceHarmonics.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input signal
+  * @param {VectorFloat} array the input signal
   * @returns {object} {array: 'the input signal with enhanced harmonics'}
   * @memberof Essentia
   */
@@ -2232,8 +2243,8 @@ class Essentia {
   * This algorithm implements the 'Evaluate Pulse Trains' step as described in [1].Given an input onset strength signal (OSS) and a number of candidate tempo lag positions, the OSS is correlated with ideal expected pulse trains (for each candidate tempo lag) shifted in time by different amounts. The candidate tempo lag which generates the pulse train that better correlates with the OSS is returned as the preferred tempo candidate.
   For more details check the referenced paper. Check https://essentia.upf.edu/reference/std_PercivalEvaluatePulseTrains.html for more details.
   * @method
-  * @param {VectorFloat} [oss] onset strength signal (or other novelty curve)
-  * @param {VectorFloat} [positions] peak positions of BPM candidates
+  * @param {VectorFloat} oss onset strength signal (or other novelty curve)
+  * @param {VectorFloat} positions peak positions of BPM candidates
   * @returns {object} {lag: 'best tempo lag estimate'}
   * @memberof Essentia
   */
@@ -2244,8 +2255,8 @@ class Essentia {
   /**
   * This algorithm converts a pitch sequence estimated from an audio signal into a set of discrete note events. Each note is defined by its onset time, duration and MIDI pitch value, quantized to the equal tempered scale. Check https://essentia.upf.edu/reference/std_PitchContourSegmentation.html for more details.
   * @method
-  * @param {VectorFloat} [pitch] estimated pitch contour [Hz]
-  * @param {VectorFloat} [signal] input audio signal
+  * @param {VectorFloat} pitch estimated pitch contour [Hz]
+  * @param {VectorFloat} signal input audio signal
   * @param {number} [hopSize=128] hop size of the extracted pitch
   * @param {number} [minDuration=0.1] minimum note duration [s]
   * @param {number} [pitchDistanceThreshold=60] pitch threshold for note segmentation [cents]
@@ -2262,8 +2273,8 @@ class Essentia {
   /**
   * This algorithm tracks a set of predominant pitch contours of an audio signal. This algorithm is intended to receive its "frequencies" and "magnitudes" inputs from the PitchSalienceFunctionPeaks algorithm outputs aggregated over all frames in the sequence. The output is a vector of estimated melody pitch values. Check https://essentia.upf.edu/reference/std_PitchContours.html for more details.
   * @method
-  * @param {VectorVectorFloat} [peakBins] frame-wise array of cent bins corresponding to pitch salience function peaks
-  * @param {VectorVectorFloat} [peakSaliences] frame-wise array of values of salience function peaks
+  * @param {VectorVectorFloat} peakBins frame-wise array of cent bins corresponding to pitch salience function peaks
+  * @param {VectorVectorFloat} peakSaliences frame-wise array of values of salience function peaks
   * @param {number} [binResolution=10] salience function bin resolution [cents]
   * @param {number} [hopSize=128] the hop size with which the pitch salience function was computed
   * @param {number} [minDuration=100] the minimum allowed contour duration [ms]
@@ -2283,10 +2294,10 @@ class Essentia {
   * This algorithm converts a set of pitch contours into a sequence of predominant f0 values in Hz by taking the value of the most predominant contour in each frame.
   This algorithm is intended to receive its "contoursBins", "contoursSaliences", and "contoursStartTimes" inputs from the PitchContours algorithm. The "duration" input corresponds to the time duration of the input signal. The output is a vector of estimated pitch values and a vector of confidence values. Check https://essentia.upf.edu/reference/std_PitchContoursMelody.html for more details.
   * @method
-  * @param {VectorVectorFloat} [contoursBins] array of frame-wise vectors of cent bin values representing each contour
-  * @param {VectorVectorFloat} [contoursSaliences] array of frame-wise vectors of pitch saliences representing each contour
-  * @param {VectorFloat} [contoursStartTimes] array of the start times of each contour [s]
-  * @param {number} [duration] time duration of the input signal [s]
+  * @param {VectorVectorFloat} contoursBins array of frame-wise vectors of cent bin values representing each contour
+  * @param {VectorVectorFloat} contoursSaliences array of frame-wise vectors of pitch saliences representing each contour
+  * @param {VectorFloat} contoursStartTimes array of the start times of each contour [s]
+  * @param {number} duration time duration of the input signal [s]
   * @param {number} [binResolution=10] salience function bin resolution [cents]
   * @param {number} [filterIterations=3] number of interations for the octave errors / pitch outlier filtering process
   * @param {boolean} [guessUnvoiced=false] Estimate pitch for non-voiced segments by using non-salient contours when no salient ones are present in a frame
@@ -2309,10 +2320,10 @@ class Essentia {
   In contrast to pitchContoursMelody, it assumes a single source. 
   This algorithm is intended to receive its "contoursBins", "contoursSaliences", and "contoursStartTimes" inputs from the PitchContours algorithm. The "duration" input corresponds to the time duration of the input signal. The output is a vector of estimated pitch values and a vector of confidence values. Check https://essentia.upf.edu/reference/std_PitchContoursMonoMelody.html for more details.
   * @method
-  * @param {VectorVectorFloat} [contoursBins] array of frame-wise vectors of cent bin values representing each contour
-  * @param {VectorVectorFloat} [contoursSaliences] array of frame-wise vectors of pitch saliences representing each contour
-  * @param {VectorFloat} [contoursStartTimes] array of the start times of each contour [s]
-  * @param {number} [duration] time duration of the input signal [s]
+  * @param {VectorVectorFloat} contoursBins array of frame-wise vectors of cent bin values representing each contour
+  * @param {VectorVectorFloat} contoursSaliences array of frame-wise vectors of pitch saliences representing each contour
+  * @param {VectorFloat} contoursStartTimes array of the start times of each contour [s]
+  * @param {number} duration time duration of the input signal [s]
   * @param {number} [binResolution=10] salience function bin resolution [cents]
   * @param {number} [filterIterations=3] number of interations for the octave errors / pitch outlier filtering process
   * @param {boolean} [guessUnvoiced=false] Estimate pitch for non-voiced segments by using non-salient contours when no salient ones are present in a frame
@@ -2332,10 +2343,10 @@ class Essentia {
   * This algorithm post-processes a set of pitch contours into a sequence of mutliple f0 values in Hz.
   This algorithm is intended to receive its "contoursBins", "contoursSaliences", and "contoursStartTimes" inputs from the PitchContours algorithm. The "duration" input corresponds to the time duration of the input signal. The output is a vector of estimated pitch values Check https://essentia.upf.edu/reference/std_PitchContoursMultiMelody.html for more details.
   * @method
-  * @param {VectorVectorFloat} [contoursBins] array of frame-wise vectors of cent bin values representing each contour
-  * @param {VectorVectorFloat} [contoursSaliences] array of frame-wise vectors of pitch saliences representing each contour
-  * @param {VectorFloat} [contoursStartTimes] array of the start times of each contour [s]
-  * @param {number} [duration] time duration of the input signal [s]
+  * @param {VectorVectorFloat} contoursBins array of frame-wise vectors of cent bin values representing each contour
+  * @param {VectorVectorFloat} contoursSaliences array of frame-wise vectors of pitch saliences representing each contour
+  * @param {VectorFloat} contoursStartTimes array of the start times of each contour [s]
+  * @param {number} duration time duration of the input signal [s]
   * @param {number} [binResolution=10] salience function bin resolution [cents]
   * @param {number} [filterIterations=3] number of interations for the octave errors / pitch outlier filtering process
   * @param {boolean} [guessUnvoiced=false] Estimate pitch for non-voiced segments by using non-salient contours when no salient ones are present in a frame
@@ -2354,8 +2365,8 @@ class Essentia {
   /**
   * This algorithm corrects the fundamental frequency estimations for a sequence of frames given pitch values together with their confidence values. In particular, it removes non-confident parts and spurious jumps in pitch and applies octave corrections. Check https://essentia.upf.edu/reference/std_PitchFilter.html for more details.
   * @method
-  * @param {VectorFloat} [pitch] vector of pitch values for the input frames [Hz]
-  * @param {VectorFloat} [pitchConfidence] vector of pitch confidence values for the input frames
+  * @param {VectorFloat} pitch vector of pitch values for the input frames [Hz]
+  * @param {VectorFloat} pitchConfidence vector of pitch confidence values for the input frames
   * @param {number} [confidenceThreshold=36] ratio between the average confidence of the most confident chunk and the minimum allowed average confidence of a chunk
   * @param {number} [minChunkSize=30] minumum number of frames in non-zero pitch chunks
   * @param {boolean} [useAbsolutePitchConfidence=false] treat negative pitch confidence values as positive (use with melodia guessUnvoiced=True)
@@ -2369,7 +2380,7 @@ class Essentia {
   /**
   * This algorithm computes the pitch salience of a spectrum. The pitch salience is given by the ratio of the highest auto correlation value of the spectrum to the non-shifted auto correlation value. Pitch salience was designed as quick measure of tone sensation. Unpitched sounds (non-musical sound effects) and pure tones have an average pitch salience value close to 0 whereas sounds containing several harmonics in the spectrum tend to have a higher value. Check https://essentia.upf.edu/reference/std_PitchSalience.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the input audio spectrum
+  * @param {VectorFloat} spectrum the input audio spectrum
   * @param {number} [highBoundary=5000] until which frequency we are looking for the minimum (must be smaller than half sampleRate) [Hz]
   * @param {number} [lowBoundary=100] from which frequency we are looking for the maximum (must not be larger than highBoundary) [Hz]
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
@@ -2383,8 +2394,8 @@ class Essentia {
   /**
   * This algorithm computes the pitch salience function of a signal frame given its spectral peaks. The salience function covers a pitch range of nearly five octaves (i.e., 6000 cents), starting from the "referenceFrequency", and is quantized into cent bins according to the specified "binResolution". The salience of a given frequency is computed as the sum of the weighted energies found at integer multiples (harmonics) of that frequency.  Check https://essentia.upf.edu/reference/std_PitchSalienceFunction.html for more details.
   * @method
-  * @param {VectorFloat} [frequencies] the frequencies of the spectral peaks [Hz]
-  * @param {VectorFloat} [magnitudes] the magnitudes of the spectral peaks
+  * @param {VectorFloat} frequencies the frequencies of the spectral peaks [Hz]
+  * @param {VectorFloat} magnitudes the magnitudes of the spectral peaks
   * @param {number} [binResolution=10] salience function bin resolution [cents]
   * @param {number} [harmonicWeight=0.8] harmonic weighting parameter (weight decay ratio between two consequent harmonics, =1 for no decay)
   * @param {number} [magnitudeCompression=1] magnitude compression parameter (=0 for maximum compression, =1 for no compression)
@@ -2401,7 +2412,7 @@ class Essentia {
   /**
   * This algorithm computes the peaks of a given pitch salience function. Check https://essentia.upf.edu/reference/std_PitchSalienceFunctionPeaks.html for more details.
   * @method
-  * @param {VectorFloat} [salienceFunction] the array of salience function values corresponding to cent frequency bins
+  * @param {VectorFloat} salienceFunction the array of salience function values corresponding to cent frequency bins
   * @param {number} [binResolution=10] salience function bin resolution [cents]
   * @param {number} [maxFrequency=1760] the maximum frequency to evaluate (ignore peaks above) [Hz]
   * @param {number} [minFrequency=55] the minimum frequency to evaluate (ignore peaks below) [Hz]
@@ -2416,7 +2427,7 @@ class Essentia {
   /**
   * This algorithm estimates the fundamental frequency given the frame of a monophonic music signal. It is an implementation of the Yin algorithm [1] for computations in the time domain. Check https://essentia.upf.edu/reference/std_PitchYin.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal frame
+  * @param {VectorFloat} signal the input signal frame
   * @param {number} [frameSize=2048] number of samples in the input frame (this is an optional parameter to optimize memory allocation)
   * @param {boolean} [interpolate=true] enable interpolation
   * @param {number} [maxFrequency=22050] the maximum allowed frequency [Hz]
@@ -2433,7 +2444,7 @@ class Essentia {
   /**
   * This algorithm estimates the fundamental frequency given the spectrum of a monophonic music signal. It is an implementation of YinFFT algorithm [1], which is an optimized version of Yin algorithm for computation in the frequency domain. It is recommended to window the input spectrum with a Hann window. The raw spectrum can be computed with the Spectrum algorithm. Check https://essentia.upf.edu/reference/std_PitchYinFFT.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the input spectrum (preferably created with a hann window)
+  * @param {VectorFloat} spectrum the input spectrum (preferably created with a hann window)
   * @param {number} [frameSize=2048] number of samples in the input spectrum
   * @param {boolean} [interpolate=true] boolean flag to enable interpolation
   * @param {number} [maxFrequency=22050] the maximum allowed frequency [Hz]
@@ -2450,7 +2461,7 @@ class Essentia {
   /**
   * This algorithm computes the pitch track of a mono audio signal using probabilistic Yin algorithm. Check https://essentia.upf.edu/reference/std_PitchYinProbabilistic.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input mono audio signal
+  * @param {VectorFloat} signal the input mono audio signal
   * @param {number} [frameSize=2048] the frame size of FFT
   * @param {number} [hopSize=256] the hop size with which the pitch is computed
   * @param {number} [lowRMSThreshold=0.1] the low RMS amplitude threshold
@@ -2467,7 +2478,7 @@ class Essentia {
   /**
   * This algorithm estimates the fundamental frequencies, their probabilities given the frame of a monophonic music signal. It is a part of the implementation of the probabilistic Yin algorithm [1]. Check https://essentia.upf.edu/reference/std_PitchYinProbabilities.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal frame
+  * @param {VectorFloat} signal the input signal frame
   * @param {number} [frameSize=2048] number of samples in the input frame
   * @param {number} [lowAmp=0.1] the low RMS amplitude threshold
   * @param {boolean} [preciseTime=false] use non-standard precise YIN timing (slow).
@@ -2482,8 +2493,8 @@ class Essentia {
   /**
   * This algorithm estimates the smoothed fundamental frequency given the pitch candidates and probabilities using hidden Markov models. It is a part of the implementation of the probabilistic Yin algorithm [1]. Check https://essentia.upf.edu/reference/std_PitchYinProbabilitiesHMM.html for more details.
   * @method
-  * @param {VectorVectorFloat} [pitchCandidates] the pitch candidates
-  * @param {VectorVectorFloat} [probabilities] the pitch probabilities
+  * @param {VectorVectorFloat} pitchCandidates the pitch candidates
+  * @param {VectorVectorFloat} probabilities the pitch probabilities
   * @param {number} [minFrequency=61.735] minimum detected frequency
   * @param {number} [numberBinsPerSemitone=5] number of bins per semitone
   * @param {number} [selfTransition=0.99] the self transition probabilities
@@ -2501,8 +2512,8 @@ class Essentia {
       where x = Real part, y = Imaginary part,
       and |z| = modulus = magnitude, α = phase Check https://essentia.upf.edu/reference/std_PolarToCartesian.html for more details.
   * @method
-  * @param {VectorFloat} [magnitude] the magnitude vector
-  * @param {VectorFloat} [phase] the phase vector
+  * @param {VectorFloat} magnitude the magnitude vector
+  * @param {VectorFloat} phase the phase vector
   * @returns {object} {complex: 'the resulting complex vector'}
   * @memberof Essentia
   */
@@ -2513,7 +2524,7 @@ class Essentia {
   /**
   * This algorithm computes the power mean of an array. It accepts one parameter, p, which is the power (or order or degree) of the Power Mean. Note that if p=-1, the Power Mean is equal to the Harmonic Mean, if p=0, the Power Mean is equal to the Geometric Mean, if p=1, the Power Mean is equal to the Arithmetic Mean, if p=2, the Power Mean is equal to the Root Mean Square. Check https://essentia.upf.edu/reference/std_PowerMean.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array (must contain only positive real numbers)
+  * @param {VectorFloat} array the input array (must contain only positive real numbers)
   * @param {number} [power=1] the power to which to elevate each element before taking the mean
   * @returns {object} {powerMean: 'the power mean of the input array'}
   * @memberof Essentia
@@ -2525,7 +2536,7 @@ class Essentia {
   /**
   * This algorithm computes the power spectrum of an array of Reals. The resulting power spectrum has a size which is half the size of the input array plus one. Bins contain squared magnitude values. Check https://essentia.upf.edu/reference/std_PowerSpectrum.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {number} [size=2048] the expected size of the input frame (this is purely optional and only targeted at optimizing the creation time of the FFT object)
   * @returns {object} {powerSpectrum: 'power spectrum of the input signal'}
   * @memberof Essentia
@@ -2542,7 +2553,7 @@ class Essentia {
     [1] Root mean square - Wikipedia, the free encyclopedia,
     http://en.wikipedia.org/wiki/Root_mean_square Check https://essentia.upf.edu/reference/std_RMS.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @returns {object} {rms: 'the root mean square of the input array'}
   * @memberof Essentia
   */
@@ -2553,7 +2564,7 @@ class Essentia {
   /**
   * This algorithm computes the first 5 raw moments of an array. The output array is of size 6 because the zero-ith moment is used for padding so that the first moment corresponds to index 1. Check https://essentia.upf.edu/reference/std_RawMoments.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @param {number} [range=22050] the range of the input array, used for normalizing the results
   * @returns {object} {rawMoments: 'the (raw) moments of the input array'}
   * @memberof Essentia
@@ -2565,7 +2576,7 @@ class Essentia {
   /**
   * This algorithm computes the Replay Gain loudness value of an audio signal. The algorithm is described in detail in [1]. The value returned is the 'standard' ReplayGain value, not the value with 6dB preamplification as computed by lame, mp3gain, vorbisgain, and all widely used ReplayGain programs. Check https://essentia.upf.edu/reference/std_ReplayGain.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input audio signal (must be longer than 0.05ms)
+  * @param {VectorFloat} signal the input audio signal (must be longer than 0.05ms)
   * @param {number} [sampleRate=44100] the sampling rate of the input audio signal [Hz]
   * @returns {object} {replayGain: 'the distance to the suitable average replay level (~-31dbB) defined by SMPTE [dB]'}
   * @memberof Essentia
@@ -2577,7 +2588,7 @@ class Essentia {
   /**
   * This algorithm resamples the input signal to the desired sampling rate. Check https://essentia.upf.edu/reference/std_Resample.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {number} [inputSampleRate=44100] the sampling rate of the input signal [Hz]
   * @param {number} [outputSampleRate=44100] the sampling rate of the output signal [Hz]
   * @param {number} [quality=1] the quality of the conversion, 0 for best quality
@@ -2591,7 +2602,7 @@ class Essentia {
   /**
   * This algorithm resamples a sequence using FFT / IFFT. The input and output sizes must be an even number. (It is meant to be eqivalent to the resample function in Numpy). Check https://essentia.upf.edu/reference/std_ResampleFFT.html for more details.
   * @method
-  * @param {VectorFloat} [input] input array
+  * @param {VectorFloat} input input array
   * @param {number} [inSize=128] the size of the input sequence. It needss to be even-sized.
   * @param {number} [outSize=128] the size of the output sequence. It needss to be even-sized.
   * @returns {object} {output: 'output resample array'}
@@ -2604,7 +2615,7 @@ class Essentia {
   /**
   * This algorithm computes rhythm features (bpm, beat positions, beat histogram peaks) for an audio signal. It combines RhythmExtractor2013 for beat tracking and BPM estimation with BpmHistogramDescriptors algorithms. Check https://essentia.upf.edu/reference/std_RhythmDescriptors.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the audio input signal
+  * @param {VectorFloat} signal the audio input signal
   * @returns {object} {beats_position: 'See RhythmExtractor2013 algorithm documentation', confidence: 'See RhythmExtractor2013 algorithm documentation', bpm: 'See RhythmExtractor2013 algorithm documentation', bpm_estimates: 'See RhythmExtractor2013 algorithm documentation', bpm_intervals: 'See RhythmExtractor2013 algorithm documentation', first_peak_bpm: 'See BpmHistogramDescriptors algorithm documentation', first_peak_spread: 'See BpmHistogramDescriptors algorithm documentation', first_peak_weight: 'See BpmHistogramDescriptors algorithm documentation', second_peak_bpm: 'See BpmHistogramDescriptors algorithm documentation', second_peak_spread: 'See BpmHistogramDescriptors algorithm documentation', second_peak_weight: 'See BpmHistogramDescriptors algorithm documentation', histogram: 'bpm histogram [bpm]'}
   * @memberof Essentia
   */
@@ -2618,7 +2629,7 @@ class Essentia {
   - complex-domain spectral difference function (see OnsetDetection)
   - periodicity function based on energy bands (see FrequencyBands, TempoScaleBands) Check https://essentia.upf.edu/reference/std_RhythmExtractor.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the audio input signal
+  * @param {VectorFloat} signal the audio input signal
   * @param {number} [frameHop=1024] the number of feature frames separating two evaluations
   * @param {number} [frameSize=1024] the number audio samples used to compute a feature
   * @param {number} [hopSize=256] the number of audio samples per features
@@ -2647,7 +2658,7 @@ class Essentia {
     - 'multifeature', the BeatTrackerMultiFeature algorithm
     - 'degara', the BeatTrackerDegara algorithm (note that there is no confidence estimation for this method, the output confidence value is always 0) Check https://essentia.upf.edu/reference/std_RhythmExtractor2013.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the audio input signal
+  * @param {VectorFloat} signal the audio input signal
   * @param {number} [maxTempo=208] the fastest tempo to detect [bpm]
   * @param {string} [method=multifeature] the method used for beat tracking
   * @param {number} [minTempo=40] the slowest tempo to detect [bpm]
@@ -2661,7 +2672,7 @@ class Essentia {
   /**
   * This algorithm implements the rhythm transform. It computes a tempogram, a representation of rhythmic periodicities in the input signal in the rhythm domain, by using FFT similarly to computation of spectrum in the frequency domain [1]. Additional features, including rhythmic centroid and a rhythmic counterpart of MFCCs, can be derived from this rhythmic representation. Check https://essentia.upf.edu/reference/std_RhythmTransform.html for more details.
   * @method
-  * @param {VectorVectorFloat} [melBands] the energies in the mel bands
+  * @param {VectorVectorFloat} melBands the energies in the mel bands
   * @param {number} [frameSize=256] the frame size to compute the rhythm trasform
   * @param {number} [hopSize=32] the hop size to compute the rhythm transform
   * @returns {object} {rhythm: 'consecutive frames in the rhythm domain'}
@@ -2674,7 +2685,7 @@ class Essentia {
   /**
   * This algorithm computes the roll-off frequency of a spectrum. The roll-off frequency is defined as the frequency under which some percentage (cutoff) of the total energy of the spectrum is contained. The roll-off frequency can be used to distinguish between harmonic (below roll-off) and noisy sounds (above roll-off). Check https://essentia.upf.edu/reference/std_RollOff.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the input audio spectrum (must have more than one elements)
+  * @param {VectorFloat} spectrum the input audio spectrum (must have more than one elements)
   * @param {number} [cutoff=0.85] the ratio of total energy to attain before yielding the roll-off frequency
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal (used to normalize rollOff) [Hz]
   * @returns {object} {rollOff: 'the roll-off frequency [Hz]'}
@@ -2687,7 +2698,7 @@ class Essentia {
   /**
   * This algorithm segments audio using the Bayesian Information Criterion given a matrix of frame features. The algorithm searches homogeneous segments for which the feature vectors have the same probability distribution based on the implementation in [1]. The input matrix is assumed to have features along dim1 (horizontal) while frames along dim2 (vertical). Check https://essentia.upf.edu/reference/std_SBic.html for more details.
   * @method
-  * @param {VectorFloat} [features] extracted features matrix (rows represent features, and columns represent frames of audio)
+  * @param {VectorFloat} features extracted features matrix (rows represent features, and columns represent frames of audio)
   * @param {number} [cpw=1.5] complexity penalty weight
   * @param {number} [inc1=60] first pass increment [frames]
   * @param {number} [inc2=20] second pass increment [frames]
@@ -2709,7 +2720,7 @@ class Essentia {
   The algorithm also returns an overall (a single value for the whole spectrum) SNR estimation and an averaged overall SNR estimation using Exponential Moving Average filtering.
   This algorithm throws a Warning if less than 15 frames are used to estimte the noise PSD. Check https://essentia.upf.edu/reference/std_SNR.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input audio frame
+  * @param {VectorFloat} frame the input audio frame
   * @param {number} [MAAlpha=0.95] Alpha coefficient for the EMA SNR estimation [2]
   * @param {number} [MMSEAlpha=0.98] Alpha coefficient for the MMSE estimation [1].
   * @param {number} [NoiseAlpha=0.9] Alpha coefficient for the EMA noise estimation [2]
@@ -2730,7 +2741,7 @@ class Essentia {
   	 2. the difference between the samples in a saturated region should be smaller than a given threshold.
   	 3. the duration of the saturated region should be longer than a given threshold. Check https://essentia.upf.edu/reference/std_SaturationDetector.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input audio frame
+  * @param {VectorFloat} frame the input audio frame
   * @param {number} [differentialThreshold=0.001] minimum difference between contiguous samples of the salturated regions
   * @param {number} [energyThreshold=-1] mininimum energy of the samples in the saturated regions [dB]
   * @param {number} [frameSize=512] expected input frame size
@@ -2747,7 +2758,7 @@ class Essentia {
   /**
   * This algorithm scales the audio by the specified factor using clipping if required. Check https://essentia.upf.edu/reference/std_Scale.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input audio signal
+  * @param {VectorFloat} signal the input audio signal
   * @param {boolean} [clipping=true] boolean flag whether to apply clipping or not
   * @param {number} [factor=10] the multiplication factor by which the audio will be scaled
   * @param {number} [maxAbsValue=1] the maximum value above which to apply clipping
@@ -2761,7 +2772,7 @@ class Essentia {
   /**
   * This algorithm computes the sine model analysis.  Check https://essentia.upf.edu/reference/std_SineModelAnal.html for more details.
   * @method
-  * @param {VectorFloat} [fft] the input frame
+  * @param {VectorFloat} fft the input frame
   * @param {number} [freqDevOffset=20] minimum frequency deviation at 0Hz
   * @param {number} [freqDevSlope=0.01] slope increase of minimum frequency deviation
   * @param {number} [magnitudeThreshold=-74] peaks below this given threshold are not outputted
@@ -2781,9 +2792,9 @@ class Essentia {
   /**
   * This algorithm computes the sine model synthesis from sine model analysis. Check https://essentia.upf.edu/reference/std_SineModelSynth.html for more details.
   * @method
-  * @param {VectorFloat} [magnitudes] the magnitudes of the sinusoidal peaks
-  * @param {VectorFloat} [frequencies] the frequencies of the sinusoidal peaks [Hz]
-  * @param {VectorFloat} [phases] the phases of the sinusoidal peaks
+  * @param {VectorFloat} magnitudes the magnitudes of the sinusoidal peaks
+  * @param {VectorFloat} frequencies the frequencies of the sinusoidal peaks [Hz]
+  * @param {VectorFloat} phases the phases of the sinusoidal peaks
   * @param {number} [fftSize=2048] the size of the output FFT frame (full spectrum size)
   * @param {number} [hopSize=512] the hop size between frames
   * @param {number} [sampleRate=44100] the audio sampling rate [Hz]
@@ -2797,10 +2808,10 @@ class Essentia {
   /**
   * This algorithm subtracts the sinusoids computed with the sine model analysis from an input audio signal. It ouputs an audio signal. Check https://essentia.upf.edu/reference/std_SineSubtraction.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input audio frame to subtract from
-  * @param {VectorFloat} [magnitudes] the magnitudes of the sinusoidal peaks
-  * @param {VectorFloat} [frequencies] the frequencies of the sinusoidal peaks [Hz]
-  * @param {VectorFloat} [phases] the phases of the sinusoidal peaks
+  * @param {VectorFloat} frame the input audio frame to subtract from
+  * @param {VectorFloat} magnitudes the magnitudes of the sinusoidal peaks
+  * @param {VectorFloat} frequencies the frequencies of the sinusoidal peaks [Hz]
+  * @param {VectorFloat} phases the phases of the sinusoidal peaks
   * @param {number} [fftSize=512] the size of the FFT internal process (full spectrum size) and output frame. Minimum twice the hopsize.
   * @param {number} [hopSize=128] the hop size between frames
   * @param {number} [sampleRate=44100] the audio sampling rate [Hz]
@@ -2814,7 +2825,7 @@ class Essentia {
   /**
   * This algorithm computes the spectrum energy of a single beat across the whole frequency range and on each specified frequency band given an audio segment. It detects the onset of the beat within the input segment, computes spectrum on a window starting on this onset, and estimates energy (see Energy and EnergyBandRatio algorithms). The frequency bands used by default are: 0-200 Hz, 200-400 Hz, 400-800 Hz, 800-1600 Hz, 1600-3200 Hz, 3200-22000Hz, following E. Scheirer [1]. Check https://essentia.upf.edu/reference/std_SingleBeatLoudness.html for more details.
   * @method
-  * @param {VectorFloat} [beat] audio segement containing a beat
+  * @param {VectorFloat} beat audio segement containing a beat
   * @param {number} [beatDuration=0.05] window size for the beat's energy computation (the window starts at the onset) [s]
   * @param {number} [beatWindowDuration=0.1] window size for the beat's onset detection [s]
   * @param {any[]} [frequencyBands=[0, 200, 400, 800, 1600, 3200, 22000]] frequency bands
@@ -2834,7 +2845,7 @@ class Essentia {
   /**
   * This algorithm estimates the single gaussian distribution for a matrix of feature vectors. For example, using the single gaussian on descriptors like MFCC with the symmetric Kullback-Leibler divergence might be a much better option than just the mean and variance of the descriptors over a whole signal. Check https://essentia.upf.edu/reference/std_SingleGaussian.html for more details.
   * @method
-  * @param {VectorFloat} [matrix] the input data matrix (e.g. the MFCC descriptor over frames)
+  * @param {VectorFloat} matrix the input data matrix (e.g. the MFCC descriptor over frames)
   * @returns {object} {mean: 'the mean of the values', covariance: 'the covariance matrix', inverseCovariance: 'the inverse of the covariance matrix'}
   * @memberof Essentia
   */
@@ -2845,7 +2856,7 @@ class Essentia {
   /**
   * This algorithm splits an audio signal into segments given their start and end times. Check https://essentia.upf.edu/reference/std_Slicer.html for more details.
   * @method
-  * @param {VectorFloat} [audio] the input audio signal
+  * @param {VectorFloat} audio the input audio signal
   * @param {any[]} [endTimes=[]] the list of end times for the slices you want to extract
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @param {any[]} [startTimes=[]] the list of start times for the slices you want to extract
@@ -2871,7 +2882,7 @@ class Essentia {
    [1] Udo Zölzer (2002). DAFX Digital Audio Effects pag.364-365
    Check https://essentia.upf.edu/reference/std_SpectralCentroidTime.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @param {number} [sampleRate=44100] sampling rate of the input spectrum [Hz]
   * @returns {object} {centroid: 'the spectral centroid of the signal'}
   * @memberof Essentia
@@ -2883,7 +2894,7 @@ class Essentia {
   /**
   * This algorithm computes the spectral complexity of a spectrum. The spectral complexity is based on the number of peaks in the input spectrum. Check https://essentia.upf.edu/reference/std_SpectralComplexity.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the input spectrum
+  * @param {VectorFloat} spectrum the input spectrum
   * @param {number} [magnitudeThreshold=0.005] the minimum spectral-peak magnitude that contributes to spectral complexity
   * @param {number} [sampleRate=44100] the audio sampling rate [Hz]
   * @returns {object} {spectralComplexity: 'the spectral complexity of the input spectrum'}
@@ -2896,7 +2907,7 @@ class Essentia {
   /**
   * This algorithm computes the Spectral Contrast feature of a spectrum. It is based on the Octave Based Spectral Contrast feature as described in [1]. The version implemented here is a modified version to improve discriminative power and robustness. The modifications are described in [2]. Check https://essentia.upf.edu/reference/std_SpectralContrast.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the audio spectrum
+  * @param {VectorFloat} spectrum the audio spectrum
   * @param {number} [frameSize=2048] the size of the fft frames
   * @param {number} [highFrequencyBound=11000] the upper bound of the highest band
   * @param {number} [lowFrequencyBound=20] the lower bound of the lowest band
@@ -2914,7 +2925,7 @@ class Essentia {
   /**
   * This algorithm extracts peaks from a spectrum. It is important to note that the peak algorithm is independent of an input that is linear or in dB, so one has to adapt the threshold to fit with the type of data fed to it. The algorithm relies on PeakDetection algorithm which is run with parabolic interpolation [1]. The exactness of the peak-searching depends heavily on the windowing type. It gives best results with dB input, a blackman-harris 92dB window and interpolation set to true. According to [1], spectral peak frequencies tend to be about twice as accurate when dB magnitude is used rather than just linear magnitude. For further information about the peak detection, see the description of the PeakDetection algorithm. Check https://essentia.upf.edu/reference/std_SpectralPeaks.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the input spectrum
+  * @param {VectorFloat} spectrum the input spectrum
   * @param {number} [magnitudeThreshold=0] peaks below this given threshold are not outputted
   * @param {number} [maxFrequency=5000] the maximum frequency of the range to evaluate [Hz]
   * @param {number} [maxPeaks=100] the maximum number of returned peaks
@@ -2931,9 +2942,9 @@ class Essentia {
   /**
   * Performs spectral whitening of spectral peaks of a spectrum. The algorithm works in dB scale, but the conversion is done by the algorithm so input should be in linear scale. The concept of 'whitening' refers to 'white noise' or a non-zero flat spectrum. It first computes a spectral envelope similar to the 'true envelope' in [1], and then modifies the amplitude of each peak relative to the envelope. For example, the predominant peaks will have a value close to 0dB because they are very close to the envelope. On the other hand, minor peaks between significant peaks will have lower amplitudes such as -30dB. Check https://essentia.upf.edu/reference/std_SpectralWhitening.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the audio linear spectrum
-  * @param {VectorFloat} [frequencies] the spectral peaks' linear frequencies
-  * @param {VectorFloat} [magnitudes] the spectral peaks' linear magnitudes
+  * @param {VectorFloat} spectrum the audio linear spectrum
+  * @param {VectorFloat} frequencies the spectral peaks' linear frequencies
+  * @param {VectorFloat} magnitudes the spectral peaks' linear magnitudes
   * @param {number} [maxFrequency=5000] max frequency to apply whitening to [Hz]
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @returns {object} {magnitudes: 'the whitened spectral peaks' linear magnitudes'}
@@ -2946,7 +2957,7 @@ class Essentia {
   /**
   * This algorithm computes the magnitude spectrum of an array of Reals. The resulting magnitude spectrum has a size which is half the size of the input array plus one. Bins contain raw (linear) magnitude values. Check https://essentia.upf.edu/reference/std_Spectrum.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input audio frame
+  * @param {VectorFloat} frame the input audio frame
   * @param {number} [size=2048] the expected size of the input audio signal (this is an optional parameter to optimize memory allocation)
   * @returns {object} {spectrum: 'magnitude spectrum of the input audio signal'}
   * @memberof Essentia
@@ -2959,7 +2970,7 @@ class Essentia {
   * This algorithm computes the magnitude of the Constant-Q spectrum. See ConstantQ algorithm for more details.
    Check https://essentia.upf.edu/reference/std_SpectrumCQ.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input audio frame
+  * @param {VectorFloat} frame the input audio frame
   * @param {number} [binsPerOctave=12] number of bins per octave
   * @param {number} [minFrequency=32.7] minimum frequency [Hz]
   * @param {number} [minimumKernelSize=4] minimum size allowed for frequency kernels
@@ -2979,7 +2990,7 @@ class Essentia {
   /**
   * This algorithm computes energy in triangular frequency bands of a spectrum equally spaced on the cent scale. Each band is computed to have a constant wideness in the cent scale. For each band the power-spectrum (mag-squared) is summed. Check https://essentia.upf.edu/reference/std_SpectrumToCent.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the input spectrum (must be greater than size one)
+  * @param {VectorFloat} spectrum the input spectrum (must be greater than size one)
   * @param {number} [bands=720] number of bins to compute. Default is 720 (6 octaves with the default 'centBinResolution')
   * @param {number} [centBinResolution=10] Width of each band in cents. Default is 10 cents
   * @param {number} [inputSize=32768] the size of the spectrum
@@ -3003,7 +3014,7 @@ class Essentia {
     - Beta: evaluates a cubic beta spline approximant. For beta splines parameters 'beta1' and 'beta2' can be supplied. For no bias set beta1 to 1 and for no tension set beta2 to 0. Note that if beta1=1 and beta2=0, the cubic beta becomes a cubic B spline. On the other hand if beta1=1 and beta2 is large the beta spline turns into a linear spline.
     - Quadratic: evaluates a piecewise quadratic spline at a point. Note that size of input must be odd. Check https://essentia.upf.edu/reference/std_Spline.html for more details.
   * @method
-  * @param {number} [x] the input coordinate (x-axis)
+  * @param {number} x the input coordinate (x-axis)
   * @param {number} [beta1=1] the skew or bias parameter (only available for type beta)
   * @param {number} [beta2=0] the tension parameter
   * @param {string} [type=b] the type of spline to be computed
@@ -3027,7 +3038,7 @@ class Essentia {
   /**
   * This algorithm computes the sinusoidal plus residual model analysis.  Check https://essentia.upf.edu/reference/std_SprModelAnal.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input frame
+  * @param {VectorFloat} frame the input frame
   * @param {number} [fftSize=2048] the size of the internal FFT size (full spectrum size)
   * @param {number} [freqDevOffset=20] minimum frequency deviation at 0Hz
   * @param {number} [freqDevSlope=0.01] slope increase of minimum frequency deviation
@@ -3049,10 +3060,10 @@ class Essentia {
   /**
   * This algorithm computes the sinusoidal plus residual model synthesis from SPS model analysis. Check https://essentia.upf.edu/reference/std_SprModelSynth.html for more details.
   * @method
-  * @param {VectorFloat} [magnitudes] the magnitudes of the sinusoidal peaks
-  * @param {VectorFloat} [frequencies] the frequencies of the sinusoidal peaks [Hz]
-  * @param {VectorFloat} [phases] the phases of the sinusoidal peaks
-  * @param {VectorFloat} [res] the residual frame
+  * @param {VectorFloat} magnitudes the magnitudes of the sinusoidal peaks
+  * @param {VectorFloat} frequencies the frequencies of the sinusoidal peaks [Hz]
+  * @param {VectorFloat} phases the phases of the sinusoidal peaks
+  * @param {VectorFloat} res the residual frame
   * @param {number} [fftSize=2048] the size of the output FFT frame (full spectrum size)
   * @param {number} [hopSize=512] the hop size between frames
   * @param {number} [sampleRate=44100] the audio sampling rate [Hz]
@@ -3066,7 +3077,7 @@ class Essentia {
   /**
   * This algorithm computes the stochastic model analysis.  Check https://essentia.upf.edu/reference/std_SpsModelAnal.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input frame
+  * @param {VectorFloat} frame the input frame
   * @param {number} [fftSize=2048] the size of the internal FFT size (full spectrum size)
   * @param {number} [freqDevOffset=20] minimum frequency deviation at 0Hz
   * @param {number} [freqDevSlope=0.01] slope increase of minimum frequency deviation
@@ -3089,10 +3100,10 @@ class Essentia {
   /**
   * This algorithm computes the sinusoidal plus stochastic model synthesis from SPS model analysis. Check https://essentia.upf.edu/reference/std_SpsModelSynth.html for more details.
   * @method
-  * @param {VectorFloat} [magnitudes] the magnitudes of the sinusoidal peaks
-  * @param {VectorFloat} [frequencies] the frequencies of the sinusoidal peaks [Hz]
-  * @param {VectorFloat} [phases] the phases of the sinusoidal peaks
-  * @param {VectorFloat} [stocenv] the stochastic envelope
+  * @param {VectorFloat} magnitudes the magnitudes of the sinusoidal peaks
+  * @param {VectorFloat} frequencies the frequencies of the sinusoidal peaks [Hz]
+  * @param {VectorFloat} phases the phases of the sinusoidal peaks
+  * @param {VectorFloat} stocenv the stochastic envelope
   * @param {number} [fftSize=2048] the size of the output FFT frame (full spectrum size)
   * @param {number} [hopSize=512] the hop size between frames
   * @param {number} [sampleRate=44100] the audio sampling rate [Hz]
@@ -3107,7 +3118,7 @@ class Essentia {
   /**
   * This algorithm outputs if there is a cut at the beginning or at the end of the audio by locating the first and last non-silent frames and comparing their positions to the actual beginning and end of the audio. The input audio is considered to be cut at the beginning (or the end) and the corresponding flag is activated if the first (last) non-silent frame occurs before (after) the configurable time threshold. Check https://essentia.upf.edu/reference/std_StartStopCut.html for more details.
   * @method
-  * @param {VectorFloat} [audio] the input audio 
+  * @param {VectorFloat} audio the input audio 
   * @param {number} [frameSize=256] the frame size for the internal power analysis
   * @param {number} [hopSize=256] the hop size for the internal power analysis
   * @param {number} [maximumStartTime=10] if the first non-silent frame occurs before maximumStartTime startCut is activated [ms]
@@ -3124,7 +3135,7 @@ class Essentia {
   /**
   * This algorithm outputs the frame at which sound begins and the frame at which sound ends. Check https://essentia.upf.edu/reference/std_StartStopSilence.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input audio frames
+  * @param {VectorFloat} frame the input audio frames
   * @param {number} [threshold=-60] the threshold below which average energy is defined as silence [dB]
   * @returns {object} {startFrame: 'number of the first non-silent frame', stopFrame: 'number of the last non-silent frame'}
   * @memberof Essentia
@@ -3136,7 +3147,7 @@ class Essentia {
   /**
   * This algorithm outputs left and right channel separately given a stereo signal. If the signal is monophonic, it outputs a zero signal on the right channel. Check https://essentia.upf.edu/reference/std_StereoDemuxer.html for more details.
   * @method
-  * @param {VectorVectorFloat} [audio] the audio signal
+  * @param {VectorVectorFloat} audio the audio signal
   * @returns {object} {left: 'the left channel of the audio signal', right: 'the right channel of the audio signal'}
   * @memberof Essentia
   */
@@ -3147,8 +3158,8 @@ class Essentia {
   /**
   * This algorithm outputs a stereo signal given left and right channel separately. Check https://essentia.upf.edu/reference/std_StereoMuxer.html for more details.
   * @method
-  * @param {VectorFloat} [left] the left channel of the audio signal
-  * @param {VectorFloat} [right] the right channel of the audio signal
+  * @param {VectorFloat} left the left channel of the audio signal
+  * @param {VectorFloat} right the right channel of the audio signal
   * @returns {object} {audio: 'the audio signal'}
   * @memberof Essentia
   */
@@ -3160,7 +3171,7 @@ class Essentia {
   * This algorithm extracts a segment of a stereo audio signal given its start and end times.
   Giving "startTime" greater than "endTime" will raise an exception. Check https://essentia.upf.edu/reference/std_StereoTrimmer.html for more details.
   * @method
-  * @param {VectorVectorFloat} [signal] the input stereo signal
+  * @param {VectorVectorFloat} signal the input stereo signal
   * @param {boolean} [checkRange=false] check whether the specified time range for a slice fits the size of input signal (throw exception if not)
   * @param {number} [endTime=1e+06] the end time of the slice you want to extract [s]
   * @param {number} [sampleRate=44100] the sampling rate of the input audio signal [Hz]
@@ -3175,7 +3186,7 @@ class Essentia {
   /**
   * This algorithm computes the stochastic model analysis. It gets the resampled spectral envelope of the stochastic component. Check https://essentia.upf.edu/reference/std_StochasticModelAnal.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input frame
+  * @param {VectorFloat} frame the input frame
   * @param {number} [fftSize=2048] the size of the internal FFT size (full spectrum size)
   * @param {number} [hopSize=512] the hop size between frames
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
@@ -3190,7 +3201,7 @@ class Essentia {
   /**
   * This algorithm computes the stochastic model synthesis. It generates the noisy spectrum from a resampled spectral envelope of the stochastic component. Check https://essentia.upf.edu/reference/std_StochasticModelSynth.html for more details.
   * @method
-  * @param {VectorFloat} [stocenv] the stochastic envelope input
+  * @param {VectorFloat} stocenv the stochastic envelope input
   * @param {number} [fftSize=2048] the size of the internal FFT size (full spectrum size)
   * @param {number} [hopSize=512] the hop size between frames
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
@@ -3205,7 +3216,7 @@ class Essentia {
   /**
   * This algorithm computes the Strong Decay of an audio signal. The Strong Decay is built from the non-linear combination of the signal energy and the signal temporal centroid, the latter being the balance of the absolute value of the signal. A signal containing a temporal centroid near its start boundary and a strong energy is said to have a strong decay. Check https://essentia.upf.edu/reference/std_StrongDecay.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input audio signal
+  * @param {VectorFloat} signal the input audio signal
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @returns {object} {strongDecay: 'the strong decay'}
   * @memberof Essentia
@@ -3217,7 +3228,7 @@ class Essentia {
   /**
   * This algorithm computes the Strong Peak of a spectrum. The Strong Peak is defined as the ratio between the spectrum's maximum peak's magnitude and the "bandwidth" of the peak above a threshold (half its amplitude). This ratio reveals whether the spectrum presents a very "pronounced" maximum peak (i.e. the thinner and the higher the maximum of the spectrum is, the higher the ratio value). Check https://essentia.upf.edu/reference/std_StrongPeak.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the input spectrum (must be greater than one element and cannot contain negative values)
+  * @param {VectorFloat} spectrum the input spectrum (must be greater than one element and cannot contain negative values)
   * @returns {object} {strongPeak: 'the Strong Peak ratio'}
   * @memberof Essentia
   */
@@ -3228,7 +3239,7 @@ class Essentia {
   /**
   * This algorithm detects onsets given an audio signal using SuperFlux algorithm. This implementation is based on the available reference implementation in python [2]. The algorithm computes spectrum of the input signal, summarizes it into triangular band energies, and computes a onset detection function based on spectral flux tracking spectral trajectories with a maximum filter (SuperFluxNovelty). The peaks of the function are then detected (SuperFluxPeaks). Check https://essentia.upf.edu/reference/std_SuperFluxExtractor.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the audio input signal
+  * @param {VectorFloat} signal the audio input signal
   * @param {number} [combine=20] time threshold for double onsets detections (ms)
   * @param {number} [frameSize=2048] the frame size for computing low-level features
   * @param {number} [hopSize=256] the hop size for computing low-level features
@@ -3245,7 +3256,7 @@ class Essentia {
   /**
   * Onset detection function for Superflux algorithm. See SuperFluxExtractor for more details. Check https://essentia.upf.edu/reference/std_SuperFluxNovelty.html for more details.
   * @method
-  * @param {VectorVectorFloat} [bands] the input bands spectrogram
+  * @param {VectorVectorFloat} bands the input bands spectrogram
   * @param {number} [binWidth=3] filter width (number of frequency bins)
   * @param {number} [frameWidth=2] differentiation offset (compute the difference with the N-th previous frame)
   * @returns {object} {differences: 'SuperFlux novelty curve'}
@@ -3258,7 +3269,7 @@ class Essentia {
   /**
   * This algorithm detects peaks of an onset detection function computed by the SuperFluxNovelty algorithm. See SuperFluxExtractor for more details. Check https://essentia.upf.edu/reference/std_SuperFluxPeaks.html for more details.
   * @method
-  * @param {VectorFloat} [novelty] the input onset detection function
+  * @param {VectorFloat} novelty the input onset detection function
   * @param {number} [combine=30] time threshold for double onsets detections (ms)
   * @param {number} [frameRate=172] frameRate
   * @param {number} [pre_avg=100] look back duration for moving average filter [ms]
@@ -3275,7 +3286,7 @@ class Essentia {
   /**
   * This algorithm calculates the ratio of the temporal centroid to the total length of a signal envelope. This ratio shows how the sound is 'balanced'. Its value is close to 0 if most of the energy lies at the beginning of the sound (e.g. decrescendo or impulsive sounds), close to 0.5 if the sound is symetric (e.g. 'delta unvarying' sounds), and close to 1 if most of the energy lies at the end of the sound (e.g. crescendo sounds). Check https://essentia.upf.edu/reference/std_TCToTotal.html for more details.
   * @method
-  * @param {VectorFloat} [envelope] the envelope of the signal (its length must be greater than 1
+  * @param {VectorFloat} envelope the envelope of the signal (its length must be greater than 1
   * @returns {object} {TCToTotal: 'the temporal centroid to total length ratio'}
   * @memberof Essentia
   */
@@ -3286,7 +3297,7 @@ class Essentia {
   /**
   * This algorithm computes features for tempo tracking to be used with the TempoTap algorithm. See standard_rhythmextractor_tempotap in examples folder. Check https://essentia.upf.edu/reference/std_TempoScaleBands.html for more details.
   * @method
-  * @param {VectorFloat} [bands] the audio power spectrum divided into bands
+  * @param {VectorFloat} bands the audio power spectrum divided into bands
   * @param {any[]} [bandsGain=[2, 3, 2, 1, 1.20000004768, 2, 3, 2.5]] gain for each bands
   * @param {number} [frameTime=512] the frame rate in samples
   * @returns {object} {scaledBands: 'the output bands after scaling', cumulativeBands: 'cumulative sum of the output bands before scaling'}
@@ -3306,7 +3317,7 @@ class Essentia {
    - BeatIt, elaborated by Fabien Gouyon and Simon Dixon (input features) [1]
    - Multi-comb filter with Rayleigh weighting, Mathew Davies [2] Check https://essentia.upf.edu/reference/std_TempoTap.html for more details.
   * @method
-  * @param {VectorFloat} [featuresFrame] input temporal features of a frame
+  * @param {VectorFloat} featuresFrame input temporal features of a frame
   * @param {number} [frameHop=1024] number of feature frames separating two evaluations
   * @param {number} [frameSize=256] number of audio samples in a frame
   * @param {number} [maxTempo=208] fastest tempo allowed to be detected [bpm]
@@ -3328,7 +3339,7 @@ class Essentia {
   /**
   * This algorithm estimates beat positions given an onset detection function.  The detection function is partitioned into 6-second frames with a 1.5-second increment, and the autocorrelation is computed for each frame, and is weighted by a tempo preference curve [2]. Periodicity estimations are done frame-wisely, searching for the best match with the Viterbi algorith [3]. The estimated periods are then passed to the probabilistic beat tracking algorithm [1], which computes beat positions. Check https://essentia.upf.edu/reference/std_TempoTapDegara.html for more details.
   * @method
-  * @param {VectorFloat} [onsetDetections] the input frame-wise vector of onset detection values
+  * @param {VectorFloat} onsetDetections the input frame-wise vector of onset detection values
   * @param {number} [maxTempo=208] fastest tempo allowed to be detected [bpm]
   * @param {number} [minTempo=40] slowest tempo allowed to be detected [bpm]
   * @param {string} [resample=none] use upsampling of the onset detection function (may increase accuracy)
@@ -3343,7 +3354,7 @@ class Essentia {
   /**
   * This algorithm outputs beat positions and confidence of their estimation based on the maximum mutual agreement between beat candidates estimated by different beat trackers (or using different features). Check https://essentia.upf.edu/reference/std_TempoTapMaxAgreement.html for more details.
   * @method
-  * @param {VectorVectorFloat} [tickCandidates] the tick candidates estimated using different beat trackers (or features) [s]
+  * @param {VectorVectorFloat} tickCandidates the tick candidates estimated using different beat trackers (or features) [s]
   * @returns {object} {ticks: 'the list of resulting ticks [s]', confidence: 'confidence with which the ticks were detected [0, 5.32]'}
   * @memberof Essentia
   */
@@ -3354,8 +3365,8 @@ class Essentia {
   /**
   * This algorithm builds the list of ticks from the period and phase candidates given by the TempoTap algorithm. Check https://essentia.upf.edu/reference/std_TempoTapTicks.html for more details.
   * @method
-  * @param {VectorFloat} [periods] tempo period candidates for the current frame, in frames
-  * @param {VectorFloat} [phases] tempo ticks phase candidates for the current frame, in frames
+  * @param {VectorFloat} periods tempo period candidates for the current frame, in frames
+  * @param {VectorFloat} phases tempo ticks phase candidates for the current frame, in frames
   * @param {number} [frameHop=512] number of feature frames separating two evaluations
   * @param {number} [hopSize=256] number of audio samples per features
   * @param {number} [sampleRate=44100] sampling rate of the audio signal [Hz]
@@ -3369,7 +3380,7 @@ class Essentia {
   /**
   * This algorithm computes tonal features for an audio signal Check https://essentia.upf.edu/reference/std_TonalExtractor.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the audio input signal
+  * @param {VectorFloat} signal the audio input signal
   * @param {number} [frameSize=4096] the framesize for computing tonal features
   * @param {number} [hopSize=2048] the hopsize for computing tonal features
   * @param {number} [tuningFrequency=440] the tuning frequency of the input signal
@@ -3383,7 +3394,7 @@ class Essentia {
   /**
   * This algorithm estimates the tonic frequency of the lead artist in Indian art music. It uses multipitch representation of the audio signal (pitch salience) to compute a histogram using which the tonic is identified as one of its peak. The decision is made based on the distance between the prominent peaks, the classification is done using a decision tree. Check https://essentia.upf.edu/reference/std_TonicIndianArtMusic.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {number} [binResolution=10] salience function bin resolution [cents]
   * @param {number} [frameSize=2048] the frame size for computing pitch saliecnce
   * @param {number} [harmonicWeight=0.85] harmonic weighting parameter (weight decay ratio between two consequent harmonics, =1 for no decay)
@@ -3406,7 +3417,7 @@ class Essentia {
   /**
   * This algorithm computes energy in triangular frequency bands of a spectrum. The arbitrary number of overlapping bands can be specified. For each band the power-spectrum (mag-squared) is summed. Check https://essentia.upf.edu/reference/std_TriangularBands.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the input spectrum (must be greater than size one)
+  * @param {VectorFloat} spectrum the input spectrum (must be greater than size one)
   * @param {any[]} [frequencyBands=[21.533203125, 43.06640625, 64.599609375, 86.1328125, 107.666015625, 129.19921875, 150.732421875, 172.265625, 193.798828125, 215.33203125, 236.865234375, 258.3984375, 279.931640625, 301.46484375, 322.998046875, 344.53125, 366.064453125, 387.59765625, 409.130859375, 430.6640625, 452.197265625, 473.73046875, 495.263671875, 516.796875, 538.330078125, 559.86328125, 581.396484375, 602.9296875, 624.462890625, 645.99609375, 667.529296875, 689.0625, 710.595703125, 732.12890625, 753.662109375, 775.1953125, 796.728515625, 839.794921875, 861.328125, 882.861328125, 904.39453125, 925.927734375, 968.994140625, 990.52734375, 1012.06054688, 1055.12695312, 1076.66015625, 1098.19335938, 1141.25976562, 1184.32617188, 1205.859375, 1248.92578125, 1270.45898438, 1313.52539062, 1356.59179688, 1399.65820312, 1442.72460938, 1485.79101562, 1528.85742188, 1571.92382812, 1614.99023438, 1658.05664062, 1701.12304688, 1765.72265625, 1808.7890625, 1873.38867188, 1916.45507812, 1981.0546875, 2024.12109375, 2088.72070312, 2153.3203125, 2217.91992188, 2282.51953125, 2347.11914062, 2411.71875, 2497.8515625, 2562.45117188, 2627.05078125, 2713.18359375, 2799.31640625, 2885.44921875, 2950.04882812, 3036.18164062, 3143.84765625, 3229.98046875, 3316.11328125, 3423.77929688, 3509.91210938, 3617.578125, 3725.24414062, 3832.91015625, 3940.57617188, 4069.77539062, 4177.44140625, 4306.640625, 4435.83984375, 4565.0390625, 4694.23828125, 4844.97070312, 4974.16992188, 5124.90234375, 5275.63476562, 5426.3671875, 5577.09960938, 5749.36523438, 5921.63085938, 6093.89648438, 6266.16210938, 6459.9609375, 6653.75976562, 6847.55859375, 7041.35742188, 7256.68945312, 7450.48828125, 7687.35351562, 7902.68554688, 8139.55078125, 8376.41601562, 8613.28125, 8871.6796875, 9130.078125, 9388.4765625, 9668.40820312, 9948.33984375, 10249.8046875, 10551.2695312, 10852.734375, 11175.7324219, 11498.7304688, 11843.2617188, 12187.7929688, 12553.8574219, 12919.921875, 13285.9863281, 13673.5839844, 14082.7148438, 14491.8457031, 14922.5097656, 15353.1738281, 15805.3710938, 16257.5683594]] list of frequency ranges into which the spectrum is divided (these must be in ascending order and connot contain duplicates),each triangle is build as x(i-1)=0, x(i)=1, x(i+1)=0 over i, the resulting number of bands is size of input array - 2
   * @param {number} [inputSize=1025] the size of the spectrum
   * @param {boolean} [log=true] compute log-energies (log10 (1 + energy))
@@ -3430,7 +3441,7 @@ class Essentia {
   See the BFCC algorithm documentation for more information as to why you might want to choose this over Mel frequency analysis
   It is recommended that the input "spectrum" be calculated by the Spectrum algorithm. Check https://essentia.upf.edu/reference/std_TriangularBarkBands.html for more details.
   * @method
-  * @param {VectorFloat} [spectrum] the audio spectrum
+  * @param {VectorFloat} spectrum the audio spectrum
   * @param {number} [highFrequencyBound=22050] an upper-bound limit for the frequencies to be included in the bands
   * @param {number} [inputSize=1025] the size of the spectrum
   * @param {boolean} [log=false] compute log-energies (log10 (1 + energy))
@@ -3451,7 +3462,7 @@ class Essentia {
   * This algorithm extracts a segment of an audio signal given its start and end times.
   Giving "startTime" greater than "endTime" will raise an exception. Check https://essentia.upf.edu/reference/std_Trimmer.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {boolean} [checkRange=false] check whether the specified time range for a slice fits the size of input signal (throw exception if not)
   * @param {number} [endTime=1e+06] the end time of the slice you want to extract [s]
   * @param {number} [sampleRate=44100] the sampling rate of the input audio signal [Hz]
@@ -3466,8 +3477,8 @@ class Essentia {
   /**
   * This algorithm calculates the tristimulus of a signal given its harmonic peaks. The tristimulus has been introduced as a timbre equivalent to the color attributes in the vision. Tristimulus measures the mixture of harmonics in a given sound, grouped into three sections. The first tristimulus measures the relative weight of the first harmonic; the second tristimulus measures the relative weight of the second, third, and fourth harmonics taken together; and the third tristimulus measures the relative weight of all the remaining harmonics. Check https://essentia.upf.edu/reference/std_Tristimulus.html for more details.
   * @method
-  * @param {VectorFloat} [frequencies] the frequencies of the harmonic peaks ordered by frequency
-  * @param {VectorFloat} [magnitudes] the magnitudes of the harmonic peaks ordered by frequency
+  * @param {VectorFloat} frequencies the frequencies of the harmonic peaks ordered by frequency
+  * @param {VectorFloat} magnitudes the magnitudes of the harmonic peaks ordered by frequency
   * @returns {object} {tristimulus: 'a three-element vector that measures the mixture of harmonics of the given spectrum'}
   * @memberof Essentia
   */
@@ -3487,7 +3498,7 @@ class Essentia {
     https://www.itu.int/dms_pubrec/itu-r/rec/bs/R-REC-BS.1770-2-201103-S!!PDF-E.pdf
    Check https://essentia.upf.edu/reference/std_TruePeakDetector.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input audio signal
+  * @param {VectorFloat} signal the input audio signal
   * @param {boolean} [blockDC=false] flag to activate the optional DC blocker
   * @param {boolean} [emphasise=false] flag to activate the optional emphasis filter
   * @param {number} [oversamplingFactor=4] times the signal is oversapled
@@ -3505,8 +3516,8 @@ class Essentia {
   /**
   * This algorithm estimates the tuning frequency give a sequence/set of spectral peaks. The result is the tuning frequency in Hz, and its distance from 440Hz in cents. This version is slightly adapted from the original algorithm [1], but gives the same results. Check https://essentia.upf.edu/reference/std_TuningFrequency.html for more details.
   * @method
-  * @param {VectorFloat} [frequencies] the frequencies of the spectral peaks [Hz]
-  * @param {VectorFloat} [magnitudes] the magnitudes of the spectral peaks
+  * @param {VectorFloat} frequencies the frequencies of the spectral peaks [Hz]
+  * @param {VectorFloat} magnitudes the magnitudes of the spectral peaks
   * @param {number} [resolution=1] resolution in cents (logarithmic scale, 100 cents = 1 semitone) for tuning frequency determination
   * @returns {object} {tuningFrequency: 'the tuning frequency [Hz]', tuningCents: 'the deviation from 440 Hz (between -35 to 65 cents)'}
   * @memberof Essentia
@@ -3518,7 +3529,7 @@ class Essentia {
   /**
   * This algorithm extracts the tuning frequency of an audio signal Check https://essentia.upf.edu/reference/std_TuningFrequencyExtractor.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the audio input signal
+  * @param {VectorFloat} signal the audio input signal
   * @param {number} [frameSize=4096] the frameSize for computing tuning frequency
   * @param {number} [hopSize=2048] the hopsize for computing tuning frequency
   * @returns {object} {tuningFrequency: 'the computed tuning frequency'}
@@ -3536,7 +3547,7 @@ class Essentia {
     - for x<0, sqrt(x) is invalid
     - scale and shift parameters define linear transformation to be applied to the resulting elements Check https://essentia.upf.edu/reference/std_UnaryOperator.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @param {number} [scale=1] multiply result by factor
   * @param {number} [shift=0] shift result by value (add value)
   * @param {string} [type=identity] the type of the unary operator to apply to input array
@@ -3555,7 +3566,7 @@ class Essentia {
     - for x<0, sqrt(x) is invalid
     - scale and shift parameters define linear transformation to be applied to the resulting elements Check https://essentia.upf.edu/reference/std_UnaryOperatorStream.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @param {number} [scale=1] multiply result by factor
   * @param {number} [shift=0] shift result by value (add value)
   * @param {string} [type=identity] the type of the unary operator to apply to input array
@@ -3569,7 +3580,7 @@ class Essentia {
   /**
   * This algorithm computes the variance of an array. Check https://essentia.upf.edu/reference/std_Variance.html for more details.
   * @method
-  * @param {VectorFloat} [array] the input array
+  * @param {VectorFloat} array the input array
   * @returns {object} {variance: 'the variance of the input array'}
   * @memberof Essentia
   */
@@ -3580,7 +3591,7 @@ class Essentia {
   /**
   * This algorithm detects the presence of vibrato and estimates its parameters given a pitch contour [Hz]. The result is the vibrato frequency in Hz and the extent (peak to peak) in cents. If no vibrato is detected in a frame, the output of both values is zero. Check https://essentia.upf.edu/reference/std_Vibrato.html for more details.
   * @method
-  * @param {VectorFloat} [pitch] the pitch trajectory [Hz].
+  * @param {VectorFloat} pitch the pitch trajectory [Hz].
   * @param {number} [maxExtend=250] maximum considered vibrato extent [cents]
   * @param {number} [maxFrequency=8] maximum considered vibrato frequency [Hz]
   * @param {number} [minExtend=50] minimum considered vibrato extent [cents]
@@ -3598,7 +3609,7 @@ class Essentia {
   This algorithm is only defined for positive lambda = 1.0674*sqrt(2.0*atan(0.00006583*sampleRate)/PI) - 0.1916, thus it will throw an exception when the supplied sampling rate does not pass the requirements.
   If maxLag is larger than the size of the input array, an exception is thrown. Check https://essentia.upf.edu/reference/std_WarpedAutoCorrelation.html for more details.
   * @method
-  * @param {VectorFloat} [array] the array to be analyzed
+  * @param {VectorFloat} array the array to be analyzed
   * @param {number} [maxLag=1] the maximum lag for which the auto-correlation is computed (inclusive) (must be smaller than signal size) 
   * @param {number} [sampleRate=44100] the audio sampling rate [Hz]
   * @returns {object} {warpedAutoCorrelation: 'the warped auto-correlation vector'}
@@ -3612,7 +3623,7 @@ class Essentia {
   *  This algorithm estimates the Power Spectral Density of the input signal using the Welch's method [1].
    The input should be fed with the overlapped audio frames. The algorithm stores internally therequired past frames to compute each output. Call reset() to clear the buffers. This implentation is based on Scipy [2] Check https://essentia.upf.edu/reference/std_Welch.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input stereo audio signal
+  * @param {VectorFloat} frame the input stereo audio signal
   * @param {number} [averagingFrames=10] amount of frames to average
   * @param {number} [fftSize=1024] size of the FFT. Zero padding is added if this is larger the input frame size.
   * @param {number} [frameSize=512] the expected size of the input audio signal (this is an optional parameter to optimize memory allocation)
@@ -3629,7 +3640,7 @@ class Essentia {
   /**
   * This algorithm applies windowing to an audio signal. It optionally applies zero-phase windowing and optionally adds zero-padding. The resulting windowed frame size is equal to the incoming frame size plus the number of padded zeros. By default, the available windows are normalized (to have an area of 1) and then scaled by a factor of 2. Check https://essentia.upf.edu/reference/std_Windowing.html for more details.
   * @method
-  * @param {VectorFloat} [frame] the input audio frame
+  * @param {VectorFloat} frame the input audio frame
   * @param {boolean} [normalized=true] a boolean value to specify whether to normalize windows (to have an area of 1) and then scale by a factor of 2
   * @param {number} [size=1024] the window size
   * @param {string} [type=hann] the window type, which can be 'hamming', 'hann', 'triangular', 'square' or 'blackmanharrisXX'
@@ -3646,7 +3657,7 @@ class Essentia {
   * This algorithm computes the zero-crossing rate of an audio signal. It is the number of sign changes between consecutive signal values divided by the total number of values. Noisy signals tend to have higher zero-crossing rate.
   In order to avoid small variations around zero caused by noise, a threshold around zero is given to consider a valid zerocrosing whenever the boundary is crossed. Check https://essentia.upf.edu/reference/std_ZeroCrossingRate.html for more details.
   * @method
-  * @param {VectorFloat} [signal] the input signal
+  * @param {VectorFloat} signal the input signal
   * @param {number} [threshold=0] the threshold which will be taken as the zero axis in both positive and negative sign
   * @returns {object} {zeroCrossingRate: 'the zero-crossing rate'}
   * @memberof Essentia
@@ -3658,4 +3669,7 @@ class Essentia {
 
 }
 
+/*
+@exports
+*/
 export default Essentia;

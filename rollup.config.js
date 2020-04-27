@@ -49,7 +49,7 @@ export default [{
    {
     file: 'dist/essentia.js-models.js',
     format: 'iife',
-    name: 'EssentiaModels' // the global which can be used in a browser
+    name: 'EssentiaModel' // the global which can be used in a browser
    }
   ],
   plugins: [

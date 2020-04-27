@@ -16,25 +16,36 @@
  * You should have received a copy of the Affero GNU General Public License
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
+
 // NOTE: The following code snippets are machine generated. Do not edit.
+
 /**
- * @class essentia.js JavaScript interface
+ * @fileOverview Essentia high-level core interface
+ * @author <a href="mailto:albin.correya@upf.edu">Albin Correya</a>
+ * @version 0.0.9
+ */
+
+/**
+ * essentia.js-core JS API
+ * @class 
+ * @example
+ * const essentia = new Essentia(EssentiaModule)
  */
 class Essentia {
   /** 
-  * @property {EssentiaEmscriptenModule} this.module 
-  * @property {string} this.version 
-  * @property {string} this.algorithmNames 
+  * @property {EssentiaEmscriptenModule} this.module Essentia emcripten global module object 
+  * @property {string} this.version Essentia WASM backend version
+  * @property {string} this.algorithmNames List of available Essentia alogrithms from the WASM backend
   */
   private algorithms: any;
-  module: any;
-  version: string;
-  algorithmNames: string;
-  /** 
-  * @constructor 
-  * @param {EssentiaEmscriptenModule} 
+  public module: any;
+  public version: string;
+  public algorithmNames: string;
+
+  /**  
+  * @constructs
+  * @param {EssentiaEmscriptenModule} EssentiaModule Essentia emcripten global module object which is loaded from 'essentia-wasm.*.js file'
   * @param {boolean} [isDebug=false]
-  * @memberof Essentia
   */
   constructor(public EssentiaModule: any, public isDebug: boolean=false) {
     this.algorithms = new EssentiaModule.EssentiaJS(isDebug);
@@ -44,11 +55,11 @@ class Essentia {
   }
 
   /**
-   *Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API
+   * Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API. (NOTE: only works on modern web-browsers)
    * @async
    * @method
    * @param {string} audioURL web url or blob uri of a audio file
-   * @param {AudioContext} webAudioCtx an instance of WebAudioApi `AudioContext`
+   * @param {AudioContext} webAudioCtx an instance of Web Audio API `AudioContext`
    * @param {number} [channel=0] audio channel number
    * @returns {Float32Array} decode and returns the audio data as Float32 array for the given channel
    * @memberof Essentia
@@ -61,7 +72,7 @@ class Essentia {
   }
 
   /**
-   * Shutdown essentia algorithm instance to free memory
+   * Method to shutdown essentia algorithm instance after it's use
    * @method
    * @memberof Essentia
    */
@@ -70,7 +81,7 @@ class Essentia {
   }
 
   /**
-   * Method for re-instantiating this.algorithms instance after using the this.shutdown method
+   * Method for re-instantiating essentia algorithms instance after using the shutdown method
    * @method
    * @memberof Essentia
    */
@@ -79,20 +90,20 @@ class Essentia {
   }
 
   /**
-   * Convert an input JS array into VectorFloat by accessing raw pointers
+   * Convert an input JS array into VectorFloat type
    * @method
-   * @param {Float32Array} inpurtArray input JS typed array
+   * @param {Float32Array} inputArray input JS typed array
    * @returns {VectorFloat} returns vector float
    * @memberof Essentia
    */
-  arrayToVector(inpurtArray: any) {
-    return this.module.arrayToVector(inpurtArray);
+  arrayToVector(inputArray: any) {
+    return this.module.arrayToVector(inputArray);
   }
 
   /**
-   * Convert an input VectorFloat array into typed Float32Array by copying it's element
+   * Convert an input VectorFloat array into typed JS Float32Array 
    * @method 
-   * @param {VectorFloat} inputVector input VectorFloat
+   * @param {VectorFloat} inputVector input VectorFloat array
    * @returns {Float32Array} returns converted JS typed array
    * @memberof Essentia
    */
@@ -127,4 +138,7 @@ class Essentia {
 
 }
 
+/*
+@exports
+*/
 export default Essentia;

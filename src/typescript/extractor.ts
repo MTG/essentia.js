@@ -20,8 +20,8 @@
 import Essentia from "./core_api";
 
 /**
- * 
- * @class EssentiaExtractor
+ * EssentiaExtractor Base Class
+ * @class 
  * @extends {Essentia}
  */
 class EssentiaExtractor extends Essentia {
@@ -91,7 +91,7 @@ class EssentiaExtractor extends Essentia {
    *Creates an instance of EssentiaExtractor.
   * @param {*} EssentiaModule
   * @param {boolean} [isDebug=false]
-  * @memberof EssentiaExtractor
+  * @constructs
   */
   constructor(public EssentiaModule: any, public isDebug: boolean=false) {
     super(EssentiaModule, isDebug);
@@ -100,15 +100,19 @@ class EssentiaExtractor extends Essentia {
   /**
    * Compute mel spectrogram for a given audio data along with an optional extractor profile configuration
    * @method
-   * @param {Float32Array} audioData
+   * @param {Float32Array} audioData decoded audio signal as Float32 typed array
+   * @param {boolean} [asVector=false] whether to output the spectrogram as a vector float type for chaining with other essentia algorithms.
    * @param {*} [config=this.profile]
-   * @returns
+   * @returns {Array} Frame-wise Mel Spectrogram
    * @memberof EssentiaExtractor
    */
-  melSpectrogram(audioData: Float32Array, config: any=this.profile) {
+  melSpectrogram(audioData: Float32Array, asVector: boolean=false, config: any=this.profile) {
     // cut audio data into overlapping frames
-    var frames = this.FrameGenerator(audioData, this.frameSize, this.hopSize);
-    var logMelbandFrames = [];
+    let frames = this.FrameGenerator(audioData, this.frameSize, this.hopSize);
+
+    let logMelBandVec = new this.module.VectorVectorFloat();
+    let logMelbandFrames = [];
+  
     for (var i=0; i <frames.size(); i++) {
       // we need to compute the following signal process chain 
       // audio frame => windowing => spectrum => mel bands => log scale
@@ -134,29 +138,40 @@ class EssentiaExtractor extends Essentia {
                                       config.UnaryOperator.scale, 
                                       config.UnaryOperator.shift,
                                       config.UnaryOperator.type);
-      // convert type to JS array
-      var melBandFrame = this.vectorToArray(logNorm.array);
-      logMelbandFrames.push(melBandFrame);
+      if (asVector) {
+        logMelBandVec.push_back(logNorm.array);
+      }
+      else {
+        // convert type to JS array
+        let melBandFrame = this.vectorToArray(logNorm.array);
+        logMelbandFrames.push(melBandFrame);
+      }
     }
     // fallback to free the std vectors
-    windowOut.frame.resize(0, 1);
-    spectrumOut.spectrum.resize(0, 1);
-    melOut.bands.resize(0, 1);
+    delete windowOut.frame;
+    delete spectrumOut.spectrum;
+    delete melOut.bands;
+    delete logNorm.array;
 
-    return logMelbandFrames;
+    if (asVector) return logMelBandVec;
+    else return logMelbandFrames;
   }
+  
   /**
    * Compute frame-wise HPCP chroma feature for a given audio data along with an optional extractor profile configuration
    * @method
-   * @param {Float32Array} audioData
-   * @param {*} [config=this.profile]
-   * @returns
+   * @param {Float32Array} audioData decoded audio signal as Float32 typed array
+   * @param {boolean} [asVector=false] whether to output the hpcpgram as a vector float type for chaining with other essentia algorithms.
+   * @param {*} [config=this.profile] 
+   * @returns {Array} Frame-wise HPCP
    * @memberof EssentiaExtractor
    */
-  hpcpgram(audioData: Float32Array, config: any=this.profile) {
+  hpcpgram(audioData: Float32Array, asVector: boolean=false, config: any=this.profile) {
     // cut audio data into overlapping frames
-    var frames = this.FrameGenerator(audioData, this.frameSize, this.hopSize);
-    var hpcpGram = [];
+    let frames = this.FrameGenerator(audioData, this.frameSize, this.hopSize);
+
+    let hpcpGramVec = new this.module.VectorVectorFloat();
+    let hpcpGram = [];
     for (var i=0; i <frames.size(); i++) { 
       // we need to compute the following signal process chain 
       // audio frame => windowing => spectrum => spectral peak => spectral whitening => HPCP
@@ -198,19 +213,26 @@ class EssentiaExtractor extends Essentia {
                               config.HPCP.size,
                               config.HPCP.weightType,
                               config.HPCP.windowSize);
-      
-      var hpcpFrame = this.vectorToArray(hpcpOut.hpcp);
-      hpcpGram.push(hpcpFrame);
+
+      if (asVector) {
+        hpcpGramVec.push_back(hpcpOut.hpcp);
+      }
+      else {
+        // convert type to JS array
+        let hpcpFrame = this.vectorToArray(hpcpOut.hpcp);
+        hpcpGram.push(hpcpFrame);
+      }
     }
     // fallback to free the std vectors
-    windowOut.frame.resize(0, 1);
-    spectrumOut.spectrum.resize(0, 1);
-    peaksOut.frequencies.resize(0, 1);
-    peaksOut.magnitudes.resize(0, 1);
-    whiteningOut.magnitudes.resize(0, 1);
-    hpcpOut.hpcp.resize(0, 1);
+    delete windowOut.frame;
+    delete spectrumOut.spectrum;
+    delete peaksOut.frequencies;
+    delete peaksOut.magnitudes;
+    delete whiteningOut.magnitudes;
+    delete hpcpOut.hpcp;
 
-    return hpcpGram;
+    if (asVector) return hpcpGramVec;
+    else return hpcpGram;
   }
 
 }
