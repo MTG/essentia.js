@@ -72,6 +72,8 @@ class EssentiaWorkletProcessor extends AudioWorkletProcessor {
 
     // convert the output back to float32 typed array
     let outputArray = this.essentia.vectorToArray(windowedFrame.frame);
+
+    console.log("Processed audio buffer stream using essentia.js worklet with size: " + outputArray.length + " frames.");
     
     // copy converted array to the output channel 0
     output[0].set(outputArray);
