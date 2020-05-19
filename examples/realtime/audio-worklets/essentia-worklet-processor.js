@@ -1,7 +1,7 @@
 // import Module from 'https://unpkg.com/essentia.js@0.0.8/dist/essentia-module.js';
-import { EssentiaModule } from "https://unpkg.com/essentia.js@0.0.9/dist/essentia-wasm.module.js";
+import { EssentiaModule } from "https://cdn.jsdelivr.net/npm/essentia.js@0.0.9/dist/essentia-wasm.module.js";
 // import Essentia JS API interface
-import Essentia from "https://unpkg.com/essentia.js@0.0.9/dist/essentia.js-core.es.js";
+import Essentia from "https://cdn.jsdelivr.net/npm/essentia.js@0.0.9/dist/essentia.js-core.es.js";
 // Tools for sending audio interleaved audio frames between threads, wait-free from the ringbuf.js package
 // import { RingBuffer, AudioReader, ParameterReader } from "https://unpkg.com/browse/ringbuf.js@0.1.0/dist/index.es.js";
 
