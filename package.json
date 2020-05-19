@@ -1,6 +1,6 @@
 {
   "name": "essentia.js",
-  "version": "0.0.9",
+  "version": "0.1.0-dev",
   "description": "JavaScript library for music/audio analysis and processing for both real-time and offline audio feature extraction, powered by WebAssembly",
   "homepage": "https://mtg.github.io/essentia.js/",
   "author": "Albin Correya <albin.correya@upf.edu> (http://mtg.upf.edu)",
