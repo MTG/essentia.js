@@ -33,9 +33,6 @@
     "esm"
   ],
   "devDependencies": {
-    "@babel/cli": "^7.4.4",
-    "@babel/core": "^7.4.5",
-    "@babel/preset-env": "^7.4.5",
     "chai": "^4.2.0",
     "esm": "^3.2.25",
     "foodoc": "0.0.9",
