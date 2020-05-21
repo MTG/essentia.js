@@ -55,6 +55,9 @@ EssentiaJS::EssentiaJS(bool debugger) {
     essentia::infoLevelActive = true;
     // activate error level    
     essentia::errorLevelActive = true;    
+  } else {
+    essentia::infoLevelActive = false;
+    essentia::warningLevelActive = false;
   }
   essentia::init();
   essentiaVersion = essentia::version;
