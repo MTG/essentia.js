@@ -113,7 +113,7 @@ class EssentiaExtractor extends Essentia {
     let logMelBandVec = new this.module.VectorVectorFloat();
     let logMelbandFrames = [];
   
-    for (var i=0; i <frames.size(); i++) {
+    for (var i=0; i <=frames.size(); i++) {
       // we need to compute the following signal process chain 
       // audio frame => windowing => spectrum => mel bands => log scale
       var windowOut = this.Windowing(frames.get(i), 
@@ -172,7 +172,7 @@ class EssentiaExtractor extends Essentia {
 
     let hpcpGramVec = new this.module.VectorVectorFloat();
     let hpcpGram = [];
-    for (var i=0; i <frames.size(); i++) { 
+    for (var i=0; i <=frames.size(); i++) { 
       // we need to compute the following signal process chain 
       // audio frame => windowing => spectrum => spectral peak => spectral whitening => HPCP
       var windowOut = this.Windowing(frames.get(i), 
