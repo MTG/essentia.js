@@ -35,7 +35,7 @@ class EssentiaExtractor extends Essentia {
       normalized: true,
       size: this.frameSize,
       type: "blackmanharris62",
-      zeroPadding: this.frameSize,
+      zeroPadding: 0,
       zeroPhase: true
     },
     Spectrum: {
@@ -120,7 +120,7 @@ class EssentiaExtractor extends Essentia {
                                     config.Windowing.normalized, 
                                     this.frameSize,
                                     config.Windowing.type, 
-                                    this.frameSize,
+                                    config.Windowing.zeroPadding,
                                     config.Windowing.zeroPhase);
       var spectrumOut = this.Spectrum(windowOut.frame, this.frameSize);
       var melOut = this.MelBands(spectrumOut.spectrum, 
@@ -179,7 +179,7 @@ class EssentiaExtractor extends Essentia {
                                     config.Windowing.normalized, 
                                     this.frameSize,
                                     config.Windowing.type, 
-                                    this.frameSize,
+                                    config.Windowing.zeroPadding,
                                     config.Windowing.zeroPhase);
 
       var spectrumOut = this.Spectrum(windowOut.frame, this.frameSize);
