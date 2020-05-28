@@ -35,6 +35,8 @@ DEFAULT_EXCLUDE_ALGOS = [# requires FFTW, TagLib or Chromaprint dependencies
                         # these algorithms expect std::complex** type for wither input, parameters or outputs, which are not yet supported for the JS bindings 
                         'CartesianToPolar', 'PolarToCartesian', 'Magnitude', 'ConstantQ', 'NSGConstantQ', 'NSGIConstantQ', 
                         'FFT', 'IFFT', 'FFTC', 'IFFTC', 'HarmonicMask', 'HarmonicModelAnal', 'SineModelAnal', 'SineModelSynth',
+                        # expect vector_stereosample type
+                        'FalseStereoDetector', 'LoudnessEBUR128', 'StereoDemuxer', 'StereoMuxer', 'StereoTrimmer',
                         ]
 
 # create a default file for exclude algo list file in case there is none
