@@ -27,9 +27,9 @@ logging.info("Excluding the following %s algorithms while generating bindings ..
 logging.info(TO_EXCLUDE_ALGOS)
 
 def map_types_to_cpp(es_type):
-	if es_type in ['vector_real', 'vector_complex', 'matrix_real']:
+	if es_type == 'vector_real':
 		return "std::vector<float>&"
-	elif es_type in ['vector_vector_real', 'vector_vector_complex', 'vector_stereosample']:
+	elif es_type == 'vector_vector_real':
 		return "std::vector<std::vector<float> >&"
 	elif es_type == 'vector_string':
 		return "std::vector<std::string>"
@@ -39,8 +39,15 @@ def map_types_to_cpp(es_type):
 		return "int"
 	elif es_type == 'real':
 		return "float"
-	elif es_type in ['bool']:
+	elif es_type == 'bool':
 		return es_type
+	# TODO: implement coressponding JS supported types for the following types
+	# elif es_type == "vector_complex":
+	# 	return "std::complex<float>&"
+	# elif es_type == 'vector_stereosample':
+	# 	return ""
+	# elif es_type == 'matrix_real':
+	# 	return ""
 	else:
 		raise NotImplementedError("Cannot find the correspoding type for '%s'" % es_type)
 
@@ -234,6 +241,7 @@ def generate_headers(algorithms=TO_INCLUDE_ALGOS):
 	logging.info("Total %s algorithms" % len(TO_INCLUDE_ALGOS))
 	logging.info("Generating essentiajs.h file ...")
 	for algo_name in algorithms:
+		logging.info(algo_name)
 		funcs.append(parse_algorithm_info(algo_name, target="header"))
 	return funcs
 
