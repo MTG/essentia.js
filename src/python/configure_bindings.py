@@ -47,12 +47,6 @@ if not os.path.exists(TO_EXCLUDE_ALGOS_TXT_FILE):
 # (due to FFTW dependency or need of filesystem access etc) 
 TO_EXCLUDE_ALGOS = read_txt_file(TO_EXCLUDE_ALGOS_TXT_FILE)
 
-# excluding these algos too temporarily since the current essentia AlgorithmFactory instances has a limitation 
-# on number of parameters (16) that can configure at algorithm creation. See https://github.com/MTG/essentia/pull/957
-# NOTE: these algos should be included once the cpp macros has added in the main essentia repository.
-TO_EXCLUDE_ALGOS.extend(['MultiPitchKlapuri', 'MultiPitchMelodia', 'PitchMelodia', 
-                        'PredominantPitchMelodia'])
-
 # By default, we include all the algorithms from essentia except ones that are in exclude algo list
 DEFAULT_INCLUDE_ALGOS = [al for al in estd.algorithmNames() if al not in TO_EXCLUDE_ALGOS]
 # create a default to include algo list file in case there is none
