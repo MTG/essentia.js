@@ -25,4 +25,13 @@ RUN pip install --upgrade setuptools \
     && pip install --no-cache-dir -r /tmp/requirements.txt \
     && rm /tmp/requirements.txt
 
+# update nodejs and npm to latest stable version
+RUN npm install n -g && n stable 
+
+# (hacky way) Change the default environment varibales emsdk entrypoint to our custom node installation since essentia.js requires the latest Nodejs engine (v12 or later) 
+RUN echo 'export PATH="/emsdk_portable:/emsdk_portable/clang/tag-e1.38.43/build_tag-e1.38.43_64/bin:/emsdk_portable/emscripten/tag-1.38.43:/emsdk_portable/binaryen/tag-1.38.43_64bit_binaryen/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/bin/node:/usr/local/bin/npm"' >> /emsdk_portable/emsdk_set_env.sh 
+RUN echo 'export EMSDK_NODE="/usr/local/bin/node"' >> /emsdk_portable/emsdk_set_env.sh
+
+ENV NODE_JS /usr/local/bin/node
+
 WORKDIR /essentia/
