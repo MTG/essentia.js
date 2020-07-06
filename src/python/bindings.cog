@@ -32,6 +32,7 @@ EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) {
     .property("algorithmNames", &EssentiaJS::algorithmNames)
     .function("shutdown", &EssentiaJS::shutdown)
     .function("FrameGenerator", &EssentiaJS::FrameGenerator)
+    .function("LoudnessEBUR128", &EssentiaJS::LoudnessEBUR128)
     /*[[[cog
     import logging
     import cog

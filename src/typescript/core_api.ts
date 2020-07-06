@@ -124,6 +124,21 @@ class Essentia {
     return this.algorithms.FrameGenerator(inputAudioData, frameSize, hopSize);
   }
 
+  /**
+  * This algorithm computes the EBU R128 loudness descriptors of an audio signal. Check https://essentia.upf.edu/reference/std_LoudnessEBUR128.html for more details.
+  * @method
+  * @param {VectorFloat} leftChannel the left channel of the stereo audio signal
+  * @param {VectorFloat} rightChannel the right channel of the stereo audio signal
+  * @param {number} [hopSize=0.1] the hop size with which the loudness is computed [s]
+  * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
+  * @param {boolean} [startAtZero=false] start momentary/short-term loudness estimation at time 0 (zero-centered loudness estimation windows) if true; otherwise start both windows at time 0 (time positions for momentary and short-term values will not be syncronized)
+  * @returns {object} {momentaryLoudness: 'momentary loudness (over 400ms) (LUFS)', shortTermLoudness: 'short-term loudness (over 3 seconds) (LUFS)', integratedLoudness: 'integrated loudness (overall) (LUFS)', loudnessRange: 'loudness range over an arbitrary long time interval [3] (dB, LU)'}
+  * @memberof Essentia
+  */
+  LoudnessEBUR128(leftSignal: any, rightSignal: any, hopSize: number=0.1, sampleRate: number=44100, startAtZero: boolean=false) {
+    return this.algorithms.LoudnessEBUR128(leftSignal, rightSignal, hopSize, sampleRate, startAtZero);
+  }
+
   // NOTE: The following code snippets are machine generated. Do not edit.
   /**
   * This algorithm computes the ratio between the pitch energy after the pitch maximum and the pitch energy before the pitch maximum. Sounds having an monotonically ascending pitch or one unique pitch will show a value of (0,1], while sounds having a monotonically descending pitch will show a value of [1,inf). In case there is no energy before the max pitch, the algorithm will return the energy after the maximum pitch. Check https://essentia.upf.edu/reference/std_AfterMaxToBeforeMaxEnergyRatio.html for more details.
@@ -373,29 +388,6 @@ class Essentia {
   }
    
   /**
-  * This algorithm analyzes predominant periodicities in a signal given its novelty curve [1] (see NoveltyCurve algorithm) or another onset detection function (see OnsetDetection and OnsetDetectionGlobal). It estimates pulse BPM values and time positions together with a half-wave rectified sinusoid whose peaks represent the pulses present in the audio signal and their magnitudes. The analysis is based on the FFT of the input novelty curve from which salient periodicities are detected by thresholding. Temporal evolution of these periodicities is output in the "tempogram". Candidate BPMs are then detected based on a histogram of the observed periodicities weighted by their energy in the tempogram. The sinusoidal model is constructed based on the observed periodicities and their magnitudes with the estimated overall BPM as a reference. Check https://essentia.upf.edu/reference/std_BpmHistogram.html for more details.
-  * @method
-  * @param {VectorFloat} novelty the novelty curve
-  * @param {number} [bpm=0] bpm to induce a certain tempo tracking. Zero if unknown
-  * @param {boolean} [constantTempo=false] whether to consider constant tempo. Set to true when inducina specific tempo
-  * @param {number} [frameRate=86.1328] the sampling rate of the novelty curve [frame/s]
-  * @param {number} [frameSize=4] the minimum length to compute the FFT [s]
-  * @param {number} [maxBpm=560] the maximum bpm to consider
-  * @param {number} [maxPeaks=50] the number of peaks to be considered at each spectrum
-  * @param {number} [minBpm=30] the minimum bpm to consider
-  * @param {number} [overlap=16] the overlap factor
-  * @param {number} [tempoChange=5] the minimum length to consider a change in tempo as stable [s]
-  * @param {boolean} [weightByMagnitude=true] whether to consider peaks' magnitude when building the histogram
-  * @param {string} [windowType=hann] the window type to be used when computing the FFT
-  * @param {number} [zeroPadding=0] zero padding factor to compute the FFT [s]
-  * @returns {object} {bpm: 'mean BPM of the most salient tempo', bpmCandidates: 'list of the most salient BPM values', bpmMagnitudes: 'magnitudes of the most salient BPM values', tempogram: 'spectrogram-like representation of tempo over time (frames of BPM magnitudes)', frameBpms: 'BPM values at each frame', ticks: 'time positions of ticks [s]', ticksMagnitude: 'ticks' strength (magnitude)', sinusoid: 'sinusoid whose peaks indicate tick positions'}
-  * @memberof Essentia
-  */
-  BpmHistogram(novelty: any, bpm: number=0, constantTempo: boolean=false, frameRate: number=86.1328, frameSize: number=4, maxBpm: number=560, maxPeaks: number=50, minBpm: number=30, overlap: number=16, tempoChange: number=5, weightByMagnitude: boolean=true, windowType: string='hann', zeroPadding: number=0) {
-    return this.algorithms.BpmHistogram(novelty, bpm, constantTempo, frameRate, frameSize, maxBpm, maxPeaks, minBpm, overlap, tempoChange, weightByMagnitude, windowType, zeroPadding);
-  }
-   
-  /**
   * This algorithm computes beats per minute histogram and its statistics for the highest and second highest peak.
   Note: histogram vector contains occurance frequency for each bpm value, 0-th element corresponds to 0 bpm value. Check https://essentia.upf.edu/reference/std_BpmHistogramDescriptors.html for more details.
   * @method
@@ -419,20 +411,6 @@ class Essentia {
   */
   BpmRubato(beats: any, longRegionsPruningTime: number=20, shortRegionsMergingTime: number=4, tolerance: number=0.08) {
     return this.algorithms.BpmRubato(beats, longRegionsPruningTime, shortRegionsMergingTime, tolerance);
-  }
-   
-  /**
-  * This algorithm converts an array of complex numbers from cartesian to polar form. It uses the Euler formula:
-    z = x + i*y = |z|(cos(α) + i sin(α))
-      where x = Real part, y = Imaginary part,
-      and |z| = modulus = magnitude, α = phase in (-pi,pi] Check https://essentia.upf.edu/reference/std_CartesianToPolar.html for more details.
-  * @method
-  * @param {VectorFloat} complex the complex input vector
-  * @returns {object} {magnitude: 'the magnitude vector', phase: 'the phase vector'}
-  * @memberof Essentia
-  */
-  CartesianToPolar(complex: any) {
-    return this.algorithms.CartesianToPolar(complex);
   }
    
   /**
@@ -591,26 +569,6 @@ class Essentia {
   */
   Clipper(signal: any, max: number=1, min: number=-1) {
     return this.algorithms.Clipper(signal, max, min);
-  }
-   
-  /**
-  * This algorithm computes Constant Q Transform using the FFT for fast calculation. It transforms a windowed audio frame into the log frequency domain. Check https://essentia.upf.edu/reference/std_ConstantQ.html for more details.
-  * @method
-  * @param {VectorFloat} frame the windowed input audio frame
-  * @param {number} [binsPerOctave=12] number of bins per octave
-  * @param {number} [minFrequency=32.7] minimum frequency [Hz]
-  * @param {number} [minimumKernelSize=4] minimum size allowed for frequency kernels
-  * @param {number} [numberBins=84] number of frequency bins, starting at minFrequency
-  * @param {number} [sampleRate=44100] FFT sampling rate [Hz]
-  * @param {number} [scale=1] filters scale. Larger values use longer windows
-  * @param {number} [threshold=0.01] bins whose magnitude is below this quantile are discarded
-  * @param {string} [windowType=hann] the window type, which can be 'hamming', 'hann', 'triangular', 'square' or 'blackmanharrisXX'
-  * @param {boolean} [zeroPhase=true] a boolean value that enables zero-phase windowing. Input audio frames should be windowed with the same phase mode
-  * @returns {object} {constantq: 'the Constant Q transform'}
-  * @memberof Essentia
-  */
-  ConstantQ(frame: any, binsPerOctave: number=12, minFrequency: number=32.7, minimumKernelSize: number=4, numberBins: number=84, sampleRate: number=44100, scale: number=1, threshold: number=0.01, windowType: string='hann', zeroPhase: boolean=true) {
-    return this.algorithms.ConstantQ(frame, binsPerOctave, minFrequency, minimumKernelSize, numberBins, sampleRate, scale, threshold, windowType, zeroPhase);
   }
    
   /**
@@ -972,61 +930,6 @@ class Essentia {
   }
    
   /**
-  * This algorithm computes the positive complex short-term Fourier transform (STFT) of an array using the FFT algorithm. The resulting fft has a size of (s/2)+1, where s is the size of the input frame.
-  At the moment FFT can only be computed on frames which size is even and non zero, otherwise an exception is thrown. Check https://essentia.upf.edu/reference/std_FFT.html for more details.
-  * @method
-  * @param {VectorFloat} frame the input audio frame
-  * @param {number} [size=1024] the expected size of the input frame. This is purely optional and only targeted at optimizing the creation time of the FFT object
-  * @returns {object} {fft: 'the FFT of the input frame'}
-  * @memberof Essentia
-  */
-  FFT(frame: any, size: number=1024) {
-    return this.algorithms.FFT(frame, size);
-  }
-   
-  /**
-  * This algorithm computes the complex short-term Fourier transform (STFT) of a complex array using the FFT algorithm. If the `negativeFrequencies` flag is set on, the resulting fft has a size of (s/2)+1, where s is the size of the input frame. Otherwise, output matches the input size.
-  At the moment FFT can only be computed on frames which size is even and non zero, otherwise an exception is thrown. Check https://essentia.upf.edu/reference/std_FFTC.html for more details.
-  * @method
-  * @param {VectorFloat} frame the input frame (complex)
-  * @param {boolean} [negativeFrequencies=false] returns the full spectrum or just the positive frequencies
-  * @param {number} [size=1024] the expected size of the input frame. This is purely optional and only targeted at optimizing the creation time of the FFT object
-  * @returns {object} {fft: 'the FFT of the input frame'}
-  * @memberof Essentia
-  */
-  FFTC(frame: any, negativeFrequencies: boolean=false, size: number=1024) {
-    return this.algorithms.FFTC(frame, negativeFrequencies, size);
-  }
-   
-  /**
-  * This algorithm detects fade-in and fade-outs time positions in an audio signal given a sequence of RMS values. It outputs two arrays containing the start/stop points of fade-ins and fade-outs. The main hypothesis for the detection is that an increase or decrease of the RMS over time in an audio file corresponds to a fade-in or fade-out, repectively. Minimum and maximum mean-RMS-thresholds are used to define where fade-in and fade-outs occur. Check https://essentia.upf.edu/reference/std_FadeDetection.html for more details.
-  * @method
-  * @param {VectorFloat} rms rms values array
-  * @param {number} [cutoffHigh=0.85] fraction of the average RMS to define the maximum threshold
-  * @param {number} [cutoffLow=0.2] fraction of the average RMS to define the minimum threshold
-  * @param {number} [frameRate=4] the rate of frames used in calculation of the RMS [frames/s]
-  * @param {number} [minLength=3] the minimum length to consider a fade-in/out [s]
-  * @returns {object} {fadeIn: '2D-array containing start/stop timestamps corresponding to fade-ins [s] (ordered chronologically)', fadeOut: '2D-array containing start/stop timestamps corresponding to fade-outs [s] (ordered chronologically)'}
-  * @memberof Essentia
-  */
-  FadeDetection(rms: any, cutoffHigh: number=0.85, cutoffLow: number=0.2, frameRate: number=4, minLength: number=3) {
-    return this.algorithms.FadeDetection(rms, cutoffHigh, cutoffLow, frameRate, minLength);
-  }
-   
-  /**
-  * This algorithm detects if a stereo track has duplicated channels (false stereo).It is based on the Pearson linear correlation coefficient and thus it is robust scaling and shifting between channels. Check https://essentia.upf.edu/reference/std_FalseStereoDetector.html for more details.
-  * @method
-  * @param {VectorVectorFloat} frame the input frame (must be non-empty)
-  * @param {number} [correlationThreshold=0.9995] threshold to activate the isFalseStereo flag
-  * @param {number} [silenceThreshold=-70] Silent frames will be skkiped.
-  * @returns {object} {isFalseStereo: 'a flag indicating if the frame channes are simmilar', correlation: 'correlation betweeen the input channels'}
-  * @memberof Essentia
-  */
-  FalseStereoDetector(frame: any, correlationThreshold: number=0.9995, silenceThreshold: number=-70) {
-    return this.algorithms.FalseStereoDetector(frame, correlationThreshold, silenceThreshold);
-  }
-   
-  /**
   * This algorithm computes the flatness of an array, which is defined as the ratio between the geometric mean and the arithmetic mean. Check https://essentia.upf.edu/reference/std_Flatness.html for more details.
   * @method
   * @param {VectorFloat} array the input array
@@ -1232,46 +1135,6 @@ class Essentia {
   }
    
   /**
-  * This algorithm applies a spectral mask to remove a pitched source component from the signal. It computes first an harmonic mask corresponding to the input pitch and applies the mask to the input FFT to remove that pitch. The bin width determines how many spectral bins are masked per harmonic partial. 
-  An attenuation value in dB determines the amount of suppression of the pitched component w.r.t the background for the case of muting. A negative attenuation value allows soloing the pitched component.  Check https://essentia.upf.edu/reference/std_HarmonicMask.html for more details.
-  * @method
-  * @param {VectorFloat} fft the input frame
-  * @param {number} pitch an estimate of the fundamental frequency of the signal [Hz]
-  * @param {number} [attenuation=-200] attenuation in dB's of the muted pitched component. If value is positive the pitched component is attenuated (muted), if the value is negative the pitched component is soloed (i.e. background component is attenuated).
-  * @param {number} [binWidth=4] number of bins per harmonic partials applied to the mask. This will depend on the internal FFT size
-  * @param {number} [sampleRate=44100] the audio sampling rate [Hz]
-  * @returns {object} {fft: 'the output frame'}
-  * @memberof Essentia
-  */
-  HarmonicMask(fft: any, pitch: number, attenuation: number=-200, binWidth: number=4, sampleRate: number=44100) {
-    return this.algorithms.HarmonicMask(fft, pitch, attenuation, binWidth, sampleRate);
-  }
-   
-  /**
-  * This algorithm computes the harmonic model analysis. Check https://essentia.upf.edu/reference/std_HarmonicModelAnal.html for more details.
-  * @method
-  * @param {VectorFloat} fft the input fft
-  * @param {number} pitch external pitch input [Hz].
-  * @param {number} [freqDevOffset=20] minimum frequency deviation at 0Hz
-  * @param {number} [freqDevSlope=0.01] slope increase of minimum frequency deviation
-  * @param {number} [harmDevSlope=0.01] slope increase of minimum frequency deviation
-  * @param {number} [hopSize=512] the hop size between frames
-  * @param {number} [magnitudeThreshold=-74] peaks below this given threshold are not outputted
-  * @param {number} [maxFrequency=5000] the maximum frequency of the F0 [Hz]
-  * @param {number} [maxPeaks=100] the maximum number of returned peaks
-  * @param {number} [maxnSines=100] maximum number of sines per frame
-  * @param {number} [minFrequency=20] the minimum frequency of the F0 [Hz]
-  * @param {number} [nHarmonics=100] maximum number of harmonics per frame
-  * @param {string} [orderBy=frequency] the ordering type of the outputted peaks (ascending by frequency or descending by magnitude)
-  * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
-  * @returns {object} {frequencies: 'the frequencies of the sinusoidal peaks [Hz]', magnitudes: 'the magnitudes of the sinusoidal peaks', phases: 'the phases of the sinusoidal peaks'}
-  * @memberof Essentia
-  */
-  HarmonicModelAnal(fft: any, pitch: number, freqDevOffset: number=20, freqDevSlope: number=0.01, harmDevSlope: number=0.01, hopSize: number=512, magnitudeThreshold: number=-74, maxFrequency: number=5000, maxPeaks: number=100, maxnSines: number=100, minFrequency: number=20, nHarmonics: number=100, orderBy: string='frequency', sampleRate: number=44100) {
-    return this.algorithms.HarmonicModelAnal(fft, pitch, freqDevOffset, freqDevSlope, harmDevSlope, hopSize, magnitudeThreshold, maxFrequency, maxPeaks, maxnSines, minFrequency, nHarmonics, orderBy, sampleRate);
-  }
-   
-  /**
   * This algorithm finds the harmonic peaks of a signal given its spectral peaks and its fundamental frequency.
   Note:
     - "tolerance" parameter defines the allowed fixed deviation from ideal harmonics, being a percentage over the F0. For example: if the F0 is 100Hz you may decide to allow a deviation of 20%, that is a fixed deviation of 20Hz; for the harmonic series it is: [180-220], [280-320], [380-420], etc.
@@ -1386,29 +1249,6 @@ class Essentia {
   }
    
   /**
-  * This algorithm detects low frequency tonal noises in the audio signal. First, the steadiness of the Power Spectral Density (PSD) of the signal is computed by measuring the quantile ratios as described in [1]. After this, the PitchContours algorithm is used to keep track of the humming tones [2]. Check https://essentia.upf.edu/reference/std_HumDetector.html for more details.
-  * @method
-  * @param {VectorFloat} signal the input audio signal
-  * @param {number} [Q0=0.1] low quantile
-  * @param {number} [Q1=0.55] high quatile
-  * @param {number} [detectionThreshold=5] the detection threshold for the peaks of the r matrix
-  * @param {number} [frameSize=0.4] the frame size with which the loudness is computed [s]
-  * @param {number} [hopSize=0.2] the hop size with which the loudness is computed [s]
-  * @param {number} [maximumFrequency=400] maximum frequency to consider [Hz]
-  * @param {number} [minimumDuration=2] minimun duration of the humming tones [s]
-  * @param {number} [minimumFrequency=22.5] minimum frequency to consider [Hz]
-  * @param {number} [numberHarmonics=1] number of considered harmonics
-  * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
-  * @param {number} [timeContinuity=10] time continuity cue (the maximum allowed gap duration for a pitch contour) [s]
-  * @param {number} [timeWindow=10] analysis time to use for the hum estimation [s]
-  * @returns {object} {r: 'the quantile ratios matrix', frequencies: 'humming tones frequencies', saliences: 'humming tones saliences', starts: 'humming tones starts', ends: 'humming tones ends'}
-  * @memberof Essentia
-  */
-  HumDetector(signal: any, Q0: number=0.1, Q1: number=0.55, detectionThreshold: number=5, frameSize: number=0.4, hopSize: number=0.2, maximumFrequency: number=400, minimumDuration: number=2, minimumFrequency: number=22.5, numberHarmonics: number=1, sampleRate: number=44100, timeContinuity: number=10, timeWindow: number=10) {
-    return this.algorithms.HumDetector(signal, Q0, Q1, detectionThreshold, frameSize, hopSize, maximumFrequency, minimumDuration, minimumFrequency, numberHarmonics, sampleRate, timeContinuity, timeWindow);
-  }
-   
-  /**
   * This algorithm computes the Inverse Discrete Cosine Transform of an array.
   It can be configured to perform the inverse DCT-II form, with the 1/sqrt(2) scaling factor for the first coefficient or the inverse DCT-III form based on the HTK implementation. Check https://essentia.upf.edu/reference/std_IDCT.html for more details.
   * @method
@@ -1422,32 +1262,6 @@ class Essentia {
   */
   IDCT(dct: any, dctType: number=2, inputSize: number=10, liftering: number=0, outputSize: number=10) {
     return this.algorithms.IDCT(dct, dctType, inputSize, liftering, outputSize);
-  }
-   
-  /**
-  * This algorithm calculates the inverse short-term Fourier transform (STFT) of an array of complex values using the FFT algorithm. The resulting frame has a size of (s-1)*2, where s is the size of the input fft frame. The inverse Fourier transform is not defined for frames which size is less than 2 samples. Otherwise an exception is thrown. Check https://essentia.upf.edu/reference/std_IFFT.html for more details.
-  * @method
-  * @param {VectorFloat} fft the input frame
-  * @param {boolean} [normalize=true] wheter to normalize the output by the FFT length.
-  * @param {number} [size=1024] the expected size of the input frame. This is purely optional and only targeted at optimizing the creation time of the FFT object
-  * @returns {object} {frame: 'the IFFT of the input frame'}
-  * @memberof Essentia
-  */
-  IFFT(fft: any, normalize: boolean=true, size: number=1024) {
-    return this.algorithms.IFFT(fft, normalize, size);
-  }
-   
-  /**
-  * This algorithm calculates the inverse short-term Fourier transform (STFT) of an array of complex values using the FFT algorithm. The resulting frame has a size equal to the input fft frame size. The inverse Fourier transform is not defined for frames which size is less than 2 samples. Otherwise an exception is thrown. Check https://essentia.upf.edu/reference/std_IFFTC.html for more details.
-  * @method
-  * @param {VectorFloat} fft the input frame
-  * @param {boolean} [normalize=true] wheter to normalize the output by the FFT length.
-  * @param {number} [size=1024] the expected size of the input frame. This is purely optional and only targeted at optimizing the creation time of the FFT object
-  * @returns {object} {frame: 'the complex IFFT of the input frame'}
-  * @memberof Essentia
-  */
-  IFFTC(fft: any, normalize: boolean=true, size: number=1024) {
-    return this.algorithms.IFFTC(fft, normalize, size);
   }
    
   /**
@@ -1669,20 +1483,6 @@ class Essentia {
   }
    
   /**
-  * This algorithm computes the EBU R128 loudness descriptors of an audio signal. Check https://essentia.upf.edu/reference/std_LoudnessEBUR128.html for more details.
-  * @method
-  * @param {VectorVectorFloat} signal the input stereo audio signal
-  * @param {number} [hopSize=0.1] the hop size with which the loudness is computed [s]
-  * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
-  * @param {boolean} [startAtZero=false] start momentary/short-term loudness estimation at time 0 (zero-centered loudness estimation windows) if true; otherwise start both windows at time 0 (time positions for momentary and short-term values will not be syncronized)
-  * @returns {object} {momentaryLoudness: 'momentary loudness (over 400ms) (LUFS)', shortTermLoudness: 'short-term loudness (over 3 seconds) (LUFS)', integratedLoudness: 'integrated loudness (overall) (LUFS)', loudnessRange: 'loudness range over an arbitrary long time interval [3] (dB, LU)'}
-  * @memberof Essentia
-  */
-  LoudnessEBUR128(signal: any, hopSize: number=0.1, sampleRate: number=44100, startAtZero: boolean=false) {
-    return this.algorithms.LoudnessEBUR128(signal, hopSize, sampleRate, startAtZero);
-  }
-   
-  /**
   * This algorithm computes Vickers's loudness of an audio signal. Currently, this algorithm only works for signals with a 44100Hz sampling rate. This algorithm is meant to be given frames of audio as input (not entire audio signals). The algorithm described in the paper performs a weighted average of the loudness value computed for each of the given frames, this step is left as a post processing step and is not performed by this algorithm. Check https://essentia.upf.edu/reference/std_LoudnessVickers.html for more details.
   * @method
   * @param {VectorFloat} signal the input signal
@@ -1765,17 +1565,6 @@ class Essentia {
   */
   MFCC(spectrum: any, dctType: number=2, highFrequencyBound: number=11000, inputSize: number=1025, liftering: number=0, logType: string='dbamp', lowFrequencyBound: number=0, normalize: string='unit_sum', numberBands: number=40, numberCoefficients: number=13, sampleRate: number=44100, silenceThreshold: number=1e-10, type: string='power', warpingFormula: string='htkMel', weighting: string='warping') {
     return this.algorithms.MFCC(spectrum, dctType, highFrequencyBound, inputSize, liftering, logType, lowFrequencyBound, normalize, numberBands, numberCoefficients, sampleRate, silenceThreshold, type, warpingFormula, weighting);
-  }
-   
-  /**
-  * This algorithm computes the absolute value of each element in a vector of complex numbers. Check https://essentia.upf.edu/reference/std_Magnitude.html for more details.
-  * @method
-  * @param {VectorFloat} complex the input vector of complex numbers
-  * @returns {object} {magnitude: 'the magnitudes of the input vector'}
-  * @memberof Essentia
-  */
-  Magnitude(complex: any) {
-    return this.algorithms.Magnitude(complex);
   }
    
   /**
@@ -1918,6 +1707,58 @@ class Essentia {
   }
    
   /**
+  * This algorithm estimates multiple pitch values corresponding to the melodic lines present in a polyphonic music signal (for example, string quartet, piano). This implementation is based on the algorithm in [1]: In each frame, a set of possible fundamental frequency candidates is extracted based on the principle of harmonic summation. In an optimization stage, the number of harmonic sources (polyphony) is estimated and the final set of fundamental frequencies determined. In contrast to the pich salience function proposed in [2], this implementation uses the pitch salience function described in [1].
+  The output is a vector for each frame containing the estimated melody pitch values. Check https://essentia.upf.edu/reference/std_MultiPitchKlapuri.html for more details.
+  * @method
+  * @param {VectorFloat} signal the input signal
+  * @param {number} [binResolution=10] salience function bin resolution [cents]
+  * @param {number} [frameSize=2048] the frame size for computing pitch saliecnce
+  * @param {number} [harmonicWeight=0.8] harmonic weighting parameter (weight decay ratio between two consequent harmonics, =1 for no decay)
+  * @param {number} [hopSize=128] the hop size with which the pitch salience function was computed
+  * @param {number} [magnitudeCompression=1] magnitude compression parameter for the salience function (=0 for maximum compression, =1 for no compression)
+  * @param {number} [magnitudeThreshold=40] spectral peak magnitude threshold (maximum allowed difference from the highest peak in dBs)
+  * @param {number} [maxFrequency=1760] the maximum allowed frequency for salience function peaks (ignore peaks above) [Hz]
+  * @param {number} [minFrequency=80] the minimum allowed frequency for salience function peaks (ignore peaks below) [Hz]
+  * @param {number} [numberHarmonics=10] number of considered harmonics
+  * @param {number} [referenceFrequency=55] the reference frequency for Hertz to cent convertion [Hz], corresponding to the 0th cent bin
+  * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
+  * @returns {object} {pitch: 'the estimated pitch values [Hz]'}
+  * @memberof Essentia
+  */
+  MultiPitchKlapuri(signal: any, binResolution: number=10, frameSize: number=2048, harmonicWeight: number=0.8, hopSize: number=128, magnitudeCompression: number=1, magnitudeThreshold: number=40, maxFrequency: number=1760, minFrequency: number=80, numberHarmonics: number=10, referenceFrequency: number=55, sampleRate: number=44100) {
+    return this.algorithms.MultiPitchKlapuri(signal, binResolution, frameSize, harmonicWeight, hopSize, magnitudeCompression, magnitudeThreshold, maxFrequency, minFrequency, numberHarmonics, referenceFrequency, sampleRate);
+  }
+   
+  /**
+  * This algorithm estimates multiple fundamental frequency contours from an audio signal. It is a multi pitch version of the MELODIA algorithm described in [1]. While the algorithm is originally designed to extract melody in polyphonic music, this implementation is adapted for multiple sources. The approach is based on the creation and characterization of pitch contours, time continuous sequences of pitch candidates grouped using auditory streaming cues. To this end, PitchSalienceFunction, PitchSalienceFunctionPeaks, PitchContours, and PitchContoursMonoMelody algorithms are employed. It is strongly advised to use the default parameter values which are optimized according to [1] (where further details are provided) except for minFrequency, maxFrequency, and voicingTolerance, which will depend on your application. Check https://essentia.upf.edu/reference/std_MultiPitchMelodia.html for more details.
+  * @method
+  * @param {VectorFloat} signal the input signal
+  * @param {number} [binResolution=10] salience function bin resolution [cents]
+  * @param {number} [filterIterations=3] number of iterations for the octave errors / pitch outlier filtering process
+  * @param {number} [frameSize=2048] the frame size for computing pitch saliecnce
+  * @param {boolean} [guessUnvoiced=false] estimate pitch for non-voiced segments by using non-salient contours when no salient ones are present in a frame
+  * @param {number} [harmonicWeight=0.8] harmonic weighting parameter (weight decay ratio between two consequent harmonics, =1 for no decay)
+  * @param {number} [hopSize=128] the hop size with which the pitch salience function was computed
+  * @param {number} [magnitudeCompression=1] magnitude compression parameter for the salience function (=0 for maximum compression, =1 for no compression)
+  * @param {number} [magnitudeThreshold=40] spectral peak magnitude threshold (maximum allowed difference from the highest peak in dBs)
+  * @param {number} [maxFrequency=20000] the minimum allowed frequency for salience function peaks (ignore contours with peaks above) [Hz]
+  * @param {number} [minDuration=100] the minimum allowed contour duration [ms]
+  * @param {number} [minFrequency=40] the minimum allowed frequency for salience function peaks (ignore contours with peaks below) [Hz]
+  * @param {number} [numberHarmonics=20] number of considered harmonics
+  * @param {number} [peakDistributionThreshold=0.9] allowed deviation below the peak salience mean over all frames (fraction of the standard deviation)
+  * @param {number} [peakFrameThreshold=0.9] per-frame salience threshold factor (fraction of the highest peak salience in a frame)
+  * @param {number} [pitchContinuity=27.5625] pitch continuity cue (maximum allowed pitch change during 1 ms time period) [cents]
+  * @param {number} [referenceFrequency=55] the reference frequency for Hertz to cent convertion [Hz], corresponding to the 0th cent bin
+  * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
+  * @param {number} [timeContinuity=100] time continuity cue (the maximum allowed gap duration for a pitch contour) [ms]
+  * @returns {object} {pitch: 'the estimated pitch values [Hz]'}
+  * @memberof Essentia
+  */
+  MultiPitchMelodia(signal: any, binResolution: number=10, filterIterations: number=3, frameSize: number=2048, guessUnvoiced: boolean=false, harmonicWeight: number=0.8, hopSize: number=128, magnitudeCompression: number=1, magnitudeThreshold: number=40, maxFrequency: number=20000, minDuration: number=100, minFrequency: number=40, numberHarmonics: number=20, peakDistributionThreshold: number=0.9, peakFrameThreshold: number=0.9, pitchContinuity: number=27.5625, referenceFrequency: number=55, sampleRate: number=44100, timeContinuity: number=100) {
+    return this.algorithms.MultiPitchMelodia(signal, binResolution, filterIterations, frameSize, guessUnvoiced, harmonicWeight, hopSize, magnitudeCompression, magnitudeThreshold, maxFrequency, minDuration, minFrequency, numberHarmonics, peakDistributionThreshold, peakFrameThreshold, pitchContinuity, referenceFrequency, sampleRate, timeContinuity);
+  }
+   
+  /**
   * This algorithm returns a single vector from a given number of real values and/or frames. Frames from different inputs are multiplexed onto a single stream in an alternating fashion. Check https://essentia.upf.edu/reference/std_Multiplexer.html for more details.
   * @method
   * @param {number} [numberRealInputs=0] the number of inputs of type Real to multiplex
@@ -1952,60 +1793,6 @@ class Essentia {
   */
   NNLSChroma(logSpectrogram: any, meanTuning: any, localTuning: any, chromaNormalization: string='none', frameSize: number=1025, sampleRate: number=44100, spectralShape: number=0.7, spectralWhitening: number=1, tuningMode: string='global', useNNLS: boolean=true) {
     return this.algorithms.NNLSChroma(logSpectrogram, meanTuning, localTuning, chromaNormalization, frameSize, sampleRate, spectralShape, spectralWhitening, tuningMode, useNNLS);
-  }
-   
-  /**
-  * This algorithm computes a constant Q transform using non stationary Gabor frames and returns a complex time-frequency representation of the input vector.
-  The implementation is inspired by the toolbox described in [1].
-  References:
-    [1] Schörkhuber, C., Klapuri, A., Holighaus, N., & Dörfler, M. (n.d.). A Matlab Toolbox for Efficient Perfect Reconstruction Time-Frequency Transforms with Log-Frequency Resolution. Check https://essentia.upf.edu/reference/std_NSGConstantQ.html for more details.
-  * @method
-  * @param {VectorFloat} frame the input frame (vector)
-  * @param {number} [binsPerOctave=48] the number of bins per octave
-  * @param {number} [gamma=0] The bandwidth of each filter is given by Bk = 1/Q * fk + gamma
-  * @param {number} [inputSize=4096] the size of the input
-  * @param {number} [maxFrequency=7040] the maximum frequency
-  * @param {number} [minFrequency=27.5] the minimum frequency
-  * @param {number} [minimumWindow=4] minimum size allowed for the windows
-  * @param {string} [normalize=none] coefficient normalization
-  * @param {string} [phaseMode=global] 'local' to use zero-centered filters. 'global' to use a phase mapping function as described in [1]
-  * @param {string} [rasterize=full] hop sizes for each frequency channel. With 'none' each frequency channel is distinct. 'full' sets the hop sizes of all the channels to the smallest. 'piecewise' rounds down the hop size to a power of two
-  * @param {number} [sampleRate=44100] the desired sampling rate [Hz]
-  * @param {string} [window=hannnsgcq] the type of window for the frequency filters. It is not recommended to change the default window.
-  * @param {number} [windowSizeFactor=1] window sizes are rounded to multiples of this
-  * @returns {object} {constantq: 'the constant Q transform of the input frame', constantqdc: 'the DC band transform of the input frame. Only needed for the inverse transform', constantqnf: 'the Nyquist band transform of the input frame. Only needed for the inverse transform'}
-  * @memberof Essentia
-  */
-  NSGConstantQ(frame: any, binsPerOctave: number=48, gamma: number=0, inputSize: number=4096, maxFrequency: number=7040, minFrequency: number=27.5, minimumWindow: number=4, normalize: string='none', phaseMode: string='global', rasterize: string='full', sampleRate: number=44100, window: string='hannnsgcq', windowSizeFactor: number=1) {
-    return this.algorithms.NSGConstantQ(frame, binsPerOctave, gamma, inputSize, maxFrequency, minFrequency, minimumWindow, normalize, phaseMode, rasterize, sampleRate, window, windowSizeFactor);
-  }
-   
-  /**
-  * This algorithm computes an inverse constant Q transform using non stationary Gabor frames and returns a complex time-frequency representation of the input vector.
-  The implementation is inspired by the toolbox described in [1].
-  References:
-    [1] Schörkhuber, C., Klapuri, A., Holighaus, N., & Dörfler, M. (n.d.). A Matlab Toolbox for Efficient Perfect Reconstruction Time-Frequency Transforms with Log-Frequency Resolution. Check https://essentia.upf.edu/reference/std_NSGIConstantQ.html for more details.
-  * @method
-  * @param {VectorVectorFloat} constantq the constant Q transform of the input frame
-  * @param {VectorFloat} constantqdc the DC band transform of the input frame
-  * @param {VectorFloat} constantqnf the Nyquist band transform of the input frame
-  * @param {number} [binsPerOctave=48] the number of bins per octave
-  * @param {number} [gamma=0] The bandwidth of each filter is given by Bk = 1/Q * fk + gamma
-  * @param {number} [inputSize=4096] the size of the input
-  * @param {number} [maxFrequency=7040] the maximum frequency
-  * @param {number} [minFrequency=27.5] the minimum frequency
-  * @param {number} [minimumWindow=4] minimum size allowed for the windows
-  * @param {string} [normalize=none] coefficient normalization
-  * @param {string} [phaseMode=global] 'local' to use zero-centered filters. 'global' to use a phase mapping function as described in [1]
-  * @param {string} [rasterize=full] hop sizes for each frequency channel. With 'none' each frequency channel is distinct. 'full' sets the hop sizes of all the channels to the smallest. 'piecewise' rounds down the hop size to a power of two
-  * @param {number} [sampleRate=44100] the desired sampling rate [Hz]
-  * @param {string} [window=hannnsgcq] the type of window for the frequency filters. It is not recommended to change the default window.
-  * @param {number} [windowSizeFactor=1] window sizes are rounded to multiples of this
-  * @returns {object} {frame: 'the input frame (vector)'}
-  * @memberof Essentia
-  */
-  NSGIConstantQ(constantq: any, constantqdc: any, constantqnf: any, binsPerOctave: number=48, gamma: number=0, inputSize: number=4096, maxFrequency: number=7040, minFrequency: number=27.5, minimumWindow: number=4, normalize: string='none', phaseMode: string='global', rasterize: string='full', sampleRate: number=44100, window: string='hannnsgcq', windowSizeFactor: number=1) {
-    return this.algorithms.NSGIConstantQ(constantq, constantqdc, constantqnf, binsPerOctave, gamma, inputSize, maxFrequency, minFrequency, minimumWindow, normalize, phaseMode, rasterize, sampleRate, window, windowSizeFactor);
   }
    
   /**
@@ -2141,22 +1928,6 @@ class Essentia {
   }
    
   /**
-  * This algorithm computes onset positions given various onset detection functions. Check https://essentia.upf.edu/reference/std_Onsets.html for more details.
-  * @method
-  * @param {VectorFloat} detections matrix containing onset detection functions--rows represent the values of different detection functions and columns represent different frames of audio (i.e. detections[i][j] represents the value of the ith detection function for the jth frame of audio)
-  * @param {VectorFloat} weights the weighting coefficicients for each detection function, must be the same as the first dimension of "detections"
-  * @param {number} [alpha=0.1] the proportion of the mean included to reject smaller peaks--filters very short onsets
-  * @param {number} [delay=5] the number of frames used to compute the threshold--size of short-onset filter
-  * @param {number} [frameRate=86.1328] frames per second
-  * @param {number} [silenceThreshold=0.02] the threshold for silence
-  * @returns {object} {onsets: 'the onset positions [s]'}
-  * @memberof Essentia
-  */
-  Onsets(detections: any, weights: any, alpha: number=0.1, delay: number=5, frameRate: number=86.1328, silenceThreshold: number=0.02) {
-    return this.algorithms.Onsets(detections, weights, alpha, delay, frameRate, silenceThreshold);
-  }
-   
-  /**
   * This algorithm returns the output of an overlap-add process for a sequence of frames of an audio signal. It considers that the input audio frames are windowed audio signals. Giving the size of the frame and the hop size, overlapping and adding consecutive frames will produce a continuous signal. A normalization gain can be passed as a parameter. Check https://essentia.upf.edu/reference/std_OverlapAdd.html for more details.
   * @method
   * @param {VectorFloat} signal the windowed input audio frame
@@ -2168,24 +1939,6 @@ class Essentia {
   */
   OverlapAdd(signal: any, frameSize: number=2048, gain: number=1, hopSize: number=128) {
     return this.algorithms.OverlapAdd(signal, frameSize, gain, hopSize);
-  }
-   
-  /**
-  * This algorithm characterizes panorama distribution by comparing spectra from the left and right channels. The panning coefficients are extracted by: Check https://essentia.upf.edu/reference/std_Panning.html for more details.
-  * @method
-  * @param {VectorFloat} spectrumLeft left channel's spectrum
-  * @param {VectorFloat} spectrumRight right channel's spectrum
-  * @param {number} [averageFrames=43] number of frames to take into account for averaging
-  * @param {number} [numBands=1] number of mel bands
-  * @param {number} [numCoeffs=20] number of coefficients used to define the panning curve at each frame
-  * @param {number} [panningBins=512] size of panorama histogram (in bins)
-  * @param {number} [sampleRate=44100] audio sampling rate [Hz]
-  * @param {boolean} [warpedPanorama=true] if true, warped panorama is applied, having more resolution in the center area
-  * @returns {object} {panningCoeffs: 'parameters that define the panning curve at each frame'}
-  * @memberof Essentia
-  */
-  Panning(spectrumLeft: any, spectrumRight: any, averageFrames: number=43, numBands: number=1, numCoeffs: number=20, panningBins: number=512, sampleRate: number=44100, warpedPanorama: boolean=true) {
-    return this.algorithms.Panning(spectrumLeft, spectrumRight, averageFrames, numBands, numCoeffs, panningBins, sampleRate, warpedPanorama);
   }
    
   /**
@@ -2378,6 +2131,35 @@ class Essentia {
   }
    
   /**
+  * This algorithm estimates the fundamental frequency corresponding to the melody of a monophonic music signal based on the MELODIA algorithm. While the algorithm is originally designed to extract the predominant melody from polyphonic music [1], this implementation is adapted for monophonic signals. The approach is based on the creation and characterization of pitch contours, time continuous sequences of pitch candidates grouped using auditory streaming cues. To this end, PitchSalienceFunction, PitchSalienceFunctionPeaks, PitchContours, and PitchContoursMonoMelody algorithms are employed. It is strongly advised to use the default parameter values which are optimized according to [1] (where further details are provided) except for minFrequency and maxFrequency, which will depend on your application. Check https://essentia.upf.edu/reference/std_PitchMelodia.html for more details.
+  * @method
+  * @param {VectorFloat} signal the input signal
+  * @param {number} [binResolution=10] salience function bin resolution [cents]
+  * @param {number} [filterIterations=3] number of iterations for the octave errors / pitch outlier filtering process
+  * @param {number} [frameSize=2048] the frame size for computing pitch saliecnce
+  * @param {boolean} [guessUnvoiced=false] estimate pitch for non-voiced segments by using non-salient contours when no salient ones are present in a frame
+  * @param {number} [harmonicWeight=0.8] harmonic weighting parameter (weight decay ratio between two consequent harmonics, =1 for no decay)
+  * @param {number} [hopSize=128] the hop size with which the pitch salience function was computed
+  * @param {number} [magnitudeCompression=1] magnitude compression parameter for the salience function (=0 for maximum compression, =1 for no compression)
+  * @param {number} [magnitudeThreshold=40] spectral peak magnitude threshold (maximum allowed difference from the highest peak in dBs)
+  * @param {number} [maxFrequency=20000] the minimum allowed frequency for salience function peaks (ignore contours with peaks above) [Hz]
+  * @param {number} [minDuration=100] the minimum allowed contour duration [ms]
+  * @param {number} [minFrequency=40] the minimum allowed frequency for salience function peaks (ignore contours with peaks below) [Hz]
+  * @param {number} [numberHarmonics=20] number of considered harmonics
+  * @param {number} [peakDistributionThreshold=0.9] allowed deviation below the peak salience mean over all frames (fraction of the standard deviation)
+  * @param {number} [peakFrameThreshold=0.9] per-frame salience threshold factor (fraction of the highest peak salience in a frame)
+  * @param {number} [pitchContinuity=27.5625] pitch continuity cue (maximum allowed pitch change during 1 ms time period) [cents]
+  * @param {number} [referenceFrequency=55] the reference frequency for Hertz to cent convertion [Hz], corresponding to the 0th cent bin
+  * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
+  * @param {number} [timeContinuity=100] time continuity cue (the maximum allowed gap duration for a pitch contour) [ms]
+  * @returns {object} {pitch: 'the estimated pitch values [Hz]', pitchConfidence: 'confidence with which the pitch was detected'}
+  * @memberof Essentia
+  */
+  PitchMelodia(signal: any, binResolution: number=10, filterIterations: number=3, frameSize: number=2048, guessUnvoiced: boolean=false, harmonicWeight: number=0.8, hopSize: number=128, magnitudeCompression: number=1, magnitudeThreshold: number=40, maxFrequency: number=20000, minDuration: number=100, minFrequency: number=40, numberHarmonics: number=20, peakDistributionThreshold: number=0.9, peakFrameThreshold: number=0.9, pitchContinuity: number=27.5625, referenceFrequency: number=55, sampleRate: number=44100, timeContinuity: number=100) {
+    return this.algorithms.PitchMelodia(signal, binResolution, filterIterations, frameSize, guessUnvoiced, harmonicWeight, hopSize, magnitudeCompression, magnitudeThreshold, maxFrequency, minDuration, minFrequency, numberHarmonics, peakDistributionThreshold, peakFrameThreshold, pitchContinuity, referenceFrequency, sampleRate, timeContinuity);
+  }
+   
+  /**
   * This algorithm computes the pitch salience of a spectrum. The pitch salience is given by the ratio of the highest auto correlation value of the spectrum to the non-shifted auto correlation value. Pitch salience was designed as quick measure of tone sensation. Unpitched sounds (non-musical sound effects) and pure tones have an average pitch salience value close to 0 whereas sounds containing several harmonics in the spectrum tend to have a higher value. Check https://essentia.upf.edu/reference/std_PitchSalience.html for more details.
   * @method
   * @param {VectorFloat} spectrum the input audio spectrum
@@ -2507,21 +2289,6 @@ class Essentia {
   }
    
   /**
-  * This algorithm converts an array of complex numbers from polar to cartesian form. It uses the Euler formula:
-    z = x + i*y = |z|(cos(α) + i sin(α))
-      where x = Real part, y = Imaginary part,
-      and |z| = modulus = magnitude, α = phase Check https://essentia.upf.edu/reference/std_PolarToCartesian.html for more details.
-  * @method
-  * @param {VectorFloat} magnitude the magnitude vector
-  * @param {VectorFloat} phase the phase vector
-  * @returns {object} {complex: 'the resulting complex vector'}
-  * @memberof Essentia
-  */
-  PolarToCartesian(magnitude: any, phase: any) {
-    return this.algorithms.PolarToCartesian(magnitude, phase);
-  }
-   
-  /**
   * This algorithm computes the power mean of an array. It accepts one parameter, p, which is the power (or order or degree) of the Power Mean. Note that if p=-1, the Power Mean is equal to the Harmonic Mean, if p=0, the Power Mean is equal to the Geometric Mean, if p=1, the Power Mean is equal to the Arithmetic Mean, if p=2, the Power Mean is equal to the Root Mean Square. Check https://essentia.upf.edu/reference/std_PowerMean.html for more details.
   * @method
   * @param {VectorFloat} array the input array (must contain only positive real numbers)
@@ -2543,6 +2310,37 @@ class Essentia {
   */
   PowerSpectrum(signal: any, size: number=2048) {
     return this.algorithms.PowerSpectrum(signal, size);
+  }
+   
+  /**
+  * This algorithm estimates the fundamental frequency of the predominant melody from polyphonic music signals using the MELODIA algorithm. It is specifically suited for music with a predominent melodic element, for example the singing voice melody in an accompanied singing recording. The approach [1] is based on the creation and characterization of pitch contours, time continuous sequences of pitch candidates grouped using auditory streaming cues. It furthermore determines for each frame, if the predominant melody is present or not. To this end, PitchSalienceFunction, PitchSalienceFunctionPeaks, PitchContours, and PitchContoursMelody algorithms are employed. It is strongly advised to use the default parameter values which are optimized according to [1] (where further details are provided) except for minFrequency, maxFrequency, and voicingTolerance, which will depend on your application. Check https://essentia.upf.edu/reference/std_PredominantPitchMelodia.html for more details.
+  * @method
+  * @param {VectorFloat} signal the input signal
+  * @param {number} [binResolution=10] salience function bin resolution [cents]
+  * @param {number} [filterIterations=3] number of iterations for the octave errors / pitch outlier filtering process
+  * @param {number} [frameSize=2048] the frame size for computing pitch salience
+  * @param {boolean} [guessUnvoiced=false] estimate pitch for non-voiced segments by using non-salient contours when no salient ones are present in a frame
+  * @param {number} [harmonicWeight=0.8] harmonic weighting parameter (weight decay ratio between two consequent harmonics, =1 for no decay)
+  * @param {number} [hopSize=128] the hop size with which the pitch salience function was computed
+  * @param {number} [magnitudeCompression=1] magnitude compression parameter for the salience function (=0 for maximum compression, =1 for no compression)
+  * @param {number} [magnitudeThreshold=40] spectral peak magnitude threshold (maximum allowed difference from the highest peak in dBs)
+  * @param {number} [maxFrequency=20000] the minimum allowed frequency for salience function peaks (ignore contours with peaks above) [Hz]
+  * @param {number} [minDuration=100] the minimum allowed contour duration [ms]
+  * @param {number} [minFrequency=80] the minimum allowed frequency for salience function peaks (ignore contours with peaks below) [Hz]
+  * @param {number} [numberHarmonics=20] number of considered harmonics
+  * @param {number} [peakDistributionThreshold=0.9] allowed deviation below the peak salience mean over all frames (fraction of the standard deviation)
+  * @param {number} [peakFrameThreshold=0.9] per-frame salience threshold factor (fraction of the highest peak salience in a frame)
+  * @param {number} [pitchContinuity=27.5625] pitch continuity cue (maximum allowed pitch change during 1 ms time period) [cents]
+  * @param {number} [referenceFrequency=55] the reference frequency for Hertz to cent conversion [Hz], corresponding to the 0th cent bin
+  * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
+  * @param {number} [timeContinuity=100] time continuity cue (the maximum allowed gap duration for a pitch contour) [ms]
+  * @param {boolean} [voiceVibrato=false] detect voice vibrato
+  * @param {number} [voicingTolerance=0.2] allowed deviation below the average contour mean salience of all contours (fraction of the standard deviation)
+  * @returns {object} {pitch: 'the estimated pitch values [Hz]', pitchConfidence: 'confidence with which the pitch was detected'}
+  * @memberof Essentia
+  */
+  PredominantPitchMelodia(signal: any, binResolution: number=10, filterIterations: number=3, frameSize: number=2048, guessUnvoiced: boolean=false, harmonicWeight: number=0.8, hopSize: number=128, magnitudeCompression: number=1, magnitudeThreshold: number=40, maxFrequency: number=20000, minDuration: number=100, minFrequency: number=80, numberHarmonics: number=20, peakDistributionThreshold: number=0.9, peakFrameThreshold: number=0.9, pitchContinuity: number=27.5625, referenceFrequency: number=55, sampleRate: number=44100, timeContinuity: number=100, voiceVibrato: boolean=false, voicingTolerance: number=0.2) {
+    return this.algorithms.PredominantPitchMelodia(signal, binResolution, filterIterations, frameSize, guessUnvoiced, harmonicWeight, hopSize, magnitudeCompression, magnitudeThreshold, maxFrequency, minDuration, minFrequency, numberHarmonics, peakDistributionThreshold, peakFrameThreshold, pitchContinuity, referenceFrequency, sampleRate, timeContinuity, voiceVibrato, voicingTolerance);
   }
    
   /**
@@ -2696,23 +2494,6 @@ class Essentia {
   }
    
   /**
-  * This algorithm segments audio using the Bayesian Information Criterion given a matrix of frame features. The algorithm searches homogeneous segments for which the feature vectors have the same probability distribution based on the implementation in [1]. The input matrix is assumed to have features along dim1 (horizontal) while frames along dim2 (vertical). Check https://essentia.upf.edu/reference/std_SBic.html for more details.
-  * @method
-  * @param {VectorFloat} features extracted features matrix (rows represent features, and columns represent frames of audio)
-  * @param {number} [cpw=1.5] complexity penalty weight
-  * @param {number} [inc1=60] first pass increment [frames]
-  * @param {number} [inc2=20] second pass increment [frames]
-  * @param {number} [minLength=10] minimum length of a segment [frames]
-  * @param {number} [size1=300] first pass window size [frames]
-  * @param {number} [size2=200] second pass window size [frames]
-  * @returns {object} {segmentation: 'a list of frame indices that indicate where a segment of audio begins/ends (the indices of the first and last frame are also added to the list at the beginning and end, respectively)'}
-  * @memberof Essentia
-  */
-  SBic(features: any, cpw: number=1.5, inc1: number=60, inc2: number=20, minLength: number=10, size1: number=300, size2: number=200) {
-    return this.algorithms.SBic(features, cpw, inc1, inc2, minLength, size1, size2);
-  }
-   
-  /**
   * This algorithm computes the SNR of the input audio in a frame-wise manner. The algorithm assumes that:
     1. The noise is gaussian.
     2. There is a region of noise (without signal) at the beginning of the stream in order to estimate the PSD of the noise.[1]
@@ -2770,42 +2551,6 @@ class Essentia {
   }
    
   /**
-  * This algorithm computes the sine model analysis.  Check https://essentia.upf.edu/reference/std_SineModelAnal.html for more details.
-  * @method
-  * @param {VectorFloat} fft the input frame
-  * @param {number} [freqDevOffset=20] minimum frequency deviation at 0Hz
-  * @param {number} [freqDevSlope=0.01] slope increase of minimum frequency deviation
-  * @param {number} [magnitudeThreshold=-74] peaks below this given threshold are not outputted
-  * @param {number} [maxFrequency=22050] the maximum frequency of the range to evaluate [Hz]
-  * @param {number} [maxPeaks=250] the maximum number of returned peaks
-  * @param {number} [maxnSines=100] maximum number of sines per frame
-  * @param {number} [minFrequency=0] the minimum frequency of the range to evaluate [Hz]
-  * @param {string} [orderBy=frequency] the ordering type of the outputted peaks (ascending by frequency or descending by magnitude)
-  * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
-  * @returns {object} {frequencies: 'the frequencies of the sinusoidal peaks [Hz]', magnitudes: 'the magnitudes of the sinusoidal peaks', phases: 'the phases of the sinusoidal peaks'}
-  * @memberof Essentia
-  */
-  SineModelAnal(fft: any, freqDevOffset: number=20, freqDevSlope: number=0.01, magnitudeThreshold: number=-74, maxFrequency: number=22050, maxPeaks: number=250, maxnSines: number=100, minFrequency: number=0, orderBy: string='frequency', sampleRate: number=44100) {
-    return this.algorithms.SineModelAnal(fft, freqDevOffset, freqDevSlope, magnitudeThreshold, maxFrequency, maxPeaks, maxnSines, minFrequency, orderBy, sampleRate);
-  }
-   
-  /**
-  * This algorithm computes the sine model synthesis from sine model analysis. Check https://essentia.upf.edu/reference/std_SineModelSynth.html for more details.
-  * @method
-  * @param {VectorFloat} magnitudes the magnitudes of the sinusoidal peaks
-  * @param {VectorFloat} frequencies the frequencies of the sinusoidal peaks [Hz]
-  * @param {VectorFloat} phases the phases of the sinusoidal peaks
-  * @param {number} [fftSize=2048] the size of the output FFT frame (full spectrum size)
-  * @param {number} [hopSize=512] the hop size between frames
-  * @param {number} [sampleRate=44100] the audio sampling rate [Hz]
-  * @returns {object} {fft: 'the output FFT frame'}
-  * @memberof Essentia
-  */
-  SineModelSynth(magnitudes: any, frequencies: any, phases: any, fftSize: number=2048, hopSize: number=512, sampleRate: number=44100) {
-    return this.algorithms.SineModelSynth(magnitudes, frequencies, phases, fftSize, hopSize, sampleRate);
-  }
-   
-  /**
   * This algorithm subtracts the sinusoids computed with the sine model analysis from an input audio signal. It ouputs an audio signal. Check https://essentia.upf.edu/reference/std_SineSubtraction.html for more details.
   * @method
   * @param {VectorFloat} frame the input audio frame to subtract from
@@ -2840,17 +2585,6 @@ class Essentia {
       vecfrequencyBands.push_back(frequencyBands[i]);
     }
     return this.algorithms.SingleBeatLoudness(beat, beatDuration, beatWindowDuration, vecfrequencyBands, onsetStart, sampleRate);
-  }
-   
-  /**
-  * This algorithm estimates the single gaussian distribution for a matrix of feature vectors. For example, using the single gaussian on descriptors like MFCC with the symmetric Kullback-Leibler divergence might be a much better option than just the mean and variance of the descriptors over a whole signal. Check https://essentia.upf.edu/reference/std_SingleGaussian.html for more details.
-  * @method
-  * @param {VectorFloat} matrix the input data matrix (e.g. the MFCC descriptor over frames)
-  * @returns {object} {mean: 'the mean of the values', covariance: 'the covariance matrix', inverseCovariance: 'the inverse of the covariance matrix'}
-  * @memberof Essentia
-  */
-  SingleGaussian(matrix: any) {
-    return this.algorithms.SingleGaussian(matrix);
   }
    
   /**
@@ -3142,45 +2876,6 @@ class Essentia {
   */
   StartStopSilence(frame: any, threshold: number=-60) {
     return this.algorithms.StartStopSilence(frame, threshold);
-  }
-   
-  /**
-  * This algorithm outputs left and right channel separately given a stereo signal. If the signal is monophonic, it outputs a zero signal on the right channel. Check https://essentia.upf.edu/reference/std_StereoDemuxer.html for more details.
-  * @method
-  * @param {VectorVectorFloat} audio the audio signal
-  * @returns {object} {left: 'the left channel of the audio signal', right: 'the right channel of the audio signal'}
-  * @memberof Essentia
-  */
-  StereoDemuxer(audio: any) {
-    return this.algorithms.StereoDemuxer(audio);
-  }
-   
-  /**
-  * This algorithm outputs a stereo signal given left and right channel separately. Check https://essentia.upf.edu/reference/std_StereoMuxer.html for more details.
-  * @method
-  * @param {VectorFloat} left the left channel of the audio signal
-  * @param {VectorFloat} right the right channel of the audio signal
-  * @returns {object} {audio: 'the audio signal'}
-  * @memberof Essentia
-  */
-  StereoMuxer(left: any, right: any) {
-    return this.algorithms.StereoMuxer(left, right);
-  }
-   
-  /**
-  * This algorithm extracts a segment of a stereo audio signal given its start and end times.
-  Giving "startTime" greater than "endTime" will raise an exception. Check https://essentia.upf.edu/reference/std_StereoTrimmer.html for more details.
-  * @method
-  * @param {VectorVectorFloat} signal the input stereo signal
-  * @param {boolean} [checkRange=false] check whether the specified time range for a slice fits the size of input signal (throw exception if not)
-  * @param {number} [endTime=1e+06] the end time of the slice you want to extract [s]
-  * @param {number} [sampleRate=44100] the sampling rate of the input audio signal [Hz]
-  * @param {number} [startTime=0] the start time of the slice you want to extract [s]
-  * @returns {object} {signal: 'the trimmed stereo signal'}
-  * @memberof Essentia
-  */
-  StereoTrimmer(signal: any, checkRange: boolean=false, endTime: number=1e+06, sampleRate: number=44100, startTime: number=0) {
-    return this.algorithms.StereoTrimmer(signal, checkRange, endTime, sampleRate, startTime);
   }
    
   /**
