@@ -1,16 +1,13 @@
-EMSCRIPTEN=/home/albin/Documents/Github/Final_Github/emsdk/upstream/emscripten
 LIB_DIR_ESSENTIA=$(EMSCRIPTEN)/system/local/lib
 ESSENTIA_JS_WEB=essentia-custom-extractor.web.js
 ESSENTIA_JS_WEB_WASM=essentia-custom-extractor.web.wasm
 ESSENTIA_JS_MODULE=essentia-custom-extractor.module.js
-PRE_JS_WASM=../../src/js/wasm.module.pre.js
-POST_JS_WEB_WASM=../../src/js/wasm.webmodule.post.js
-POST_JS_ES6_WASM=../../src/js/wasm.es6module.post.js
+PRE_JS_WASM=../../js/wasm.module.pre.js
+POST_JS_WEB_WASM=../../js/wasm.webmodule.post.js
+POST_JS_ES6_WASM=../../js/wasm.es6module.post.js
 
 build:
-
 	@echo "Compiling the Essentia custom cpp extractor"
-
 	# Async builds for html imports ...
 	@emcc --bind -Oz \
 	   bindings_extractor.cpp essentia_custom_extractor.cpp ${LIB_DIR_ESSENTIA}/essentia.a \
