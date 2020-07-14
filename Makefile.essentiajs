@@ -1,5 +1,5 @@
 ESSENTIAJS_VERSION=0.1.0-dev
-LIB_DIR_ES=$(EMSCRIPTEN)/system/local/lib
+LIB_DIR_ESSENTIA=$(EMSCRIPTEN)/system/local/lib
 BUILD_DIR_ES=builds
 DIST_DIR_ES=dist
 BINDING_CPP_ES=src/cpp/bindings_essentiajs.cpp
@@ -32,7 +32,7 @@ build:
 	@echo "Linking and compiling the bindings with essentia to js, wasm files ..."
 	@echo "compiling async builds..."
 	@emcc --bind -Oz \
-	   $(BUILD_DIR_ES)/essentiajs.bc ${LIB_DIR_ES}/essentia.a \
+	   $(BUILD_DIR_ES)/essentiajs.bc ${LIB_DIR_ESSENTIA}/essentia.a \
 	   -s WASM=1 \
 	   -o $(ESSENTIA_JS_WEB) \
 	   -s EXCEPTION_DEBUG \
@@ -46,7 +46,7 @@ build:
 	@echo "compiling sync builds..."
 	@emcc --bind -Oz \
 	   -s WASM=1 \
-	   $(BUILD_DIR_ES)/essentiajs.bc ${LIB_DIR_ES}/essentia.a \
+	   $(BUILD_DIR_ES)/essentiajs.bc ${LIB_DIR_ESSENTIA}/essentia.a \
 	   -o $(ESSENTIA_JS_MODULE) \
 	   -s BINARYEN_ASYNC_COMPILATION=0 \
 	   -s ALLOW_MEMORY_GROWTH=1 \

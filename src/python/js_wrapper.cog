@@ -33,7 +33,7 @@
  */
 class Essentia {
   /** 
-  * @property {EssentiaEmscriptenModule} this.module Essentia emcripten global module object 
+  * @property {EssentiaEmscriptenModule} this.module Essentia WASM emcripten global module object 
   * @property {string} this.version Essentia WASM backend version
   * @property {string} this.algorithmNames List of available Essentia alogrithms from the WASM backend
   */
@@ -44,12 +44,12 @@ class Essentia {
 
   /**  
   * @constructs
-  * @param {EssentiaEmscriptenModule} EssentiaModule Essentia emcripten global module object which is loaded from 'essentia-wasm.*.js file'
+  * @param {EssentiaWASM} Essentia WASM backend (emcripten global module object) which is loaded from 'essentia-wasm.*.js file'
   * @param {boolean} [isDebug=false]
   */
-  constructor(public EssentiaModule: any, public isDebug: boolean=false) {
-    this.algorithms = new EssentiaModule.EssentiaJS(isDebug);
-    this.module = EssentiaModule;
+  constructor(public EssentiaWASM: any, public isDebug: boolean=false) {
+    this.algorithms = new EssentiaWASM.EssentiaJS(isDebug);
+    this.module = EssentiaWASM;
     this.version = this.algorithms.version;
     this.algorithmNames = this.algorithms.algorithmNames;
   }
