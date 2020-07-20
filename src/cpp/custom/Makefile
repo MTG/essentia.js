@@ -1,3 +1,4 @@
+EIGEN_PATH=/usr/local/include/eigen3
 LIB_DIR_ESSENTIA=$(EMSCRIPTEN)/system/local/lib
 ESSENTIA_JS_WEB=essentia-custom-extractor.web.js
 ESSENTIA_JS_WEB_WASM=essentia-custom-extractor.web.wasm
@@ -9,8 +10,8 @@ POST_JS_ES6_WASM=../../js/wasm.es6module.post.js
 build:
 	@echo "Compiling the Essentia custom cpp extractor"
 	# Async builds for html imports ...
-	@emcc --bind -Oz \
-	   bindings_extractor.cpp essentia_custom_extractor.cpp ${LIB_DIR_ESSENTIA}/essentia.a \
+	@emcc -I $(EIGEN_PATH) \
+	   --bind -Oz bindings_extractor.cpp essentia_custom_extractor.cpp ${LIB_DIR_ESSENTIA}/essentia.a \
 	   -s WASM=1 \
 	   -o $(ESSENTIA_JS_WEB) \
 	   -s EXCEPTION_DEBUG \
@@ -24,9 +25,8 @@ build:
 	@echo "Done ..."
 	   
 	# Sync builds for ES6 import and AudioWorklet support ...
-	@emcc --bind -Oz \
+	@emcc --bind -Oz bindings_extractor.cpp essentia_custom_extractor.cpp ${LIB_DIR_ESSENTIA}/essentia.a \
 		-s WASM=1 \
-		bindings_extractor.cpp essentia_custom_extractor.cpp ${LIB_DIR_ESSENTIA}/essentia.a \
 		-o $(ESSENTIA_JS_MODULE) \
 		-s BINARYEN_ASYNC_COMPILATION=0 \
 		-s ALLOW_MEMORY_GROWTH=1 \

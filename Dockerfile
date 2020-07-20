@@ -1,18 +1,17 @@
-ARG EMSCRIPTEN_VERSION=1.38.43
-FROM trzeci/emscripten-slim:sdk-tag-${EMSCRIPTEN_VERSION}-64bit
+ARG EMSCRIPTEN_VERSION=latest
+FROM emscripten/emsdk:${EMSCRIPTEN_VERSION}
 
 ENV LANG C.UTF-8
 
 # compile essentia with emscripten and selected third-party dependencies
 RUN apt-get update \
-    && apt-get install -y build-essential libsamplerate0-dev git-core cmake curl nano \
-    && mkdir /essentia && cd /essentia && git clone -b emscripten https://github.com/albincorreya/essentia.git \
+    && apt-get install -y cmake curl nano python-dev python-numpy-dev libpython2.7 python-pip libeigen3-dev \
+    && mkdir /essentia && cd /essentia && git clone https://github.com/MTG/essentia.git \
     && cd /essentia/essentia/packaging/debian_3rdparty \
-    && bash -C "./build_libsamplerate.sh" \
     && bash -C "./build_eigen3.sh" && cd ../../ \
     && emconfigure sh -c './waf configure --prefix=$EMSCRIPTEN/system/local/ --build-static --fft=KISS --emscripten --static-dependencies' \
     && emmake ./waf && emmake ./waf install \
-    &&  apt-get remove -y libsamplerate0-dev \
+    &&  apt-get remove -y python-dev libeigen3-dev \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/* \
@@ -20,18 +19,17 @@ RUN apt-get update \
 
 # copy and install python dependencies
 COPY src/python/requirements.txt /tmp/requirements.txt
-
 RUN pip install --upgrade setuptools \
     && pip install --no-cache-dir -r /tmp/requirements.txt \
     && rm /tmp/requirements.txt
 
-# update nodejs and npm to latest stable version
-RUN npm install n -g && n stable 
+# add latest eigen3 header files for linking the essentia.js binding builds
+ARG EIGEN_VERSION=3.3.7
+RUN wget  -P /usr/local/include/ "https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-${EIGEN_VERSION}.tar.gz" \
+    && cd /usr/local/include/ && tar -xvzf eigen-${EIGEN_VERSION}.tar.gz \
+    && rm -f eigen-${EIGEN_VERSION}.tar.gz && mv eigen-${EIGEN_VERSION} eigen3
 
-# (hacky way) Change the default environment varibales emsdk entrypoint to our custom node installation since essentia.js requires the latest Nodejs engine (v12 or later) 
-RUN echo 'export PATH="/emsdk_portable:/emsdk_portable/clang/tag-e1.38.43/build_tag-e1.38.43_64/bin:/emsdk_portable/emscripten/tag-1.38.43:/emsdk_portable/binaryen/tag-1.38.43_64bit_binaryen/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/bin/node:/usr/local/bin/npm"' >> /emsdk_portable/emsdk_set_env.sh 
-RUN echo 'export EMSDK_NODE="/usr/local/bin/node"' >> /emsdk_portable/emsdk_set_env.sh
-
-ENV NODE_JS /usr/local/bin/node
+ENV EIGEN_PATH /usr/local/include/eigen3
+ENV EMSCRIPTEN /emsdk/upstream/emscripten
 
 WORKDIR /essentia/
