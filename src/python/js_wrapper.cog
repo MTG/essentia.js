@@ -125,7 +125,19 @@ class Essentia {
   }
 
   /**
-  * This algorithm computes the EBU R128 loudness descriptors of an audio signal. Check https://essentia.upf.edu/reference/std_LoudnessEBUR128.html for more details.
+  * This algorithm downmixes the signal into a single channel given a stereo signal. It is a wrapper around https://essentia.upf.edu/reference/std_MonoMixer.html.
+  * @method
+  * @param {VectorFloat} leftChannel the left channel of the stereo audio signal
+  * @param {VectorFloat} rightChannel the right channel of the stereo audio signal
+  * @returns {object} {audio: 'the downmixed mono signal'}
+  * @memberof Essentia
+  */
+  MonoMixer(leftSignal: any, rightSignal: any) {
+    return this.algorithms.MonoMixer(leftSignal, rightSignal);
+  }
+
+  /**
+  * This algorithm computes the EBUR128 loudness descriptors of an audio signal. It is a wrapper around https://essentia.upf.edu/reference/std_LoudnessEBUR128.html.
   * @method
   * @param {VectorFloat} leftChannel the left channel of the stereo audio signal
   * @param {VectorFloat} rightChannel the right channel of the stereo audio signal

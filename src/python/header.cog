@@ -22,7 +22,6 @@
 #ifndef ESSENTIAJS_H
 #define ESSENTIAJS_H
 
-#include <vector>
 #include <emscripten/bind.h>
 
 using namespace emscripten;
@@ -38,6 +37,7 @@ class EssentiaJS {
     void shutdown();
     // method for generating frames from a given audio signal
     std::vector<std::vector<float> > FrameGenerator(const val& signalArray, int frameSize, int hopSize);
+    val MonoMixer(std::vector<float>& left_channel, std::vector<float>& right_channel);
     val LoudnessEBUR128(std::vector<float>& left_channel, std::vector<float>& right_channel, const float hopSize=0.1, const float sampleRate=44100, const bool startAtZero=false);
     // NOTE: The following code snippets are machine generated. Do not edit.    
     /*[[[cog
