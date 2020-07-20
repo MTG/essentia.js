@@ -6,7 +6,7 @@ language: cpp
 sudo: required
 services:
     - docker
-env: DOCKER_IMAGE=mtgupf/essentia-emscripten:2.1-beta5-dev
+env: DOCKER_IMAGE=mtgupf/essentia-emscripten:latest
      ES_MAKE_FILE=Makefile.essentiajs
 
 install:
