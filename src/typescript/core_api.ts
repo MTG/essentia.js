@@ -33,7 +33,7 @@
  */
 class Essentia {
   /** 
-  * @property {EssentiaEmscriptenModule} this.module Essentia emcripten global module object 
+  * @property {EssentiaEmscriptenModule} this.module Essentia WASM emcripten global module object 
   * @property {string} this.version Essentia WASM backend version
   * @property {string} this.algorithmNames List of available Essentia alogrithms from the WASM backend
   */
@@ -44,12 +44,12 @@ class Essentia {
 
   /**  
   * @constructs
-  * @param {EssentiaEmscriptenModule} EssentiaModule Essentia emcripten global module object which is loaded from 'essentia-wasm.*.js file'
+  * @param {EssentiaWASM} Essentia WASM backend (emcripten global module object) which is loaded from 'essentia-wasm.*.js file'
   * @param {boolean} [isDebug=false]
   */
-  constructor(public EssentiaModule: any, public isDebug: boolean=false) {
-    this.algorithms = new EssentiaModule.EssentiaJS(isDebug);
-    this.module = EssentiaModule;
+  constructor(public EssentiaWASM: any, public isDebug: boolean=false) {
+    this.algorithms = new EssentiaWASM.EssentiaJS(isDebug);
+    this.module = EssentiaWASM;
     this.version = this.algorithms.version;
     this.algorithmNames = this.algorithms.algorithmNames;
   }
@@ -125,7 +125,19 @@ class Essentia {
   }
 
   /**
-  * This algorithm computes the EBU R128 loudness descriptors of an audio signal. Check https://essentia.upf.edu/reference/std_LoudnessEBUR128.html for more details.
+  * This algorithm downmixes the signal into a single channel given a stereo signal. It is a wrapper around https://essentia.upf.edu/reference/std_MonoMixer.html.
+  * @method
+  * @param {VectorFloat} leftChannel the left channel of the stereo audio signal
+  * @param {VectorFloat} rightChannel the right channel of the stereo audio signal
+  * @returns {object} {audio: 'the downmixed mono signal'}
+  * @memberof Essentia
+  */
+  MonoMixer(leftSignal: any, rightSignal: any) {
+    return this.algorithms.MonoMixer(leftSignal, rightSignal);
+  }
+
+  /**
+  * This algorithm computes the EBUR128 loudness descriptors of an audio signal. It is a wrapper around https://essentia.upf.edu/reference/std_LoudnessEBUR128.html.
   * @method
   * @param {VectorFloat} leftChannel the left channel of the stereo audio signal
   * @param {VectorFloat} rightChannel the right channel of the stereo audio signal
@@ -528,19 +540,6 @@ class Essentia {
   }
    
   /**
-  * This algorithm computes the fingerprint of the input signal using Chromaprint algorithm. It is a wrapper of the Chromaprint library [1,2]. The chromaprints are returned as base64-encoded strings. Check https://essentia.upf.edu/reference/std_Chromaprinter.html for more details.
-  * @method
-  * @param {VectorFloat} signal the input audio signal
-  * @param {number} [maxLength=0] use the first 'maxLength' seconds to compute the chromaprint. 0 to use the full audio length [s]
-  * @param {number} [sampleRate=44100] the input audio sampling rate [Hz]
-  * @returns {object} {fingerprint: 'the chromaprint as a base64-encoded string'}
-  * @memberof Essentia
-  */
-  Chromaprinter(signal: any, maxLength: number=0, sampleRate: number=44100) {
-    return this.algorithms.Chromaprinter(signal, maxLength, sampleRate);
-  }
-   
-  /**
   * This algorithm detects the locations of impulsive noises (clicks and pops) on the input audio frame. It relies on LPC coefficients to inverse-filter the audio in order to attenuate the stationary part and enhance the prediction error (or excitation noise)[1]. After this, a matched filter is used to further enhance the impulsive peaks. The detection threshold is obtained from a robust estimate of the excitation noise power [2] plus a parametric gain value. Check https://essentia.upf.edu/reference/std_ClickDetector.html for more details.
   * @method
   * @param {VectorFloat} frame the input frame (must be non-empty)
@@ -572,7 +571,7 @@ class Essentia {
   }
    
   /**
-  * This algorithm computes a cover song similiarity measure from an input cross similarity matrix of two chroma vectors of a query and reference song using various alignment constraints of smith-waterman local-alignment algorithm. Check https://essentia.upf.edu/reference/std_CoverSongSimilarity.html for more details.
+  * This algorithm computes a cover song similiarity measure from a binary cross similarity matrix input between two chroma vectors of a query and reference song using various alignment constraints of smith-waterman local-alignment algorithm. Check https://essentia.upf.edu/reference/std_CoverSongSimilarity.html for more details.
   * @method
   * @param {VectorVectorFloat} inputArray  a 2D binary cross-similarity matrix between two audio chroma vectors (query vs reference song) (refer 'ChromaCrossSimilarity' algorithm').
   * @param {string} [alignmentType=serra09] choose either one of the given local-alignment constraints for smith-waterman algorithm as described in [2] or [3] respectively.

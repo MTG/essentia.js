@@ -19,7 +19,6 @@
 
 // NOTE: This source code is machine-generated.
 
-#include <stdio.h>
 #include <essentia/algorithmfactory.h>
 #include <essentia/essentiamath.h>
 #include <essentia/pool.h>
@@ -95,6 +94,33 @@ std::vector<std::vector<float> > EssentiaJS::FrameGenerator(const val& signalArr
   delete fc;
   return pool.value<std::vector<std::vector<float> > >("frames");
 }
+
+// This a wrapper for MonoMixer algorithm to accept both left and right channels to downmix an stereo channel input to mono
+// check https://essentia.upf.edu/reference/std_MonoMixer.html for algorithm details
+val EssentiaJS::MonoMixer(std::vector<float>& left_channel, std::vector<float>& right_channel) {
+  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+
+  Algorithm* algoStereoMuxer = factory.create("StereoMuxer");
+  algoStereoMuxer->input("left").set(left_channel);
+  algoStereoMuxer->input("right").set(right_channel);
+  std::vector<StereoSample> stereoSignal;
+  algoStereoMuxer->output("audio").set(stereoSignal);
+  algoStereoMuxer->compute();
+  delete algoStereoMuxer;
+
+  Algorithm* algoMonoMixer = factory.create("MonoMixer");
+  std::vector<float> output_audio;
+  algoMonoMixer->input("audio").set(stereoSignal);
+  // set numberChannels=2 since we only deal with stereo signal in this wrapper
+  algoMonoMixer->input("numberChannels").set(2);
+  algoMonoMixer->output("audio").set(output_audio);
+  algoMonoMixer->compute();
+
+  val outputMonoMixer(val::object());
+  outputMonoMixer.set("audio", output_audio);
+  delete algoMonoMixer;
+  return outputMonoMixer;
+};
 
 // This a wrapper for LoudnessEBUR128 algorithm to accept both left and right channels of an stereo audio signal seperately
 // check https://essentia.upf.edu/reference/std_LoudnessEBUR128.html for algorithm details
@@ -524,20 +550,6 @@ val EssentiaJS::Chromagram(std::vector<float>& input_frame, const int binsPerOct
   outputChromagram.set("chromagram", output_chromagram);
   delete algoChromagram;
   return outputChromagram;
-}
- 
-// check https://essentia.upf.edu/reference/std_Chromaprinter.html
-val EssentiaJS::Chromaprinter(std::vector<float>& input_signal, const float maxLength, const float sampleRate) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoChromaprinter = factory.create("Chromaprinter", "maxLength", maxLength, "sampleRate", sampleRate);
-  algoChromaprinter->input("signal").set(input_signal);
-  std::string output_fingerprint;
-  algoChromaprinter->output("fingerprint").set(output_fingerprint);
-  algoChromaprinter->compute();
-  val outputChromaprinter(val::object());
-  outputChromaprinter.set("fingerprint", output_fingerprint);
-  delete algoChromaprinter;
-  return outputChromaprinter;
 }
  
 // check https://essentia.upf.edu/reference/std_ClickDetector.html
