@@ -24,7 +24,7 @@ TO_EXCLUDE_ALGOS_TXT_FILE = "excluded_algos.md"
 # see https://github.com/MTG/essentia.js/issues/27
 DEFAULT_EXCLUDE_ALGOS = [# requires FFTW, TagLib or Chromaprint dependencies
                         'MonoLoader', 'AudioLoader', 'EasyLoader', 'MonoWriter', 'MonoMixer', 'EqloudLoader', 'AudioWriter',
-                        'ChromaPrinter', 'Extractor', 'FreesoundExtractor', 'MusicExtractor', 
+                        'Chromaprinter', 'Extractor', 'FreesoundExtractor', 'MusicExtractor', 
                         'PCA', 'PoolAggregator', 'YamlInput', 'YamlOutput', 'MetadataReader', 'Viterbi', 'SilenceRate',
                         'FFTW', 'IFFTW', 'IFFTA', 'FFTA', 'FFTWComplex', 'IFFTWComplex', 'FFTAComplex', 'IFFTAComplex',
                         # requires Gaia and Tensorflow dependencies
