@@ -4,7 +4,7 @@ Module['vectorToArray'] = function(vect) {
   const typedArray = new Float32Array(vect.size());
     for (var i=0; i < vect.size(); i++) {
       typedArray[i] = vect.get(i); 
-      typedArray[i] = parseFloat(typedArray[i].toFixed(2));
+      // typedArray[i] = parseFloat(typedArray[i].toFixed(2));
     }
   return typedArray;
 }
