@@ -5,7 +5,7 @@ MonoWriter
 MonoMixer
 EqloudLoader
 AudioWriter
-ChromaPrint
+Chromaprinter
 Extractor
 FreesoundExtractor
 MusicExtractor

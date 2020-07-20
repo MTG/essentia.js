@@ -20,12 +20,14 @@ Centroid
 ChordsDescriptors
 ChordsDetection
 ChordsDetectionBeats
+ChromaCrossSimilarity
 Chromagram
-Chromaprinter
 ClickDetector
 Clipper
+CoverSongSimilarity
 Crest
 CrossCorrelation
+CrossSimilarityMatrix
 CubicSpline
 DCRemoval
 DCT
@@ -94,6 +96,7 @@ Median
 MedianFilter
 MelBands
 Meter
+MinMax
 MinToTotal
 MovingAverage
 MultiPitchKlapuri
