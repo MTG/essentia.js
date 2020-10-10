@@ -1,13 +1,18 @@
-ESSENTIAJS_VERSION=0.1.0-dev
+ESSENTIAJS_VERSION=0.1.0
+## Path to libs for Emscripten
 LIB_DIR_ESSENTIA=$(EMSCRIPTEN)/system/local/lib
 EIGEN_PATH=/usr/local/include/eigen3
-BUILD_DIR_ES=builds
-DIST_DIR_ES=dist
+## pass custom build and dist directories using system environment variables
+BUILD_DIR_ES := $(or $(ESSENTIAJS_WASM_BUILDS_DIR),builds)
+DIST_DIR_ES := $(or $(ESSENTIAJS_BUILDS_DIR),dist)
+## C++ source code for Essentia.js
 BINDING_ESSENTIAJS=src/cpp/bindings_essentiajs.cpp
 INCLUDE_ESSENTIAJS=src/cpp/includes/essentiajs.cpp 
+## Define builds
 ESSENTIA_JS_WEB=$(BUILD_DIR_ES)/essentia-wasm.web.js
 ESSENTIA_JS_WEB_WASM=$(BUILD_DIR_ES)/essentia-wasm.web.wasm
 ESSENTIA_JS_MODULE=$(BUILD_DIR_ES)/essentia-wasm.module.js
+## Path to custom --pre-js and --post-js files for Emscripten
 PRE_JS_WASM=src/js/wasm.module.pre.js
 POST_JS_WEB_WASM=src/js/wasm.webmodule.post.js
 POST_JS_ES6_WASM=src/js/wasm.es6module.post.js
