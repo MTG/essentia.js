@@ -4,4 +4,6 @@
 node_modules/
 *.pyc
 builds/
-dist/*
+dist/
+coverage/
+package-lock.json
