@@ -6,7 +6,7 @@
 [![npm version](https://badge.fury.io/js/essentia.js.svg)](https://badge.fury.io/js/essentia.js)
 [![](https://data.jsdelivr.com/v1/package/npm/essentia.js/badge)](https://www.jsdelivr.com/package/npm/essentia.js)
 
-JavaScript library for music/audio signal analysis and processing for both real-time and offline use-cases. The core of [`essentia.js`](/) is powered by [essentia C++ library](https://essentia.upf.edu) back-end using [WebAssembly](https://webassembly.org/) along with a high-level Typescript API and utility modules. ie, Now you can run a extensive colleciton of music/audio processing and analysis algorithms on your web-browser or Node.js applications with ease-of-use. [`essentia.js`]() also provides additional modules for easy-to-use configurable feature extractors for selected features and helper classes for visualizing common music processing features directly into your HTML web page using [Plotly.js](https://plotly.com/javascript/) library.
+A JavaScript library for music/audio signal analysis and processing for both real-time and offline use-cases. The core of [`essentia.js`](/) is powered by [Essentia C++ library](https://essentia.upf.edu) back-end using [WebAssembly](https://webassembly.org/) along with a high-level Typescript API and add-on utility modules. ie, Now you can run a extensive colleciton of music/audio processing and analysis algorithms on your web-browser or Node.js applications with ease-of-use. [`essentia.js`]() also provides additional modules for easy-to-use configurable feature extractors for some selected features and helper classes for visualizing common music processing features directly into your HTML web page using [Plotly.js](https://plotly.com/javascript/) library.
 
 - Repository: [https://github.com/MTG/essentia.js](https://github.com/MTG/essentia.js)
 
@@ -18,5 +18,7 @@ JavaScript library for music/audio signal analysis and processing for both real-
   
 - Examples: [https://mtg.github.io/essentia.js/examples](https://mtg.github.io/essentia.js/examples)
 
+
+You are also most welcome to [contribute](CONTRIBUTING.md) to `essentia.js`. 
 
 > NOTE: Currently under active-development, some of the algorithms are not yet manually tested on the JavaScript front. Please submit the issues at https://github.com/MTG/essentia.js/issues.
