@@ -90,6 +90,15 @@ class Essentia {
   }
 
   /**
+   * Delete essentiajs class instance
+   * @method
+   * @memberof Essentia
+   */
+  delete() {
+    this.algorithms.delete();
+  }
+
+  /**
    * Convert an input JS array into VectorFloat type
    * @method
    * @param {Float32Array} inputArray input JS typed array
