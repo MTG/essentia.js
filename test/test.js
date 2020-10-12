@@ -1,6 +1,7 @@
 // Tests for essentia.js 
 // Unit tests were not done each algorithms since they were already passed tested on C++ upstream repo
 // However, in future we also need to check it is working consistenly on the web-end as well.
+// Another set of tests should be related with testing regression of few selected feture extractors with their corresponding C++ ones.
 
 var chai = require('chai');
 var esLib = require('../index');
@@ -25,5 +26,5 @@ describe('essentia.js', function() {
     ]);
   });
   // TODO: add more tests for testing the library on various web platforms.
-  // Also regression test for feature extractors comparing using C++, Python and JS interface.
+  // Also write regression test for feature extractors comparing using C++, Python and JS interface.
 });
