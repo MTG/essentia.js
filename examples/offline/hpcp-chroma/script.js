@@ -10,6 +10,8 @@ let plotChroma;
 let plotContainerId = "plotDiv";
 
 let isComputed = false;
+let frameSize = 4096;
+let hopSize = 2048;
 
 // callback function which compute the frame-wise HPCP chroma of input audioURL on a button.onclick event
 async function onClickFeatureExtractor() {
@@ -19,19 +21,27 @@ async function onClickFeatureExtractor() {
   if (isComputed) { plotChroma.destroy(); };
   
   // modifying default extractor settings
-  essentiaExtractor.frameSize = 4096;
-  essentiaExtractor.hopSize = 2048;
+  essentiaExtractor.frameSize = frameSize;
+  essentiaExtractor.hopSize = hopSize;
   essentiaExtractor.sampleRate = audioCtx.sampleRate;
   // settings specific to an algorithm
   essentiaExtractor.profile.HPCP.nonLinear = true;
+
+  // Now generate overlapping frames with given frameSize and hopSize
+  // You could also do it using pure JS to avoid arrayToVector and vectorToArray conversion
+  let audioFrames = essentiaExtractor.FrameGenerator(audioData, frameSize, hopSize);
+  let hpcpgram = [];
+  for (var i=0; i<audioFrames.size(); i++) {
+    hpcpgram.push(essentiaExtractor.hpcpExtractor(essentiaExtractor.vectorToArray(audioFrames.get(i))));
+  }
   
-  let chromaHPCP = essentiaExtractor.hpcpgram(audioData);
   // plot the feature
   plotChroma.create(
-    chromaHPCP, // input feature array
+    hpcpgram, // input feature array
     "HPCP Chroma", // plot title
     audioData.length, // length of audio in samples
-    audioCtx.sampleRate // audio sample rate
+    audioCtx.sampleRate, // audio sample rate,
+    hopSize // hopSize
   );
   essentiaExtractor.delete();
   isComputed = true;
@@ -48,7 +58,7 @@ $(document).ready(function() {
   );
 
   // Now let's load the essentia wasm back-end, if so create UI elements for computing features
-  EssentiaModule().then(async function(WasmModule) {
+  EssentiaWASM().then(async function(WasmModule) {
     // populate html audio player with audio
     let player = document.getElementById("audioPlayer");
     player.src = audioURL;

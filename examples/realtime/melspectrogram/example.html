@@ -187,8 +187,6 @@
 
           let audioBuffer = event.inputBuffer.getChannelData(0);
 
-          console.log(audioBuffer.length);
-
           // modifying default extractor settings
           essentiaExtractor.frameSize = bufferSize;
           essentiaExtractor.hopSize = hopSize;
