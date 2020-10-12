@@ -58,7 +58,7 @@ let LayoutChromaPlot = {
       title: 'Time'
   },
   yaxis: {
-      title: 'Bins',
+      title: 'Pitch class',
       range: [0, 11]
   },
 };
@@ -240,13 +240,15 @@ class PlotHeatmap extends EssentiaPlot {
    * @param {string} plotTitle title of the plot
    * @param {*} audioFrameSize length of input audio data in samples
    * @param {*} audioSampleRate sample rate of input audio
+   * @param {*} [hopSize=0] hopSize used for the feture extraction if applies.
    * @param {string} [colorscale='Jet']
    * @memberof PlotHeatmap
    */
   create(featureArray: any,  
         plotTitle: string,
-        audioFrameSize: any, 
-        audioSampleRate: any,
+        audioFrameSize: number, 
+        audioSampleRate: number,
+        hopSize: number,
         colorscale: string='Jet',) {
 
     this.plotLayout.title = plotTitle;
@@ -257,22 +259,54 @@ class PlotHeatmap extends EssentiaPlot {
     } 
      
     if (!this.isPlotting) {
-      let timeAxis = this.makeLinearSpace(this.startTimeIndex, audioFrameSize / audioSampleRate, featureArray.length);
+
+      let heatmapFeature;
+      let timeAxis;
+
+      if ((featureArray[0].constructor === Array) || (featureArray[0].constructor === Float32Array)) {
+        if (featureArray.length == 1) {
+          heatmapFeature = featureArray;
+          timeAxis = [this.startTimeIndex + hopSize/audioSampleRate, this.startTimeIndex + audioFrameSize / audioSampleRate];
+        } else {
+          heatmapFeature = featureArray;
+          timeAxis = this.makeLinearSpace(this.startTimeIndex, audioFrameSize / audioSampleRate, heatmapFeature.length);
+        } 
+      } else {
+        throw "Got 1D array as input, expect a 2D array..."
+      }
+       
       let data = {
         x: timeAxis,
         y: this.yAxis,
-        z: featureArray,
+        z: heatmapFeature,
         colorscale: colorscale,
         type: 'heatmap',
         transpose: true,
       };
+
       this.Plotly.newPlot(this.divId, [data], this.plotLayout);
       this.isPlotting = true;
       this.startTimeIndex = timeAxis[timeAxis.length-1];
 
+      console.log(this.startTimeIndex);
+
     } else {
       // realtime mode
-      let timeAxis = this.makeLinearSpace(this.startTimeIndex, this.startTimeIndex + (audioFrameSize / audioSampleRate), featureArray.length);
+      let heatmapFeature;
+      let timeAxis;
+
+      if ((featureArray[0].constructor === Array) || (featureArray[0].constructor === Float32Array)) {
+        if (featureArray.length == 1) {
+          heatmapFeature = featureArray;
+          timeAxis = [this.startTimeIndex + hopSize/audioSampleRate, this.startTimeIndex + audioFrameSize / audioSampleRate];
+        } else {
+          heatmapFeature = featureArray;
+          timeAxis = this.makeLinearSpace(this.startTimeIndex, audioFrameSize / audioSampleRate, heatmapFeature.length);
+        }
+      } else {
+        throw "Got 1D array as input, expect a 2D array..."
+      }
+    
       this.startTimeIndex = timeAxis[timeAxis.length-1]; 
       // realtime mode  
       this.Plotly.extendTraces(this.divId, {

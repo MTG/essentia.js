@@ -1,12 +1,18 @@
-ESSENTIAJS_VERSION=0.0.9-dev
-LIB_DIR_ES=$(EMSCRIPTEN)/system/local/lib
-BUILD_DIR_ES=builds
-DIST_DIR_ES=dist
-BINDING_CPP_ES=src/cpp/bindings_essentiajs.cpp
-TO_INCLUDE_ES=src/cpp/includes/essentiajs.cpp 
+ESSENTIAJS_VERSION=0.1.0
+## Path to libs for Emscripten
+LIB_DIR_ESSENTIA=$(EMSCRIPTEN)/system/local/lib
+EIGEN_PATH=/usr/local/include/eigen3
+## pass custom build and dist directories using system environment variables
+BUILD_DIR_ES := $(or $(ESSENTIAJS_WASM_BUILDS_DIR),builds)
+DIST_DIR_ES := $(or $(ESSENTIAJS_BUILDS_DIR),dist)
+## C++ source code for Essentia.js
+BINDING_ESSENTIAJS=src/cpp/bindings_essentiajs.cpp
+INCLUDE_ESSENTIAJS=src/cpp/includes/essentiajs.cpp 
+## Define builds
 ESSENTIA_JS_WEB=$(BUILD_DIR_ES)/essentia-wasm.web.js
 ESSENTIA_JS_WEB_WASM=$(BUILD_DIR_ES)/essentia-wasm.web.wasm
 ESSENTIA_JS_MODULE=$(BUILD_DIR_ES)/essentia-wasm.module.js
+## Path to custom --pre-js and --post-js files for Emscripten
 PRE_JS_WASM=src/js/wasm.module.pre.js
 POST_JS_WEB_WASM=src/js/wasm.webmodule.post.js
 POST_JS_ES6_WASM=src/js/wasm.es6module.post.js
@@ -20,9 +26,8 @@ build:
 
 	@echo "Compiling the emscripten embind cpp bindings to bitcode ..."
 
-	@emcc --bind -Oz \
-	   $(BINDING_CPP_ES) \
-	   $(TO_INCLUDE_ES) \
+	@emcc -I $(EIGEN_PATH) \
+	   --bind -Oz $(BINDING_ESSENTIAJS) $(INCLUDE_ESSENTIAJS) \
 	   -o $(BUILD_DIR_ES)/essentiajs.bc \
 	   -s EXCEPTION_DEBUG \
 	   -s ASSERTIONS=2 \
@@ -31,22 +36,21 @@ build:
 
 	@echo "Linking and compiling the bindings with essentia to js, wasm files ..."
 	@echo "compiling async builds..."
-	@emcc --bind -Oz \
-	   $(BUILD_DIR_ES)/essentiajs.bc ${LIB_DIR_ES}/essentia.a \
+	@emcc --bind -Oz $(BUILD_DIR_ES)/essentiajs.bc ${LIB_DIR_ESSENTIA}/essentia.a \
 	   -s WASM=1 \
 	   -o $(ESSENTIA_JS_WEB) \
 	   -s EXCEPTION_DEBUG \
 	   -s ASSERTIONS=2 \
 	   -s ENVIRONMENT=web \
 	   -s MODULARIZE=1 \
-	   -s EXPORT_NAME="EssentiaModule" \
+	   -s EXPORT_NAME="EssentiaWASM" \
 	   --post-js $(POST_JS_WEB_WASM) \
 	   -s ALLOW_MEMORY_GROWTH=1 || exit 1
+	@echo "Done ..."
 
 	@echo "compiling sync builds..."
-	@emcc --bind -Oz \
+	@emcc --bind -Oz $(BUILD_DIR_ES)/essentiajs.bc ${LIB_DIR_ESSENTIA}/essentia.a \
 	   -s WASM=1 \
-	   $(BUILD_DIR_ES)/essentiajs.bc ${LIB_DIR_ES}/essentia.a \
 	   -o $(ESSENTIA_JS_MODULE) \
 	   -s BINARYEN_ASYNC_COMPILATION=0 \
 	   -s ALLOW_MEMORY_GROWTH=1 \
@@ -60,16 +64,13 @@ build:
 	@cp -f $(ESSENTIA_JS_WEB) $(DIST_DIR_ES)/
 	@cp -f $(ESSENTIA_JS_WEB_WASM) $(DIST_DIR_ES)/
 	@cp -f $(ESSENTIA_JS_MODULE) $(DIST_DIR_ES)/
-
 	@echo "Done ..."
 
 	@echo "Removing unnecessary files ..."
 	@rm $(BUILD_DIR_ES)/essentiajs.bc
-	@echo "Done ..."
 
 	@echo "Builds ..."
 	@ls $(BUILD_DIR_ES)
-	@echo "Done ..."
 
 clean:
 	@rm -rf $(BUILD_DIR_ES)

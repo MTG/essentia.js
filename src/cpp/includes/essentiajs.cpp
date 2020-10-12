@@ -19,7 +19,6 @@
 
 // NOTE: This source code is machine-generated.
 
-#include <stdio.h>
 #include <essentia/algorithmfactory.h>
 #include <essentia/essentiamath.h>
 #include <essentia/pool.h>
@@ -55,6 +54,9 @@ EssentiaJS::EssentiaJS(bool debugger) {
     essentia::infoLevelActive = true;
     // activate error level    
     essentia::errorLevelActive = true;    
+  } else {
+    essentia::infoLevelActive = false;
+    essentia::warningLevelActive = false;
   }
   essentia::init();
   essentiaVersion = essentia::version;
@@ -91,6 +93,69 @@ std::vector<std::vector<float> > EssentiaJS::FrameGenerator(const val& signalArr
   }
   delete fc;
   return pool.value<std::vector<std::vector<float> > >("frames");
+}
+
+// This a wrapper for MonoMixer algorithm to accept both left and right channels to downmix an stereo channel input to mono
+// check https://essentia.upf.edu/reference/std_MonoMixer.html for algorithm details
+// TODO: could be reimplemented with BinaryOperator and UnaryOperator in the future
+val EssentiaJS::MonoMixer(std::vector<float>& left_channel, std::vector<float>& right_channel) {
+  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+
+  // TODO: remove this stereosample cresting overhead in future 
+  Algorithm* algoStereoMuxer = factory.create("StereoMuxer");
+  algoStereoMuxer->input("left").set(left_channel);
+  algoStereoMuxer->input("right").set(right_channel);
+  std::vector<StereoSample> stereoSignal;
+  algoStereoMuxer->output("audio").set(stereoSignal);
+  algoStereoMuxer->compute();
+  delete algoStereoMuxer;
+
+  Algorithm* algoMonoMixer = factory.create("MonoMixer");
+  std::vector<float> output_audio;
+  algoMonoMixer->input("audio").set(stereoSignal);
+  // set numberChannels=2 since we only deal with stereo signal in this wrapper
+  algoMonoMixer->input("numberChannels").set(2);
+  algoMonoMixer->output("audio").set(output_audio);
+  algoMonoMixer->compute();
+
+  val outputMonoMixer(val::object());
+  outputMonoMixer.set("audio", output_audio);
+  delete algoMonoMixer;
+  return outputMonoMixer;
+};
+
+// This a wrapper for LoudnessEBUR128 algorithm to accept both left and right channels of an stereo audio signal seperately
+// check https://essentia.upf.edu/reference/std_LoudnessEBUR128.html for algorithm details
+val EssentiaJS::LoudnessEBUR128(std::vector<float>& left_channel, std::vector<float>& right_channel, const float hopSize, const float sampleRate, const bool startAtZero) {
+  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+
+  Algorithm* algoStereoMuxer = factory.create("StereoMuxer");
+  algoStereoMuxer->input("left").set(left_channel);
+  algoStereoMuxer->input("right").set(right_channel);
+  std::vector<StereoSample> stereoSignal;
+  algoStereoMuxer->output("audio").set(stereoSignal);
+  algoStereoMuxer->compute();
+  delete algoStereoMuxer;
+
+  Algorithm* algoLoudnessEBUR128 = factory.create("LoudnessEBUR128", "hopSize", hopSize, "sampleRate", sampleRate, "startAtZero", startAtZero);
+  algoLoudnessEBUR128->input("signal").set(stereoSignal);
+  std::vector<float> output_momentaryLoudness;
+  std::vector<float> output_shortTermLoudness;
+  float output_integratedLoudness;
+  float output_loudnessRange;
+  algoLoudnessEBUR128->output("momentaryLoudness").set(output_momentaryLoudness);
+  algoLoudnessEBUR128->output("shortTermLoudness").set(output_shortTermLoudness);
+  algoLoudnessEBUR128->output("integratedLoudness").set(output_integratedLoudness);
+  algoLoudnessEBUR128->output("loudnessRange").set(output_loudnessRange);
+  algoLoudnessEBUR128->compute();
+  val outputLoudnessEBUR128(val::object());
+  outputLoudnessEBUR128.set("momentaryLoudness", output_momentaryLoudness);
+  outputLoudnessEBUR128.set("shortTermLoudness", output_shortTermLoudness);
+  outputLoudnessEBUR128.set("integratedLoudness", output_integratedLoudness);
+  outputLoudnessEBUR128.set("loudnessRange", output_loudnessRange);
+
+  delete algoLoudnessEBUR128;
+  return outputLoudnessEBUR128;
 }
 
 // NOTE: The following code snippets are machine generated. Do not edit.
@@ -317,41 +382,6 @@ val EssentiaJS::BinaryOperatorStream(std::vector<float>& input_array1, std::vect
   return outputBinaryOperatorStream;
 }
  
-// check https://essentia.upf.edu/reference/std_BpmHistogram.html
-val EssentiaJS::BpmHistogram(std::vector<float>& input_novelty, const float bpm, const bool constantTempo, const float frameRate, const float frameSize, const float maxBpm, const int maxPeaks, const float minBpm, const int overlap, const float tempoChange, const bool weightByMagnitude, const std::string& windowType, const int zeroPadding) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoBpmHistogram = factory.create("BpmHistogram", "bpm", bpm, "constantTempo", constantTempo, "frameRate", frameRate, "frameSize", frameSize, "maxBpm", maxBpm, "maxPeaks", maxPeaks, "minBpm", minBpm, "overlap", overlap, "tempoChange", tempoChange, "weightByMagnitude", weightByMagnitude, "windowType", windowType, "zeroPadding", zeroPadding);
-  algoBpmHistogram->input("novelty").set(input_novelty);
-  float output_bpm;
-  std::vector<float> output_bpmCandidates;
-  std::vector<float> output_bpmMagnitudes;
-  std::vector<float> output_tempogram;
-  std::vector<float> output_frameBpms;
-  std::vector<float> output_ticks;
-  std::vector<float> output_ticksMagnitude;
-  std::vector<float> output_sinusoid;
-  algoBpmHistogram->output("bpm").set(output_bpm);
-  algoBpmHistogram->output("bpmCandidates").set(output_bpmCandidates);
-  algoBpmHistogram->output("bpmMagnitudes").set(output_bpmMagnitudes);
-  algoBpmHistogram->output("tempogram").set(output_tempogram);
-  algoBpmHistogram->output("frameBpms").set(output_frameBpms);
-  algoBpmHistogram->output("ticks").set(output_ticks);
-  algoBpmHistogram->output("ticksMagnitude").set(output_ticksMagnitude);
-  algoBpmHistogram->output("sinusoid").set(output_sinusoid);
-  algoBpmHistogram->compute();
-  val outputBpmHistogram(val::object());
-  outputBpmHistogram.set("bpm", output_bpm);
-  outputBpmHistogram.set("bpmCandidates", output_bpmCandidates);
-  outputBpmHistogram.set("bpmMagnitudes", output_bpmMagnitudes);
-  outputBpmHistogram.set("tempogram", output_tempogram);
-  outputBpmHistogram.set("frameBpms", output_frameBpms);
-  outputBpmHistogram.set("ticks", output_ticks);
-  outputBpmHistogram.set("ticksMagnitude", output_ticksMagnitude);
-  outputBpmHistogram.set("sinusoid", output_sinusoid);
-  delete algoBpmHistogram;
-  return outputBpmHistogram;
-}
- 
 // check https://essentia.upf.edu/reference/std_BpmHistogramDescriptors.html
 val EssentiaJS::BpmHistogramDescriptors(std::vector<float>& input_bpmIntervals) {
   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
@@ -402,23 +432,6 @@ val EssentiaJS::BpmRubato(std::vector<float>& input_beats, const float longRegio
   outputBpmRubato.set("rubatoNumber", output_rubatoNumber);
   delete algoBpmRubato;
   return outputBpmRubato;
-}
- 
-// check https://essentia.upf.edu/reference/std_CartesianToPolar.html
-val EssentiaJS::CartesianToPolar(std::vector<float>& input_complex) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoCartesianToPolar = factory.create("CartesianToPolar");
-  algoCartesianToPolar->input("complex").set(input_complex);
-  std::vector<float> output_magnitude;
-  std::vector<float> output_phase;
-  algoCartesianToPolar->output("magnitude").set(output_magnitude);
-  algoCartesianToPolar->output("phase").set(output_phase);
-  algoCartesianToPolar->compute();
-  val outputCartesianToPolar(val::object());
-  outputCartesianToPolar.set("magnitude", output_magnitude);
-  outputCartesianToPolar.set("phase", output_phase);
-  delete algoCartesianToPolar;
-  return outputCartesianToPolar;
 }
  
 // check https://essentia.upf.edu/reference/std_CentralMoments.html
@@ -541,20 +554,6 @@ val EssentiaJS::Chromagram(std::vector<float>& input_frame, const int binsPerOct
   return outputChromagram;
 }
  
-// check https://essentia.upf.edu/reference/std_Chromaprinter.html
-val EssentiaJS::Chromaprinter(std::vector<float>& input_signal, const float maxLength, const float sampleRate) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoChromaprinter = factory.create("Chromaprinter", "maxLength", maxLength, "sampleRate", sampleRate);
-  algoChromaprinter->input("signal").set(input_signal);
-  std::string output_fingerprint;
-  algoChromaprinter->output("fingerprint").set(output_fingerprint);
-  algoChromaprinter->compute();
-  val outputChromaprinter(val::object());
-  outputChromaprinter.set("fingerprint", output_fingerprint);
-  delete algoChromaprinter;
-  return outputChromaprinter;
-}
- 
 // check https://essentia.upf.edu/reference/std_ClickDetector.html
 val EssentiaJS::ClickDetector(std::vector<float>& input_frame, const float detectionThreshold, const int frameSize, const int hopSize, const int order, const int powerEstimationThreshold, const float sampleRate, const int silenceThreshold) {
   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
@@ -584,20 +583,6 @@ val EssentiaJS::Clipper(std::vector<float>& input_signal, const float max, const
   outputClipper.set("signal", output_signal);
   delete algoClipper;
   return outputClipper;
-}
- 
-// check https://essentia.upf.edu/reference/std_ConstantQ.html
-val EssentiaJS::ConstantQ(std::vector<float>& input_frame, const int binsPerOctave, const float minFrequency, const int minimumKernelSize, const int numberBins, const float sampleRate, const float scale, const float threshold, const std::string& windowType, const bool zeroPhase) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoConstantQ = factory.create("ConstantQ", "binsPerOctave", binsPerOctave, "minFrequency", minFrequency, "minimumKernelSize", minimumKernelSize, "numberBins", numberBins, "sampleRate", sampleRate, "scale", scale, "threshold", threshold, "windowType", windowType, "zeroPhase", zeroPhase);
-  algoConstantQ->input("frame").set(input_frame);
-  std::vector<float> output_constantq;
-  algoConstantQ->output("constantq").set(output_constantq);
-  algoConstantQ->compute();
-  val outputConstantQ(val::object());
-  outputConstantQ.set("constantq", output_constantq);
-  delete algoConstantQ;
-  return outputConstantQ;
 }
  
 // check https://essentia.upf.edu/reference/std_CoverSongSimilarity.html
@@ -966,68 +951,6 @@ val EssentiaJS::EqualLoudness(std::vector<float>& input_signal, const float samp
   return outputEqualLoudness;
 }
  
-// check https://essentia.upf.edu/reference/std_FFT.html
-val EssentiaJS::FFT(std::vector<float>& input_frame, const int size) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoFFT = factory.create("FFT", "size", size);
-  algoFFT->input("frame").set(input_frame);
-  std::vector<float> output_fft;
-  algoFFT->output("fft").set(output_fft);
-  algoFFT->compute();
-  val outputFFT(val::object());
-  outputFFT.set("fft", output_fft);
-  delete algoFFT;
-  return outputFFT;
-}
- 
-// check https://essentia.upf.edu/reference/std_FFTC.html
-val EssentiaJS::FFTC(std::vector<float>& input_frame, const bool negativeFrequencies, const int size) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoFFTC = factory.create("FFTC", "negativeFrequencies", negativeFrequencies, "size", size);
-  algoFFTC->input("frame").set(input_frame);
-  std::vector<float> output_fft;
-  algoFFTC->output("fft").set(output_fft);
-  algoFFTC->compute();
-  val outputFFTC(val::object());
-  outputFFTC.set("fft", output_fft);
-  delete algoFFTC;
-  return outputFFTC;
-}
- 
-// check https://essentia.upf.edu/reference/std_FadeDetection.html
-val EssentiaJS::FadeDetection(std::vector<float>& input_rms, const float cutoffHigh, const float cutoffLow, const float frameRate, const float minLength) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoFadeDetection = factory.create("FadeDetection", "cutoffHigh", cutoffHigh, "cutoffLow", cutoffLow, "frameRate", frameRate, "minLength", minLength);
-  algoFadeDetection->input("rms").set(input_rms);
-  std::vector<float> output_fadeIn;
-  std::vector<float> output_fadeOut;
-  algoFadeDetection->output("fadeIn").set(output_fadeIn);
-  algoFadeDetection->output("fadeOut").set(output_fadeOut);
-  algoFadeDetection->compute();
-  val outputFadeDetection(val::object());
-  outputFadeDetection.set("fadeIn", output_fadeIn);
-  outputFadeDetection.set("fadeOut", output_fadeOut);
-  delete algoFadeDetection;
-  return outputFadeDetection;
-}
- 
-// check https://essentia.upf.edu/reference/std_FalseStereoDetector.html
-val EssentiaJS::FalseStereoDetector(std::vector<std::vector<float> >& input_frame, const float correlationThreshold, const int silenceThreshold) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoFalseStereoDetector = factory.create("FalseStereoDetector", "correlationThreshold", correlationThreshold, "silenceThreshold", silenceThreshold);
-  algoFalseStereoDetector->input("frame").set(input_frame);
-  int output_isFalseStereo;
-  float output_correlation;
-  algoFalseStereoDetector->output("isFalseStereo").set(output_isFalseStereo);
-  algoFalseStereoDetector->output("correlation").set(output_correlation);
-  algoFalseStereoDetector->compute();
-  val outputFalseStereoDetector(val::object());
-  outputFalseStereoDetector.set("isFalseStereo", output_isFalseStereo);
-  outputFalseStereoDetector.set("correlation", output_correlation);
-  delete algoFalseStereoDetector;
-  return outputFalseStereoDetector;
-}
- 
 // check https://essentia.upf.edu/reference/std_Flatness.html
 val EssentiaJS::Flatness(std::vector<float>& input_array) {
   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
@@ -1217,42 +1140,6 @@ val EssentiaJS::HarmonicBpm(std::vector<float>& input_bpms, const int bpm, const
   return outputHarmonicBpm;
 }
  
-// check https://essentia.upf.edu/reference/std_HarmonicMask.html
-val EssentiaJS::HarmonicMask(std::vector<float>& input_fft, float input_pitch, const float attenuation, const int binWidth, const float sampleRate) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoHarmonicMask = factory.create("HarmonicMask", "attenuation", attenuation, "binWidth", binWidth, "sampleRate", sampleRate);
-  algoHarmonicMask->input("fft").set(input_fft);
-  algoHarmonicMask->input("pitch").set(input_pitch);
-  std::vector<float> output_fft;
-  algoHarmonicMask->output("fft").set(output_fft);
-  algoHarmonicMask->compute();
-  val outputHarmonicMask(val::object());
-  outputHarmonicMask.set("fft", output_fft);
-  delete algoHarmonicMask;
-  return outputHarmonicMask;
-}
- 
-// check https://essentia.upf.edu/reference/std_HarmonicModelAnal.html
-val EssentiaJS::HarmonicModelAnal(std::vector<float>& input_fft, float input_pitch, const float freqDevOffset, const float freqDevSlope, const float harmDevSlope, const int hopSize, const float magnitudeThreshold, const float maxFrequency, const int maxPeaks, const int maxnSines, const float minFrequency, const int nHarmonics, const std::string& orderBy, const float sampleRate) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoHarmonicModelAnal = factory.create("HarmonicModelAnal", "freqDevOffset", freqDevOffset, "freqDevSlope", freqDevSlope, "harmDevSlope", harmDevSlope, "hopSize", hopSize, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "maxPeaks", maxPeaks, "maxnSines", maxnSines, "minFrequency", minFrequency, "nHarmonics", nHarmonics, "orderBy", orderBy, "sampleRate", sampleRate);
-  algoHarmonicModelAnal->input("fft").set(input_fft);
-  algoHarmonicModelAnal->input("pitch").set(input_pitch);
-  std::vector<float> output_frequencies;
-  std::vector<float> output_magnitudes;
-  std::vector<float> output_phases;
-  algoHarmonicModelAnal->output("frequencies").set(output_frequencies);
-  algoHarmonicModelAnal->output("magnitudes").set(output_magnitudes);
-  algoHarmonicModelAnal->output("phases").set(output_phases);
-  algoHarmonicModelAnal->compute();
-  val outputHarmonicModelAnal(val::object());
-  outputHarmonicModelAnal.set("frequencies", output_frequencies);
-  outputHarmonicModelAnal.set("magnitudes", output_magnitudes);
-  outputHarmonicModelAnal.set("phases", output_phases);
-  delete algoHarmonicModelAnal;
-  return outputHarmonicModelAnal;
-}
- 
 // check https://essentia.upf.edu/reference/std_HarmonicPeaks.html
 val EssentiaJS::HarmonicPeaks(std::vector<float>& input_frequencies, std::vector<float>& input_magnitudes, float input_pitch, const int maxHarmonics, const float tolerance) {
   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
@@ -1371,32 +1258,6 @@ val EssentiaJS::HpsModelAnal(std::vector<float>& input_frame, float input_pitch,
   return outputHpsModelAnal;
 }
  
-// check https://essentia.upf.edu/reference/std_HumDetector.html
-val EssentiaJS::HumDetector(std::vector<float>& input_signal, const float Q0, const float Q1, const float detectionThreshold, const float frameSize, const float hopSize, const float maximumFrequency, const float minimumDuration, const float minimumFrequency, const int numberHarmonics, const float sampleRate, const float timeContinuity, const float timeWindow) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoHumDetector = factory.create("HumDetector", "Q0", Q0, "Q1", Q1, "detectionThreshold", detectionThreshold, "frameSize", frameSize, "hopSize", hopSize, "maximumFrequency", maximumFrequency, "minimumDuration", minimumDuration, "minimumFrequency", minimumFrequency, "numberHarmonics", numberHarmonics, "sampleRate", sampleRate, "timeContinuity", timeContinuity, "timeWindow", timeWindow);
-  algoHumDetector->input("signal").set(input_signal);
-  std::vector<float> output_r;
-  std::vector<float> output_frequencies;
-  std::vector<float> output_saliences;
-  std::vector<float> output_starts;
-  std::vector<float> output_ends;
-  algoHumDetector->output("r").set(output_r);
-  algoHumDetector->output("frequencies").set(output_frequencies);
-  algoHumDetector->output("saliences").set(output_saliences);
-  algoHumDetector->output("starts").set(output_starts);
-  algoHumDetector->output("ends").set(output_ends);
-  algoHumDetector->compute();
-  val outputHumDetector(val::object());
-  outputHumDetector.set("r", output_r);
-  outputHumDetector.set("frequencies", output_frequencies);
-  outputHumDetector.set("saliences", output_saliences);
-  outputHumDetector.set("starts", output_starts);
-  outputHumDetector.set("ends", output_ends);
-  delete algoHumDetector;
-  return outputHumDetector;
-}
- 
 // check https://essentia.upf.edu/reference/std_IDCT.html
 val EssentiaJS::IDCT(std::vector<float>& input_dct, const int dctType, const int inputSize, const int liftering, const int outputSize) {
   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
@@ -1409,34 +1270,6 @@ val EssentiaJS::IDCT(std::vector<float>& input_dct, const int dctType, const int
   outputIDCT.set("idct", output_idct);
   delete algoIDCT;
   return outputIDCT;
-}
- 
-// check https://essentia.upf.edu/reference/std_IFFT.html
-val EssentiaJS::IFFT(std::vector<float>& input_fft, const bool normalize, const int size) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoIFFT = factory.create("IFFT", "normalize", normalize, "size", size);
-  algoIFFT->input("fft").set(input_fft);
-  std::vector<float> output_frame;
-  algoIFFT->output("frame").set(output_frame);
-  algoIFFT->compute();
-  val outputIFFT(val::object());
-  outputIFFT.set("frame", output_frame);
-  delete algoIFFT;
-  return outputIFFT;
-}
- 
-// check https://essentia.upf.edu/reference/std_IFFTC.html
-val EssentiaJS::IFFTC(std::vector<float>& input_fft, const bool normalize, const int size) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoIFFTC = factory.create("IFFTC", "normalize", normalize, "size", size);
-  algoIFFTC->input("fft").set(input_fft);
-  std::vector<float> output_frame;
-  algoIFFTC->output("frame").set(output_frame);
-  algoIFFTC->compute();
-  val outputIFFTC(val::object());
-  outputIFFTC.set("frame", output_frame);
-  delete algoIFFTC;
-  return outputIFFTC;
 }
  
 // check https://essentia.upf.edu/reference/std_IIR.html
@@ -1681,29 +1514,6 @@ val EssentiaJS::Loudness(std::vector<float>& input_signal) {
   return outputLoudness;
 }
  
-// check https://essentia.upf.edu/reference/std_LoudnessEBUR128.html
-val EssentiaJS::LoudnessEBUR128(std::vector<std::vector<float> >& input_signal, const float hopSize, const float sampleRate, const bool startAtZero) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoLoudnessEBUR128 = factory.create("LoudnessEBUR128", "hopSize", hopSize, "sampleRate", sampleRate, "startAtZero", startAtZero);
-  algoLoudnessEBUR128->input("signal").set(input_signal);
-  std::vector<float> output_momentaryLoudness;
-  std::vector<float> output_shortTermLoudness;
-  float output_integratedLoudness;
-  float output_loudnessRange;
-  algoLoudnessEBUR128->output("momentaryLoudness").set(output_momentaryLoudness);
-  algoLoudnessEBUR128->output("shortTermLoudness").set(output_shortTermLoudness);
-  algoLoudnessEBUR128->output("integratedLoudness").set(output_integratedLoudness);
-  algoLoudnessEBUR128->output("loudnessRange").set(output_loudnessRange);
-  algoLoudnessEBUR128->compute();
-  val outputLoudnessEBUR128(val::object());
-  outputLoudnessEBUR128.set("momentaryLoudness", output_momentaryLoudness);
-  outputLoudnessEBUR128.set("shortTermLoudness", output_shortTermLoudness);
-  outputLoudnessEBUR128.set("integratedLoudness", output_integratedLoudness);
-  outputLoudnessEBUR128.set("loudnessRange", output_loudnessRange);
-  delete algoLoudnessEBUR128;
-  return outputLoudnessEBUR128;
-}
- 
 // check https://essentia.upf.edu/reference/std_LoudnessVickers.html
 val EssentiaJS::LoudnessVickers(std::vector<float>& input_signal, const float sampleRate) {
   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
@@ -1879,20 +1689,6 @@ val EssentiaJS::MFCC(std::vector<float>& input_spectrum, const int dctType, cons
   return outputMFCC;
 }
  
-// check https://essentia.upf.edu/reference/std_Magnitude.html
-val EssentiaJS::Magnitude(std::vector<float>& input_complex) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoMagnitude = factory.create("Magnitude");
-  algoMagnitude->input("complex").set(input_complex);
-  std::vector<float> output_magnitude;
-  algoMagnitude->output("magnitude").set(output_magnitude);
-  algoMagnitude->compute();
-  val outputMagnitude(val::object());
-  outputMagnitude.set("magnitude", output_magnitude);
-  delete algoMagnitude;
-  return outputMagnitude;
-}
- 
 // check https://essentia.upf.edu/reference/std_MaxFilter.html
 val EssentiaJS::MaxFilter(std::vector<float>& input_signal, const bool causal, const int width) {
   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
@@ -2050,6 +1846,34 @@ val EssentiaJS::MovingAverage(std::vector<float>& input_signal, const int size) 
   return outputMovingAverage;
 }
  
+// check https://essentia.upf.edu/reference/std_MultiPitchKlapuri.html
+val EssentiaJS::MultiPitchKlapuri(std::vector<float>& input_signal, const float binResolution, const int frameSize, const float harmonicWeight, const int hopSize, const float magnitudeCompression, const int magnitudeThreshold, const float maxFrequency, const float minFrequency, const int numberHarmonics, const float referenceFrequency, const float sampleRate) {
+  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+  Algorithm* algoMultiPitchKlapuri = factory.create("MultiPitchKlapuri", "binResolution", binResolution, "frameSize", frameSize, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "numberHarmonics", numberHarmonics, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate);
+  algoMultiPitchKlapuri->input("signal").set(input_signal);
+  std::vector<std::vector<float> > output_pitch;
+  algoMultiPitchKlapuri->output("pitch").set(output_pitch);
+  algoMultiPitchKlapuri->compute();
+  val outputMultiPitchKlapuri(val::object());
+  outputMultiPitchKlapuri.set("pitch", output_pitch);
+  delete algoMultiPitchKlapuri;
+  return outputMultiPitchKlapuri;
+}
+ 
+// check https://essentia.upf.edu/reference/std_MultiPitchMelodia.html
+val EssentiaJS::MultiPitchMelodia(std::vector<float>& input_signal, const float binResolution, const int filterIterations, const int frameSize, const bool guessUnvoiced, const float harmonicWeight, const int hopSize, const float magnitudeCompression, const int magnitudeThreshold, const float maxFrequency, const int minDuration, const float minFrequency, const int numberHarmonics, const float peakDistributionThreshold, const float peakFrameThreshold, const float pitchContinuity, const float referenceFrequency, const float sampleRate, const int timeContinuity) {
+  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+  Algorithm* algoMultiPitchMelodia = factory.create("MultiPitchMelodia", "binResolution", binResolution, "filterIterations", filterIterations, "frameSize", frameSize, "guessUnvoiced", guessUnvoiced, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "minDuration", minDuration, "minFrequency", minFrequency, "numberHarmonics", numberHarmonics, "peakDistributionThreshold", peakDistributionThreshold, "peakFrameThreshold", peakFrameThreshold, "pitchContinuity", pitchContinuity, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate, "timeContinuity", timeContinuity);
+  algoMultiPitchMelodia->input("signal").set(input_signal);
+  std::vector<std::vector<float> > output_pitch;
+  algoMultiPitchMelodia->output("pitch").set(output_pitch);
+  algoMultiPitchMelodia->compute();
+  val outputMultiPitchMelodia(val::object());
+  outputMultiPitchMelodia.set("pitch", output_pitch);
+  delete algoMultiPitchMelodia;
+  return outputMultiPitchMelodia;
+}
+ 
 // check https://essentia.upf.edu/reference/std_Multiplexer.html
 val EssentiaJS::Multiplexer(const int numberRealInputs, const int numberVectorRealInputs) {
   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
@@ -2086,42 +1910,6 @@ val EssentiaJS::NNLSChroma(std::vector<std::vector<float> >& input_logSpectrogra
   outputNNLSChroma.set("chromagram", output_chromagram);
   delete algoNNLSChroma;
   return outputNNLSChroma;
-}
- 
-// check https://essentia.upf.edu/reference/std_NSGConstantQ.html
-val EssentiaJS::NSGConstantQ(std::vector<float>& input_frame, const int binsPerOctave, const int gamma, const int inputSize, const float maxFrequency, const float minFrequency, const int minimumWindow, const std::string& normalize, const std::string& phaseMode, const std::string& rasterize, const float sampleRate, const std::string& window, const int windowSizeFactor) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoNSGConstantQ = factory.create("NSGConstantQ", "binsPerOctave", binsPerOctave, "gamma", gamma, "inputSize", inputSize, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "minimumWindow", minimumWindow, "normalize", normalize, "phaseMode", phaseMode, "rasterize", rasterize, "sampleRate", sampleRate, "window", window, "windowSizeFactor", windowSizeFactor);
-  algoNSGConstantQ->input("frame").set(input_frame);
-  std::vector<std::vector<float> > output_constantq;
-  std::vector<float> output_constantqdc;
-  std::vector<float> output_constantqnf;
-  algoNSGConstantQ->output("constantq").set(output_constantq);
-  algoNSGConstantQ->output("constantqdc").set(output_constantqdc);
-  algoNSGConstantQ->output("constantqnf").set(output_constantqnf);
-  algoNSGConstantQ->compute();
-  val outputNSGConstantQ(val::object());
-  outputNSGConstantQ.set("constantq", output_constantq);
-  outputNSGConstantQ.set("constantqdc", output_constantqdc);
-  outputNSGConstantQ.set("constantqnf", output_constantqnf);
-  delete algoNSGConstantQ;
-  return outputNSGConstantQ;
-}
- 
-// check https://essentia.upf.edu/reference/std_NSGIConstantQ.html
-val EssentiaJS::NSGIConstantQ(std::vector<std::vector<float> >& input_constantq, std::vector<float>& input_constantqdc, std::vector<float>& input_constantqnf, const int binsPerOctave, const int gamma, const int inputSize, const float maxFrequency, const float minFrequency, const int minimumWindow, const std::string& normalize, const std::string& phaseMode, const std::string& rasterize, const float sampleRate, const std::string& window, const int windowSizeFactor) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoNSGIConstantQ = factory.create("NSGIConstantQ", "binsPerOctave", binsPerOctave, "gamma", gamma, "inputSize", inputSize, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "minimumWindow", minimumWindow, "normalize", normalize, "phaseMode", phaseMode, "rasterize", rasterize, "sampleRate", sampleRate, "window", window, "windowSizeFactor", windowSizeFactor);
-  algoNSGIConstantQ->input("constantq").set(input_constantq);
-  algoNSGIConstantQ->input("constantqdc").set(input_constantqdc);
-  algoNSGIConstantQ->input("constantqnf").set(input_constantqnf);
-  std::vector<float> output_frame;
-  algoNSGIConstantQ->output("frame").set(output_frame);
-  algoNSGIConstantQ->compute();
-  val outputNSGIConstantQ(val::object());
-  outputNSGIConstantQ.set("frame", output_frame);
-  delete algoNSGIConstantQ;
-  return outputNSGIConstantQ;
 }
  
 // check https://essentia.upf.edu/reference/std_NoiseAdder.html
@@ -2244,21 +2032,6 @@ val EssentiaJS::OnsetRate(std::vector<float>& input_signal) {
   return outputOnsetRate;
 }
  
-// check https://essentia.upf.edu/reference/std_Onsets.html
-val EssentiaJS::Onsets(std::vector<float>& input_detections, std::vector<float>& input_weights, const float alpha, const int delay, const float frameRate, const float silenceThreshold) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoOnsets = factory.create("Onsets", "alpha", alpha, "delay", delay, "frameRate", frameRate, "silenceThreshold", silenceThreshold);
-  algoOnsets->input("detections").set(input_detections);
-  algoOnsets->input("weights").set(input_weights);
-  std::vector<float> output_onsets;
-  algoOnsets->output("onsets").set(output_onsets);
-  algoOnsets->compute();
-  val outputOnsets(val::object());
-  outputOnsets.set("onsets", output_onsets);
-  delete algoOnsets;
-  return outputOnsets;
-}
- 
 // check https://essentia.upf.edu/reference/std_OverlapAdd.html
 val EssentiaJS::OverlapAdd(std::vector<float>& input_signal, const int frameSize, const float gain, const int hopSize) {
   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
@@ -2271,21 +2044,6 @@ val EssentiaJS::OverlapAdd(std::vector<float>& input_signal, const int frameSize
   outputOverlapAdd.set("signal", output_signal);
   delete algoOverlapAdd;
   return outputOverlapAdd;
-}
- 
-// check https://essentia.upf.edu/reference/std_Panning.html
-val EssentiaJS::Panning(std::vector<float>& input_spectrumLeft, std::vector<float>& input_spectrumRight, const int averageFrames, const int numBands, const int numCoeffs, const int panningBins, const float sampleRate, const bool warpedPanorama) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoPanning = factory.create("Panning", "averageFrames", averageFrames, "numBands", numBands, "numCoeffs", numCoeffs, "panningBins", panningBins, "sampleRate", sampleRate, "warpedPanorama", warpedPanorama);
-  algoPanning->input("spectrumLeft").set(input_spectrumLeft);
-  algoPanning->input("spectrumRight").set(input_spectrumRight);
-  std::vector<float> output_panningCoeffs;
-  algoPanning->output("panningCoeffs").set(output_panningCoeffs);
-  algoPanning->compute();
-  val outputPanning(val::object());
-  outputPanning.set("panningCoeffs", output_panningCoeffs);
-  delete algoPanning;
-  return outputPanning;
 }
  
 // check https://essentia.upf.edu/reference/std_PeakDetection.html
@@ -2465,6 +2223,23 @@ val EssentiaJS::PitchFilter(std::vector<float>& input_pitch, std::vector<float>&
   return outputPitchFilter;
 }
  
+// check https://essentia.upf.edu/reference/std_PitchMelodia.html
+val EssentiaJS::PitchMelodia(std::vector<float>& input_signal, const float binResolution, const int filterIterations, const int frameSize, const bool guessUnvoiced, const float harmonicWeight, const int hopSize, const float magnitudeCompression, const int magnitudeThreshold, const float maxFrequency, const int minDuration, const float minFrequency, const int numberHarmonics, const float peakDistributionThreshold, const float peakFrameThreshold, const float pitchContinuity, const float referenceFrequency, const float sampleRate, const int timeContinuity) {
+  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+  Algorithm* algoPitchMelodia = factory.create("PitchMelodia", "binResolution", binResolution, "filterIterations", filterIterations, "frameSize", frameSize, "guessUnvoiced", guessUnvoiced, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "minDuration", minDuration, "minFrequency", minFrequency, "numberHarmonics", numberHarmonics, "peakDistributionThreshold", peakDistributionThreshold, "peakFrameThreshold", peakFrameThreshold, "pitchContinuity", pitchContinuity, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate, "timeContinuity", timeContinuity);
+  algoPitchMelodia->input("signal").set(input_signal);
+  std::vector<float> output_pitch;
+  std::vector<float> output_pitchConfidence;
+  algoPitchMelodia->output("pitch").set(output_pitch);
+  algoPitchMelodia->output("pitchConfidence").set(output_pitchConfidence);
+  algoPitchMelodia->compute();
+  val outputPitchMelodia(val::object());
+  outputPitchMelodia.set("pitch", output_pitch);
+  outputPitchMelodia.set("pitchConfidence", output_pitchConfidence);
+  delete algoPitchMelodia;
+  return outputPitchMelodia;
+}
+ 
 // check https://essentia.upf.edu/reference/std_PitchSalience.html
 val EssentiaJS::PitchSalience(std::vector<float>& input_spectrum, const float highBoundary, const float lowBoundary, const float sampleRate) {
   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
@@ -2597,21 +2372,6 @@ val EssentiaJS::PitchYinProbabilitiesHMM(std::vector<std::vector<float> >& input
   return outputPitchYinProbabilitiesHMM;
 }
  
-// check https://essentia.upf.edu/reference/std_PolarToCartesian.html
-val EssentiaJS::PolarToCartesian(std::vector<float>& input_magnitude, std::vector<float>& input_phase) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoPolarToCartesian = factory.create("PolarToCartesian");
-  algoPolarToCartesian->input("magnitude").set(input_magnitude);
-  algoPolarToCartesian->input("phase").set(input_phase);
-  std::vector<float> output_complex;
-  algoPolarToCartesian->output("complex").set(output_complex);
-  algoPolarToCartesian->compute();
-  val outputPolarToCartesian(val::object());
-  outputPolarToCartesian.set("complex", output_complex);
-  delete algoPolarToCartesian;
-  return outputPolarToCartesian;
-}
- 
 // check https://essentia.upf.edu/reference/std_PowerMean.html
 val EssentiaJS::PowerMean(std::vector<float>& input_array, const float power) {
   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
@@ -2638,6 +2398,23 @@ val EssentiaJS::PowerSpectrum(std::vector<float>& input_signal, const int size) 
   outputPowerSpectrum.set("powerSpectrum", output_powerSpectrum);
   delete algoPowerSpectrum;
   return outputPowerSpectrum;
+}
+ 
+// check https://essentia.upf.edu/reference/std_PredominantPitchMelodia.html
+val EssentiaJS::PredominantPitchMelodia(std::vector<float>& input_signal, const float binResolution, const int filterIterations, const int frameSize, const bool guessUnvoiced, const float harmonicWeight, const int hopSize, const float magnitudeCompression, const int magnitudeThreshold, const float maxFrequency, const int minDuration, const float minFrequency, const int numberHarmonics, const float peakDistributionThreshold, const float peakFrameThreshold, const float pitchContinuity, const float referenceFrequency, const float sampleRate, const int timeContinuity, const bool voiceVibrato, const float voicingTolerance) {
+  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+  Algorithm* algoPredominantPitchMelodia = factory.create("PredominantPitchMelodia", "binResolution", binResolution, "filterIterations", filterIterations, "frameSize", frameSize, "guessUnvoiced", guessUnvoiced, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "minDuration", minDuration, "minFrequency", minFrequency, "numberHarmonics", numberHarmonics, "peakDistributionThreshold", peakDistributionThreshold, "peakFrameThreshold", peakFrameThreshold, "pitchContinuity", pitchContinuity, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate, "timeContinuity", timeContinuity, "voiceVibrato", voiceVibrato, "voicingTolerance", voicingTolerance);
+  algoPredominantPitchMelodia->input("signal").set(input_signal);
+  std::vector<float> output_pitch;
+  std::vector<float> output_pitchConfidence;
+  algoPredominantPitchMelodia->output("pitch").set(output_pitch);
+  algoPredominantPitchMelodia->output("pitchConfidence").set(output_pitchConfidence);
+  algoPredominantPitchMelodia->compute();
+  val outputPredominantPitchMelodia(val::object());
+  outputPredominantPitchMelodia.set("pitch", output_pitch);
+  outputPredominantPitchMelodia.set("pitchConfidence", output_pitchConfidence);
+  delete algoPredominantPitchMelodia;
+  return outputPredominantPitchMelodia;
 }
  
 // check https://essentia.upf.edu/reference/std_RMS.html
@@ -2834,20 +2611,6 @@ val EssentiaJS::RollOff(std::vector<float>& input_spectrum, const float cutoff, 
   return outputRollOff;
 }
  
-// check https://essentia.upf.edu/reference/std_SBic.html
-val EssentiaJS::SBic(std::vector<float>& input_features, const float cpw, const int inc1, const int inc2, const int minLength, const int size1, const int size2) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoSBic = factory.create("SBic", "cpw", cpw, "inc1", inc1, "inc2", inc2, "minLength", minLength, "size1", size1, "size2", size2);
-  algoSBic->input("features").set(input_features);
-  std::vector<float> output_segmentation;
-  algoSBic->output("segmentation").set(output_segmentation);
-  algoSBic->compute();
-  val outputSBic(val::object());
-  outputSBic.set("segmentation", output_segmentation);
-  delete algoSBic;
-  return outputSBic;
-}
- 
 // check https://essentia.upf.edu/reference/std_SNR.html
 val EssentiaJS::SNR(std::vector<float>& input_frame, const float MAAlpha, const float MMSEAlpha, const float NoiseAlpha, const int frameSize, const float noiseThreshold, const float sampleRate, const bool useBroadbadNoiseCorrection) {
   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
@@ -2899,42 +2662,6 @@ val EssentiaJS::Scale(std::vector<float>& input_signal, const bool clipping, con
   return outputScale;
 }
  
-// check https://essentia.upf.edu/reference/std_SineModelAnal.html
-val EssentiaJS::SineModelAnal(std::vector<float>& input_fft, const float freqDevOffset, const float freqDevSlope, const float magnitudeThreshold, const float maxFrequency, const int maxPeaks, const int maxnSines, const float minFrequency, const std::string& orderBy, const float sampleRate) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoSineModelAnal = factory.create("SineModelAnal", "freqDevOffset", freqDevOffset, "freqDevSlope", freqDevSlope, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "maxPeaks", maxPeaks, "maxnSines", maxnSines, "minFrequency", minFrequency, "orderBy", orderBy, "sampleRate", sampleRate);
-  algoSineModelAnal->input("fft").set(input_fft);
-  std::vector<float> output_frequencies;
-  std::vector<float> output_magnitudes;
-  std::vector<float> output_phases;
-  algoSineModelAnal->output("frequencies").set(output_frequencies);
-  algoSineModelAnal->output("magnitudes").set(output_magnitudes);
-  algoSineModelAnal->output("phases").set(output_phases);
-  algoSineModelAnal->compute();
-  val outputSineModelAnal(val::object());
-  outputSineModelAnal.set("frequencies", output_frequencies);
-  outputSineModelAnal.set("magnitudes", output_magnitudes);
-  outputSineModelAnal.set("phases", output_phases);
-  delete algoSineModelAnal;
-  return outputSineModelAnal;
-}
- 
-// check https://essentia.upf.edu/reference/std_SineModelSynth.html
-val EssentiaJS::SineModelSynth(std::vector<float>& input_magnitudes, std::vector<float>& input_frequencies, std::vector<float>& input_phases, const int fftSize, const int hopSize, const float sampleRate) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoSineModelSynth = factory.create("SineModelSynth", "fftSize", fftSize, "hopSize", hopSize, "sampleRate", sampleRate);
-  algoSineModelSynth->input("magnitudes").set(input_magnitudes);
-  algoSineModelSynth->input("frequencies").set(input_frequencies);
-  algoSineModelSynth->input("phases").set(input_phases);
-  std::vector<float> output_fft;
-  algoSineModelSynth->output("fft").set(output_fft);
-  algoSineModelSynth->compute();
-  val outputSineModelSynth(val::object());
-  outputSineModelSynth.set("fft", output_fft);
-  delete algoSineModelSynth;
-  return outputSineModelSynth;
-}
- 
 // check https://essentia.upf.edu/reference/std_SineSubtraction.html
 val EssentiaJS::SineSubtraction(std::vector<float>& input_frame, std::vector<float>& input_magnitudes, std::vector<float>& input_frequencies, std::vector<float>& input_phases, const int fftSize, const int hopSize, const float sampleRate) {
   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
@@ -2967,26 +2694,6 @@ val EssentiaJS::SingleBeatLoudness(std::vector<float>& input_beat, const float b
   outputSingleBeatLoudness.set("loudnessBandRatio", output_loudnessBandRatio);
   delete algoSingleBeatLoudness;
   return outputSingleBeatLoudness;
-}
- 
-// check https://essentia.upf.edu/reference/std_SingleGaussian.html
-val EssentiaJS::SingleGaussian(std::vector<float>& input_matrix) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoSingleGaussian = factory.create("SingleGaussian");
-  algoSingleGaussian->input("matrix").set(input_matrix);
-  std::vector<float> output_mean;
-  std::vector<float> output_covariance;
-  std::vector<float> output_inverseCovariance;
-  algoSingleGaussian->output("mean").set(output_mean);
-  algoSingleGaussian->output("covariance").set(output_covariance);
-  algoSingleGaussian->output("inverseCovariance").set(output_inverseCovariance);
-  algoSingleGaussian->compute();
-  val outputSingleGaussian(val::object());
-  outputSingleGaussian.set("mean", output_mean);
-  outputSingleGaussian.set("covariance", output_covariance);
-  outputSingleGaussian.set("inverseCovariance", output_inverseCovariance);
-  delete algoSingleGaussian;
-  return outputSingleGaussian;
 }
  
 // check https://essentia.upf.edu/reference/std_Slicer.html
@@ -3264,52 +2971,6 @@ val EssentiaJS::StartStopSilence(std::vector<float>& input_frame, const int thre
   outputStartStopSilence.set("stopFrame", output_stopFrame);
   delete algoStartStopSilence;
   return outputStartStopSilence;
-}
- 
-// check https://essentia.upf.edu/reference/std_StereoDemuxer.html
-val EssentiaJS::StereoDemuxer(std::vector<std::vector<float> >& input_audio) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoStereoDemuxer = factory.create("StereoDemuxer");
-  algoStereoDemuxer->input("audio").set(input_audio);
-  std::vector<float> output_left;
-  std::vector<float> output_right;
-  algoStereoDemuxer->output("left").set(output_left);
-  algoStereoDemuxer->output("right").set(output_right);
-  algoStereoDemuxer->compute();
-  val outputStereoDemuxer(val::object());
-  outputStereoDemuxer.set("left", output_left);
-  outputStereoDemuxer.set("right", output_right);
-  delete algoStereoDemuxer;
-  return outputStereoDemuxer;
-}
- 
-// check https://essentia.upf.edu/reference/std_StereoMuxer.html
-val EssentiaJS::StereoMuxer(std::vector<float>& input_left, std::vector<float>& input_right) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoStereoMuxer = factory.create("StereoMuxer");
-  algoStereoMuxer->input("left").set(input_left);
-  algoStereoMuxer->input("right").set(input_right);
-  std::vector<std::vector<float> > output_audio;
-  algoStereoMuxer->output("audio").set(output_audio);
-  algoStereoMuxer->compute();
-  val outputStereoMuxer(val::object());
-  outputStereoMuxer.set("audio", output_audio);
-  delete algoStereoMuxer;
-  return outputStereoMuxer;
-}
- 
-// check https://essentia.upf.edu/reference/std_StereoTrimmer.html
-val EssentiaJS::StereoTrimmer(std::vector<std::vector<float> >& input_signal, const bool checkRange, const float endTime, const float sampleRate, const float startTime) {
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  Algorithm* algoStereoTrimmer = factory.create("StereoTrimmer", "checkRange", checkRange, "endTime", endTime, "sampleRate", sampleRate, "startTime", startTime);
-  algoStereoTrimmer->input("signal").set(input_signal);
-  std::vector<std::vector<float> > output_signal;
-  algoStereoTrimmer->output("signal").set(output_signal);
-  algoStereoTrimmer->compute();
-  val outputStereoTrimmer(val::object());
-  outputStereoTrimmer.set("signal", output_signal);
-  delete algoStereoTrimmer;
-  return outputStereoTrimmer;
 }
  
 // check https://essentia.upf.edu/reference/std_StochasticModelAnal.html

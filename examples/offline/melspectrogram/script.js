@@ -9,22 +9,33 @@ let plotSpectrogram;
 let plotContainerId = "plotDiv";
 
 let isComputed = false;
+// settings for feature extractor
+let frameSize = 1024;
+let hopSize = 512;
+let numBands = 96;
 
 // callback function which compute the log mel spectrogram of input audioURL on a button.onclick event
 async function onClickFeatureExtractor() {
   // load audio file from an url
+  audioCtx.resume();
   audioData = await essentiaExtractor.getAudioChannelDataFromURL(audioURL, audioCtx);
 
   // if already computed, destroy plot traces
   if (isComputed) { plotSpectrogram.destroy(); };
   
   // modifying default extractor settings
-  essentiaExtractor.frameSize = 1024;
-  essentiaExtractor.hopSize = 512;
+  essentiaExtractor.frameSize = frameSize;
+  essentiaExtractor.hopSize = hopSize;
   // settings specific to an algorithm
-  essentiaExtractor.profile.MelBands.numberBands = 96;
-  
-  let logMelSpectrogram = essentiaExtractor.melSpectrogram(audioData);
+  essentiaExtractor.profile.MelBands.numberBands = numBands;
+
+  // Now generate overlapping frames with given frameSize and hopSize
+  // You could also do it using pure JS to avoid arrayToVector and vectorToArray conversion
+  let audioFrames = essentiaExtractor.FrameGenerator(audioData, frameSize, hopSize);
+  let logMelSpectrogram = [];
+  for (var i=0; i<audioFrames.size(); i++) {
+    logMelSpectrogram.push(essentiaExtractor.melSpectrumExtractor(essentiaExtractor.vectorToArray(audioFrames.get(i))));
+  }
 
   // plot the feature
   plotSpectrogram.create(
@@ -33,7 +44,7 @@ async function onClickFeatureExtractor() {
     audioData.length, // length of audio in samples
     audioCtx.sampleRate // audio sample rate
   );
-  
+  essentiaExtractor.algorithms.delete();
   isComputed = true;
 }
 
@@ -47,8 +58,10 @@ $(document).ready(function() {
     EssentiaPlot.LayoutSpectrogramPlot // layout settings
   );
 
+  plotSpectrogram.plotLayout.yaxis.range = [0, numBands];
+
   // Now let's load the essentia wasm back-end, if so create UI elements for computing features
-  EssentiaModule().then(async function(WasmModule) {
+  EssentiaWASM().then(async function(WasmModule) {
     // populate html audio player with audio
     let player = document.getElementById("audioPlayer");
     player.src = audioURL;

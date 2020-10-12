@@ -1,27 +1,17 @@
-ARG EMSCRIPTEN_VERSION=1.38.43
-FROM trzeci/emscripten-slim:sdk-tag-${EMSCRIPTEN_VERSION}-64bit
+ARG EMSCRIPTEN_VERSION=latest
+FROM emscripten/emsdk:${EMSCRIPTEN_VERSION}
 
 ENV LANG C.UTF-8
 
-# install third-party dependencies for essentia
+# compile essentia with emscripten and selected third-party dependencies
 RUN apt-get update \
-    && apt-get install -y libyaml-0-2 libfftw3-3 libtag1v5 libsamplerate0 \
-       libavcodec57 libavformat57 libavutil55 libeigen3-dev libavresample3 \
-    && rm -rf /var/lib/apt/lists/*
-
-# compile essentia with emscripten
-RUN apt-get update \
-    && apt-get install -y build-essential libyaml-dev libfftw3-dev \
-       libavcodec-dev libavformat-dev libavutil-dev libavresample-dev \
-       libsamplerate0-dev libtag1-dev git-core \
+    && apt-get install -y cmake curl nano python-dev python-numpy-dev libpython2.7 python-pip libeigen3-dev \
     && mkdir /essentia && cd /essentia && git clone https://github.com/MTG/essentia.git \
-    && cd /essentia/essentia \
-    && emconfigure sh -c './waf configure --prefix=$EMSCRIPTEN/system/local/ --build-static --fft=KISS --emscripten \
-                        --pkg-config-path=/usr/share/pkgconfig' \
+    && cd /essentia/essentia/packaging/debian_3rdparty \
+    && bash -C "./build_eigen3.sh" && cd ../../ \
+    && emconfigure sh -c './waf configure --prefix=$EMSCRIPTEN/system/local/ --build-static --fft=KISS --emscripten --static-dependencies' \
     && emmake ./waf && emmake ./waf install \
-    &&  apt-get remove -y libyaml-dev libfftw3-dev libavcodec-dev \
-        libavformat-dev libavutil-dev libavresample-dev libsamplerate0-dev \
-        libtag1-dev \
+    &&  apt-get remove -y python-dev libeigen3-dev \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/* \
@@ -29,9 +19,17 @@ RUN apt-get update \
 
 # copy and install python dependencies
 COPY src/python/requirements.txt /tmp/requirements.txt
-
 RUN pip install --upgrade setuptools \
     && pip install --no-cache-dir -r /tmp/requirements.txt \
     && rm /tmp/requirements.txt
+
+# add latest eigen3 header files for linking the essentia.js binding builds
+ARG EIGEN_VERSION=3.3.7
+RUN wget  -P /usr/local/include/ "https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-${EIGEN_VERSION}.tar.gz" \
+    && cd /usr/local/include/ && tar -xvzf eigen-${EIGEN_VERSION}.tar.gz \
+    && rm -f eigen-${EIGEN_VERSION}.tar.gz && mv eigen-${EIGEN_VERSION} eigen3
+
+ENV EIGEN_PATH /usr/local/include/eigen3
+ENV EMSCRIPTEN /emsdk/upstream/emscripten
 
 WORKDIR /essentia/

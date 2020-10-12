@@ -1,17 +1,30 @@
 // Tests for essentia.js 
+// Unit tests were not done each algorithms since they were already passed tested on C++ upstream repo
+// However, in future we also need to check it is working consistenly on the web-end as well.
+// Another set of tests should be related with testing regression of few selected feture extractors with their corresponding C++ ones.
 
 var chai = require('chai');
-var esLib = require('essentiajs');
+var esLib = require('../index');
 
 describe('essentia.js', function() {
-  // TODO: write more concise tests
-  it('should sucessfully find all the essentia class and methods', function() {
-    chai.assert.hasAllKeys(esLib, ['EssentiaJS', 
-                                   'VectorFloat', 
-                                   'VectorString', 
-                                   'VectorDouble', 
-                                   'VectorVectorFloat']);
+  it('should sucessfully find all the import methods of essentia.js instance', function() {
+    chai.expect(esLib).to.have.any.keys([
+      'EssentiaModule',
+      'algorithms',
+      'algorithmNames',
+      'version',
+      'reinstantiate',
+      'shutdown',
+      'delete',
+      'vectorToArray',
+      'arrayToVector',
+      'VectorInt',
+      'VectorFloat', 
+      'VectorString', 
+      'VectorDouble', 
+      'VectorVectorFloat'
+    ]);
   });
-
-  // TODO: add more tests here
+  // TODO: add more tests for testing the library on various web platforms.
+  // Also write regression test for feature extractors comparing using C++, Python and JS interface.
 });

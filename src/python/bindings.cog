@@ -19,9 +19,7 @@
 
 // NOTE: This source code is auto-generated.
 
-#include <stdio.h>
 #include "./includes/essentiajs.h"
-
 
 // expose essentiajs class to js using embind wrappers
 EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) { 
@@ -32,6 +30,8 @@ EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) {
     .property("algorithmNames", &EssentiaJS::algorithmNames)
     .function("shutdown", &EssentiaJS::shutdown)
     .function("FrameGenerator", &EssentiaJS::FrameGenerator)
+    .function("MonoMixer", &EssentiaJS::MonoMixer)
+    .function("LoudnessEBUR128", &EssentiaJS::LoudnessEBUR128)
     /*[[[cog
     import logging
     import cog

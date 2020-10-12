@@ -9,9 +9,9 @@
       <body style="background-color:  #000000!important;"">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
-        <script src="https://unpkg.com/essentia.js@0.0.9/dist/essentia-wasm.web.js"></script>
-        <script src="https://unpkg.com/essentia.js@0.0.9/dist/essentia.js-core.js"></script>
-        <script src="https://unpkg.com/essentia.js@0.0.9/dist/essentia.js-plot.js"></script>
+        <script src="../../../dist/essentia-wasm.web.js"></script>
+        <script src="../../../dist/essentia.js-core.js"></script>
+        <script src="../../../dist/essentia.js-plot.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
         
         <div class="ui main_wrapper landing-image">
@@ -21,7 +21,7 @@
             <img id="header-img" src="../../../src/assets/img/essentiajsbanner.png">
           </a>
           <div>
-              <h2 class="ui header white-text" style="color: azure;">PitchYinProbabilistic extraction with Web Audio API (ScriptNodeProcessor)</h2>
+              <h2 class="ui header white-text" style="color: azure;">PitchMelodia extraction with Web Audio API (ScriptProcessorNode)</h2>
           </div>
 
           <div class="ui divider" style="height: 2px; width: 1px;"></div>
@@ -65,7 +65,7 @@
             let isEssentiaInstance = false;
             // global var for web audio api AudioContext
             let audioCtx;
-            // buffer size microphone stream (bufferSize is high in order to make PitchYinProbabilistic algo to work)
+            // buffer size microphone stream (bufferSize is high in order to make PitchMelodia algo to work)
             let bufferSize = 8192;
 
             try {
@@ -82,6 +82,8 @@
             // settings for plotting
             let plotContainerId = "plotDiv";
             let plotMelodyContour = new EssentiaPlot.PlotMelodyContour(Plotly, plotContainerId);
+
+            plotMelodyContour.plotLayout.yaxis.range = [80, 4000];
 
 
             // record native microphone input and do further audio processing on each audio buffer using the given callback functions
@@ -147,20 +149,23 @@
               var bufferSignal = essentia.arrayToVector(event.inputBuffer.getChannelData(0));
               if (!bufferSignal) { throw "onRecordingError: empty audio signal input found!"};
               
-              // check https://essentia.upf.edu/reference/std_PitchYinProbabilistic.html
-              var algoOutput = essentia.PitchYinProbabilistic(bufferSignal, // input_1
-                                                            // parameters (optional)
-                                                            4096, // frameSize
-                                                            256, // hopSize
-                                                            0.1, // lowRMSThreshold
-                                                            'zero', // outputUnvoiced,
-                                                            false, // preciseTime
-                                                            audioCtx.sampleRate); //sampleRate
+              // Running PitchMelodia algorithm on an input audio signal vector
+              // check https://essentia.upf.edu/reference/std_PitchMelodia.html
+              let algoOutput = essentia.PitchMelodia(bufferSignal, // input
+                // parameters (optional)
+                10, // binResolution,
+                3, // filterIterations
+                2048, // frameSize
+                false, // guessUnvoiced
+                0.8, // harmonicWeight
+                128, // hopSize
+              ); 
 
               // convert the output to js arrray
               var pitchValues = essentia.vectorToArray(algoOutput.pitch);
+
               // here we call the plotting function to display realtime feature extraction results
-              plotMelodyContour.create(pitchValues, 'PitchYinProbabilistic', bufferSize, audioCtx.sampleRate);
+              plotMelodyContour.create(pitchValues, 'PitchMelodia', bufferSize, audioCtx.sampleRate);
               // free the outputs
               delete algoOutput;
             }
@@ -172,10 +177,10 @@
                 if (!recording) {
                   $(this).prop("disabled", true);
 
-                  EssentiaModule().then( function(essentiaModule){
+                  EssentiaWASM().then( function(essentiaWASM){
 
                     if (!isEssentiaInstance) { 
-                      essentia = new Essentia(essentiaModule); 
+                      essentia = new Essentia(essentiaWASM); 
                       isEssentiaInstance = true; 
                     }
                     // 

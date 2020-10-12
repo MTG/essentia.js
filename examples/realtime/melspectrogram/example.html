@@ -8,14 +8,14 @@
       type="text/css"
       href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
     />
-    <title>essentia.js with Web Audio API ScriptNodeProcessor example</title>
+    <title>essentia.js with Web Audio API example (ScriptProcessorNode)</title>
   </head>
   <body style="background-color:  #000000!important;">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
-    <script src="https://unpkg.com/essentia.js@0.0.9/dist/essentia-wasm.web.js"></script>
-    <script src="https://unpkg.com/essentia.js@0.0.9/dist/essentia.js-extractor.js"></script>
-    <script src="https://unpkg.com/essentia.js@0.0.9/dist/essentia.js-plot.js"></script>
+    <script src="../../../dist/essentia-wasm.web.js"></script>
+    <script src="../../../dist/essentia.js-extractor.js"></script>
+    <script src="../../../dist/essentia.js-plot.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
     <div class="ui main_wrapper landing-image">
@@ -28,7 +28,7 @@
         </a>
         <div>
           <h2 class="ui header white-text" style="color: azure;">
-            Mel Spectrogram extraction using Web Audio API (ScriptNodeProcessor)
+            LogMelSpectrogram extraction using Web Audio API (ScriptProcessorNode)
           </h2>
           <div class="ui basic large button">
             <a href="https://github.com/MTG/essentia.js/tree/master/examples/realtime/melspectrogram/example.html" target="_blank" class="ui small button">Code<i class="right github icon"></i></a>
@@ -90,6 +90,8 @@
         let audioCtx;
         // buffer size microphone stream (bufferSize is high in order to make PitchYinProbabilistic algo to work)
         let bufferSize = 2048;
+        let hopSize = 1024;
+        let melNumBands = 96;
 
         try {
           const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -185,19 +187,24 @@
 
           let audioBuffer = event.inputBuffer.getChannelData(0);
 
+          console.log(audioBuffer.length);
+
           // modifying default extractor settings
-          essentiaExtractor.frameSize = 1024;
-          essentiaExtractor.hopSize = 512;
+          essentiaExtractor.frameSize = bufferSize;
+          essentiaExtractor.hopSize = hopSize;
           // settings specific to an algorithm
-          essentiaExtractor.profile.MelBands.numberBands = 96;
+          essentiaExtractor.profile.MelBands.numberBands = melNumBands;
           // compute hpcp for overlapping frames of audio
-          let spectrogram = essentiaExtractor.melSpectrogram(audioBuffer);
+          let spectrum = essentiaExtractor.melSpectrumExtractor(audioBuffer, audioCtx.sampleRate);
+          let spectrogram = [];
+          spectrogram.push(spectrum);
           // here we call the plotting function to display realtime feature extraction results
           plotSpectrogram.create(
             spectrogram,
             "Log-scaled MelSpectrogram",
             bufferSize,
-            audioCtx.sampleRate
+            audioCtx.sampleRate,
+            hopSize
           );
 
         //   plotChroma.isPlotting = true;
@@ -218,10 +225,13 @@
                 EssentiaPlot.LayoutSpectrogramPlot // layout settings
               );
 
+              plotSpectrogram.plotLayout.yaxis.range = [0, melNumBands];
+              plotSpectrogram.plotLayout.yaxis.autorange = false;
+
               // loads the WASM backend and runs the feature extraction
-              EssentiaModule().then(function(essentiaModule) {
+              EssentiaWASM().then(function(essentiaWASM) {
                 if (!isEssentiaInstance) {
-                  essentiaExtractor = new EssentiaExtractor(essentiaModule);
+                  essentiaExtractor = new EssentiaExtractor(essentiaWASM);
                   isEssentiaInstance = true;
                 }
                 // start microphone stream using getUserMedia

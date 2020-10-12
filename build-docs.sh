@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -e -x
+
 tsc src/typescript/core_api.ts || exit 1
 tsc src/typescript/extractor.ts || exit 1
 tsc src/typescript/plot.ts || exit 1

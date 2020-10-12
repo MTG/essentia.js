@@ -19,26 +19,33 @@ TO_INCLUDE_ALGOS_TXT_FILE = "included_algos.md"
 TO_EXCLUDE_ALGOS_TXT_FILE = "excluded_algos.md"
 
 # essentia algorithms that are excluded by default 
-DEFAULT_EXCLUDE_ALGOS = ['MonoLoader', 'AudioLoader', 'EasyLoader', 'MonoWriter', 'MonoMixer', 'EqloudLoader', 'AudioWriter',
-                        'ChromaPrint', 'Extractor', 'FreesoundExtractor', 'MusicExtractor', 'MusicExtractorSVM',
+# some of them are excluded because of either third party dependencies or the need file I/O access
+# some of them have matrix-real input types which are not supported for the embind wrappers
+# see https://github.com/MTG/essentia.js/issues/27
+DEFAULT_EXCLUDE_ALGOS = [# requires FFTW, TagLib or Chromaprint dependencies
+                        'MonoLoader', 'AudioLoader', 'EasyLoader', 'MonoWriter', 'MonoMixer', 'EqloudLoader', 'AudioWriter',
+                        'Chromaprinter', 'Extractor', 'FreesoundExtractor', 'MusicExtractor', 
                         'PCA', 'PoolAggregator', 'YamlInput', 'YamlOutput', 'MetadataReader', 'Viterbi', 'SilenceRate',
                         'FFTW', 'IFFTW', 'IFFTA', 'FFTA', 'FFTWComplex', 'IFFTWComplex', 'FFTAComplex', 'IFFTAComplex',
-                        'GaiaTransform', 'TensorflowPredict', 'TensorflowPredictMusiCNN', 'TensorflowPredictVGGish', 
-                        'TensorflowInputMusiCNN', 'TensorflowInputVGGish']
+                        # requires Gaia and Tensorflow dependencies
+                        'GaiaTransform', 'MusicExtractorSVM', 'TensorflowPredict', 'TensorflowPredictMusiCNN', 
+                        'TensorflowPredictVGGish', 'TensorflowInputMusiCNN', 'TensorflowInputVGGish',
+                        # these algortihms expect a matrix_real input or output types which are not yet supported for the JS bindings 
+                        'BpmHistogram', 'FadeDetection', 'HumDetector', 'Onsets', 'Panning', 'SBic', 'SingleGaussian',
+                        # these algorithms expect std::complex** type for wither input, parameters or outputs, which are not yet supported for the JS bindings 
+                        'CartesianToPolar', 'PolarToCartesian', 'Magnitude', 'ConstantQ', 'NSGConstantQ', 'NSGIConstantQ', 
+                        'FFT', 'IFFT', 'FFTC', 'IFFTC', 'HarmonicMask', 'HarmonicModelAnal', 'SineModelAnal', 'SineModelSynth',
+                        # expect vector_stereosample type
+                        'FalseStereoDetector', 'LoudnessEBUR128', 'StereoDemuxer', 'StereoMuxer', 'StereoTrimmer',
+                        ]
 
 # create a default file for exclude algo list file in case there is none
 if not os.path.exists(TO_EXCLUDE_ALGOS_TXT_FILE): 
     savelist_to_file(DEFAULT_EXCLUDE_ALGOS, TO_EXCLUDE_ALGOS_TXT_FILE)
 
 # essentia algorithms that are excluded by default while building essentia.js bindings 
-# (due to FFTW dependency or need of filesystem access etc)
+# (due to FFTW dependency or need of filesystem access etc) 
 TO_EXCLUDE_ALGOS = read_txt_file(TO_EXCLUDE_ALGOS_TXT_FILE)
-
-# excluding these algos too temporarily since the current essentia AlgorithmFactory instances has a limitation 
-# on number of parameters (16) that can configure at algorithm creation. See https://github.com/MTG/essentia/pull/957
-# NOTE: these algos should be included once the cpp macros has added in the main essentia repository.
-TO_EXCLUDE_ALGOS.extend(['MultiPitchKlapuri', 'MultiPitchMelodia', 'PitchMelodia', 
-                        'PredominantPitchMelodia'])
 
 # By default, we include all the algorithms from essentia except ones that are in exclude algo list
 DEFAULT_INCLUDE_ALGOS = [al for al in estd.algorithmNames() if al not in TO_EXCLUDE_ALGOS]

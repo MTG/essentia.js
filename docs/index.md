@@ -14,8 +14,8 @@ You can find the latest releases on [Github](https://github.com/MTG/essentia.js/
 
 ### Core JS API
 
-- `essentia.js-core.js` - `Essentia` main JS interface for web browsers.
-- `essentia.js-core.es.js` - `Essentia` main JS interface for ES6 imports.
+- `essentia.js-core.*.js` - `Essentia` main JS interface for web browsers.
+- `essentia.js-core.es.*.js` - `Essentia` main JS interface for ES6 imports.
 
 ### WASM modules 
 
@@ -30,10 +30,10 @@ The documentation for essentia C++ algorithms can be found [here](https://essent
   
 ### Add-on JS modules
 
-- `essentia.js-extractor.js` - `EssentiaExtractor` import for  web browsers
-- `essentia.js-extractor.es.js` - `EssentiaExtractor` for ES6 imports.
-- `essentia.js-plot.js` - `EssentiaPlot` import for  web browsers
-- `essentia.js-plot.es.js` - `EssentiaPlot` for ES6 imports.
+- `essentia.js-extractor.*.js` - `EssentiaExtractor` import for  web browsers
+- `essentia.js-extractor.es.*.js` - `EssentiaExtractor` for ES6 imports.
+- `essentia.js-plot.*.js` - `EssentiaPlot` import for  web browsers
+- `essentia.js-plot.es.*.js` - `EssentiaPlot` import for ES6 imports.
 
 
 ### Essentia WebAssembly (WASM) back-end

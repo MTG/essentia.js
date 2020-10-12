@@ -19,7 +19,6 @@
 
 // NOTE: This source code is machine-generated.
 
-#include <stdio.h>
 #include <essentia/algorithmfactory.h>
 #include <essentia/essentiamath.h>
 #include <essentia/pool.h>
@@ -55,6 +54,9 @@ EssentiaJS::EssentiaJS(bool debugger) {
     essentia::infoLevelActive = true;
     // activate error level    
     essentia::errorLevelActive = true;    
+  } else {
+    essentia::infoLevelActive = false;
+    essentia::warningLevelActive = false;
   }
   essentia::init();
   essentiaVersion = essentia::version;
@@ -91,6 +93,69 @@ std::vector<std::vector<float> > EssentiaJS::FrameGenerator(const val& signalArr
   }
   delete fc;
   return pool.value<std::vector<std::vector<float> > >("frames");
+}
+
+// This a wrapper for MonoMixer algorithm to accept both left and right channels to downmix an stereo channel input to mono
+// check https://essentia.upf.edu/reference/std_MonoMixer.html for algorithm details
+// TODO: could be reimplemented with BinaryOperator and UnaryOperator in the future
+val EssentiaJS::MonoMixer(std::vector<float>& left_channel, std::vector<float>& right_channel) {
+  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+
+  // TODO: remove this stereosample cresting overhead in future 
+  Algorithm* algoStereoMuxer = factory.create("StereoMuxer");
+  algoStereoMuxer->input("left").set(left_channel);
+  algoStereoMuxer->input("right").set(right_channel);
+  std::vector<StereoSample> stereoSignal;
+  algoStereoMuxer->output("audio").set(stereoSignal);
+  algoStereoMuxer->compute();
+  delete algoStereoMuxer;
+
+  Algorithm* algoMonoMixer = factory.create("MonoMixer");
+  std::vector<float> output_audio;
+  algoMonoMixer->input("audio").set(stereoSignal);
+  // set numberChannels=2 since we only deal with stereo signal in this wrapper
+  algoMonoMixer->input("numberChannels").set(2);
+  algoMonoMixer->output("audio").set(output_audio);
+  algoMonoMixer->compute();
+
+  val outputMonoMixer(val::object());
+  outputMonoMixer.set("audio", output_audio);
+  delete algoMonoMixer;
+  return outputMonoMixer;
+};
+
+// This a wrapper for LoudnessEBUR128 algorithm to accept both left and right channels of an stereo audio signal seperately
+// check https://essentia.upf.edu/reference/std_LoudnessEBUR128.html for algorithm details
+val EssentiaJS::LoudnessEBUR128(std::vector<float>& left_channel, std::vector<float>& right_channel, const float hopSize, const float sampleRate, const bool startAtZero) {
+  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+
+  Algorithm* algoStereoMuxer = factory.create("StereoMuxer");
+  algoStereoMuxer->input("left").set(left_channel);
+  algoStereoMuxer->input("right").set(right_channel);
+  std::vector<StereoSample> stereoSignal;
+  algoStereoMuxer->output("audio").set(stereoSignal);
+  algoStereoMuxer->compute();
+  delete algoStereoMuxer;
+
+  Algorithm* algoLoudnessEBUR128 = factory.create("LoudnessEBUR128", "hopSize", hopSize, "sampleRate", sampleRate, "startAtZero", startAtZero);
+  algoLoudnessEBUR128->input("signal").set(stereoSignal);
+  std::vector<float> output_momentaryLoudness;
+  std::vector<float> output_shortTermLoudness;
+  float output_integratedLoudness;
+  float output_loudnessRange;
+  algoLoudnessEBUR128->output("momentaryLoudness").set(output_momentaryLoudness);
+  algoLoudnessEBUR128->output("shortTermLoudness").set(output_shortTermLoudness);
+  algoLoudnessEBUR128->output("integratedLoudness").set(output_integratedLoudness);
+  algoLoudnessEBUR128->output("loudnessRange").set(output_loudnessRange);
+  algoLoudnessEBUR128->compute();
+  val outputLoudnessEBUR128(val::object());
+  outputLoudnessEBUR128.set("momentaryLoudness", output_momentaryLoudness);
+  outputLoudnessEBUR128.set("shortTermLoudness", output_shortTermLoudness);
+  outputLoudnessEBUR128.set("integratedLoudness", output_integratedLoudness);
+  outputLoudnessEBUR128.set("loudnessRange", output_loudnessRange);
+
+  delete algoLoudnessEBUR128;
+  return outputLoudnessEBUR128;
 }
 
 // NOTE: The following code snippets are machine generated. Do not edit.
