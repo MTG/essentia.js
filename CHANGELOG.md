@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added 
 - Added support for new algorithms for pitch extraction (Melodia), EBUR loudness and downmixing stereo signals etc. (see [#6](https://github.com/MTG/essentia.js/issues/6) and [#30](https://github.com/MTG/essentia.js/issues/30)). 
 - Added example of how to write efficient custom C++ features exractor and their corresponding Essentia WASM JS bindings for performance demanding applications (see [here](https://github.com/MTG/essentia.js/pull/38/commits/517065cab819f9d9bef8bae8c8ee1e33d627f67e)).
+- Added both normal and minified builds of essentia.js seperately.
   
 
 ### Changes
