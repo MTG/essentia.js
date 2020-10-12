@@ -1,7 +1,6 @@
 # Contribute to `essentia.js`
 
-We are more than happy to collaborate and receive your contributions to `essentia.js`. 
-The best practice of submitting your code is by creating pull requests to our GitHub [repository](https://github.com/MTG/essentia.js) following our contribution policy. 
+You are more than welcome to collaborate and submit your contributions to `Essentia.js`. The best practice of submitting your code is by creating pull requests to our GitHub [repository](https://github.com/MTG/essentia.js) following our contribution policy. 
 
 By submitting your code you authorize that it complies with the Developer's Certificate of Origin.
 
@@ -19,6 +18,6 @@ By submitting your code you authorize that it complies with the Developer's Cert
 
 Based on https://gcc.gnu.org/contribute.html and http://elinux.org/Developer_Certificate_Of_Origin
 
-We encourage sharing with us any ideas on how we can improve Essentia and the best way to do this is by creating github issues for bug reports, feature requests and improvement ideas.
+We encourage sharing with us any ideas on how we can improve Essentia.js and the best way to do this is by creating github issues for bug reports, feature requests and improvement ideas.
 
 You are also more than welcome to suggest any improvements, including proposals for new algorithms, etc.
