@@ -19,8 +19,8 @@
     "templates": {
         "cleverLinks": true,
         "monospaceLinks": false,
-        "systemName": "essentia.js",
-        "systemSummary": "JavaScript library for Music/Audio analysis, powered by WebAssembly.",
+        "systemName": "Essentia.js",
+        "systemSummary": "JavaScript library for Music/Audio analysis, powered by Essentia WebAssembly backend.",
         "systemColor": "black",
         "footer": "https://essentia.upf.edu",
         "copyright": "Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra",
