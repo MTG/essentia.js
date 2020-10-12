@@ -1,4 +1,4 @@
-ESSENTIAJS_VERSION=0.1.0
+ESSENTIAJS_VERSION=0.1.0-dev
 ## Path to libs for Emscripten
 LIB_DIR_ESSENTIA=$(EMSCRIPTEN)/system/local/lib
 EIGEN_PATH=/usr/local/include/eigen3

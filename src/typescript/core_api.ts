@@ -22,7 +22,7 @@
 /**
  * @fileOverview Essentia high-level core interface
  * @author <a href="mailto:albin.correya@upf.edu">Albin Correya</a>
- * @version 0.0.9
+ * @version 0.1.0-dev
  */
 
 /**
