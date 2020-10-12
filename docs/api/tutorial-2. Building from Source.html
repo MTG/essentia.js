@@ -41,7 +41,7 @@
 				}
 			</style>
 		<script type="text/javascript">
-			window.TEMPLATE_OPTIONS = {"includeDate":false,"dateFormat":"Do MMM YYYY","systemName":"essentia.js","systemSummary":"JavaScript library for Music/Audio analysis, powered by WebAssembly.","systemLogo":"","systemColor":"black","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"https://essentia.upf.edu","copyright":"Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra","linenums":true,"collapseSymbols":true,"inverseNav":true,"inlineNav":false,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":false,"favicon":null,"stylesheets":[],"scripts":[],"monospaceLinks":false,"cleverLinks":true};
+			window.TEMPLATE_OPTIONS = {"includeDate":false,"dateFormat":"Do MMM YYYY","systemName":"Essentia.js","systemSummary":"JavaScript library for Music/Audio analysis, powered by Essentia WebAssembly backend.","systemLogo":"","systemColor":"black","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"https://essentia.upf.edu","copyright":"Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra","linenums":true,"collapseSymbols":true,"inverseNav":true,"inlineNav":false,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":false,"favicon":null,"stylesheets":[],"scripts":[],"monospaceLinks":false,"cleverLinks":true};
 			window.DOCLET_TOC_ENABLED = true;
 			window.DOCLET_AFILTER_ENABLED = false;
 		</script>
@@ -52,7 +52,7 @@
 		<div class="container">
 			<div class="navbar-header">
 				<a class="navbar-brand" href="index.html">
-					essentia.js
+					Essentia.js
 				</a>
 				<!-- displayed on small devices -->
 				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
@@ -67,9 +67,14 @@
 									<a href="list_class.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 									<ul class="dropdown-menu">
 											<li><a href="Essentia.html">Essentia</a></li>
+											<li><a href="Essentia.html">Essentia</a></li>
+											<li><a href="EssentiaExtractor.html">EssentiaExtractor</a></li>
 											<li><a href="EssentiaExtractor.html">EssentiaExtractor</a></li>
 											<li><a href="EssentiaPlot.html">EssentiaPlot</a></li>
+											<li><a href="EssentiaPlot.html">EssentiaPlot</a></li>
 											<li><a href="PlotHeatmap.html">PlotHeatmap</a></li>
+											<li><a href="PlotHeatmap.html">PlotHeatmap</a></li>
+											<li><a href="PlotMelodyContour.html">PlotMelodyContour</a></li>
 											<li><a href="PlotMelodyContour.html">PlotMelodyContour</a></li>
 									</ul>
 								</li>
@@ -78,6 +83,7 @@
 									<ul class="dropdown-menu">
 											<li><a href="tutorial-1. Getting Started.html">1. Getting Started</a></li>
 											<li><a href="tutorial-2. Building from Source.html">2. Building from Source</a></li>
+											<li><a href="tutorial-3. Developer notes.html">3. Developer notes</a></li>
 									</ul>
 								</li>
 				</ul>
@@ -100,19 +106,43 @@
 						</ol>
 		<section class="tutorial-section">
 			<article><h1>Building essentia.js from source</h1>
-<p>You can find pre-compiled builds of <code>essentia.js</code> <a href="https://github.com/MTG/essentia.js/releases">here</a>.</p>
-<p>You need to have a local installation of <a href="https://nodejs.org/en/">Node.js</a> (v12.9.1 or later)</p>
+<p>You can find pre-compiled builds of <code>Essentia.js</code> <a href="https://github.com/MTG/essentia.js/releases">here</a>.</p>
 <ul>
-<li>Clone or download the <a href="https://github.com/MTG/essentia.js">essentia.js</a> repository and run the following command to install all the Node.js dependencies.</li>
+<li>Clone or download the <a href="https://github.com/MTG/essentia.js">essentia.js</a> repository.</li>
 </ul>
+<h2>Easiest way</h2>
+<ul>
+<li>
+<p>Pull official essentia-emscripten docker image.</p>
+<pre class="prettyprint source lang-bash"><code>docker pull mtgupf/essentia-emscripten:latest
+</code></pre>
+</li>
+<li>
+<p>Build Essentia.js inside the docker</p>
+<pre class="prettyprint source lang-bash"><code>docker run --rm -v `pwd`:/essentia/ mtgupf/essentia-emscripten:latest /essentia/build-libs.sh
+</code></pre>
+</li>
+</ul>
+<p>OR</p>
+<h2>Step-by-step</h2>
+<ul>
+<li>
+<p>Run the following command to install all the Node.js dependencies.</p>
 <pre class="prettyprint source lang-bash"><code>npm install 
 </code></pre>
+</li>
+</ul>
+<blockquote>
+<p>You need to have a local installation of <a href="https://nodejs.org/en/">Node.js</a> (v12.9.1 or later)</p>
+</blockquote>
 <h3>Generate essentia-wasm backend and bindings.</h3>
-<p>In order to build the associate <code>essentia.js</code> builds we need to compile the essentia C++ library to WebAssembly target using emscripten for linking.</p>
-<p>In order to make the process easy, you coudl use the <a href="https://docs.docker.com/install/">docker</a> image (recommended) or build everything from the source on your local system.</p>
+<p>In order to build the associate <code>essentia.js</code> builds we need to compile the essentia C++ library to WebAssembly target using Emscripten.</p>
+<p>In order to make the process easier, you could use the <a href="https://docs.docker.com/install/">docker</a> image (recommended) or build everything from the source on your local system.</p>
 <p>(Optional)</p>
-<p>We use some python scripts to automatically generate the C++ wrappers and the JS bindings from the essentia documentation using the essentia python bindings.
+<blockquote>
+<p>We use some python scripts to automatically generate the C++ wrappers and the JS bindings from the Essentia upstream documentation using the Essentia python bindings.
 You need to have a local installation of Python with the required dependencies to re-generate the JS bindings and typescript wrapper source code.</p>
+</blockquote>
 <pre class="prettyprint source lang-bash"><code>pip install -r src/python/requirements.txt
 </code></pre>
 <h4>Using docker</h4>
@@ -120,7 +150,7 @@ You need to have a local installation of Python with the required dependencies t
 <ul>
 <li>
 <p>Pull the official <a href="https://hub.docker.com/r/mtgupf/essentia-emscripten"><code>essentia-emscripten</code></a> docker image.</p>
-<pre class="prettyprint source lang-bash"><code>docker pull mtgupf/essentia-emscripten:2.1-beta5-dev
+<pre class="prettyprint source lang-bash"><code>docker pull mtgupf/essentia-emscripten:latest
 </code></pre>
 </li>
 <li>
@@ -204,112 +234,53 @@ python configure_bindings.py -i your_included_algos_list.txt
 python configure_bindings.py -h
 </code></pre>
 <h3>Advanced</h3>
-<h3>Writing custom essentia C++ extractor and cross-compile to JS</h3>
+<h4>Writing custom essentia C++ extractor and cross-compile to JS for better performance on JS</h4>
 <p>You could also write  your own customised <a href="https://essentia.upf.edu/howto_standard_extractor.html">essentia feature extractor</a> in C++ and cross-compile to WASM using emscripten and our toolchain following the build instructions.</p>
+<p>A custom C++ feature extractors can be write and cross-compiled to JS using our given template and examples in cases in which the performance of feature extractors are significant. The <a href="https://github.com/MTG/essentia.js/tree/master/src/cpp/custom/essentia_custom_extractor.h"><code>essentia_custom_extractor.h</code></a>, <a href="https://github.com/MTG/essentia.js/tree/master/src/cpp/custom/essentia_custom_extractor.cpp"><code>essentia_custom_extractor.cpp</code></a> and <a href="https://github.com/MTG/essentia.js/tree/master/src/cpp/custom/bindings_extractor.cpp"><code>bindings_extractor.cpp</code></a> files demonstrates an example of writing an efficient custom C++ extractor which can be cross-compiled and run on JS for both real-time and offline feature extraction cases. In this particular example the extractor computes Log-scaled MelSpectrogram for a given audio channel data input from the WebAudio API or any other sources. The extractor provide a object-oriented interface which can be used to <code>configure</code>, <code>compute</code>, <code>reset</code> and <code>shutdown</code> the algorithms as the user needs (relevant for better performance in batch or real-time feature extractors).</p>
+<h5>Usage</h5>
 <ul>
-<li>
-<h4>Using <a href="../src/cpp/custom/essentia_extractor.cpp"><code>EssentiaExtractor</code></a> class examples</h4>
-<ul>
-<li>Build using <code>make -f Makefile.essentia.extractor</code> given in the <code>src/cpp/custom/</code> directory.</li>
+<li>Build the custom cpp extractor using the given <a href="https://github.com/MTG/essentia.js/tree/master/src/cpp/custom/Makefile">Makefile</a>. Make sure you have the required dependencies for building Essentia WASM.</li>
 </ul>
-</li>
-<li>
-<h4>Write custom extractor in C++ from scratch.</h4>
-<ul>
-<li>An example of custom essentia C++ extractor with embind bindings. Here we write an extractor for computing log mel-scaled spectrogram from an input audio signal.</li>
-</ul>
-<pre class="prettyprint source lang-c++"><code>#include &lt;stdio.h>
-#include &lt;essentia/algorithmfactory.h>
-#include &lt;essentia/essentiamath.h>
-#include &lt;essentia/pool.h>
-#include &lt;emscripten/bind.h>
-
-using namespace essentia;
-using namespace essentia::standard;
-using namespace emscripten;
-
-std::vector&lt;float> logMelSpectrogramExtractor(std::vector&lt;float>& signal, int numBands, int frameSize, int hopSize, std::string windowType) {
-  // we want to compute the MFCC of a input signal: we need the create the following:
-  // vector -> framecutter -> windowing -> FFT -> MFCC 
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-
-  Algorithm* fc = factory.create(&quot;FrameCutter&quot;,
-                  &quot;frameSize&quot;, frameSize,
-                &quot;hopSize&quot;, hopSize,
-                &quot;startFromZero&quot;, true);
-
-  Algorithm* w = factory.create(&quot;Windowing&quot;,
-                  &quot;type&quot;, windowType,
-                &quot;zeroPadding&quot;, frameSize);
-
-  Algorithm* spec = factory.create(&quot;Spectrum&quot;,
-                  &quot;size&quot;, frameSize);
-
-  Algorithm* mel = factory.create(&quot;MelBands&quot;,
-                  &quot;numberBands&quot;, numBands,
-                  &quot;type&quot;, &quot;magnitude&quot;);
-
-  Algorithm* logNorm = factory.create(&quot;UnaryOperator&quot;,
-                    &quot;type&quot;, &quot;log&quot;);							   
-  /////////// STARTING THE ALGORITHMS //////////////////
-  fc->input(&quot;signal&quot;).set(signal);
-  // FrameCutter -> Windowing -> Spectrum
-  std::vector&lt;Real> frame, windowedFrame;
-  fc->output(&quot;frame&quot;).set(frame);
-  w->input(&quot;frame&quot;).set(frame);
-  w->output(&quot;frame&quot;).set(windowedFrame);
-  spec->input(&quot;frame&quot;).set(windowedFrame);
-  // Spectrum -> MFCC
-  std::vector&lt;Real> spectrum, mfccBands, melBands;
-  spec->output(&quot;spectrum&quot;).set(spectrum);
-  mel->input(&quot;spectrum&quot;).set(spectrum);
-  mel->output(&quot;bands&quot;).set(mfccBands);
-  logNorm->input(&quot;array&quot;).set(mfccBands);
-  logNorm->output(&quot;array&quot;).set(melBands);
-  while (true) {
-    // compute a frame
-    fc->compute();
-    // if it was the last one (ie: it was empty), then we're done.
-    if (!frame.size()) {
-      break;
-    }
-    // if the frame is silent, just drop it and go on processing
-    if (isSilent(frame)) continue;
-    w->compute();
-    spec->compute();
-    mel->compute();
-    logNorm->compute();
-  }
-  delete fc;
-  delete w;
-  delete spec;
-  delete mel;
-  delete logNorm;
-  return melBands;
-}
-
-EMSCRIPTEN_BINDINGS(es_extractor) {
-  function(&quot;logMelSpectrogramExtractor&quot;, &logMelSpectrogramExtractor);
-  register_vector&lt;float>(&quot;VectorFloat&quot;);
-}
-
-</code></pre>
-<ul>
-<li>Build it using Emscripten compiler.</li>
-</ul>
-<pre class="prettyprint source lang-bash"><code>emcc --bind -Oz -s WASM=1 $(YOUR_CPP_FILE) $(EMSCRIPTEN)/system/local/lib/essentia.a  $(YOUR_OUTPUT.js) -s EXCEPTION_DEBUG -s ASSERTIONS=2-s ALLOW_MEMORY_GROWTH=1 
+<pre class="prettyprint source lang-bash"><code>make
 </code></pre>
 <ul>
 <li>Usage on JavaScript would be like</li>
 </ul>
-<pre class="prettyprint source lang-JavaScript"><code>Module.logMelSpectrogramExtractor(inputSignal, // std::vector&lt;float> type array
-                                  128, // numBands
-                                  4096, // frameSize
-                                  2048, // hopSize
-                                  'hann'); // windowType
-</code></pre>
-</li>
-</ul></article>
+<pre class="prettyprint source lang-JavaScript"><code>// import essentia-wasm backend
+import { EssentiaWASM } from 'essentia-custom-extractor.module.js';
+
+// create an instance of our custom 'LogMelSpectrogramExtractor' 
+// by passing our configuration settings for the given parameters
+const extractor = new EssentiaWASM.LogMelSpectrogramExtractor(1024, // frameSize
+                                                              512, // hopSize 
+                                                              96, // numBands
+                                                              'hann'); // windowType
+
+
+// Use the Web Audio API to decode the audio channel data from an url of a audio file
+const audioURL = &quot;https://freesound.org/data/previews/328/328857_230356-lq.mp3&quot;;
+const audioContext = new AudioContext();
+const response = await fetch(audioURL);
+const arrayBuffer = await response.arrayBuffer();
+const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+// getChannelData of channel number 0 (since it's a mono audio signal)
+const audioData = audioBuffer.getChannelData(0);
+
+// Now, let's compute the log-mel spectrogram feature for the given audio input
+let melSpectrogram =  extractor.compute(audioData);
+
+// reset the internal states of the algorithms used in the extractor
+extractor.reset();
+
+// reconfigure our extractor with new parmeter settings
+extractor.configure(1024, 512, 128, 'hann');
+// compute with new settings
+let melSpectrogram =  extractor.compute(audioData);
+
+// delete algorithms and free memory after it's use
+extractor.shutdown();
+extractor.delete();
+</code></pre></article>
 		</section>
 			</div>
 				<div class="col-md-3 side-content">
@@ -320,7 +291,7 @@ EMSCRIPTEN_BINDINGS(es_extractor) {
 	<footer>
 				<div class="footer-option">https://essentia.upf.edu</div>
 				<div class="copyright">Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra</div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.4</a> using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
