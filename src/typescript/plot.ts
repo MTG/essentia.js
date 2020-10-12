@@ -283,13 +283,9 @@ class PlotHeatmap extends EssentiaPlot {
         type: 'heatmap',
         transpose: true,
       };
-
       this.Plotly.newPlot(this.divId, [data], this.plotLayout);
       this.isPlotting = true;
       this.startTimeIndex = timeAxis[timeAxis.length-1];
-
-      console.log(this.startTimeIndex);
-
     } else {
       // realtime mode
       let heatmapFeature;
