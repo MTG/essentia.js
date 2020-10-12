@@ -20,21 +20,21 @@
 import Essentia from "./core_api";
 
 /**
- * EssentiaExtractor Base Class
+ * EssentiaExtractor 
+ * This class provides one-liner methods which implements the whole chain of algorithms required for computing features such as log-scaled mel spectrogram, HPCP chroma features etc This can be extended according to your needs.
  * @class 
  * @extends {Essentia}
  */
 class EssentiaExtractor extends Essentia {
 
   public sampleRate: any=44100;
-  public frameSize: any=4096;
-  public hopSize: any=2048;
+  public frameSize: any=2048;
 
   public profile: any={
     Windowing: {
-      normalized: true,
-      size: this.frameSize,
-      type: "blackmanharris62",
+      normalized: false,
+      size: 1024,
+      type: "hann",
       zeroPadding: 0,
       zeroPhase: true
     },
@@ -42,16 +42,16 @@ class EssentiaExtractor extends Essentia {
       size: this.frameSize
     },
     MelBands: {
-      highFrequencyBound: 22050,
-      inputSize: this.frameSize,
+      highFrequencyBound: Math.floor(this.sampleRate / 2),
+      inputSize: Math.floor(this.frameSize / (2+1)),
       log: false,
       lowFrequencyBound: 0,
-      normalize: 'unit_sum',
-      numberBands: 128,
+      normalize: 'unit_tri',
+      numberBands: 96,
       sampleRate: this.sampleRate,
       type: 'power',
-      warpingFormula: 'htkMel',
-      weighting: 'warping'
+      warpingFormula: 'slaneyMel',
+      weighting: 'linear'
     },
     SpectralPeaks: {
       magnitudeThreshold: 0,
@@ -80,161 +80,176 @@ class EssentiaExtractor extends Essentia {
       weightType: 'squaredCosine',
       windowSize: 1
     },
-    UnaryOperator: {
-      scale: 1,
-      shift: 0,
-      type: 'log'
-    }
   };
 
   /**
    *Creates an instance of EssentiaExtractor.
-  * @param {*} EssentiaModule
+  * @param {*} EssentiaWASM
   * @param {boolean} [isDebug=false]
   * @constructs
   */
-  constructor(public EssentiaModule: any, public isDebug: boolean=false) {
-    super(EssentiaModule, isDebug);
+  constructor(public EssentiaWASM: any, public isDebug: boolean=false) {
+    super(EssentiaWASM, isDebug);
   }
 
   /**
-   * Compute mel spectrogram for a given audio data along with an optional extractor profile configuration
+   * Compute log-scaled mel spectrogram for a given audio signal frame along with an optional extractor profile configuration
    * @method
-   * @param {Float32Array} audioData decoded audio signal as Float32 typed array
+   * @param {Float32Array} audioFrame a frame of decoded audio signal as Float32 typed array.
+   * @param {number} sampleRate Sample rate of the input audio signal.
    * @param {boolean} [asVector=false] whether to output the spectrogram as a vector float type for chaining with other essentia algorithms.
    * @param {*} [config=this.profile]
-   * @returns {Array} Frame-wise Mel Spectrogram
+   * @returns {Array} Log-scaled Mel Spectrum
    * @memberof EssentiaExtractor
    */
-  melSpectrogram(audioData: Float32Array, asVector: boolean=false, config: any=this.profile) {
-    // cut audio data into overlapping frames
-    let frames = this.FrameGenerator(audioData, this.frameSize, this.hopSize);
+  melSpectrumExtractor(audioFrame: Float32Array, sampleRate: number=this.sampleRate, asVector: boolean=false, config: any=this.profile) {
 
-    let logMelBandVec = new this.module.VectorVectorFloat();
-    let logMelbandFrames = [];
-  
-    for (var i=0; i <=frames.size(); i++) {
-      // we need to compute the following signal process chain 
-      // audio frame => windowing => spectrum => mel bands => log scale
-      var windowOut = this.Windowing(frames.get(i), 
-                                    config.Windowing.normalized, 
-                                    this.frameSize,
-                                    config.Windowing.type, 
-                                    config.Windowing.zeroPadding,
-                                    config.Windowing.zeroPhase);
-      var spectrumOut = this.Spectrum(windowOut.frame, this.frameSize);
-      var melOut = this.MelBands(spectrumOut.spectrum, 
-                                config.MelBands.highFrequencyBound, 
-                                this.frameSize, 
-                                config.MelBands.log, 
-                                config.MelBands.lowFrequencyBound, 
-                                config.MelBands.normalize, 
-                                config.MelBands.numberBands, 
-                                this.sampleRate,
-                                config.MelBands.type,
-                                config.MelBands.warpingFormula,
-                                config.MelBands.weighting);
-      var logNorm = this.UnaryOperator(melOut.bands,      
-                                      config.UnaryOperator.scale, 
-                                      config.UnaryOperator.shift,
-                                      config.UnaryOperator.type);
-      if (asVector) {
-        logMelBandVec.push_back(logNorm.array);
-      }
-      else {
-        // convert type to JS array
-        let melBandFrame = this.vectorToArray(logNorm.array);
-        logMelbandFrames.push(melBandFrame);
-      }
+    const signalFrame = this.arrayToVector(audioFrame);
+
+    let _frameSize = audioFrame.length;
+
+    // we need to compute the following signal process chain 
+    // audio frame => windowing => spectrum => mel bands => log scale
+    var windowOut = this.Windowing(signalFrame, 
+                                  config.Windowing.normalized, 
+                                  config.Windowing.size,
+                                  config.Windowing.type, 
+                                  config.Windowing.zeroPadding,
+                                  config.Windowing.zeroPhase);
+    
+    var spectrumOut = this.Spectrum(windowOut.frame, _frameSize);
+
+    var melOut = this.MelBands(spectrumOut.spectrum, 
+                              config.MelBands.highFrequencyBound, 
+                              Math.floor(_frameSize / (2+1)), 
+                              config.MelBands.log, 
+                              config.MelBands.lowFrequencyBound, 
+                              config.MelBands.normalize, 
+                              config.MelBands.numberBands, 
+                              sampleRate,
+                              config.MelBands.type,
+                              config.MelBands.warpingFormula,
+                              config.MelBands.weighting);
+    
+    // shift operation of mel-spectrograms
+    var shift = this.UnaryOperator(melOut.bands,      
+                                  10000, 
+                                  1);
+    
+    // logarithmic compression of mel-spectrograms
+    var logComp = this.UnaryOperator(shift.array, 1, 0, "log10");
+      
+    // return the output of the feature extractor either as VectorFloat type or as JavaScript Float32 typed array
+    if (asVector) {
+
+      // fallback to free the std vectors
+      //delete windowOut.frame;
+      delete spectrumOut.spectrum;
+      delete melOut.bands;
+      delete shift.array;
+
+      return logComp.array;
     }
-    // fallback to free the std vectors
-    delete windowOut.frame;
-    delete spectrumOut.spectrum;
-    delete melOut.bands;
-    delete logNorm.array;
+    else {
+      // convert type to JS array
+      let logMelBands = this.vectorToArray(logComp.array);
 
-    if (asVector) return logMelBandVec;
-    else return logMelbandFrames;
+      // fallback to free the std vectors
+      //delete windowOut.frame;
+      delete spectrumOut.spectrum;
+      delete melOut.bands;
+      delete shift.array;
+      delete logComp.array;
+
+      return logMelBands;
+    }
   }
   
   /**
-   * Compute frame-wise HPCP chroma feature for a given audio data along with an optional extractor profile configuration
+   * Compute HPCP chroma feature for a given audio signal frame along with an optional extractor profile configuration
    * @method
-   * @param {Float32Array} audioData decoded audio signal as Float32 typed array
+   * @param {Float32Array} audioFrame a decoded audio signal frame as Float32 typed array.
+   * @param {number} sampleRate Sample rate of the input audio signal.
    * @param {boolean} [asVector=false] whether to output the hpcpgram as a vector float type for chaining with other essentia algorithms.
    * @param {*} [config=this.profile] 
    * @returns {Array} Frame-wise HPCP
    * @memberof EssentiaExtractor
    */
-  hpcpgram(audioData: Float32Array, asVector: boolean=false, config: any=this.profile) {
-    // cut audio data into overlapping frames
-    let frames = this.FrameGenerator(audioData, this.frameSize, this.hopSize);
+  hpcpExtractor(audioFrame: Float32Array, sampleRate: number=this.sampleRate, asVector: boolean=false, config: any=this.profile) {
+  
+    const signalFrame = this.arrayToVector(audioFrame);
 
-    let hpcpGramVec = new this.module.VectorVectorFloat();
-    let hpcpGram = [];
-    for (var i=0; i <=frames.size(); i++) { 
-      // we need to compute the following signal process chain 
-      // audio frame => windowing => spectrum => spectral peak => spectral whitening => HPCP
-      var windowOut = this.Windowing(frames.get(i), 
-                                    config.Windowing.normalized, 
-                                    this.frameSize,
-                                    config.Windowing.type, 
-                                    config.Windowing.zeroPadding,
-                                    config.Windowing.zeroPhase);
+    let _frameSize = audioFrame.length;
 
-      var spectrumOut = this.Spectrum(windowOut.frame, this.frameSize);
+    // we need to compute the following signal process chain 
+    // audio frame => windowing => spectrum => spectral peak => spectral whitening => HPCP
+    var windowOut = this.Windowing(signalFrame, 
+                                  config.Windowing.normalized, 
+                                  config.Windowing.size,
+                                  config.Windowing.type, 
+                                  config.Windowing.zeroPadding,
+                                  config.Windowing.zeroPhase);
 
-      var peaksOut = this.SpectralPeaks(spectrumOut.spectrum,
-                                        config.SpectralPeaks.magnitudeThreshold,
-                                        config.SpectralPeaks.maxFrequency,
-                                        config.SpectralPeaks.maxPeaks,
-                                        config.SpectralPeaks.minFrequency,
-                                        config.SpectralPeaks.orderBy,
-                                        this.sampleRate);
+    var spectrumOut = this.Spectrum(windowOut.frame, _frameSize);
+
+    var peaksOut = this.SpectralPeaks(spectrumOut.spectrum,
+                                      config.SpectralPeaks.magnitudeThreshold,
+                                      config.SpectralPeaks.maxFrequency,
+                                      config.SpectralPeaks.maxPeaks,
+                                      config.SpectralPeaks.minFrequency,
+                                      config.SpectralPeaks.orderBy,
+                                      sampleRate);
       
-      var whiteningOut = this.SpectralWhitening(spectrumOut.spectrum,
-                                                peaksOut.frequencies,
-                                                peaksOut.magnitudes,
-                                                config.SpectralWhitening.maxFrequency,
-                                                this.sampleRate);
+    var whiteningOut = this.SpectralWhitening(spectrumOut.spectrum,
+                                              peaksOut.frequencies,
+                                              peaksOut.magnitudes,
+                                              config.SpectralWhitening.maxFrequency,
+                                              sampleRate);
 
-      var hpcpOut = this.HPCP(peaksOut.frequencies,
-                              whiteningOut.magnitudes,
-                              config.HPCP.bandPreset,
-                              config.HPCP.bandSplitFrequency,
-                              config.HPCP.harmonics,
-                              config.HPCP.maxFrequency,
-                              config.HPCP.maxShifted,
-                              config.HPCP.minFrequency,
-                              config.HPCP.nonLinear,
-                              config.HPCP.normalized,
-                              config.HPCP.referenceFrequency,
-                              this.sampleRate,
-                              config.HPCP.size,
-                              config.HPCP.weightType,
-                              config.HPCP.windowSize);
+    var hpcpOut = this.HPCP(peaksOut.frequencies,
+                            whiteningOut.magnitudes,
+                            config.HPCP.bandPreset,
+                            config.HPCP.bandSplitFrequency,
+                            config.HPCP.harmonics,
+                            config.HPCP.maxFrequency,
+                            config.HPCP.maxShifted,
+                            config.HPCP.minFrequency,
+                            config.HPCP.nonLinear,
+                            config.HPCP.normalized,
+                            config.HPCP.referenceFrequency,
+                            sampleRate,
+                            config.HPCP.size,
+                            config.HPCP.weightType,
+                            config.HPCP.windowSize);
 
-      if (asVector) {
-        hpcpGramVec.push_back(hpcpOut.hpcp);
-      }
-      else {
-        // convert type to JS array
-        let hpcpFrame = this.vectorToArray(hpcpOut.hpcp);
-        hpcpGram.push(hpcpFrame);
-      }
+    
+    // return the output of the feature extractor either as VectorFloat type or as JavaScript Float32 typed array
+    if (asVector) {
+      // fallback to free the std vectors
+      delete windowOut.frame;
+      delete spectrumOut.spectrum;
+      delete peaksOut.frequencies;
+      delete peaksOut.magnitudes;
+      delete whiteningOut.magnitudes;
+
+      return hpcpOut.hpcp;
     }
-    // fallback to free the std vectors
-    delete windowOut.frame;
-    delete spectrumOut.spectrum;
-    delete peaksOut.frequencies;
-    delete peaksOut.magnitudes;
-    delete whiteningOut.magnitudes;
-    delete hpcpOut.hpcp;
+    else {
+      // convert type to JS array
+      let hpcpFrame = this.vectorToArray(hpcpOut.hpcp);
 
-    if (asVector) return hpcpGramVec;
-    else return hpcpGram;
+      delete windowOut.frame;
+      delete spectrumOut.spectrum;
+      delete peaksOut.frequencies;
+      delete peaksOut.magnitudes;
+      delete whiteningOut.magnitudes;
+      delete hpcpOut.hpcp;
+     
+      return hpcpFrame;
+    }
   }
 
+  // Add your new extractor methods here ...
 }
 
 export default EssentiaExtractor;
