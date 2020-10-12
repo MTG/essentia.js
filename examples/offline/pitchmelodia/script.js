@@ -15,42 +15,37 @@ let isComputed = false;
 // callback function which compute the frame-wise HPCP chroma of input audioURL on a button.onclick event
 async function onClickFeatureExtractor() {
 
-  let pitchGram = [];
   // load audio file from an url
   audioData = await essentia.getAudioChannelDataFromURL(audioURL, audioCtx, 0);
   
   if (isComputed) { plotChroma.destroy(); };
 
-  let frames = essentia.FrameGenerator(audioData, 4096, 512);
+  const audioVector = essentia.arrayToVector(audioData);
 
-  // compute for overlapping frames
-  for (var i=0; i<frames.size(); i++) {
-
-    // Running PitchYinProbabilistic algorithm on an input audio signal vector
-    // check https://essentia.upf.edu/reference/std_PitchYinProbabilistic.html
-    let pitchPyYin = essentia.PitchYinProbabilistic(frames.get(i), // input
-      // parameters (optional)
-      4096, // frameSize
-      256, // hopSize
-      0.1, // lowRMSThreshold
-      'zero', // outputUnvoiced,
-      false, // preciseTime
-      audioCtx.sampleRate //sampleRate
-    ); 
+  // Running PitchMelodia algorithm on an input audio signal vector
+  // check https://essentia.upf.edu/reference/std_PitchMelodia.html
+  let pitchMelodia = essentia.PitchMelodia(audioVector, // input
+    // parameters (optional)
+    10, // binResolution,
+    3, // filterIterations
+    2048, // frameSize
+    false, // guessUnvoiced
+    0.8, // harmonicWeight
+    128, // hopSize
+  ); 
    
-    let pitches = essentia.vectorToArray(pitchPyYin.pitch);
+  let pitches = essentia.vectorToArray(pitchMelodia.pitch);
 
-    pitchGram.push(pitches[0]);
-
-  }
   // plot the feature
   plotMelodyContour.create(
-    pitchGram, // input feature array
-    "PitchYinProbabilistic", // plot title
+    pitches, // input feature array
+    "PitchMelodia", // plot title
     audioData.length, // length of audio in samples
     audioCtx.sampleRate // audio sample rate
   );
+
   isComputed = true;
+  essentia.algorithms.delete();
 }
 
 $(document).ready(function() {
@@ -58,10 +53,10 @@ $(document).ready(function() {
   // create EssentaPlot instance
   plotMelodyContour = new EssentiaPlot.PlotMelodyContour(Plotly, plotContainerId);
 
-  plotMelodyContour.plotLayout.yaxis.range = [40, 300];
+  plotMelodyContour.plotLayout.yaxis.range = [40, 2000];
 
   // Now let's load the essentia wasm back-end, if so create UI elements for computing features
-  EssentiaModule().then(async function(WasmModule) {
+  EssentiaWASM().then(async function(WasmModule) {
     // populate html audio player with audio
     let player = document.getElementById("audioPlayer");
     player.src = audioURL;
@@ -75,7 +70,7 @@ $(document).ready(function() {
     );
 
     $("#logDiv").append(
-      '<button id="btn" class="ui white inverted button">Compute PitchYinProbabilistic </button>'
+      '<button id="btn" class="ui white inverted button">Compute PitchMelodia </button>'
     );
 
     var button = document.getElementById("btn");

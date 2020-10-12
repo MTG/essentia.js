@@ -33,6 +33,7 @@ async function onClickFeatureExtractor() {
     audioData.length, // length of audio in samples
     audioCtx.sampleRate // audio sample rate
   );
+  essentiaExtractor.delete();
   isComputed = true;
 }
 

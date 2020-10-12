@@ -28,7 +28,7 @@
         </a>
         <div>
           <h2 class="ui header white-text" style="color: azure;">
-            Chroma feature extraction using Web Audio API (ScriptNodeProcessor)
+            HPCP Chroma feature extraction using Web Audio API (ScriptProcessorNode)
           </h2>
           <div class="ui basic large button">
             <a href="https://github.com/MTG/essentia.js/tree/master/examples/realtime/hpcp-chroma/example.html" target="_blank" class="ui small button">Code<i class="right github icon"></i></a>
@@ -90,6 +90,7 @@
         let audioCtx;
         // buffer size microphone stream (bufferSize is high in order to make PitchYinProbabilistic algo to work)
         let bufferSize = 8192;
+        let hopSize = 2048;
 
         try {
           const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -190,7 +191,7 @@
 
           // modifying default extractor settings
           essentiaExtractor.frameSize = 4096;
-          essentiaExtractor.hopSize = 2048;
+          essentiaExtractor.hopSize = hopSize;
           essentiaExtractor.sampleRate = audioCtx.sampleRate;
           // settings specific to an algorithm
           essentiaExtractor.profile.HPCP.nonLinear = true;
@@ -201,7 +202,8 @@
             hpcpGram,
             "HPCP",
             bufferSize,
-            audioCtx.sampleRate
+            audioCtx.sampleRate,
+            hopSize
           );
 
         //   plotChroma.isPlotting = true;
