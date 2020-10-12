@@ -42,9 +42,10 @@ async function onClickFeatureExtractor() {
     logMelSpectrogram, // input feature array
     "LogMelSpectrogram", // plot title
     audioData.length, // length of audio in samples
-    audioCtx.sampleRate // audio sample rate
+    audioCtx.sampleRate, // audio sample rate,
+    hopSize // hopSize
   );
-  essentiaExtractor.algorithms.delete();
+  // essentiaExtractor.algorithms.delete();
   isComputed = true;
 }
 
