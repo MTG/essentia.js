@@ -97,9 +97,11 @@ std::vector<std::vector<float> > EssentiaJS::FrameGenerator(const val& signalArr
 
 // This a wrapper for MonoMixer algorithm to accept both left and right channels to downmix an stereo channel input to mono
 // check https://essentia.upf.edu/reference/std_MonoMixer.html for algorithm details
+// TODO: could be reimplemented with BinaryOperator and UnaryOperator in the future
 val EssentiaJS::MonoMixer(std::vector<float>& left_channel, std::vector<float>& right_channel) {
   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
 
+  // TODO: remove this stereosample cresting overhead in future 
   Algorithm* algoStereoMuxer = factory.create("StereoMuxer");
   algoStereoMuxer->input("left").set(left_channel);
   algoStereoMuxer->input("right").set(right_channel);
