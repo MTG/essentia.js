@@ -240,6 +240,7 @@ class PlotHeatmap extends EssentiaPlot {
    * @param {string} plotTitle title of the plot
    * @param {*} audioFrameSize length of input audio data in samples
    * @param {*} audioSampleRate sample rate of input audio
+   * @param {*} [hopSize=0] hopSize used for the feture extraction if applies.
    * @param {string} [colorscale='Jet']
    * @memberof PlotHeatmap
    */
