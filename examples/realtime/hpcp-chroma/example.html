@@ -13,9 +13,10 @@
   <body style="background-color:  #000000!important;">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/essentia.js@0.0.9/dist/essentia-wasm.web.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/essentia.js@0.0.9/dist/essentia.js-extractor.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/essentia.js@0.0.9/dist/essentia.js-plot.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia-wasm.web.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia-wasm.web.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia.js-extractor.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia.js-plot.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
     <div class="ui main_wrapper landing-image">
@@ -196,7 +197,8 @@
           // settings specific to an algorithm
           essentiaExtractor.profile.HPCP.nonLinear = true;
           // compute hpcp for overlapping frames of audio
-          let hpcpGram = essentiaExtractor.hpcpgram(audioBuffer);
+          let hpcp = essentiaExtractor.hpcpExtractor(audioBuffer);
+          let hpcpGram = [hpcp];
           // here we call the plotting function to display realtime feature extraction results
           plotChroma.create(
             hpcpGram,
@@ -225,9 +227,9 @@
               );
 
               // loads the WASM backend and runs the feature extraction
-              EssentiaModule().then(function(essentiaModule) {
+              EssentiaWASM().then(function(essentiaWasmModule) {
                 if (!isEssentiaInstance) {
-                  essentiaExtractor = new EssentiaExtractor(essentiaModule);
+                  essentiaExtractor = new EssentiaExtractor(essentiaWasmModule);
                   isEssentiaInstance = true;
                 }
                 // start microphone stream using getUserMedia
