@@ -13,4 +13,4 @@ install:
 
 script:
   - docker run --rm -v `pwd`:/essentia/ $DOCKER_IMAGE /essentia/build-libs.sh
-  - travis/deploy_builds.sh
+  #- travis/deploy_builds.sh
