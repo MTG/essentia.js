@@ -19,7 +19,7 @@ You can find the latest releases on [Github](https://github.com/MTG/essentia.js/
 
 ### WASM modules 
 
-Imports an [Emscripten WASM Module](https://emscripten.org/docs/api_reference/module.html) object `EssentiaModule` to the global namespace which has JS bindings to essentia C++ library WASM back-end.
+Imports an [Emscripten WASM Module](https://emscripten.org/docs/api_reference/module.html) object `EssentiaWASM` to the global namespace which has JS bindings to essentia C++ library WASM back-end.
 
 - `essentia-wasm.web.wasm` - essentia WASM back-end for asynchronous imports. 
 - `essentia-wasm.web.js` - JS glue code for loading `essentia-wasm-web.wasm` (can be used with HTML `<script>` tag).
