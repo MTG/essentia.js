@@ -15,7 +15,7 @@ ESSENTIA_JS_MODULE=$(BUILD_DIR_ES)/essentia-wasm.module.js
 ## Path to custom --pre-js and --post-js files for Emscripten
 PRE_JS_WASM=src/js/wasm.module.pre.js
 POST_JS_WEB_WASM=src/js/wasm.webmodule.post.js
-POST_JS_ES6_WASM=src/js/wasm.es6module.post.js
+POST_JS_ES6_WASM=src/js/wasm.module.post.js
 
 codegen:
 	@echo "Generating cpp source code from essentia python bindings ..."

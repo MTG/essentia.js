@@ -1,14 +1,14 @@
 {
-  "name": "essentia.js",
+  "name": "@jhurliman/essentia.js",
   "version": "0.1.0-dev",
   "description": "JavaScript library for music/audio analysis and processing for both real-time and offline audio feature extraction, powered by WebAssembly",
   "homepage": "https://mtg.github.io/essentia.js/",
-  "author": "Albin Correya <albin.correya@upf.edu> (http://mtg.upf.edu)",
+  "author": "John Hurliman (https://jhurliman.org)",
   "license": "AGPL-3.0",
   "main": "index.js",
+  "types": "index.d.ts",
   "files": [
     "dist/*",
-    "src/js/es6module.main.js",
     "index.js",
     "LICENSE.md",
     "README.md",
@@ -26,15 +26,9 @@
     "example": "examples",
     "test": "test"
   },
-  "dependencies": {
-    "esm": "3.2.25"
-  },
-  "bundledDependencies": [
-    "esm"
-  ],
+  "dependencies": {},
   "devDependencies": {
     "chai": "^4.2.0",
-    "esm": "^3.2.25",
     "foodoc": "0.0.9",
     "jsdoc": "^3.6.3",
     "mocha": "^8.1.3",
@@ -60,5 +54,7 @@
   "bugs": {
     "url": "https://github.com/MTG/essentia.js/issues"
   },
-  "publishConfig": {"registry": "https://npm.pkg.github.com/"}
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
 }

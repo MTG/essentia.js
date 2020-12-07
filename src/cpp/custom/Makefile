@@ -5,7 +5,7 @@ ESSENTIA_JS_WEB_WASM=essentia-custom-extractor.web.wasm
 ESSENTIA_JS_MODULE=essentia-custom-extractor.module.js
 PRE_JS_WASM=../../js/wasm.module.pre.js
 POST_JS_WEB_WASM=../../js/wasm.webmodule.post.js
-POST_JS_ES6_WASM=../../js/wasm.es6module.post.js
+POST_JS_MODULE_WASM=../../js/wasm.module.post.js
 
 build:
 	@echo "Compiling the Essentia custom cpp extractor"
@@ -34,6 +34,6 @@ build:
 	
 	@cat $(PRE_JS_WASM) $(ESSENTIA_JS_WEB) > $$.tmp && mv $$.tmp $(ESSENTIA_JS_WEB)
 	@cat $(PRE_JS_WASM) $(ESSENTIA_JS_MODULE) > $$.tmp && mv $$.tmp $(ESSENTIA_JS_MODULE)
-	@cat $(POST_JS_ES6_WASM) >> $(ESSENTIA_JS_MODULE)
+	@cat $(POST_JS_MODULE_WASM) >> $(ESSENTIA_JS_MODULE)
 
 	@echo "Done ..."
