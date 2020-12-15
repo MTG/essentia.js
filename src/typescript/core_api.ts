@@ -1,4 +1,5 @@
-/*
+/** 
+ * @license
  * Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra
  *
  * This file is part of Essentia
@@ -20,16 +21,10 @@
 // NOTE: The following code snippets are machine generated. Do not edit.
 
 /**
- * @fileOverview Essentia high-level core interface
- * @author <a href="mailto:albin.correya@upf.edu">Albin Correya</a>
- * @version 0.1.0-dev
- */
-
-/**
  * essentia.js-core JS API
  * @class 
  * @example
- * const essentia = new Essentia(EssentiaModule)
+ * const essentia = new Essentia(EssentiaWASM);
  */
 class Essentia {
   /** 
@@ -55,7 +50,23 @@ class Essentia {
   }
 
   /**
-   * Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API. (NOTE: only works on modern web-browsers)
+   * Decode and returns the audio buffer of a given audio url or blob uri using Web Audio API. (NOTE: This doesn't work on Safari browser)
+   * @async
+   * @method
+   * @param {string} audioURL web url or blob uri of a audio file
+   * @param {AudioContext} webAudioCtx an instance of Web Audio API `AudioContext`
+   * @returns {AudioBuffer} decoded audio buffer object
+   * @memberof Essentia
+   */
+  async getAudioBufferFromURL(audioURL: string, webAudioCtx: AudioContext): Promise<AudioBuffer> {
+    const response = await fetch(audioURL);
+    const arrayBuffer = await response.arrayBuffer();
+    const audioBuffer = await webAudioCtx.decodeAudioData(arrayBuffer);
+    return audioBuffer;
+  }
+
+  /**
+   * Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API. (NOTE: This doesn't work on Safari browser)
    * @async
    * @method
    * @param {string} audioURL web url or blob uri of a audio file
@@ -3078,6 +3089,28 @@ class Essentia {
   */
   TempoTapTicks(periods: any, phases: any, frameHop: number=512, hopSize: number=256, sampleRate: number=44100) {
     return this.algorithms.TempoTapTicks(periods, phases, frameHop, hopSize, sampleRate);
+  }
+   
+  /**
+  * This algorithm computes mel-bands with a particular parametrization specific to MusiCNN based models. Check https://essentia.upf.edu/reference/std_TensorflowInputMusiCNN.html for more details.
+  * @method
+  * @param {VectorFloat} frame the audio frame
+  * @returns {object} {bands: 'the log compressed mel bands'}
+  * @memberof Essentia
+  */
+  TensorflowInputMusiCNN(frame: any) {
+    return this.algorithms.TensorflowInputMusiCNN(frame);
+  }
+   
+  /**
+  * This algorithm computes mel-bands with a particular parametrization specific to VGGish based models. Check https://essentia.upf.edu/reference/std_TensorflowInputVGGish.html for more details.
+  * @method
+  * @param {VectorFloat} frame the audio frame
+  * @returns {object} {bands: 'the log compressed mel bands'}
+  * @memberof Essentia
+  */
+  TensorflowInputVGGish(frame: any) {
+    return this.algorithms.TensorflowInputVGGish(frame);
   }
    
   /**

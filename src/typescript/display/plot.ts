@@ -1,4 +1,5 @@
-/*
+/** 
+ * @license
  * Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra
  *
  * This file is part of Essentia

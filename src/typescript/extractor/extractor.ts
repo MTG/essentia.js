@@ -1,4 +1,5 @@
-/*
+/** 
+ * @license
  * Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra
  *
  * This file is part of Essentia
@@ -17,11 +18,13 @@
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
 
-import Essentia from "./core_api";
+import Essentia from "../core_api";
 
 /**
  * EssentiaExtractor 
- * This class provides one-liner methods which implements the whole chain of algorithms required for computing features such as log-scaled mel spectrogram, HPCP chroma features etc This can be extended according to your needs.
+ * This class provides one-liner methods which implements the whole chain of algorithms 
+ * required for computing features such as log-scaled mel spectrogram, HPCP chroma features etc.
+ * This can be extended according to your needs.
  * @class 
  * @extends {Essentia}
  */
