@@ -1,8 +1,8 @@
-ESSENTIAJS_VERSION=0.1.0-dev
+ESSENTIAJS_VERSION=0.1.1
 ## Path to libs for Emscripten
 LIB_DIR_ESSENTIA=$(EMSCRIPTEN)/system/local/lib
 EIGEN_PATH=/usr/local/include/eigen3
-## pass custom build and dist directories using system environment variables
+## Pass custom build and dist directories using system environment variables
 BUILD_DIR_ES := $(or $(ESSENTIAJS_WASM_BUILDS_DIR),builds)
 DIST_DIR_ES := $(or $(ESSENTIAJS_BUILDS_DIR),dist)
 ## C++ source code for Essentia.js
