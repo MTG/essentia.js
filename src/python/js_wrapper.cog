@@ -1,4 +1,5 @@
-/*
+/** 
+ * @license
  * Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra
  *
  * This file is part of Essentia
@@ -20,16 +21,10 @@
 // NOTE: The following code snippets are machine generated. Do not edit.
 
 /**
- * @fileOverview Essentia high-level core interface
- * @author <a href="mailto:albin.correya@upf.edu">Albin Correya</a>
- * @version 0.1.0-dev
- */
-
-/**
  * essentia.js-core JS API
  * @class 
  * @example
- * const essentia = new Essentia(EssentiaModule)
+ * const essentia = new Essentia(EssentiaWASM);
  */
 class Essentia {
   /** 
@@ -55,7 +50,23 @@ class Essentia {
   }
 
   /**
-   * Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API. (NOTE: only works on modern web-browsers)
+   * Decode and returns the audio buffer of a given audio url or blob uri using Web Audio API. (NOTE: This doesn't work on Safari browser)
+   * @async
+   * @method
+   * @param {string} audioURL web url or blob uri of a audio file
+   * @param {AudioContext} webAudioCtx an instance of Web Audio API `AudioContext`
+   * @returns {AudioBuffer} decoded audio buffer object
+   * @memberof Essentia
+   */
+  async getAudioBufferFromURL(audioURL: string, webAudioCtx: AudioContext): Promise<AudioBuffer> {
+    const response = await fetch(audioURL);
+    const arrayBuffer = await response.arrayBuffer();
+    const audioBuffer = await webAudioCtx.decodeAudioData(arrayBuffer);
+    return audioBuffer;
+  }
+
+  /**
+   * Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API. (NOTE: This doesn't work on Safari browser)
    * @async
    * @method
    * @param {string} audioURL web url or blob uri of a audio file

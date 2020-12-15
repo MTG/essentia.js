@@ -212,6 +212,8 @@ EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) {
     .function("TempoTapDegara", &EssentiaJS::TempoTapDegara)
     .function("TempoTapMaxAgreement", &EssentiaJS::TempoTapMaxAgreement)
     .function("TempoTapTicks", &EssentiaJS::TempoTapTicks)
+    .function("TensorflowInputMusiCNN", &EssentiaJS::TensorflowInputMusiCNN)
+    .function("TensorflowInputVGGish", &EssentiaJS::TensorflowInputVGGish)
     .function("TonalExtractor", &EssentiaJS::TonalExtractor)
     .function("TonicIndianArtMusic", &EssentiaJS::TonicIndianArtMusic)
     .function("TriangularBands", &EssentiaJS::TriangularBands)

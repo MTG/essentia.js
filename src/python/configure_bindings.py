@@ -28,8 +28,8 @@ DEFAULT_EXCLUDE_ALGOS = [# requires FFTW, TagLib or Chromaprint dependencies
                         'PCA', 'PoolAggregator', 'YamlInput', 'YamlOutput', 'MetadataReader', 'Viterbi', 'SilenceRate',
                         'FFTW', 'IFFTW', 'IFFTA', 'FFTA', 'FFTWComplex', 'IFFTWComplex', 'FFTAComplex', 'IFFTAComplex',
                         # requires Gaia and Tensorflow dependencies
-                        'GaiaTransform', 'MusicExtractorSVM', 'TensorflowPredict', 'TensorflowPredictMusiCNN', 
-                        'TensorflowPredictVGGish', 'TensorflowInputMusiCNN', 'TensorflowInputVGGish',
+                        'GaiaTransform', 'MusicExtractorSVM', 
+                        'TensorflowPredict', 'TensorflowPredictMusiCNN', 'TensorflowPredictVGGish',
                         # these algortihms expect a matrix_real input or output types which are not yet supported for the JS bindings 
                         'BpmHistogram', 'FadeDetection', 'HumDetector', 'Onsets', 'Panning', 'SBic', 'SingleGaussian',
                         # these algorithms expect std::complex** type for wither input, parameters or outputs, which are not yet supported for the JS bindings 
