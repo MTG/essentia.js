@@ -18,11 +18,11 @@
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
 
-import { EssentiaTensorflowInputExtractor } from "./tfjs_input_extractor";
+import { EssentiaTFInputExtractor } from "./tfjs_input_extractor";
 import { EssentiaTensorflowJSModel, TensorflowMusiCNN, TensorflowVGGish } from "./tfjs_models";
  
 export {
-  EssentiaTensorflowInputExtractor,
+  EssentiaTFInputExtractor,
   EssentiaTensorflowJSModel,
   TensorflowMusiCNN,
   TensorflowVGGish

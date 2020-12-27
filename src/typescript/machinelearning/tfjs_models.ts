@@ -19,21 +19,24 @@
  */
 
 
-import { InputMusiCNN, InputVGGish, InputTempoCNN } from './types';
+import { InputMusiCNN, InputVGGish, InputTempoCNN, EssentiaTFInputExtractorOutput } from './types';
 
 
 /**
  * Base class for loading a pre-trained Essentia-Tensorflow.js model for inference
- * using tensorflow.js. 
+ * using TensorFlow.js. 
  * @class 
  */
 class EssentiaTensorflowJSModel {
 
   public model: any = null;
+  protected audioSampleRate: number = 16000;
   protected tf: any = null;
   protected isReady: boolean = false;
   protected modelPath: string = "";
   protected IS_TRAIN: any = null;
+  protected randomTensorInput: any = null;
+  protected minimumInputFrameSize: any = null;
 
   constructor(tfjs: any, modelPath: string, verbose: boolean=false) {
     this.tf = tfjs;
@@ -42,53 +45,80 @@ class EssentiaTensorflowJSModel {
     this.isReady = !!this.model;
   }
 
-  public async loadModel(){
+  /**
+   * Promise for loading & initialise an Essentia.js-TensorFlow.js model.
+   * @async
+   * @method
+   * @memberof EssentiaTensorflowJSModel
+   */
+  public async initialize(): Promise<void> {
     this.model = await this.tf.loadGraphModel(this.modelPath);
     this.isReady = true;
   }
 
-  public arrayToTensorAsBatches(inputfeatureArray: Float32Array, inputShape: any[], patchSize: number) {
+  /**
+   * Converts an input 1D or 2D array into a 3D tensor (tfjs) given it's shape and required
+   * patchSize. If `padding=true`, this method will zero-pad the input feature.
+   * 
+   * @method 
+   * @param {Float32Array|any[]} inputFeatureArray input feature array as either 1D or 2D areay
+   * @param {any[]} inputShape shape of the input feature array in 2D.
+   * @param {number} patchSize required patchSize to dynamically make batches of feature
+   * @param {boolean} [padding=false] whether to enable zero-padding if less frames found for a batch.
+   * @returns {tf.Tensor3D} returns the computed frame-wise feature for the given audio signal.
+   * @memberof EssentiaTensorflowJSModel
+   */
+  public arrayToTensorAsBatches(inputfeatureArray: Float32Array|any[], inputShape: any[], patchSize: number, padding: boolean=false) {
     // convert a flattened 1D typed array into 2D tensor with given shape 
     let featureTensor = this.tf.tensor(
       inputfeatureArray,
       inputShape,
       'float32'
     );
+
     // create a tensor of zeros for zero-padding the output tensor if necessary
     let zeroPadTensor: any;
     // variable to store the dynamic batch size computed from given input array and patchSize
     let batchSize: number;
 
+    if (!padding) {
+      this.assertMinimumFeatureInputSize({
+        melSpectrum: inputfeatureArray,
+        frameSize: inputShape[0],
+        melBandsSize: inputShape[1],
+        patchSize: patchSize
+      });
+      return featureTensor.as3D(1, patchSize, inputShape[1])
     // return the feature with batch size 1 if number of frames = patchSize
-    if (inputShape[0] === patchSize) {
+    } else if (inputShape[0] === patchSize) {
       return featureTensor.as3D(1, patchSize, inputShape[1]);
       // Otherwise do zeropadding 
-    } else if (inputShape[0] >= patchSize) {
-      if ((inputShape[0] % patchSize) != 0) {
-        batchSize = Math.floor(inputShape[0] / patchSize) + 1;
-        zeroPadTensor = this.tf.zeros(
-          [
-            Math.floor(((batchSize*patchSize*inputShape[1]) - inputfeatureArray.length) / inputShape[1]),
-            inputShape[1]
-          ], 
-          'float32'
-        );
-        featureTensor = featureTensor.concat(zeroPadTensor);
-        zeroPadTensor.dispose();
-        return featureTensor.as3D(batchSize, patchSize, inputShape[1]);
-      } else {
-        batchSize = Math.floor(inputShape[0] / patchSize);
-        zeroPadTensor = this.tf.zeros(
-          [
-            Math.floor(((batchSize*patchSize*inputShape[1]) - inputfeatureArray.length) / inputShape[1]),
-            inputShape[1]
-          ], 
-          'float32'
-        );
-        featureTensor = featureTensor.concat(zeroPadTensor);
-        zeroPadTensor.dispose();
-        return featureTensor.as3D(batchSize, patchSize, inputShape[1]);
-      }
+    } else if (inputShape[0] > patchSize) {
+        if ((inputShape[0] % patchSize) != 0) {
+          batchSize = Math.floor(inputShape[0] / patchSize) + 1;
+          zeroPadTensor = this.tf.zeros(
+            [
+              Math.floor(batchSize*patchSize - inputfeatureArray.length),
+              inputShape[1]
+            ], 
+            'float32'
+          );
+          featureTensor = featureTensor.concat(zeroPadTensor);
+          zeroPadTensor.dispose();
+          return featureTensor.as3D(batchSize, patchSize, inputShape[1]);
+        } else {
+          batchSize = Math.floor(inputShape[0] / patchSize);
+          zeroPadTensor = this.tf.zeros(
+            [
+              Math.floor(batchSize*patchSize - inputfeatureArray.length),
+              inputShape[1]
+            ], 
+            'float32'
+          );
+          featureTensor = featureTensor.concat(zeroPadTensor);
+          zeroPadTensor.dispose();
+          return featureTensor.as3D(batchSize, patchSize, inputShape[1]);
+        }
     } else {
       // fixed batchSize=1 if the input array has lengh less than the given patchSize.
       batchSize = 1;
@@ -102,81 +132,114 @@ class EssentiaTensorflowJSModel {
   public dispose(): void {
     this.model.dispose();
   }
+
+  protected assertMinimumFeatureInputSize(inputFeature: EssentiaTFInputExtractorOutput): void {
+    this.minimumInputFrameSize = inputFeature.frameSize*inputFeature.melBandsSize;
+    if (inputFeature.melSpectrum.length != this.minimumInputFrameSize ) {
+      let minimumAudioDuration = this.minimumInputFrameSize / this.audioSampleRate;
+      throw Error(
+        "When `padding=false` in `predict` method, the model expect audio feature for a minimum frame size of " 
+        + this.minimumInputFrameSize + ", ie. approx " + minimumAudioDuration + 
+        "seconds at" + this.audioSampleRate + "KHz input audio sample rate."
+      );
+    }
+  }
+
+
+  protected disambiguateExtraInputs(): any[] {
+    if (!this.isReady) throw Error("No loaded tfjs model found! Make sure to call `initialize` method and resolve the promise before calling `predict` method.");
+    let inputsCount = this.model.executor.inputs.length;
+    if (inputsCount === 1) {
+      return [];
+    } else if (inputsCount === 2){
+      return [this.IS_TRAIN.clone()];
+    } else if (inputsCount === 3){
+      // Overhead from the tensorflowjs-converter, creates random tensorinput without
+      // connected to other layers for some vggish models trained on audioset. 
+      // The tfjs model needs this unsignificant tensor object on the prediction call.
+      // This will removed in future once this has been sorted on the conversation process.
+      if (!this.randomTensorInput) this.randomTensorInput = this.tf.zeros([1, this.model.executor.inputs[0].shape[1]]);
+      return [this.randomTensorInput.clone(), this.IS_TRAIN.clone()];
+    } else {
+      throw Error("Found unsupported number of input requirements for the model. Expects the following inputs -> " + this.model.executor.inputs);
+    }
+  }
 }
 
 
 /**
- * Class with methods for computing common feature input representations
- * required for the inference of Essentia-Tensorflow.js MusiCNN-based 
- * pre-trained models using Essentia WASM backend.
+ * Class with methods for computing inference of 
+ * Essentia-Tensorflow.js MusiCNN-based pre-trained models.
+ * The `predict` method expect an input audio feature computed
+ * using `EssentiaTFInputExtractor`.
  * @class 
  * @example
  * // FEATURE EXTRACTION
- * // Create `EssentiaTensorflowInputExtractor` instance by passing 
+ * // Create `EssentiaTFInputExtractor` instance by passing 
  * // essentia-wasm import `EssentiaWASM` global object and `extractorType=musicnn`.
- * const inputFeatureExtractor = new EssentiaTensorflowInputExtractor(EssentiaWASM, "musicnn");
- * // Compute feature for a given frame of audio signal
- * let inputMusiCNN = inputFeatureExtractor.compute(audioSignalFrame);
+ * const inputFeatureExtractor = new EssentiaTFInputExtractor(EssentiaWASM, "musicnn");
+ * // Compute feature for a given audio signal
+ * let inputMusiCNN = inputFeatureExtractor.computeFrameWise(audioSignal, 512, 256);
  * // INFERENCE
- * const modelURL = "./model.json"
+ * const modelURL = "./models/autotagging/msd/msd-musicnn-1/model.json"
  * // Where `tf` is the global import object from the `@tensorflow/tfjs*` package.
  * const musicnn = new TensorflowMusiCNN(tf, modelURL);
  * // Promise for loading the model
- * await musicnn.loadModel();
- * // Compute feature for a given frame of audio signal once the model loaded.
+ * await musicnn.initialize();
+ * // Compute predictions for a given input feature.
  * let predictions = await musicnn.predict(inputMusiCNN);
  */
 class TensorflowMusiCNN extends EssentiaTensorflowJSModel {
 
   constructor(tfjs: any, model_url: string, verbose: boolean=false) {
     super(tfjs, model_url);
+    this.minimumInputFrameSize = 3;
   }
 
-  public async predict(inputFeature: InputMusiCNN): Promise<any[]> {
-
-    if (!this.isReady) throw Error("No loaded tfjs model found! Make sure to call `loadModel` method and resolve the promise before calling `predict` method.");
+  public async predict(inputFeature: InputMusiCNN, padding: boolean=false): Promise<any[]> {
 
     let featureTensor = this.arrayToTensorAsBatches(
       inputFeature.melSpectrum, 
-      [inputFeature.batchSize, inputFeature.melBandsSize], 
-      inputFeature.patchSize
+      [inputFeature.frameSize, inputFeature.melBandsSize], 
+      inputFeature.patchSize,
+      padding
     );
-
-    let results = null;
-
-    if (this.model.executor.inputs.length > 1) {
-      results = await this.model.execute([featureTensor, this.IS_TRAIN.clone()])
-    } else {
-      results = await this.model.execute([featureTensor]);
-    }
+    // Get default model input variables
+    let modelInputs = this.disambiguateExtraInputs();
+    // add the input feature tensor to the model inputs
+    modelInputs.push(featureTensor);
+    // Run inference
+    let results = this.model.execute(modelInputs);
+    // free tensors
     featureTensor.dispose();
-    let resultsArray = results.arraySync();
+    // decode the output activations as array with a promise
+    let resultsArray = await results.array();
     results.dispose();
     return resultsArray;
   }
-
 }
 
 
 /**
  * Class with methods for computing common feature input representations
  * required for the inference of Essentia-Tensorflow.js VGGish-based 
- * pre-trained models using Essentia WASM backend.
+ * pre-trained models using Essentia WASM backend. The predict method 
+ * expect an input audio feature computed using `EssentiaTFInputExtractor`.
  * @class 
  * @example
  * // FEATURE EXTRACTION
- * // Create `EssentiaTensorflowInputExtractor` instance by passing 
+ * // Create `EssentiaTFInputExtractor` instance by passing 
  * // essentia-wasm import `EssentiaWASM` global object and `extractorType=vggish`.
- * const inputFeatureExtractor = new EssentiaTensorflowInputExtractor(EssentiaWASM, "vggish");
- * // Compute feature for a given frame of audio signal
- * let inputVGGish = inputFeatureExtractor.compute(audioSignalFrame);
+ * const inputFeatureExtractor = new EssentiaTFInputExtractor(EssentiaWASM, "vggish");
+ * // Compute feature for a given audio signal array
+ * let inputVGGish = inputFeatureExtractor.computeFrameWise(audioSignal, 512, 256);
  * // INFERENCE
- * const modelURL = "./model.json"
+ * const modelURL = "./models/classifiers/danceability/danceability-vggish-audioset-1/model.json"
  * // Where `tf` is the global import object from the `@tensorflow/tfjs*` package.
  * const vggish = new TensorflowVGGish(tf, modelURL);
  * // Promise for loading the model
- * await vggish.loadModel();
- * // Compute feature for a given frame of audio signal once the model loaded.
+ * await vggish.initialize();
+ * // Compute predictions for a given input feature.
  * let predictions = await vggish.predict(inputVGGish);
  */
 class TensorflowVGGish extends EssentiaTensorflowJSModel {
@@ -185,37 +248,23 @@ class TensorflowVGGish extends EssentiaTensorflowJSModel {
     super(tfjs, model_url);
   }
 
-  public async predict(inputFeature: InputVGGish): Promise<any[]> {
-
-    if (!this.isReady) throw Error("No loaded tfjs model found! Make sure to call `loadModel` method and resolve the promise before calling `predict` method.");
-
+  public async predict(inputFeature: InputVGGish, padding: boolean=false): Promise<any[]> {
     let featureTensor = this.arrayToTensorAsBatches(
       inputFeature.melSpectrum, 
-      [inputFeature.batchSize, inputFeature.melBandsSize], 
-      inputFeature.patchSize
+      [inputFeature.frameSize, inputFeature.melBandsSize], 
+      inputFeature.patchSize,
+      padding
     );
-
-    let results = null;
-    let inputsCount = this.model.executor.inputs.length;
-
-    if (inputsCount === 1) {
-      results = await this.model.execute([featureTensor]);
-    } else if (inputsCount === 2){
-      results = await this.model.execute([featureTensor, this.IS_TRAIN.clone()]);
-    } else if (inputsCount === 3){
-      // Overhead from the tensorflowjs-converter, creates random tensorinput without
-      // connected to other layers for some vggish models trained on audioset. 
-      // The tfjs model needs this unsignificant tensor object on the prediction call.
-      // This will removed in future once this has been sorted on the conversation process.
-      let randomTensor = this.tf.zeros([1, this.model.executor.inputs[0].shape[1]]);
-      results = await this.model.execute([featureTensor, this.IS_TRAIN.clone(), randomTensor]);
-      randomTensor.dispose();
-    } else {
-      throw Error("Found unsupported number of input requirements for the VGGish model.");
-    }
-    
+    // Get default model input variables
+    let modelInputs = this.disambiguateExtraInputs();
+    // add the input feature tensor to the model inputs
+    modelInputs.push(featureTensor);
+    // Run inference
+    let results = this.model.execute(modelInputs);
+    // free tensors
     featureTensor.dispose();
-    let resultsArray = results.arraySync();
+    // decode the output activations as array with a promise
+    let resultsArray = await results.array();
     results.dispose();
     return resultsArray;
   }

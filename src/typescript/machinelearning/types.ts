@@ -20,13 +20,13 @@
 
 
 /**
- * Generic output feature type computed by the `EssentiaTensorflowInputExtractor.compute` method.
+ * Generic output feature type computed by the `EssentiaTFInputExtractor.compute` method.
  * @type
  */
-type EssentiaTensorflowInputExtractorOutput = {
-  melSpectrum: any,
+type EssentiaTFInputExtractorOutput = {
+  melSpectrum: Float32Array|any[],
   patchSize:number,
-  batchSize: number,
+  frameSize: number,
   melBandsSize: number 
 };
 
@@ -35,9 +35,9 @@ type EssentiaTensorflowInputExtractorOutput = {
  * @type
  */
 type InputMusiCNN = {
-  melSpectrum: Float32Array,
+  melSpectrum: Float32Array|any[],
   patchSize:187,
-  batchSize: any,
+  frameSize: any,
   melBandsSize: 96 
 };
 
@@ -46,9 +46,9 @@ type InputMusiCNN = {
  * @type
  */
 type InputVGGish = {
-  melSpectrum: Float32Array,
+  melSpectrum: Float32Array|any[],
   patchSize:96,
-  batchSize: any,
+  frameSize: any,
   melBandsSize: 64 
 };
 
@@ -57,9 +57,9 @@ type InputVGGish = {
  * @type
  */
 type InputTempoCNN = {
-  melSpectrum: Float32Array,
+  melSpectrum: Float32Array|any[],
   patchSize:256,
-  batchSize: any,
+  frameSize: any,
   melBandsSize: 40 
 };
 
@@ -67,5 +67,5 @@ export {
   InputMusiCNN,
   InputVGGish,
   InputTempoCNN,
-  EssentiaTensorflowInputExtractorOutput
+  EssentiaTFInputExtractorOutput
 };
