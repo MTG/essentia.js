@@ -58,7 +58,7 @@ class Essentia {
    * @returns {AudioBuffer} decoded audio buffer object
    * @memberof Essentia
    */
-  async getAudioBufferFromURL(audioURL: string, webAudioCtx: AudioContext): Promise<AudioBuffer> {
+  async getAudioBufferFromURL(audioURL: string, webAudioCtx: AudioContext) {
     const response = await fetch(audioURL);
     const arrayBuffer = await response.arrayBuffer();
     const audioBuffer = await webAudioCtx.decodeAudioData(arrayBuffer);
@@ -87,7 +87,7 @@ class Essentia {
    * @method
    * @memberof Essentia
    */
-  shutdown() {
+  shutdown(): void {
     this.algorithms.shutdown();
   }
 
@@ -96,7 +96,7 @@ class Essentia {
    * @method
    * @memberof Essentia
    */
-  reinstantiate() {
+  reinstantiate(): void {
     this.algorithms = new this.module.EssentiaJS(this.isDebug);
   }
 
@@ -105,7 +105,7 @@ class Essentia {
    * @method
    * @memberof Essentia
    */
-  delete() {
+  delete(): void {
     this.algorithms.delete();
   }
 
@@ -127,7 +127,7 @@ class Essentia {
    * @returns {Float32Array} returns converted JS typed array
    * @memberof Essentia
    */
-  vectorToArray(inputVector: any) {
+  vectorToArray(inputVector: any): Float32Array {
     return this.module.vectorToArray(inputVector);
   }
 
