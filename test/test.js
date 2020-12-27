@@ -5,10 +5,11 @@
 
 var chai = require('chai');
 var esLib = require('../index');
+const essentia = new esLib.Essentia(esLib.EssentiaWASM);
 
 describe('essentia.js', function() {
   it('should sucessfully find all the import methods of essentia.js instance', function() {
-    chai.expect(esLib).to.have.any.keys([
+    chai.expect(essentia).to.have.any.keys([
       'EssentiaModule',
       'algorithms',
       'algorithmNames',
