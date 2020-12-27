@@ -21,6 +21,9 @@ $NPM_PATH install
 # Build essentia.js JS API and add-on modules
 $NPM_PATH run build-js-api
 
+# Minified build of JS API and add-on modules
+$NPM_PATH run build-js-api rollup.config.min.js
+
 # Run tests
 echo "Running tests ..."
 $NPM_PATH test
