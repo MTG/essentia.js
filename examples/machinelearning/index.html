@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>essentia.js examples</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
+    />
+  </head>
+  <center>
+    <body style="background-color:  #000000!important;">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+      <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+      <script src="../../dist/essentia.js-plot.js"></script>
+      <script src="app.js" defer></script>
+      <script src="audio-utils.js" defer></script>
+      <script>
+
+        let audioCtx;
+        let essentiaHeatPlot;
+        let tagramPlot;
+        let audioLength;
+        const audioSampleRate = 16000;
+        const plotContainerId = "plotDiv";
+        const audioURL = "https://freesound.org/data/previews/328/328857_230356-lq.mp3";
+        const modelURL = "../../models/msd-musicnn-1/model.json"
+
+        const musiCNNLabels = ["rock", "pop", "alternative", "indie", "electronic", 
+          "female vocalists", "dance", "00s", "alternative rock", "jazz", "beautiful", 
+          "metal", "chillout", "male vocalists", "classic rock", "soul", "indie rock", 
+          "Mellow", "electronica", "80s", "folk", "90s", "chill", "instrumental", "punk", 
+          "oldies", "blues", "hard rock", "ambient", "acoustic", "experimental", "female vocalist", 
+          "guitar", "Hip-Hop", "70s", "party", "country", "easy listening", "sexy", 
+          "catchy", "funk", "electro", "heavy metal", "Progressive rock", "60s", "rnb", 
+          "indie pop", "sad", "House", "happy"
+        ];
+
+        // init Web Audio API AudioContext
+        function initAudioContext() {
+          try {  
+              unlockAudioContext();
+          } catch (e) {
+              throw 'Could not instantiate AudioContext: ' + e.message;
+          }
+        }
+
+        // cross-browser fallback to initiate WebAudio API with user gesture if required
+        function unlockAudioContext() {
+          if (typeof(audioCtx) === "undefined") {
+              const AudioContext = window.AudioContext || window.webkitAudioContext;
+              audioCtx = new AudioContext();
+          }
+          if (audioCtx.state !== ("suspended")) return;
+          const b = document.body;
+          const events = ["touchstart", "touchend", "mousedown", "keydown"];
+          events.forEach(e => b.addEventListener(e, unlock, false));
+          function unlock() {audioCtx.resume().then(clean);}
+          function clean() {
+              events.forEach(e => b.removeEventListener(e, unlock));
+          }
+        }
+
+        $(document).ready(function() {
+
+          initAudioContext();
+
+          // populate html audio player with audio
+          let player = document.getElementById("audioPlayer");
+          player.src = audioURL;
+          player.load();
+
+          $("#logDiv").html('<br/><button id="btn" class="ui white inverted button">Compute MusiCNN </button>');
+
+          var button = document.getElementById("btn");
+
+          essentiaHeatPlot = new EssentiaPlot.PlotHeatmap(
+            Plotly, // Plotly.js global 
+            plotContainerId, // HTML container id
+            "spectrogram", // type of plot
+            EssentiaPlot.LayoutSpectrogramPlot // layout settings
+          );
+
+          tagramPlot = new EssentiaPlot.PlotHeatmap(
+            Plotly, // Plotly.js global 
+            "plotDivTags", // HTML container id
+            "chroma", // type of plot
+            EssentiaPlot.LayoutChromaPlot // layout settings
+          );
+
+          tagramPlot.yAxis = musiCNNLabels;
+          tagramPlot.plotLayout.height = 650;
+          tagramPlot.plotLayout.yaxis.title = "";
+          tagramPlot.plotLayout.yaxis.range = [0, 50];
+
+          // add onclick event handler to comoute button
+          button.addEventListener("click", () => onClickAction(), false);
+
+        });
+      </script>
+      <div>
+        <a>
+          <img
+            src="https://github.com/MTG/essentia.js/blob/master/src/assets/img/essentiajsbanner.png?raw=true"
+          />
+        </a>
+      </div>
+      <h2 style="color: azure;">
+        TensorflowMusiCNN example
+      </h2>
+
+      <div class="ui divider" style="height: 2px; width: 2px;"></div>
+
+      <audio id="audioPlayer" controls>
+        <source id="audio-source" src="" type="audio/mp3" />
+      </audio>
+
+      <div id="logDiv" style="color: azure;"><br /></div>
+      <div class="ui divider" style="width: 2px; height: 5px;"></div>
+      <div id="plotDiv"></div>
+      <br/>
+      <div id="plotDivTags"></div>
+      <br />
+      <br />
+    
+      <div class="footer" style="margin-top: 30px; height: 20%;">
+        <a class="demo_logo" target="_blank" href="//essentia.upf.edu">
+          <img
+            id="logo"
+            src="https://essentia.upf.edu/documentation/_static/essentia_logo.svg"
+            alt="MTG Logo"
+            style="margin-left: 40px; height: 70px;"
+          />
+        </a>
+        <a target="_blank" href="https://www.upf.edu/web/mtg">
+          <img
+            class="essnt-footer_mtg-logo"
+            src="https://mtg.github.io/assets/img/upflogo.png"
+            alt="mtg logo"
+            style="width:300px; height: 70px;"
+          />
+        </a>
+      </div>
+    </body>
+  </center>
+</html>
