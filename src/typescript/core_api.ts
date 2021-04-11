@@ -50,7 +50,8 @@ class Essentia {
   }
 
   /**
-   * Decode and returns the audio buffer of a given audio url or blob uri using Web Audio API. (NOTE: This doesn't work on Safari browser)
+   * Decode and returns the audio buffer of a given audio url or blob uri using Web Audio API. 
+   * (NOTE: This method doesn't works on Safari browser)
    * @async
    * @method
    * @param {string} audioURL web url or blob uri of a audio file
@@ -66,7 +67,8 @@ class Essentia {
   }
 
   /**
-   * Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API. (NOTE: This doesn't work on Safari browser)
+   * Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API. 
+   * (NOTE: This method doesn't works on Safari browser)
    * @async
    * @method
    * @param {string} audioURL web url or blob uri of a audio file
@@ -80,6 +82,28 @@ class Essentia {
     const arrayBuffer = await response.arrayBuffer();
     const audioBuffer = await webAudioCtx.decodeAudioData(arrayBuffer);
     return audioBuffer.getChannelData(channel);
+  }
+
+  /**
+   * Convert an AudioBuffer object to a Mono audio signal array. The audio signal is downmixed
+   * to mono using essentia `MonoMixer` algorithm if the audio buffer has 2 channels of audio.
+   * Throws an expection if the input AudioBuffer object has more than 2 channels of audio.
+   * @method
+   * @param {AudioBuffer} buffer `AudioBuffer` object decoded from an audio file.
+   * @returns {Float32Array} audio channel data. (downmixed to mono if its stereo signal).
+   * @memberof Essentia
+   */
+  audioBufferToMonoSignal(buffer: AudioBuffer): Float32Array {
+    if (buffer.numberOfChannels === 1) {
+      return buffer.getChannelData(0);
+    }
+    if (buffer.numberOfChannels === 2) {
+      const left = this.arrayToVector(buffer.getChannelData(0));
+      const right = this.arrayToVector(buffer.getChannelData(1));
+      let monoSignal = this.MonoMixer(left, right);
+      return this.vectorToArray(monoSignal);
+    }
+    throw new Error('Unexpected number of channels found in audio buffer. Only accepts mono or stereo audio buffers.');
   }
 
   /**

@@ -64,11 +64,11 @@ class EssentiaTensorflowJSModel {
    * @param {Float32Array|any[]} inputFeatureArray input feature array as either 1D or 2D areay
    * @param {any[]} inputShape shape of the input feature array in 2D.
    * @param {number} patchSize required patchSize to dynamically make batches of feature
-   * @param {boolean} [padding=false] whether to enable zero-padding if less frames found for a batch.
+   * @param {boolean} [zeroPadding=false] whether to enable zero-padding if less frames found for a batch.
    * @returns {tf.Tensor3D} returns the computed frame-wise feature for the given audio signal.
    * @memberof EssentiaTensorflowJSModel
    */
-  public arrayToTensorAsBatches(inputfeatureArray: Float32Array|any[], inputShape: any[], patchSize: number, padding: boolean=false) {
+  public arrayToTensorAsBatches(inputfeatureArray: Float32Array|any[], inputShape: any[], patchSize: number, zeroPadding: boolean=false) {
     // convert a flattened 1D typed array into 2D tensor with given shape 
     let featureTensor = this.tf.tensor(
       inputfeatureArray,
@@ -81,7 +81,7 @@ class EssentiaTensorflowJSModel {
     // variable to store the dynamic batch size computed from given input array and patchSize
     let batchSize: number;
 
-    if (!padding) {
+    if (!zeroPadding) {
       this.assertMinimumFeatureInputSize({
         melSpectrum: inputfeatureArray,
         frameSize: inputShape[0],
@@ -179,7 +179,7 @@ class EssentiaTensorflowJSModel {
  * // essentia-wasm import `EssentiaWASM` global object and `extractorType=musicnn`.
  * const inputFeatureExtractor = new EssentiaTFInputExtractor(EssentiaWASM, "musicnn");
  * // Compute feature for a given audio signal
- * let inputMusiCNN = inputFeatureExtractor.computeFrameWise(audioSignal, 512, 256);
+ * let inputMusiCNN = inputFeatureExtractor.computeFrameWise(audioSignal);
  * // INFERENCE
  * const modelURL = "./models/autotagging/msd/msd-musicnn-1/model.json"
  * // Where `tf` is the global import object from the `@tensorflow/tfjs*` package.
@@ -196,13 +196,13 @@ class TensorflowMusiCNN extends EssentiaTensorflowJSModel {
     this.minimumInputFrameSize = 3;
   }
 
-  public async predict(inputFeature: InputMusiCNN, padding: boolean=false): Promise<any[]> {
+  public async predict(inputFeature: InputMusiCNN, zeroPadding: boolean=false): Promise<any[]> {
 
     let featureTensor = this.arrayToTensorAsBatches(
       inputFeature.melSpectrum, 
       [inputFeature.frameSize, inputFeature.melBandsSize], 
       inputFeature.patchSize,
-      padding
+      zeroPadding
     );
     // Get default model input variables
     let modelInputs = this.disambiguateExtraInputs();
@@ -232,7 +232,7 @@ class TensorflowMusiCNN extends EssentiaTensorflowJSModel {
  * // essentia-wasm import `EssentiaWASM` global object and `extractorType=vggish`.
  * const inputFeatureExtractor = new EssentiaTFInputExtractor(EssentiaWASM, "vggish");
  * // Compute feature for a given audio signal array
- * let inputVGGish = inputFeatureExtractor.computeFrameWise(audioSignal, 512, 256);
+ * let inputVGGish = inputFeatureExtractor.computeFrameWise(audioSignal);
  * // INFERENCE
  * const modelURL = "./models/classifiers/danceability/danceability-vggish-audioset-1/model.json"
  * // Where `tf` is the global import object from the `@tensorflow/tfjs*` package.
@@ -248,12 +248,12 @@ class TensorflowVGGish extends EssentiaTensorflowJSModel {
     super(tfjs, model_url);
   }
 
-  public async predict(inputFeature: InputVGGish, padding: boolean=false): Promise<any[]> {
+  public async predict(inputFeature: InputVGGish, zeroPadding: boolean=false): Promise<any[]> {
     let featureTensor = this.arrayToTensorAsBatches(
       inputFeature.melSpectrum, 
       [inputFeature.frameSize, inputFeature.melBandsSize], 
       inputFeature.patchSize,
-      padding
+      zeroPadding
     );
     // Get default model input variables
     let modelInputs = this.disambiguateExtraInputs();

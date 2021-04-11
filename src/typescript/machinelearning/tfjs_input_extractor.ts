@@ -29,10 +29,10 @@ import { EssentiaTFInputExtractorOutput } from "./types";
  * // Create `EssentiaTFInputExtractor` instance by passing EssentiaWASM import object and `extractorType` value.
  * const extractor = new EssentiaTFInputExtractor(EssentiaWASM, "musicnn");
  * // Compute feature for a given frame of audio signal
- * let featureMusiCNN = await extractor.compute(audioSignalFrame);
+ * let featureMusiCNN = extractor.compute(audioSignalFrame);
  * // Change the feature extractor with a new setting for VGGish input
  * extractor.extractorType = "vggish";
- * let featureVGGish = await extractor.compute(audioSignalFrame);
+ * let featureVGGish = extractor.compute(audioSignalFrame);
  * // Delete and shutdown the extractor instance if you don't need it anymore.
  * extractor.delete();
  * extractor.shutdown();
@@ -41,22 +41,28 @@ class EssentiaTFInputExtractor {
 
   /** 
   * @property {EssentiaJS} this.essentia an instance of `EssentiaWASM.EssentiaJS`. 
-  * @property {string} this.extractorType List of available Essentia alogrithms from the WASM backend
+  * @property {string} this.extractorType type of the choosen extractor (eg. 'muscinn', 'vggish' or 'tempocnn').
   */
   public essentia: any = null;
   public extractorType: string;
-  public sampleRate: number = 16000;
   protected module: any = null;
+  protected frameSize: number = 512;
+  private sampleRate: number = 16000;
 
   /**  
   * @constructs
   * @param {EssentiaWASM} EssentiaWASM Essentia WASM emcripten global module object 
-  * @param {string} [extractorType='musicnn']
+  * @param {string} [extractorType='musicnn'] type of the desired extractor type (eg. 'muscinn', 'vggish' or 'tempocnn').
+  * @param {boolean} [isDebug=false] whether to enable EssentiaWASM internal debugger for logs.
   */
   constructor(EssentiaWASM: any, extractorType: string="musicnn", isDebug: boolean=false) {
+    this.extractorType = extractorType;
+    if (this.extractorType === "musicnn") this.frameSize = 512;
+    else if (this.extractorType === "vggish") this.frameSize = 400;
+    else if (this.extractorType === "tempocnn") this.frameSize = 1024;
+    else throw Error("Invalid 'extractorType' choice! Available types are [musicnn', 'vggish', 'tempocnn']");
     this.essentia = new EssentiaWASM.EssentiaJS(isDebug);
     this.module = EssentiaWASM;
-    this.extractorType = extractorType;
   }
 
   /**
@@ -88,7 +94,7 @@ class EssentiaTFInputExtractor {
    * @param {string} audioURL web url or blob uri of a audio file
    * @param {AudioContext} webAudioCtx an instance of Web Audio API `AudioContext`
    * @returns {Promise<AudioBuffer>} decoded audio buffer as a promise
-   * @memberof EssentiaTensorflowInputExtractor
+   * @memberof EssentiaTFInputExtractor
    */
   public async getAudioBufferFromURL(audioURL: string, webAudioCtx: AudioContext): Promise<AudioBuffer> {
     const response = await fetch(audioURL);
@@ -97,6 +103,15 @@ class EssentiaTFInputExtractor {
     return audioBuffer
   }
 
+  /**
+   * Convert an AudioBuffer object to a Mono audio signal array. The audio signal is downmixed
+   * to mono using essentia `MonoMixer` algorithm if the audio buffer has 2 channels of audio.
+   * Throws an expection if the input AudioBuffer object has more than 2 channels of audio.
+   * @method
+   * @param {AudioBuffer} buffer `AudioBuffer` object decoded from an audio file.
+   * @returns {Float32Array} audio channel data. (downmixed to mono if its stereo signal).
+   * @memberof EssentiaTFInputExtractor
+   */
   public audioBufferToMonoSignal(buffer: AudioBuffer): Float32Array {
     if (buffer.numberOfChannels === 1) {
       return buffer.getChannelData(0);
@@ -110,9 +125,17 @@ class EssentiaTFInputExtractor {
     throw new Error('Unexpected number of channels found in audio buffer. Only accepts mono or stereo audio buffers.');
   }
 
-  public downsampleAudioBuffer(sourceBuffer: AudioBuffer, targetRate: number): Promise<Float32Array> {
+  /**
+   * Downsample a audio buffer to a target audio sample rate using the Web Audio API
+   * NOTE: This method will only works on web-browsers which supports the Web Audio API.
+   * @method
+   * @param {AudioBuffer} sourceBuffer `AudioBuffer` object decoded from an audio file.
+   * @returns {Float32Array} decoded audio buffer object
+   * @memberof EssentiaTFInputExtractor
+   */
+  public downsampleAudioBuffer(sourceBuffer: AudioBuffer): Promise<Float32Array> {
     // adapted from https://github.com/julesyoungberg/soundboy/blob/main/worker/loadSoundFile.ts#L25
-    const ctx = new OfflineAudioContext(1, sourceBuffer.duration * targetRate, targetRate);
+    const ctx = new OfflineAudioContext(1, sourceBuffer.duration * this.sampleRate, this.sampleRate);
     // create mono input buffer
     const buffer = ctx.createBuffer(1, sourceBuffer.length, sourceBuffer.sampleRate);
     buffer.copyToChannel(this.audioBufferToMonoSignal(sourceBuffer), 0);
@@ -146,7 +169,7 @@ class EssentiaTFInputExtractor {
     // setup feature extractor based on the given `extractorType` input.
     switch(this.extractorType) { 
       case "musicnn": { 
-        if (audioFrame.length != 512) throw new Error("The chosen `extractorType` only works with an audio signal frame of 512 samples.");
+        if (audioFrame.length != this.frameSize) throw new Error("The chosen `extractorType` only works with an audio signal frame size of " + this.frameSize);
         let spectrum = this.essentia.TensorflowInputMusiCNN(this.arrayToVector(audioFrame));
         return {
           melSpectrum: this.vectorToArray(spectrum.bands),
@@ -156,7 +179,7 @@ class EssentiaTFInputExtractor {
         }; 
       }
       case "vggish": {
-        if (audioFrame.length != 400) throw new Error("The chosen `extractorType` only works with an audio signal frame of 400 samples.");
+        if (audioFrame.length != this.frameSize) throw new Error("The chosen `extractorType` only works with an audio signal frame size of 400 " + this.frameSize);
         let spectrum = this.essentia.TensorflowInputVGGish(this.arrayToVector(audioFrame));
         return {
           melSpectrum: this.vectorToArray(spectrum.bands),
@@ -165,18 +188,18 @@ class EssentiaTFInputExtractor {
           melBandsSize: 64
         };   
       } 
-      // case "tempocnn": { 
-      //   if (audioFrame.length != 1024) throw "The chosen `extractorType` only works with an audio signal frame of 1024 samples.";
-      //   let spectrum = this.essentia.TensorflowInputTempoCNN(audioFrame);
-      //   return {
-      //     melSpectrum: this.vectorToArray(spectrum.bands),
-      //     frameSize: 1,
-      //     patchSize: 256,
-      //     melBandsSize: 40
-      //   };    
-      // } 
+      case "tempocnn": { 
+        if (audioFrame.length != this.frameSize) throw Error("The chosen `extractorType` only works with an audio signal frame size of " + this.frameSize);
+        let spectrum = this.essentia.TensorflowInputTempoCNN(audioFrame);
+        return {
+          melSpectrum: this.vectorToArray(spectrum.bands),
+          frameSize: 1,
+          patchSize: 256,
+          melBandsSize: 40
+        };    
+      } 
       default: { 
-        throw "Invalid 'extractorType' choice! Available types are [musicnn', 'vggish', 'tempocnn']"             
+        throw Error("Invalid 'extractorType' choice! Available types are [musicnn', 'vggish', 'tempocnn']")             
       } 
     }
   }
@@ -187,14 +210,16 @@ class EssentiaTFInputExtractor {
    * if the size of audioFrame is not equal to the pre-configured size.
    * @method 
    * @param {Float32Array} audioSignal decoded audio signal as Float32 typed JS array.
-   * @param {number} frameSize required frameSize.
-   * @param {number} hopSize required hopSize for overlapping-frames.
+   * @param {number} hopSize? optional param for specifying hopSize for overlapping-frames. By default use none.
    * @returns {EssentiaTFInputExtractorOutput} returns the computed frame-wise feature for the given audio signal.
    * @memberof EssentiaTFInputExtractor
    */
-  public computeFrameWise(audioSignal: Float32Array, frameSize: number, hopSize: number): EssentiaTFInputExtractorOutput {
+  public computeFrameWise(audioSignal: Float32Array, hopSize?: number): EssentiaTFInputExtractorOutput {
+    let _hopSize: number;
+    if(hopSize) _hopSize = hopSize;
+    else _hopSize = this.frameSize;
     // compute overlapping frames given frameSize, hopSize
-    let frames = this.essentia.FrameGenerator(audioSignal, frameSize, hopSize);
+    let frames = this.essentia.FrameGenerator(audioSignal, this.frameSize, _hopSize);
     let melSpectrogram = [];
     let framewiseFeature: any = null;
     for (var i=0; i<frames.size(); i++) {
