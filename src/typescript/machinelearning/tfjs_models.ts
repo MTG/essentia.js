@@ -61,7 +61,7 @@ class EssentiaTensorflowJSModel {
    * patchSize. If `padding=true`, this method will zero-pad the input feature.
    * 
    * @method 
-   * @param {Float32Array|any[]} inputFeatureArray input feature array as either 1D or 2D areay
+   * @param {Float32Array|any[]} inputFeatureArray input feature array as either 1D or 2D array
    * @param {any[]} inputShape shape of the input feature array in 2D.
    * @param {number} patchSize required patchSize to dynamically make batches of feature
    * @param {boolean} [zeroPadding=false] whether to enable zero-padding if less frames found for a batch.
@@ -196,6 +196,11 @@ class TensorflowMusiCNN extends EssentiaTensorflowJSModel {
     this.minimumInputFrameSize = 3;
   }
 
+  /**
+   * Run inference on the given audio feature input and returns the activations
+   * @param {InputMusiCNN} inputFeature audio feature required by the MusiCNN model.
+   * @param {boolean} [zeroPadding=false] whether to do zero-padding to the input feature.
+   */
   public async predict(inputFeature: InputMusiCNN, zeroPadding: boolean=false): Promise<any[]> {
 
     let featureTensor = this.arrayToTensorAsBatches(
@@ -248,6 +253,11 @@ class TensorflowVGGish extends EssentiaTensorflowJSModel {
     super(tfjs, model_url);
   }
 
+  /**
+   * Run inference on the given audio feature input and returns the activations
+   * @param {InputVGGish} inputFeature audio feature required by the VGGish model.
+   * @param {boolean} [zeroPadding=false] whether to do zero-padding to the input feature.
+   */
   public async predict(inputFeature: InputVGGish, zeroPadding: boolean=false): Promise<any[]> {
     let featureTensor = this.arrayToTensorAsBatches(
       inputFeature.melSpectrum, 
