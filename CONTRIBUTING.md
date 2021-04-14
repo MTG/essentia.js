@@ -1,6 +1,6 @@
 # How to contribute to Essentia.js?
 
-Everyone is welcome to contribute, and we value everybody's contribution. Code is thus not the only way to help the community. Answering questions, filling issues, feature requests, helping others, reaching out and improving the documentations are immensely valuable to the community. It also helps us if you spread the word: reference the library from blog posts on the awesome projects it made possible, shout out on Twitter every time it has helped you, or simply star the repo to say "thank you".
+Everyone is welcome to contribute, and we value everybody's contribution. Code is thus not the only way to help the community. Answering questions, filling issues, feature requests, helping others, reaching out and improving the documentations are immensely valuable to the community. It also helps us if you spread the word thorugh reference of the library in your projects or shout-out on Twitter.
 
 Whichever way you choose to contribute, please be mindful to respect our [code of conduct](https://berlincodeofconduct.org/).
 
