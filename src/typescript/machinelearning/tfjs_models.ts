@@ -188,6 +188,7 @@ class EssentiaTensorflowJSModel {
  * await musicnn.initialize();
  * // Compute predictions for a given input feature.
  * let predictions = await musicnn.predict(inputMusiCNN);
+ * @extends {EssentiaTensorflowJSModel}
  */
 class TensorflowMusiCNN extends EssentiaTensorflowJSModel {
 
@@ -248,6 +249,7 @@ class TensorflowMusiCNN extends EssentiaTensorflowJSModel {
  * await vggish.initialize();
  * // Compute predictions for a given input feature.
  * let predictions = await vggish.predict(inputVGGish);
+ * @extends {EssentiaTensorflowJSModel}
  */
 class TensorflowVGGish extends EssentiaTensorflowJSModel {
 
