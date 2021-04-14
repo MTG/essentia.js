@@ -7,9 +7,9 @@
 [![](https://data.jsdelivr.com/v1/package/npm/essentia.js/badge)](https://www.jsdelivr.com/package/npm/essentia.js)
 
 
-`Essentia.js` is a JavaScript (JS) library for music/audio signal analysis and processing for both real-time and offline use-cases on the web. The core of library is powered by [Essentia C++ library](https://essentia.upf.edu) back-end using [WebAssembly](https://webassembly.org/) built via [Emscripten](https://emscripten.org/) along with a high-level JS and TypeScript API and add-on utility modules. ie, You can run an extensive colleciton of music/audio processing and analysis algorithms/models on your web browser or Node.js runtime applications with ease-of-use. 
+`Essentia.js` is a JavaScript (JS) library for music/audio signal analysis and processing for both real-time and offline use-cases on the web, developed at the [Music Tehnology Group, UPF, Barcelona](https://www.upf.edu/web/mtg/). The core of library is powered by [Essentia C++ library](https://essentia.upf.edu) back-end using [WebAssembly](https://webassembly.org/) built via [Emscripten](https://emscripten.org/) along with a high-level JS and TypeScript API and add-on utility modules. ie, You can run an extensive colleciton of music/audio processing and analysis algorithms/models on your web browser or Node.js runtime applications with ease-of-use. 
 
-The bundled add-on modules includes easy-to-use configurable feature extractors for some selected features, interface for feature extraction and inference of a collection of pre-trained audio ML models using [Tensorflow.js](https://www.tensorflow.org/js), some helper classes for visualizing common music processing features directly into your HTML web page using [Plotly.js](https://plotly.com/javascript/) library.
+The bundled add-on modules includes configurable feature extractors for some selected features, interface for feature extraction and inference of a collection of pre-trained audio ML models using [Tensorflow.js](https://www.tensorflow.org/js), some helper classes for visualizing common music processing features directly into your HTML web page using [Plotly.js](https://plotly.com/javascript/) library.
 
 
 - Repository: [https://github.com/MTG/essentia.js](https://github.com/MTG/essentia.js)
