@@ -5,8 +5,10 @@
     "recurseDepth": 10,
     "source": {
         "include": ["src/typescript/core_api.js", 
-          "src/typescript/extractor.js",
-          "src/typescript/plot.js"
+          "src/typescript/extractor/extractor.js",
+          "src/typescript/display/plot.js",
+          "src/typescript/machinelearning/tfjs_input_extractor.js",
+          "src/typescript/machinelearning/tfjs_models.js"
         ],
         "includePattern": ".+\\.js(doc|x)?$",
         "excludePattern": "(^|\\/|\\\\)_"
@@ -23,7 +25,7 @@
         "systemSummary": "JavaScript library for Music/Audio analysis, powered by Essentia WebAssembly backend.",
         "systemColor": "black",
         "footer": "https://essentia.upf.edu",
-        "copyright": "Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra",
+        "copyright": "Copyright (C) 2006-2021  Music Technology Group - Universitat Pompeu Fabra",
         "includeDate": false,
         "search": false
     }
