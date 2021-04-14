@@ -200,6 +200,8 @@ class TensorflowMusiCNN extends EssentiaTensorflowJSModel {
    * Run inference on the given audio feature input and returns the activations
    * @param {InputMusiCNN} inputFeature audio feature required by the MusiCNN model.
    * @param {boolean} [zeroPadding=false] whether to do zero-padding to the input feature.
+   * @returns {array} activations of the output layer of the model
+   * @memberof TensorflowMusiCNN
    */
   public async predict(inputFeature: InputMusiCNN, zeroPadding: boolean=false): Promise<any[]> {
 
@@ -257,6 +259,8 @@ class TensorflowVGGish extends EssentiaTensorflowJSModel {
    * Run inference on the given audio feature input and returns the activations
    * @param {InputVGGish} inputFeature audio feature required by the VGGish model.
    * @param {boolean} [zeroPadding=false] whether to do zero-padding to the input feature.
+   * @returns {array} activations of the output layer of the model
+   * @memberof TensorflowVGGish
    */
   public async predict(inputFeature: InputVGGish, zeroPadding: boolean=false): Promise<any[]> {
     let featureTensor = this.arrayToTensorAsBatches(
