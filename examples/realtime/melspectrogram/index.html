@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
+        />
+        <title>essentia.js Melspectrogram</title>
+    </head>
+    <body style="background-color:  #000000!important;">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw==" crossorigin="anonymous"></script>
+
+        <div class="ui main_wrapper landing-image">
+            <div class="ui header centered" id="header">
+                <a href="index.html">
+                    <img
+                        id="header-img"
+                        src="./images/essentiajsbanner.png"
+                    />
+                </a>
+                <div>
+                    <h2 class="ui header white-text" style="color: azure;">
+                        LogMelSpectrogram extraction using Web Audio API (AudioWorklets)
+                    </h2>
+                    <div class="ui basic large button">
+                        <a href="https://github.com/MTG/essentia.js/tree/master/examples/realtime/melspectrogram/example.html" target="_blank" class="ui small button">Code<i class="right github icon"></i></a>
+                    </div>
+                </div>
+
+
+            <div class="ui divider" style="height: 5px; width: 2px;"></div>
+                
+            <div class="body-container">
+                <div class="ui centered one column grid container">
+                    <div class="ui vertical buttons row">
+                        <center>
+                            <button id="recordButton" class="ui red inverted big button record-button" role="switch">
+                                Mic &nbsp;&nbsp;<i class="microphone icon"></i>
+                            </button>
+                        </center>
+                    </div>
+
+                    <canvas
+                        id="axesDiv"
+                        class="ui centered"
+                        style="width: 800px; height: 388px; background-color: transparent;"
+                    ></div>
+                </div>
+            </div>
+
+            <div class="ui divider" style="height: 50px;"></div>
+
+            <center>
+                <div class="footer" style="margin-top: 30px; height: 20%;">
+                    <a class="demo_logo" target="_blank" href="//essentia.upf.edu">
+                        <img
+                            id="logo"
+                            src="./images/essentia_logo.svg"
+                            alt="MTG Logo"
+                            style="margin-left: 40px; height: 70px;"
+                        />
+                    </a>
+                    <a target="_blank" href="https://www.upf.edu/web/mtg">
+                        <img
+                            class="essnt-footer_mtg-logo"
+                            src="./images/upflogo.png"
+                            alt="mtg logo"
+                            style="width:300px; height: 70px;"
+                        />
+                    </a>
+                </div>
+            </center>
+            
+            <script>
+                exports = {};
+            </script>
+            <script>
+                // From a series of URL to js files, get an object URL that can be loaded in an
+                // AudioWorklet. This is useful to be able to use multiple files (utils, data
+                // structure, main DSP, etc.) without either using static imports, eval, manual
+                // concatenation with or without a build step, etc.
+                function URLFromFiles(files) {
+                    const promises = files
+                        .map((file) => fetch(file)
+                            .then((response) => response.text()));
+
+                    return Promise
+                        .all(promises)
+                        .then((texts) => {
+                            const text = texts.join('');
+                            const blob = new Blob([text], {type: "application/javascript"});
+
+                            return URL.createObjectURL(blob);
+                        });
+                }
+            </script>
+            <script src="./ringbuf.js/index.js"></script> <!-- by Paul Adenot, repo: https://github.com/padenot/ringbuf.js -->
+            <script>
+            (function() {
+                let AudioContext;
+                // global var for web audio API AudioContext
+                let audioCtx;
+                let bufferSize = 1024;
+                let hopSize = 512;
+                let melNumBands = 96;
+
+                try {
+                    AudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContext();
+                } catch (e) {
+                    throw "Could not instantiate AudioContext: " + e.message;
+                }
+
+                // global var getUserMedia mic stream
+                let gumStream;
+                // global audio node variables
+                let mic;
+                let gain;
+                let melspectrogramNode;
+                let splitter;
+
+                // Shared data with AudioWorkletGlobalScope
+                let audioReader;
+
+                // Plot Settings
+                const plot = {
+                    canvas: document.createElement('canvas'),
+                    movingWindowWidth: 350,
+                    get wPixelRatio() {
+                        return this.layoutWidth/this.canvas.width;
+                    },
+                    get hPixelRatio() {
+                        return this.layoutHeight/this.canvas.height;
+                    },
+                    layoutWidth: 700,
+                    layoutHeight: 288,
+                    isFull: false,
+                    offset: 50,
+                    cursor: 0,
+                    spectrumAccum: [],
+                    init: function() {
+                        this.canvas.width = this.movingWindowWidth;
+                        this.canvas.height = melNumBands;
+                        this.canvas.style.width = `${this.layoutWidth}px`;
+                        this.canvas.style.height = `${this.layoutHeight}px`;
+                        this.canvas.style.backgroundColor = 'transparent';
+                        this.ctx = this.canvas.getContext('2d');
+                    },
+                    resetState: function () {
+                        this.cursor = 0;
+                        this.isFull = false;
+                        this.canvas.width = this.movingWindowWidth;
+                        // clear this.canvas to zero
+                        let fullCanvasSlice = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+                        let data = fullCanvasSlice.data;
+                        data = data.fill(0);
+                        this.ctx.putImageData(fullCanvasSlice, 0, 0);
+                        // clear full spectro
+                        this.spectrumAccum = [];
+                    }
+                };
+
+                // Axes Settings
+                const axes = {
+                    canvas: document.getElementById('axesDiv'),
+                    xOffset: plot.offset-1,
+                    yOffset: plot.offset+1.5,
+                    tickWidth: 6,
+                    fontSize: 12, 
+                    xLabel: "Time (sec)", 
+                    yLabel: "Melbands", 
+                    xticks: [], 
+                    xtickLabels: [],
+                    get xtickSeparation() {
+                        return this.xtimeStep*(audioCtx.sampleRate/bufferSize)*plot.wPixelRatio; // leave timeStep * frames/second * pixels each takes up between ticks
+                    },
+                    yticks: [], 
+                    ytickSeparation: plot.layoutHeight / 6, 
+                    xtimeStep: 1, // place xtick every <timeStep> seconds
+                    init: function() {
+                        this.canvas.width = 800;
+                        this.canvas.height = 388;
+                        this.ctx = this.canvas.getContext('2d');
+                        this.ctx.strokeStyle = "#8c8c8c";
+                        this.ctx.fillStyle = "#8c8c8c";
+                        this.ctx.lineWidth = 1;
+
+                        // calculate tick pixel coordinates
+                        for (let i=0; i < 6; i++) {
+                            this.yticks.push([this.xOffset, this.yOffset+(i*this.ytickSeparation)]);
+                        }
+
+                        this.drawAxes();
+                        this.drawYTicks();
+                        this.resetXAxis(1);
+                    },
+                    clearXTicks: function() {
+                        this.ctx.clearRect(this.xOffset, this.yOffset+plot.layoutHeight+1, this.canvas.width-this.xOffset, this.tickWidth); 
+                    },
+                    clearXTickLabels: function() {
+                        this.ctx.clearRect(this.xOffset, this.yOffset+plot.layoutHeight+this.tickWidth+1, this.canvas.width-this.xOffset, this.fontSize);
+                    },
+                    calculateXTicks: function(step) {
+                        this.xtimeStep = step;
+                        this.xticks = [];
+                        for (let j=this.xtickSeparation; j <= plot.layoutWidth; j += this.xtickSeparation) {
+                            this.xticks.push([this.xOffset+j, this.yOffset+plot.layoutHeight]);
+                        }
+                    },
+                    drawXTicks: function() {
+                        // x ticks & labels
+                        this.ctx.font = `${this.fontSize}px sans-serif`; 
+                        this.ctx.beginPath();
+                        this.xticks.forEach((tick, idx) => {
+                            this.ctx.moveTo(tick[0], tick[1]);
+                            this.ctx.lineTo(tick[0], this.yOffset+plot.layoutHeight+this.tickWidth);
+                        });
+                        this.ctx.stroke();
+                    },
+                    calculatXTickLabels: function() {
+                        this.xtickLabels = [];
+                        this.xticks.forEach((t) => {
+                            const labelValue = this.xtimeStep*(t[0]-this.xOffset)/this.xtickSeparation;
+                            this.xtickLabels.push(Math.trunc(labelValue*10)/10);
+                        })
+                    },
+                    drawXTickLabels: function() {
+                        this.ctx.fillStyle = "#8c8c8c";
+                        this.xticks.forEach((tick, idx) => {
+                            this.ctx.fillText(this.xtickLabels[idx], tick[0]-(this.fontSize/3), this.canvas.height-(this.yOffset*0.6));
+                        });
+                    },
+                    clearPlotArea: function() {
+                        // clear axes plot area
+                        // get black image of size plotLayout[Width/Height]
+                        let emptyImageData = this.ctx.createImageData(plot.layoutWidth, plot.layoutHeight);
+                        // put empty image data
+                        this.ctx.putImageData(emptyImageData, plot.offset, plot.offset);
+                    },
+                    drawYTicks: function() {
+                        // y ticks & labels
+                        this.ctx.font = `${this.fontSize}px sans-serif`;
+                        this.ctx.beginPath();
+                        this.yticks.forEach((tick) => {
+                            this.ctx.moveTo(tick[0], tick[1]);
+                            this.ctx.lineTo(this.xOffset-this.tickWidth, tick[1]);
+                            this.ctx.fillText(96 - (tick[1]-this.yOffset)/plot.hPixelRatio, this.xOffset*0.6, tick[1]+(this.fontSize/3));
+                        });
+                        this.ctx.stroke();
+                    },
+                    drawAxes: function() {
+                        // main axes
+                        this.ctx.moveTo(this.xOffset, this.yOffset);
+                        this.ctx.lineTo(this.xOffset, this.yOffset+plot.layoutHeight);
+                        this.ctx.lineTo(this.xOffset+plot.layoutWidth, this.yOffset+plot.layoutHeight);
+                        this.ctx.stroke();
+                        this.ctx.font = `${this.fontSize + 2}px sans-serif`;
+                        let xtext = this.ctx.measureText(this.xLabel);
+                        this.ctx.fillText(this.xLabel, this.xOffset+(plot.layoutWidth*0.5-(xtext.width*0.5)), this.canvas.height-10);
+                        this.ctx.fillText(this.yLabel, 10, 30);
+                    },
+                    resetXAxis: function(step) {
+                        this.clearXTicks();
+                        this.clearXTickLabels();
+                        this.calculateXTicks(step);
+                        this.calculatXTickLabels();
+                        this.drawXTicks();
+                        this.drawXTickLabels();
+                    }
+                };
+
+                let animationLoopId;
+
+                // Utils:
+                function arraySum(total, num) {
+                    return total + num;
+                }
+
+
+                function onRecordClickHandler() {
+                    let recording = $(this).hasClass("recording");
+                        if (!recording) {
+                            $(this).prop("disabled", true);
+                            // empty canvas
+                            axes.clearPlotArea();
+                            plot.resetState();
+                            axes.resetXAxis(1);
+                            // start microphone stream using getUserMedia and runs the feature extraction
+                            startMicRecordStream();
+                        } else {
+                            stopMicRecordStream();
+                        }
+                }
+
+                // record native microphone input and do further audio processing on each audio buffer using the given callback functions
+                function startMicRecordStream() {
+                    if (navigator.mediaDevices.getUserMedia) {
+                        console.log("Initializing audio...");
+                        navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+                        .then(startAudioProcessing)
+                        .catch(function(message) {
+                                throw "Could not access microphone - " + message;
+                        });
+                    } else {
+                        throw "Could not access microphone - getUserMedia not available";
+                    }
+                }
+
+                function startAudioProcessing(stream) {
+                    gumStream = stream;
+                    if (gumStream.active) {
+                        // In most platforms where the sample rate is 44.1 kHz or 48 kHz,
+                        // and the default bufferSize will be 4096, giving 10-12 updates/sec.
+                        if (audioCtx.state == "closed") {
+                            audioCtx = new AudioContext();
+                        }
+                        else if (audioCtx.state == "suspended") {
+                            audioCtx.resume();
+                        }
+
+                        mic = audioCtx.createMediaStreamSource(gumStream);
+                        gain = audioCtx.createGain();
+                        gain.gain.setValueAtTime(0, audioCtx.currentTime);
+
+                        let codeForProcessorModule = ["https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia-wasm.module.js", 
+                                                                                    "https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia.js-extractor.es.js", 
+                                                                                    "melspectrogram-processor.js", "https://unpkg.com/ringbuf.js@0.1.0/dist/index.js"];
+
+                        // inject Essentia.js code into AudioWorkletGlobalScope context, then setup audio graph and start animation
+                        URLFromFiles(codeForProcessorModule)
+                        .then((concatenatedCode) => {
+                            audioCtx.audioWorklet.addModule(concatenatedCode)
+                            .then(setupAudioGraph)
+                            .catch( function moduleLoadRejected(msg) {
+                                console.log(`There was a problem loading the AudioWorklet module code: \n ${msg}`);
+                            });
+                        })
+                        .catch((msg) => {
+                            console.log(`There was a problem retrieving the AudioWorklet module code: \n ${msg}`);
+                        })
+
+                        // set button to stop
+                        $("#recordButton").addClass("recording");
+                        $("#recordButton").html('Stop &nbsp;&nbsp;<i class="stop icon"></i>');
+                        $("#recordButton").prop("disabled", false);
+                    } else {
+                        throw "Mic stream not active";
+                    }
+                }
+
+                function setupAudioGraph() {
+                    // 50ms of buffer, increase in case of glitches
+                    let sab = exports.RingBuffer.getStorageForCapacity(melNumBands*18, Float32Array);
+                    let rb = new exports.RingBuffer(sab, Float32Array);
+                    audioReader = new exports.AudioReader(rb);
+
+                    melspectrogramNode = new AudioWorkletNode(audioCtx, 'melspectrogram-processor', {
+                        processorOptions: {
+                            bufferSize: bufferSize,
+                            hopSize: hopSize,
+                            melNumBands: melNumBands,
+                            sampleRate: audioCtx.sampleRate,
+                        }
+                    });
+
+                    try {
+                        melspectrogramNode.port.postMessage({
+                            sab: sab,
+                        });
+                    } catch(_){
+                        alert("No SharedArrayBuffer tranfer support, try another browser.");
+                        $("#recordButton").off('click', onRecordClickHandler);
+                        $("#recordButton").prop("disabled", true);
+                        return;
+                    }
+
+                    // It seems necessary to connect the stream to a sink for the pipeline to work, contrary to documentataions.
+                    // As a workaround, here we create a gain node with zero gain, and connect temp to the system audio output.
+                    mic.connect(melspectrogramNode);
+                    melspectrogramNode.connect(gain);
+                    gain.connect(audioCtx.destination);
+
+                    requestAnimationFrame(animateSpectrogram); // start plot animation
+                }
+
+                let animationStart;
+                let elapsed;
+                // draw melspectrogram frames
+                function animateSpectrogram(timestamp) {
+                    if (animationStart === undefined)
+                        animationStart = timestamp;
+                    elapsed = timestamp - animationStart;
+                    animationLoopId = requestAnimationFrame(animateSpectrogram);
+                    /* SAB method */
+                    let melspectrumBuffer = new Float32Array(melNumBands);
+                    if (audioReader.available_read() >= melNumBands) {
+                        let toread = audioReader.dequeue(melspectrumBuffer);
+                        if (toread !== 0) {
+                            // scale spectrum values to 0 - 255
+                            let scaledMelspectrum = melspectrumBuffer.map(x => Math.round(x*35.5))
+                            // save into full spectrogram for drawing on stop
+                            plot.spectrumAccum.push(scaledMelspectrum);
+
+                            // here we call the plotting function to display realtime feature extraction results
+                            drawMovingSpectro(scaledMelspectrum);
+                        } 
+                    }
+                } 
+
+                function drawMovingSpectro(spectrum) {
+                    if (!plot.isFull) {
+                        drawNextPixelColumn(spectrum, 1);
+                        axes.clearPlotArea();
+                        // insert in axes:
+                        axes.ctx.drawImage(plot.canvas, plot.offset, plot.offset, plot.layoutWidth, plot.layoutHeight);
+                        plot.cursor += 1;
+                    } else {
+                        // update xtick labels:
+                        axes.clearXTickLabels();
+                        axes.xtickLabels = axes.xtickLabels.map((x) => {
+                            return Math.trunc((x*1000+(elapsed-axes.xtickLabels[axes.xtickLabels.length-1]*1000))*0.01)/10;
+                        });
+                        axes.drawXTickLabels();
+                        // shift previous pixels for "moving window" effect
+                        let prevSlice = plot.ctx.getImageData(1, 0, plot.canvas.width-1, plot.canvas.height);
+                        plot.ctx.putImageData(prevSlice, 0, 0);
+
+                        drawNextPixelColumn(spectrum, 1);
+                        axes.clearPlotArea();
+                        axes.ctx.drawImage(plot.canvas, plot.offset, plot.offset, plot.layoutWidth, plot.layoutHeight);
+                    }
+                    
+                    if (plot.cursor == plot.canvas.width-1 && !plot.isFull) {
+                        plot.isFull = true;
+                        console.log(`Plot is full! Elapsed time: ${elapsed} ms`);
+                    }
+                }
+
+                let redRange = (255-61)/255;
+                function drawNextPixelColumn(spectrum, step) {
+                    let singleFrameSlice = plot.ctx.getImageData(plot.cursor, 0, step, plot.canvas.height);
+                    let pixels = step*plot.canvas.height;
+                    for (let i = 0; i < plot.canvas.height; i++) {
+                        const invertedIndex = melNumBands - i;
+                        singleFrameSlice.data[4 * i + 0] = 61 + (spectrum[invertedIndex] * redRange); // R
+                        singleFrameSlice.data[4 * i + 1] = (spectrum[invertedIndex] * 81/255); // G
+                        singleFrameSlice.data[4 * i + 2] = (spectrum[invertedIndex] * 68/255); // B
+                        singleFrameSlice.data[4 * i + 3] = spectrum[invertedIndex];         // A
+                    }
+                    plot.ctx.putImageData(singleFrameSlice, plot.cursor, 0);
+                }
+
+                function drawFullSpectrogram() {
+                    plot.cursor = 0;
+                    plot.canvas.width = plot.spectrumAccum.length;
+                    for (var j = 0; j < plot.spectrumAccum.length; j++) {
+                        drawNextPixelColumn(plot.spectrumAccum[j], 1);
+                        plot.cursor += 1;
+                    }
+
+                    axes.clearPlotArea();
+                    axes.resetXAxis(elapsed*0.001/6);
+                    axes.ctx.drawImage(plot.canvas, plot.offset, plot.offset, plot.layoutWidth, plot.layoutHeight);
+                    animationStart = undefined;
+                    elapsed = 0;
+                }
+
+                function stopMicRecordStream() {
+                    if (animationLoopId) {
+                        cancelAnimationFrame(animationLoopId);
+                        drawFullSpectrogram();
+                    }
+
+                    // stop mic stream
+                    gumStream.getAudioTracks().forEach(function(track) {
+                        track.stop();
+                        gumStream.removeTrack(track);
+                    });
+                    
+                    audioCtx.close().then(function() {
+                        // manage button state
+                        $("#recordButton").removeClass("recording");
+                        $("#recordButton").html('Mic &nbsp;&nbsp;<i class="microphone icon"></i>');
+                        
+                        // disconnect nodes
+                        mic.disconnect();
+                        melspectrogramNode.disconnect();
+                        gain.disconnect();
+                        mic = undefined; 
+                        melspectrogramNode = undefined; 
+                        gain = undefined;
+
+                        console.log("Stopped recording ...");
+                    });
+                }
+
+                $(document).ready(function() {
+                    // check for SharedArrayBuffer support:
+                    try {
+                        const testSAB = new SharedArrayBuffer(1);
+                        delete testSAB;  
+                        plot.init();
+                        axes.init();
+                        // add event listeners to ui objects
+                        $("#recordButton").on('click', onRecordClickHandler);
+                    } catch (e) {
+                        if (e instanceof ReferenceError) {
+                            $("#recordButton").prop('disabled', true);
+                            if (confirm("This demo will NOT work in this browser: SharedArrayBuffer is not available or the necessary security headers are missing. We have hosted a version compatible with Firefox, and Chrome version 91 or later, at 'https://essentiajs-melspectrogram.netlify.app', would you like to check it out?")) {
+                                window.open('https://essentiajs-melspectrogram.netlify.app');
+                            }
+                        }
+                    }
+                });
+            })();
+            </script>
+        </div>
+    </body>
+</html>
