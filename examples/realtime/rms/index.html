@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"/>
+    <title>essentia.js with AudioWorket example</title>
+    <style>
+
+    </style>
+  </head>
+  <body style="background-color:  #000000!important;">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+    <script src="./mic-toggle-button.js"></script>
+    <script type="module">
+
+      import { createEssentiaNode } from "./essentia-worklet-node.js";
+
+      let audioContext;
+      let gumStream;
+
+      let isRecording = false;
+
+      let micNode = null;
+      let essentiaNode = null;
+      let analyserNode = null;
+      let analyserData = null;
+
+      let animationID;
+
+      const rmsValue = document.querySelector("#rms-value");
+
+      class Smoother {
+        constructor(windowSize=10) {
+          this.size = windowSize;
+          this.buffer = new Array(this.size).fill(0);
+          this.oldestVal = 0;
+          this.sum = 0;
+          this.firstTime = true;
+        }
+
+        lowpass(val) {
+          // computes moving average
+          this.buffer.push(val);
+          this.oldestVal = this.buffer.shift();
+          
+          if (this.firstTime) {
+            this.sum = this.buffer.reduce((acc, v) => acc + v);
+            this.firstTime = false;
+          } else {
+            this.sum = (this.sum - this.oldestVal) + val;
+          }
+          const avg = this.sum / this.size;
+          return Math.round(avg);
+        }
+      }
+
+      const smoother = new Smoother(20);
+
+      // show console.log on html div
+      window.console.logToScreen = function(str) {
+        let node = document.createElement("div");
+        node.appendChild(document.createTextNode(str));
+        document.getElementById("myLog").appendChild(node);
+      };
+
+      const audioButton = document.querySelector('mic-toggle-button');
+
+      audioButton.addEventListener('click', function() {
+        if(!isRecording) {
+            audioContext = audioButton.audio.ctx;
+            startEssentiaAnalyser(audioContext).then(()=>console.logToScreen('essentia analyzer started'));
+            return;
+        }
+        if(isRecording) {
+          gumStream.getAudioTracks().forEach((track) => {
+            track.stop();
+            gumStream.removeTrack(track);
+          });
+          console.logToScreen('Closing audio context ...');
+
+          micNode.disconnect();
+          analyserNode.disconnect();
+          essentiaNode.disconnect();
+          // micNode = null;
+          // essentiaNode = null;
+
+          cancelAnimationFrame(animationID);
+
+          isRecording = false;
+        }
+      });
+
+      function draw () {
+        animationID = requestAnimationFrame(draw);
+        analyserNode.getFloatTimeDomainData(analyserData);
+        let rms = analyserData[0];
+        let dbFS = 20 * Math.log10((rms + Number.EPSILON) * Math.sqrt(2));
+        // lowpass value for easier visualization
+        let smoothedVal = smoother.lowpass(dbFS);
+        rmsValue.innerText = smoothedVal;
+      }
+
+      // connect the nodes
+      async function startEssentiaAnalyser(audioContext) {
+        async function setupAudioGraph(stream) {
+          gumStream = stream;
+          if (gumStream.active) {
+            console.logToScreen('Sample Rate = ' + audioContext.sampleRate);
+            micNode = audioContext.createMediaStreamSource(stream);
+            analyserNode = audioContext.createAnalyser();
+            analyserNode.fftSize = 2 * 128;
+            analyserData = new Float32Array(analyserNode.frequencyBinCount);
+
+            // create essentia node only once (avoid registering processor repeatedly)
+            if (!essentiaNode) {
+              console.logToScreen("Creating EssentiaNode instance ...")
+              essentiaNode = await createEssentiaNode(audioContext);
+            }
+
+            console.logToScreen("Mic => essentiaWorklet => audioContext.destination ....");
+            console.logToScreen("Calculating RMS level from microphone input ....");
+            // connect mic stream to essentia node
+            audioButton.connectToAudioNode(essentiaNode);
+            // If it isn't connected to destination, the worklet is not executed
+            essentiaNode.connect(analyserNode);
+
+            draw(analyserData);
+
+            isRecording = true;
+          } else { 
+            throw 'Mic stream not active'; 
+          }
+        }
+        if (navigator.mediaDevices.getUserMedia) {
+          document.getElementById("myLog").innerHTML = ""; // empty on-screen log
+          console.logToScreen(".................................")
+          console.logToScreen('Initializing mic input stream ...')
+          navigator.mediaDevices.getUserMedia({audio: {sampleRate: {exact: audioContext.sampleRate }}, video: false}).then((stream) => {
+            setupAudioGraph(stream);
+          }).catch(function(message) {
+            throw 'Could not access microphone - ' + message;
+          });
+        } else {throw 'Could not access microphone - getUserMedia not available';}
+      }
+    </script>
+
+    <div class="ui main_wrapper landing-image">
+    <div class="ui header centered" id="header">
+      <a href="https://github.com/MTG/essentia.js">
+        <img id="header-img" src="https://raw.githubusercontent.com/MTG/essentia.js/master/src/assets/img/essentiajsbanner.png">
+      </a>
+      <div>
+          <h1 class="ui header white-text" style="color: azure;">AudioWorklet example: RMS Level</h1>
+      </div>
+
+      <div class="ui basic large button" style="margin: 0;">
+        <a href="https://github.com/MTG/essentia.js/tree/master/examples/realtime/audio-worklets" target="_blank" class="ui small button" style="margin: 0;">
+          Code<i class="right github icon"></i>
+        </a>
+      </div>
+
+    </div>
+    <div class="body-container">
+      <div class="ui" style="display: flex; flex-direction: column; align-items: center;">
+        <div >
+          <!-- <button class="ui red inverted big button record-button" style="width: 15rem;">
+            <i class="microphone icon" style="margin-right: 1rem;"></i>
+            <span>Start</span>
+          </button> -->
+          <mic-toggle-button style="font-size: 1.75rem;"></mic-toggle-button>
+        </div>
+        <div id="rms" class="ui segment" style="width: 30rem; font-size: 4rem; color: #000000; text-align: center; display: grid; grid-template-columns: 50% 50%;">
+          <span id="rms-value">0</span> <span>dBFS</span>
+          <!-- <input id="rms-value" type="text" style="min-width: 55%; text-align: right;" readonly>
+          <span id="rms-units" class="ui basic label">dBFS</span> -->
+        </div>
+        <div id="myLog" style="color: azure; font-size: small; width: fit-content; height: fit-content; text-align: center;"></div>
+      </div>
+    </div>
+    
+    <center>
+    <div class="footer" style="margin-top: 30px; height: 20%;">
+      <a class="demo_logo" target="_blank" href="//essentia.upf.edu">
+        <img id="logo" src="https://essentia.upf.edu/documentation/_static/essentia_logo.svg" alt="MTG Logo"
+          style="margin-left: 40px; height: 70px;">
+      </a>
+      <a target="_blank" href="https://www.upf.edu/web/mtg">
+        <img class="essnt-footer_mtg-logo" src="https://mtg.github.io/assets/img/upflogo.png" alt="mtg logo"
+            style="width:300px; height: 70px;">
+      </a>
+    </div>
+    </center>
+  </body>
+</html>
