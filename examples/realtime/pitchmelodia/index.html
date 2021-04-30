@@ -354,7 +354,9 @@
                     } catch (e) {
                         if (e instanceof ReferenceError) {
                             $("#recordButton").prop("disabled", true);
-                            alert("This demo will NOT work in this browser: SharedArrayBuffer is not available or the necessary security headers are missing.");
+                            if (confirm("This demo will NOT work in this browser: SharedArrayBuffer is not available or the necessary security headers are missing. We have hosted a version compatible with Firefox, and Chrome version 91 or later, at 'https://essentiajs-pitchmelodia.netlify.app', would you like to check it out?")) {
+                                window.open('https://essentiajs-pitchmelodia.netlify.app');
+                            }
                         }
                     }
                 });
