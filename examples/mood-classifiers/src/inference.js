@@ -1,5 +1,4 @@
 importScripts('./lib/tf.min.3.5.0.js');
-// importScripts('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs');
 importScripts('./lib/essentia.js-model.js');
 
 let model;

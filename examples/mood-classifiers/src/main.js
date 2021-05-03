@@ -54,6 +54,9 @@ function decodeFile(arrayBuffer) {
     audioCtx.resume().then(() => {
         audioCtx.decodeAudioData(arrayBuffer).then(async function handleDecodedAudio(audioBuffer) {
             console.info("Done decoding audio!");
+            
+            toggleLoader();
+            
             const prepocessedAudio = preprocess(audioBuffer);
             await audioCtx.suspend();
 
@@ -71,7 +74,6 @@ function decodeFile(arrayBuffer) {
                 audio: audioData.buffer
             }, [audioData.buffer]);
             audioData = null;
-            toggleLoader();
         })
     })
 }
@@ -133,7 +135,7 @@ function collectPredictions() {
     if (inferenceResultPromises.length == modelNames.length) {
         Promise.all(inferenceResultPromises).then((predictions) => {
             const allPredictions = {};
-            // save performance results to JSON
+            Object.assign(allPredictions, ...predictions);
             resultsViz.updateMeters(allPredictions);
             resultsViz.updateValueBoxes(essentiaAnalysis);
             toggleLoader();
