@@ -3,7 +3,7 @@
 
 importScripts(
   "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs", 
-  "../../dist/essentia.js-model.umd.js"
+  "./lib/essentia.js-model.umd.js"
 );
 
 const modelURL = "models/msd-musicnn-1/model.json"
