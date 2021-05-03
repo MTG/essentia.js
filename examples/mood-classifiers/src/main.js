@@ -1,10 +1,9 @@
 import { AnalysisResults, toggleUploadDisplayHTML, PlaybackControls } from './viz.js';
-import downloadJSON from './downloadJson.js';
 import { preprocess, shortenAudio } from './audioUtils.js';
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
-const KEEP_PERCENTAGE = 0.15; // keep only 30% of audio file
+const KEEP_PERCENTAGE = 0.3; // keep only 30% of audio file
 
 let essentia = null;
 let essentiaAnalysis;
@@ -16,13 +15,6 @@ let inferenceResultPromises = [];
 const resultsViz = new AnalysisResults(modelNames);
 let wavesurfer;
 let controls;
-
-let startTime = 0;
-const performanceResults = {
-    audiofile: "",
-    time: 0,
-    predictions: {}
-};
 
 const dropInput = document.createElement('input');
 dropInput.setAttribute('type', 'file');
@@ -49,8 +41,6 @@ function processFileUpload(files) {
         throw Error("Multiple file upload attempted, cannot process.");
     } else if (files.length) {
         files[0].arrayBuffer().then((ab) => {
-            performanceResults.audiofile = files[0].name;
-            startTime = Date.now(); // <-- START COUNTING TIME FROM FILE UPLOAD
             decodeFile(ab);
             wavesurfer = toggleUploadDisplayHTML('display');
             wavesurfer.loadBlob(files[0]);
@@ -142,13 +132,8 @@ function createInferenceWorkers() {
 function collectPredictions() {
     if (inferenceResultPromises.length == modelNames.length) {
         Promise.all(inferenceResultPromises).then((predictions) => {
-            const totalTime = Date.now() - startTime;
-            performanceResults.time = totalTime;
-
             const allPredictions = {};
-            performanceResults.predictions = Object.assign(allPredictions, ...predictions);
             // save performance results to JSON
-            downloadJSON(performanceResults, `pi-reducedAudio-${KEEP_PERCENTAGE}-WASM-${performanceResults.audiofile.replace('.mp3', '')}.json`);
             resultsViz.updateMeters(allPredictions);
             resultsViz.updateValueBoxes(essentiaAnalysis);
             toggleLoader();
