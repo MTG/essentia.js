@@ -1,5 +1,5 @@
 import { EssentiaWASM } from "./lib/essentia-wasm.module.js";
-import { EssentiaTensorflowInputExtractor}  from "./lib/essentia.js-model.es.js";
+import { EssentiaTFInputExtractor}  from "./lib/essentia.js-model.es.js";
 import { RingBuffer } from "./lib/wasm-audio-helper.js";
 
 // const EssentiaWASM = Module;
@@ -56,7 +56,7 @@ class FeatureExtractProcessor extends AudioWorkletProcessor {
         this._hopSize = 256;
         this._channelCount = 1;
         this._patchHop = new PatchHop(187, 1/3); // if patchSize at 16kHz and 256 hopSize corresponds to about 3s of audio, this would jump by 1s
-        this._extractor = new EssentiaTensorflowInputExtractor(EssentiaWASM, 'musicnn');
+        this._extractor = new EssentiaTFInputExtractor(EssentiaWASM, 'musicnn');
         this.essentia = new EssentiaWASM.EssentiaJS(false);
         this._features = {
             melSpectrum: getZeroMatrix(187, 96), // init melSpectrum 187x96 matrix with zeros

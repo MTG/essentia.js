@@ -92,44 +92,55 @@ var EssentiaModel = (function (exports) {
      * backend which is imported from `essentia-wasm*.js` builds.
      * @class
      * @example
-     * // Create `EssentiaTensorflowInputExtractor` instance by passing EssentiaWASM import object and `extractorType` value.
-     * const extractor = new EssentiaTensorflowInputExtractor(EssentiaWASM, "musicnn");
+     * // Create `EssentiaTFInputExtractor` instance by passing EssentiaWASM import object and `extractorType` value.
+     * const extractor = new EssentiaTFInputExtractor(EssentiaWASM, "musicnn");
      * // Compute feature for a given frame of audio signal
-     * let featureMusiCNN = await extractor.compute(audioSignalFrame);
+     * let featureMusiCNN = extractor.compute(audioSignalFrame);
      * // Change the feature extractor with a new setting for VGGish input
      * extractor.extractorType = "vggish";
-     * let featureVGGish = await extractor.compute(audioSignalFrame);
+     * let featureVGGish = extractor.compute(audioSignalFrame);
      * // Delete and shutdown the extractor instance if you don't need it anymore.
      * extractor.delete();
      * extractor.shutdown();
      */
-    var EssentiaTensorflowInputExtractor = /** @class */ (function () {
+    var EssentiaTFInputExtractor = /** @class */ (function () {
         /**
         * @constructs
         * @param {EssentiaWASM} EssentiaWASM Essentia WASM emcripten global module object
-        * @param {string} [extractorType='musicnn']
+        * @param {string} [extractorType='musicnn'] type of the desired extractor type (eg. 'muscinn', 'vggish' or 'tempocnn').
+        * @param {boolean} [isDebug=false] whether to enable EssentiaWASM internal debugger for logs.
         */
-        function EssentiaTensorflowInputExtractor(EssentiaWASM, extractorType, isDebug) {
+        function EssentiaTFInputExtractor(EssentiaWASM, extractorType, isDebug) {
             if (extractorType === void 0) { extractorType = "musicnn"; }
             if (isDebug === void 0) { isDebug = false; }
             /**
             * @property {EssentiaJS} this.essentia an instance of `EssentiaWASM.EssentiaJS`.
-            * @property {string} this.extractorType List of available Essentia alogrithms from the WASM backend
+            * @property {string} this.extractorType type of the choosen extractor (eg. 'muscinn', 'vggish' or 'tempocnn').
             */
             this.essentia = null;
             this.module = null;
+            this.frameSize = 512;
+            this.sampleRate = 16000;
+            this.extractorType = extractorType;
+            if (this.extractorType === "musicnn")
+                this.frameSize = 512;
+            else if (this.extractorType === "vggish")
+                this.frameSize = 400;
+            else if (this.extractorType === "tempocnn")
+                this.frameSize = 1024;
+            else
+                throw Error("Invalid 'extractorType' choice! Available types are [musicnn', 'vggish', 'tempocnn']");
             this.essentia = new EssentiaWASM.EssentiaJS(isDebug);
             this.module = EssentiaWASM;
-            this.extractorType = extractorType;
         }
         /**
          * Convert a typed JS Float32Array into VectorFloat type.
          * @method
          * @param {Float32Array} inputArray input Float32 typed array.
          * @returns {VectorFloat} returns converted VectorFloat array.
-         * @memberof EssentiaTensorflowInputExtractor
+         * @memberof EssentiaTFInputExtractor
          */
-        EssentiaTensorflowInputExtractor.prototype.arrayToVector = function (inputArray) {
+        EssentiaTFInputExtractor.prototype.arrayToVector = function (inputArray) {
             return this.module.arrayToVector(inputArray);
         };
         /**
@@ -137,9 +148,9 @@ var EssentiaModel = (function (exports) {
          * @method
          * @param {VectorFloat} inputVector input VectorFloat array
          * @returns {Float32Array} returns converted JS typed array
-         * @memberof EssentiaTensorflowInputExtractor
+         * @memberof EssentiaTFInputExtractor
          */
-        EssentiaTensorflowInputExtractor.prototype.vectorToArray = function (inputVector) {
+        EssentiaTFInputExtractor.prototype.vectorToArray = function (inputVector) {
             return this.module.vectorToArray(inputVector);
         };
         /**
@@ -149,9 +160,9 @@ var EssentiaModel = (function (exports) {
          * @param {string} audioURL web url or blob uri of a audio file
          * @param {AudioContext} webAudioCtx an instance of Web Audio API `AudioContext`
          * @returns {Promise<AudioBuffer>} decoded audio buffer as a promise
-         * @memberof EssentiaTensorflowInputExtractor
+         * @memberof EssentiaTFInputExtractor
          */
-        EssentiaTensorflowInputExtractor.prototype.getAudioBufferFromURL = function (audioURL, webAudioCtx) {
+        EssentiaTFInputExtractor.prototype.getAudioBufferFromURL = function (audioURL, webAudioCtx) {
             return __awaiter(this, void 0, void 0, function () {
                 var response, arrayBuffer, audioBuffer;
                 return __generator(this, function (_a) {
@@ -171,24 +182,54 @@ var EssentiaModel = (function (exports) {
             });
         };
         /**
-         * Generates overlapping frames (chunks) of array with given frame size and hop size from an input array.
+         * Convert an AudioBuffer object to a Mono audio signal array. The audio signal is downmixed
+         * to mono using essentia `MonoMixer` algorithm if the audio buffer has 2 channels of audio.
+         * Throws an expection if the input AudioBuffer object has more than 2 channels of audio.
          * @method
-         * @param {string} inputArray web url or blob uri of a audio file
-         * @param {number} frameSize frame size for generating frames (chunks) of input array
-         * @param {number} hopSize hop size required for overlap while generating the frames.
-         * @returns {Array<Float32Array>} generated frames as array of array of Float32 type.
-         * @memberof EssentiaTensorflowInputExtractor
+         * @param {AudioBuffer} buffer `AudioBuffer` object decoded from an audio file.
+         * @returns {Float32Array} audio channel data. (downmixed to mono if its stereo signal).
+         * @memberof EssentiaTFInputExtractor
          */
-        EssentiaTensorflowInputExtractor.prototype.arrayFrameGenerator = function (inputArray, frameSize, hopSize) {
-            if (frameSize > inputArray.length)
-                throw Error("`frameSize` shouldn't be greater than the length of input array!");
-            if (hopSize > frameSize)
-                throw Error("`hopSize` shouldn't be greater than `frameSize`!");
-            var frames = [];
-            for (var i = 0; i < inputArray.length - (frameSize - 1); i + hopSize) {
-                frames.push(inputArray.slice(i, i + frameSize));
+        EssentiaTFInputExtractor.prototype.audioBufferToMonoSignal = function (buffer) {
+            if (buffer.numberOfChannels === 1) {
+                return buffer.getChannelData(0);
             }
-            return frames;
+            if (buffer.numberOfChannels === 2) {
+                var left = this.arrayToVector(buffer.getChannelData(0));
+                var right = this.arrayToVector(buffer.getChannelData(1));
+                var monoSignal = this.essentia.MonoMixer(left, right);
+                return this.vectorToArray(monoSignal);
+            }
+            throw new Error('Unexpected number of channels found in audio buffer. Only accepts mono or stereo audio buffers.');
+        };
+        /**
+         * Downsample a audio buffer to a target audio sample rate using the Web Audio API
+         * NOTE: This method will only works on web-browsers which supports the Web Audio API.
+         * @method
+         * @param {AudioBuffer} sourceBuffer `AudioBuffer` object decoded from an audio file.
+         * @returns {Float32Array} decoded audio buffer object
+         * @memberof EssentiaTFInputExtractor
+         */
+        EssentiaTFInputExtractor.prototype.downsampleAudioBuffer = function (sourceBuffer) {
+            // adapted from https://github.com/julesyoungberg/soundboy/blob/main/worker/loadSoundFile.ts#L25
+            var ctx = new OfflineAudioContext(1, sourceBuffer.duration * this.sampleRate, this.sampleRate);
+            // create mono input buffer
+            var buffer = ctx.createBuffer(1, sourceBuffer.length, sourceBuffer.sampleRate);
+            buffer.copyToChannel(this.audioBufferToMonoSignal(sourceBuffer), 0);
+            // connect the buffer to the context
+            var source = ctx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(ctx.destination);
+            // resolve when the source buffer has been rendered to a downsampled buffer
+            return new Promise(function (resolve) {
+                ctx.oncomplete = function (e) {
+                    var rendered = e.renderedBuffer;
+                    var samples = rendered.getChannelData(0);
+                    resolve(samples);
+                };
+                ctx.startRendering();
+                source.start(0);
+            });
         };
         /**
          * This method compute the pre-configured features for a given audio signal frame.
@@ -196,56 +237,93 @@ var EssentiaModel = (function (exports) {
          * audioFrame size for the selected `extractorType` setting.
          * @method
          * @param {Float32Array} audioFrame a frame of audio signal as Float32 typed JS array.
-         * @returns {EssentiaTensorflowInputExtractorOutput} returns the computed feature for the input the given audio frame.
-         * @memberof EssentiaTensorflowInputExtractor
+         * @returns {EssentiaTFInputExtractorOutput} returns the computed feature for the input the given audio frame.
+         * @memberof EssentiaTFInputExtractor
          */
-        EssentiaTensorflowInputExtractor.prototype.compute = function (audioFrame) {
+        EssentiaTFInputExtractor.prototype.compute = function (audioFrame) {
+            var frame;
+            if (audioFrame instanceof Float32Array) {
+                frame = this.arrayToVector(audioFrame);
+            }
+            else {
+                frame = audioFrame;
+            } // assume it's of type VectorFloat
             // setup feature extractor based on the given `extractorType` input.
             switch (this.extractorType) {
                 case "musicnn": {
-                    if (audioFrame.length != 512)
-                        throw new Error("The chosen `extractorType` only works with an audio signal frame of 512 samples.");
-                    var spectrum = this.essentia.TensorflowInputMusiCNN(this.arrayToVector(audioFrame));
+                    if (audioFrame.length != this.frameSize)
+                        throw new Error("The chosen `extractorType` only works with an audio signal frame size of " + this.frameSize);
+                    var spectrum = this.essentia.TensorflowInputMusiCNN(frame);
                     return {
                         melSpectrum: this.vectorToArray(spectrum.bands),
-                        batchSize: 1,
+                        frameSize: 1,
                         patchSize: 187,
                         melBandsSize: 96
                     };
                 }
                 case "vggish": {
-                    if (audioFrame.length != 400)
-                        throw new Error("The chosen `extractorType` only works with an audio signal frame of 400 samples.");
-                    var spectrum = this.essentia.TensorflowInputVGGish(this.arrayToVector(audioFrame));
+                    if (audioFrame.length != this.frameSize)
+                        throw new Error("The chosen `extractorType` only works with an audio signal frame size of 400 " + this.frameSize);
+                    var spectrum = this.essentia.TensorflowInputVGGish(frame);
                     return {
                         melSpectrum: this.vectorToArray(spectrum.bands),
-                        batchSize: 1,
+                        frameSize: 1,
                         patchSize: 96,
                         melBandsSize: 64
                     };
                 }
-                // case "tempocnn": { 
-                //   if (audioFrame.length != 1024) throw "The chosen `extractorType` only works with an audio signal frame of 1024 samples.";
-                //   let spectrum = this.essentia.TensorflowInputTempoCNN(audioFrame);
-                //   return {
-                //     melSpectrum: this.vectorToArray(spectrum.bands),
-                //     batchSize: 1,
-                //     patchSize: 256,
-                //     melBandsSize: 40
-                //   };    
-                // } 
+                case "tempocnn": {
+                    if (audioFrame.length != this.frameSize)
+                        throw Error("The chosen `extractorType` only works with an audio signal frame size of " + this.frameSize);
+                    var spectrum = this.essentia.TensorflowInputTempoCNN(frame);
+                    return {
+                        melSpectrum: this.vectorToArray(spectrum.bands),
+                        frameSize: 1,
+                        patchSize: 256,
+                        melBandsSize: 40
+                    };
+                }
                 default: {
-                    throw "Invalid 'extractorType' choice! Available types are [musicnn', 'vggish', 'tempocnn']";
+                    throw Error("Invalid 'extractorType' choice! Available types are [musicnn', 'vggish', 'tempocnn']");
                 }
             }
+        };
+        /**
+         * This method compute the pre-configured feature for a whole audio signal.
+         * It is a wrapper on top of the `compute` method. It throws an exception
+         * if the size of audioFrame is not equal to the pre-configured size.
+         * @method
+         * @param {Float32Array} audioSignal decoded audio signal as Float32 typed JS array.
+         * @param {number} hopSize? optional param for specifying hopSize for overlapping-frames. By default use none.
+         * @returns {EssentiaTFInputExtractorOutput} returns the computed frame-wise feature for the given audio signal.
+         * @memberof EssentiaTFInputExtractor
+         */
+        EssentiaTFInputExtractor.prototype.computeFrameWise = function (audioSignal, hopSize) {
+            var _hopSize;
+            if (hopSize)
+                _hopSize = hopSize;
+            else
+                _hopSize = this.frameSize;
+            // compute overlapping frames given frameSize, hopSize
+            var frames = this.essentia.FrameGenerator(audioSignal, this.frameSize, _hopSize);
+            var melSpectrogram = [];
+            var framewiseFeature = null;
+            for (var i = 0; i < frames.size(); i++) {
+                framewiseFeature = this.compute(this.vectorToArray(frames.get(i)));
+                melSpectrogram.push(framewiseFeature.melSpectrum);
+            }
+            framewiseFeature.melSpectrum = melSpectrogram;
+            framewiseFeature.frameSize = frames.size();
+            frames.delete();
+            return framewiseFeature;
         };
         /**
          * Delete essentia session and frees the memory.
          * @method
          * @returns {null}
-         * @memberof EssentiaTensorflowInputExtractor
+         * @memberof EssentiaTFInputExtractor
          */
-        EssentiaTensorflowInputExtractor.prototype.delete = function () {
+        EssentiaTFInputExtractor.prototype.delete = function () {
             this.essentia.delete();
         };
         /**
@@ -254,12 +332,12 @@ var EssentiaModel = (function (exports) {
          * use `this.extractor.delete()` instead.
          * @method
          * @returns {null}
-         * @memberof EssentiaTensorflowInputExtractor
+         * @memberof EssentiaTFInputExtractor
          */
-        EssentiaTensorflowInputExtractor.prototype.shutdown = function () {
+        EssentiaTFInputExtractor.prototype.shutdown = function () {
             this.essentia.shutdown();
         };
-        return EssentiaTensorflowInputExtractor;
+        return EssentiaTFInputExtractor;
     }());
 
     /**
@@ -289,16 +367,24 @@ var EssentiaModel = (function (exports) {
     var EssentiaTensorflowJSModel = /** @class */ (function () {
         function EssentiaTensorflowJSModel(tfjs, modelPath, verbose) {
             this.model = null;
+            this.audioSampleRate = 16000;
             this.tf = null;
             this.isReady = false;
             this.modelPath = "";
             this.IS_TRAIN = null;
             this.randomTensorInput = null;
+            this.minimumInputFrameSize = null;
             this.tf = tfjs;
             this.IS_TRAIN = this.tf.tensor([0], [1], 'bool');
             this.modelPath = modelPath;
             this.isReady = !!this.model;
         }
+        /**
+         * Promise for loading & initialise an Essentia.js-TensorFlow.js model.
+         * @async
+         * @method
+         * @memberof EssentiaTensorflowJSModel
+         */
         EssentiaTensorflowJSModel.prototype.initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var _a;
@@ -315,23 +401,45 @@ var EssentiaModel = (function (exports) {
                 });
             });
         };
-        EssentiaTensorflowJSModel.prototype.arrayToTensorAsBatches = function (inputfeatureArray, inputShape, patchSize) {
+        /**
+         * Converts an input 1D or 2D array into a 3D tensor (tfjs) given it's shape and required
+         * patchSize. If `padding=true`, this method will zero-pad the input feature.
+         *
+         * @method
+         * @param {Float32Array|any[]} inputFeatureArray input feature array as either 1D or 2D array
+         * @param {any[]} inputShape shape of the input feature array in 2D.
+         * @param {number} patchSize required patchSize to dynamically make batches of feature
+         * @param {boolean} [zeroPadding=false] whether to enable zero-padding if less frames found for a batch.
+         * @returns {tf.Tensor3D} returns the computed frame-wise feature for the given audio signal.
+         * @memberof EssentiaTensorflowJSModel
+         */
+        EssentiaTensorflowJSModel.prototype.arrayToTensorAsBatches = function (inputfeatureArray, inputShape, patchSize, zeroPadding) {
+            if (zeroPadding === void 0) { zeroPadding = false; }
             // convert a flattened 1D typed array into 2D tensor with given shape 
             var featureTensor = this.tf.tensor(inputfeatureArray, inputShape, 'float32');
             // create a tensor of zeros for zero-padding the output tensor if necessary
             var zeroPadTensor;
             // variable to store the dynamic batch size computed from given input array and patchSize
             var batchSize;
-            // return the feature with batch size 1 if number of frames = patchSize
-            if (inputShape[0] === patchSize) {
+            if (!zeroPadding) {
+                this.assertMinimumFeatureInputSize({
+                    melSpectrum: inputfeatureArray,
+                    frameSize: inputShape[0],
+                    melBandsSize: inputShape[1],
+                    patchSize: patchSize
+                });
+                return featureTensor.as3D(1, patchSize, inputShape[1]);
+                // return the feature with batch size 1 if number of frames = patchSize
+            }
+            else if (inputShape[0] === patchSize) {
                 return featureTensor.as3D(1, patchSize, inputShape[1]);
                 // Otherwise do zeropadding 
             }
-            else if (inputShape[0] >= patchSize) {
+            else if (inputShape[0] > patchSize) {
                 if ((inputShape[0] % patchSize) != 0) {
                     batchSize = Math.floor(inputShape[0] / patchSize) + 1;
                     zeroPadTensor = this.tf.zeros([
-                        Math.floor(((batchSize * patchSize * inputShape[1]) - inputfeatureArray.length) / inputShape[1]),
+                        Math.floor(batchSize * patchSize - inputfeatureArray.length),
                         inputShape[1]
                     ], 'float32');
                     featureTensor = featureTensor.concat(zeroPadTensor);
@@ -341,7 +449,7 @@ var EssentiaModel = (function (exports) {
                 else {
                     batchSize = Math.floor(inputShape[0] / patchSize);
                     zeroPadTensor = this.tf.zeros([
-                        Math.floor(((batchSize * patchSize * inputShape[1]) - inputfeatureArray.length) / inputShape[1]),
+                        Math.floor(batchSize * patchSize - inputfeatureArray.length),
                         inputShape[1]
                     ], 'float32');
                     featureTensor = featureTensor.concat(zeroPadTensor);
@@ -360,6 +468,14 @@ var EssentiaModel = (function (exports) {
         };
         EssentiaTensorflowJSModel.prototype.dispose = function () {
             this.model.dispose();
+        };
+        EssentiaTensorflowJSModel.prototype.assertMinimumFeatureInputSize = function (inputFeature) {
+            this.minimumInputFrameSize = inputFeature.patchSize; // at least 1 full patch
+            if (inputFeature.melSpectrum.length != this.minimumInputFrameSize) {
+                // let minimumAudioDuration = this.minimumInputFrameSize / this.audioSampleRate; // <-- cannot provide accurate duration without model input hopSize
+                throw Error("When `padding=false` in `predict` method, the model expect audio feature for a minimum frame size of "
+                    + this.minimumInputFrameSize + ". Was given " + inputFeature.melSpectrum.length + " melband frames");
+            }
         };
         EssentiaTensorflowJSModel.prototype.disambiguateExtraInputs = function () {
             if (!this.isReady)
@@ -389,37 +505,48 @@ var EssentiaModel = (function (exports) {
     /**
      * Class with methods for computing inference of
      * Essentia-Tensorflow.js MusiCNN-based pre-trained models.
-     * The predict method expect an input audio feature computed
-     * using `EssentiaTensorflowInputExtractor`.
+     * The `predict` method expect an input audio feature computed
+     * using `EssentiaTFInputExtractor`.
      * @class
      * @example
      * // FEATURE EXTRACTION
-     * // Create `EssentiaTensorflowInputExtractor` instance by passing
+     * // Create `EssentiaTFInputExtractor` instance by passing
      * // essentia-wasm import `EssentiaWASM` global object and `extractorType=musicnn`.
-     * const inputFeatureExtractor = new EssentiaTensorflowInputExtractor(EssentiaWASM, "musicnn");
-     * // Compute feature for a given frame of audio signal
-     * let inputMusiCNN = inputFeatureExtractor.compute(audioSignalFrame);
+     * const inputFeatureExtractor = new EssentiaTFInputExtractor(EssentiaWASM, "musicnn");
+     * // Compute feature for a given audio signal
+     * let inputMusiCNN = inputFeatureExtractor.computeFrameWise(audioSignal);
      * // INFERENCE
-     * const modelURL = "./model.json"
+     * const modelURL = "./models/autotagging/msd/msd-musicnn-1/model.json"
      * // Where `tf` is the global import object from the `@tensorflow/tfjs*` package.
      * const musicnn = new TensorflowMusiCNN(tf, modelURL);
      * // Promise for loading the model
      * await musicnn.initialize();
-     * // Compute predictions for a given frame of input feature.
+     * // Compute predictions for a given input feature.
      * let predictions = await musicnn.predict(inputMusiCNN);
+     * @extends {EssentiaTensorflowJSModel}
      */
     var TensorflowMusiCNN = /** @class */ (function (_super) {
         __extends(TensorflowMusiCNN, _super);
         function TensorflowMusiCNN(tfjs, model_url, verbose) {
-            return _super.call(this, tfjs, model_url) || this;
+            var _this = _super.call(this, tfjs, model_url) || this;
+            _this.minimumInputFrameSize = 3;
+            return _this;
         }
-        TensorflowMusiCNN.prototype.predict = function (inputFeature) {
+        /**
+         * Run inference on the given audio feature input and returns the activations
+         * @param {InputMusiCNN} inputFeature audio feature required by the MusiCNN model.
+         * @param {boolean} [zeroPadding=false] whether to do zero-padding to the input feature.
+         * @returns {array} activations of the output layer of the model
+         * @memberof TensorflowMusiCNN
+         */
+        TensorflowMusiCNN.prototype.predict = function (inputFeature, zeroPadding) {
+            if (zeroPadding === void 0) { zeroPadding = false; }
             return __awaiter(this, void 0, void 0, function () {
                 var featureTensor, modelInputs, results, resultsArray;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            featureTensor = this.arrayToTensorAsBatches(inputFeature.melSpectrum, [inputFeature.batchSize, inputFeature.melBandsSize], inputFeature.patchSize);
+                            featureTensor = this.arrayToTensorAsBatches(inputFeature.melSpectrum, [inputFeature.frameSize, inputFeature.melBandsSize], inputFeature.patchSize, zeroPadding);
                             modelInputs = this.disambiguateExtraInputs();
                             // add the input feature tensor to the model inputs
                             modelInputs.push(featureTensor);
@@ -440,36 +567,46 @@ var EssentiaModel = (function (exports) {
     /**
      * Class with methods for computing common feature input representations
      * required for the inference of Essentia-Tensorflow.js VGGish-based
-     * pre-trained models using Essentia WASM backend.
+     * pre-trained models using Essentia WASM backend. The predict method
+     * expect an input audio feature computed using `EssentiaTFInputExtractor`.
      * @class
      * @example
      * // FEATURE EXTRACTION
-     * // Create `EssentiaTensorflowInputExtractor` instance by passing
+     * // Create `EssentiaTFInputExtractor` instance by passing
      * // essentia-wasm import `EssentiaWASM` global object and `extractorType=vggish`.
-     * const inputFeatureExtractor = new EssentiaTensorflowInputExtractor(EssentiaWASM, "vggish");
-     * // Compute feature for a given frame of audio signal
-     * let inputVGGish = inputFeatureExtractor.compute(audioSignalFrame);
+     * const inputFeatureExtractor = new EssentiaTFInputExtractor(EssentiaWASM, "vggish");
+     * // Compute feature for a given audio signal array
+     * let inputVGGish = inputFeatureExtractor.computeFrameWise(audioSignal);
      * // INFERENCE
-     * const modelURL = "./model.json"
+     * const modelURL = "./models/classifiers/danceability/danceability-vggish-audioset-1/model.json"
      * // Where `tf` is the global import object from the `@tensorflow/tfjs*` package.
      * const vggish = new TensorflowVGGish(tf, modelURL);
      * // Promise for loading the model
      * await vggish.initialize();
-     * // Compute predictions for a given frame of input feature.
+     * // Compute predictions for a given input feature.
      * let predictions = await vggish.predict(inputVGGish);
+     * @extends {EssentiaTensorflowJSModel}
      */
     var TensorflowVGGish = /** @class */ (function (_super) {
         __extends(TensorflowVGGish, _super);
         function TensorflowVGGish(tfjs, model_url, verbose) {
             return _super.call(this, tfjs, model_url) || this;
         }
-        TensorflowVGGish.prototype.predict = function (inputFeature) {
+        /**
+         * Run inference on the given audio feature input and returns the activations
+         * @param {InputVGGish} inputFeature audio feature required by the VGGish model.
+         * @param {boolean} [zeroPadding=false] whether to do zero-padding to the input feature.
+         * @returns {array} activations of the output layer of the model
+         * @memberof TensorflowVGGish
+         */
+        TensorflowVGGish.prototype.predict = function (inputFeature, zeroPadding) {
+            if (zeroPadding === void 0) { zeroPadding = false; }
             return __awaiter(this, void 0, void 0, function () {
                 var featureTensor, modelInputs, results, resultsArray;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            featureTensor = this.arrayToTensorAsBatches(inputFeature.melSpectrum, [inputFeature.batchSize, inputFeature.melBandsSize], inputFeature.patchSize);
+                            featureTensor = this.arrayToTensorAsBatches(inputFeature.melSpectrum, [inputFeature.frameSize, inputFeature.melBandsSize], inputFeature.patchSize, zeroPadding);
                             modelInputs = this.disambiguateExtraInputs();
                             // add the input feature tensor to the model inputs
                             modelInputs.push(featureTensor);
@@ -488,7 +625,7 @@ var EssentiaModel = (function (exports) {
         return TensorflowVGGish;
     }(EssentiaTensorflowJSModel));
 
-    exports.EssentiaTensorflowInputExtractor = EssentiaTensorflowInputExtractor;
+    exports.EssentiaTFInputExtractor = EssentiaTFInputExtractor;
     exports.EssentiaTensorflowJSModel = EssentiaTensorflowJSModel;
     exports.TensorflowMusiCNN = TensorflowMusiCNN;
     exports.TensorflowVGGish = TensorflowVGGish;

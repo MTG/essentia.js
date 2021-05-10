@@ -1,4 +1,4 @@
-importScripts('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js');
+importScripts('./lib/tf.min.3.5.0.js');
 importScripts('./lib/essentia.js-model.js');
 
 const modelURL = '../data/msd-musicnn-1/model.json';

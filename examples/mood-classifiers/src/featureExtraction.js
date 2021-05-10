@@ -1,8 +1,8 @@
-importScripts('./lib/essentia.js-model.js');
-importScripts('./lib/essentia-wasm.module.js');
+import { EssentiaTFInputExtractor } from './lib/essentia.js-model.es.js';
+import { EssentiaWASM } from './lib/essentia-wasm.module.js';
 
-const essentiaWASM = Module; // Module is EssentiaWASM, tweaked ES module version without exports
-const essentia = new essentiaWASM.EssentiaJS(false);
+const essentia = new EssentiaWASM.EssentiaJS(false);
+const extractor = new EssentiaTFInputExtractor(EssentiaWASM, 'musicnn', false);
 
 function outputFeatures(f) {
     postMessage({
@@ -12,25 +12,13 @@ function outputFeatures(f) {
 
 function computeFeatures(audioData) {
     const featuresStart = Date.now();
-    const frames = essentia.FrameGenerator(audioData, 512, 256);
-    const framesLength = frames.size();
+    
+    const features = extractor.computeFrameWise(audioData, 256);
 
-    const features = {
-        melSpectrum: [],
-        batchSize: 0,
-        melBandsSize: 96,
-        patchSize: 187
-    }; 
-    for (let i = 0; i < framesLength; i++) {
-        const spectrum = essentia.TensorflowInputMusiCNN(frames.get(i));
-        features.melSpectrum.push(essentiaWASM.vectorToArray(spectrum.bands));
-    }
-
-    features.batchSize = features.melSpectrum.length;
+    // console.log('computeFeatures: ', features.melSpectrum);
 
     console.info(`Feature extraction took: ${Date.now() - featuresStart}`);
 
-    frames.delete();
     return features;
 }
 

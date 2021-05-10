@@ -1,5 +1,5 @@
 importScripts('./lib/tf.min.3.5.0.js');
-importScripts('./lib/essentia.js-model.js');
+importScripts('./lib/essentia.js-model.umd.js');
 
 let model;
 let modelName = "";
@@ -40,14 +40,14 @@ async function loadModel() {
 function warmUp() {
     const fakeFeatures = {
         melSpectrum: getZeroMatrix(187, 96),
-        batchSize: 187,
+        frameSize: 187,
         melBandsSize: 96,
         patchSize: 187
     };
 
     const fakeStart = Date.now();
 
-    model.predict(fakeFeatures).then(() => {
+    model.predict(fakeFeatures, true).then(() => {
         console.info(`${modelName}: Warm up inference took: ${Date.now() - fakeStart}`);
         modelReady = true;
         if (modelLoaded && modelReady) console.log(`${modelName} loaded and ready.`);
@@ -95,7 +95,7 @@ function modelPredict(features) {
     if (modelReady) {
         const inferenceStart = Date.now();
 
-        model.predict(features).then((predictions) => {
+        model.predict(features, true).then((predictions) => {
             const summarizedPredictions = twoValuesAverage(predictions);
             // format predictions, grab only positive one
             const results = summarizedPredictions.filter((_, i) => modelTagOrder[modelName][i])[0];

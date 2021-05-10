@@ -93,7 +93,7 @@ function computeKeyBPM (audioSignal) {
 }
 
 function createFeatureExtractionWorker() {
-    featureExtractionWorker = new Worker('./src/featureExtraction.js');
+    featureExtractionWorker = new Worker('./src/featureExtraction.js', {type: 'module'});
     featureExtractionWorker.onmessage = function listenToFeatureExtractionWorker(msg) {
         // feed to models
         if (msg.data.features) {
