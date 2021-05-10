@@ -165,12 +165,17 @@ class EssentiaTFInputExtractor {
    * @returns {EssentiaTFInputExtractorOutput} returns the computed feature for the input the given audio frame.
    * @memberof EssentiaTFInputExtractor
    */
-  public compute(audioFrame: Float32Array): EssentiaTFInputExtractorOutput {
+  public compute(audioFrame: Float32Array | any[]): EssentiaTFInputExtractorOutput {
+    let frame;
+    if (audioFrame instanceof Float32Array) {
+      frame = this.arrayToVector(audioFrame);
+    } else { frame = audioFrame } // assume it's of type VectorFloat
+    
     // setup feature extractor based on the given `extractorType` input.
     switch(this.extractorType) { 
       case "musicnn": { 
         if (audioFrame.length != this.frameSize) throw new Error("The chosen `extractorType` only works with an audio signal frame size of " + this.frameSize);
-        let spectrum = this.essentia.TensorflowInputMusiCNN(this.arrayToVector(audioFrame));
+        let spectrum = this.essentia.TensorflowInputMusiCNN(frame);
         return {
           melSpectrum: this.vectorToArray(spectrum.bands),
           frameSize: 1,
@@ -180,7 +185,7 @@ class EssentiaTFInputExtractor {
       }
       case "vggish": {
         if (audioFrame.length != this.frameSize) throw new Error("The chosen `extractorType` only works with an audio signal frame size of 400 " + this.frameSize);
-        let spectrum = this.essentia.TensorflowInputVGGish(this.arrayToVector(audioFrame));
+        let spectrum = this.essentia.TensorflowInputVGGish(frame);
         return {
           melSpectrum: this.vectorToArray(spectrum.bands),
           frameSize: 1,
@@ -190,7 +195,7 @@ class EssentiaTFInputExtractor {
       } 
       case "tempocnn": { 
         if (audioFrame.length != this.frameSize) throw Error("The chosen `extractorType` only works with an audio signal frame size of " + this.frameSize);
-        let spectrum = this.essentia.TensorflowInputTempoCNN(audioFrame);
+        let spectrum = this.essentia.TensorflowInputTempoCNN(frame);
         return {
           melSpectrum: this.vectorToArray(spectrum.bands),
           frameSize: 1,
