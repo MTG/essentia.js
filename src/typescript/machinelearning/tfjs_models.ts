@@ -134,13 +134,12 @@ class EssentiaTensorflowJSModel {
   }
 
   protected assertMinimumFeatureInputSize(inputFeature: EssentiaTFInputExtractorOutput): void {
-    this.minimumInputFrameSize = inputFeature.frameSize*inputFeature.melBandsSize;
+    this.minimumInputFrameSize = inputFeature.patchSize; // at least 1 full patch
     if (inputFeature.melSpectrum.length != this.minimumInputFrameSize ) {
-      let minimumAudioDuration = this.minimumInputFrameSize / this.audioSampleRate;
+      // let minimumAudioDuration = this.minimumInputFrameSize / this.audioSampleRate; // <-- cannot provide accurate duration without model input hopSize
       throw Error(
         "When `padding=false` in `predict` method, the model expect audio feature for a minimum frame size of " 
-        + this.minimumInputFrameSize + ", ie. approx " + minimumAudioDuration + 
-        "seconds at" + this.audioSampleRate + "KHz input audio sample rate."
+        + this.minimumInputFrameSize + ". Was given " + inputFeature.melSpectrum.length + " melband frames"
       );
     }
   }
