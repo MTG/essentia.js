@@ -1,8 +1,10 @@
-import { EssentiaTFInputExtractor } from './lib/essentia.js-model.es.js';
-import { EssentiaWASM } from './lib/essentia-wasm.module.js';
+importScripts('./lib/essentia.js-model.umd.js');
+importScripts('./lib/essentia-wasm.module.js');
+// using importScripts since it works on both Chrome and Firefox
+// using modified version of ES6 essentia WASM, so that it can be loaded with importScripts
+const EssentiaWASM = Module;
 
-const essentia = new EssentiaWASM.EssentiaJS(false);
-const extractor = new EssentiaTFInputExtractor(EssentiaWASM, 'musicnn', false);
+const extractor = new EssentiaModel.EssentiaTFInputExtractor(EssentiaWASM, 'musicnn', false);
 
 function outputFeatures(f) {
     postMessage({
@@ -22,7 +24,7 @@ function computeFeatures(audioData) {
     return features;
 }
 
-onmessage = async function listenToMainThread(msg) {
+onmessage = function listenToMainThread(msg) {
     // listen for decoded audio
     if (msg.data.audio) {
         console.log("From FE worker: I've got audio!");
