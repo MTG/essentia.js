@@ -1,17 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap');
-
 *, *::before, *::after {
     box-sizing: border-box;
 }
 
 :root {
-    --light-blue: #84C0F9;
+    --light-blue: #84c0f9;
     --main-blue: #399af7;
     --dark-blue: #1C4B78;
 
     --meter-width: 0;
-
-    font-family: Roboto; 
 }
 
 body, header, h1 {
@@ -27,6 +23,18 @@ header {
 h1 {
     color: #fff;
     font-weight: 500;
+}
+
+a#essentia-header-link {
+    color: inherit;
+}
+
+a#essentia-header-link:hover {
+    text-decoration: underline;
+}
+
+a#essentia-header-link:active {
+    color: var(--dark-blue);
 }
 
 #main {
@@ -178,4 +186,60 @@ span {
     content: attr(data-classifier);
     text-align: center;
     font-size: 1rem;
+}
+
+
+/* FOOTER */
+
+footer#links {
+    width: 100%;
+
+    display: flex;
+    justify-content: space-evenly;
+    align-content: center;
+    padding-top: 1rem;
+
+    color: #ffffff;
+    font-weight: 300;
+    font-size: 1rem;
+    background-color: var(--light-blue);
+
+    position: absolute;
+    bottom: 0vh;
+}
+
+.footer-block {
+    display: flex;
+
+    text-align: center;
+    align-content: center;
+    margin-bottom: 0.5rem;
+}
+
+.footer-block p {
+    margin: auto!important;
+}
+
+.footer-block a {
+    height: fit-content;
+    margin: auto 0;
+}
+
+.footer-block img {
+    margin-left: 2rem;
+    /* height: 2.5rem; */
+    border-radius: 5px;
+}
+
+.footer-block img:hover {
+    /* border: solid 1px white; */
+    box-shadow: 0 0 0 1px white;
+}
+
+[alt="Javascript audio analysis library Essentia.js"] {
+    height: 2.5rem;
+}
+
+[alt="Music Technology Group logo"] {
+    height: 3.5rem;
 }
