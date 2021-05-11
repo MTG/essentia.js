@@ -3,7 +3,7 @@ import { preprocess, shortenAudio } from './audioUtils.js';
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
-const KEEP_PERCENTAGE = 0.3; // keep only 30% of audio file
+const KEEP_PERCENTAGE = 0.15; // keep only 15% of audio file
 
 let essentia = null;
 let essentiaAnalysis;
@@ -93,7 +93,7 @@ function computeKeyBPM (audioSignal) {
 }
 
 function createFeatureExtractionWorker() {
-    featureExtractionWorker = new Worker('./src/featureExtraction.js', {type: 'module'});
+    featureExtractionWorker = new Worker('./src/featureExtraction.js');
     featureExtractionWorker.onmessage = function listenToFeatureExtractionWorker(msg) {
         // feed to models
         if (msg.data.features) {

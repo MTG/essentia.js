@@ -47,7 +47,7 @@ function warmUp() {
 
     const fakeStart = Date.now();
 
-    model.predict(fakeFeatures, true).then(() => {
+    model.predict(fakeFeatures, false).then(() => {
         console.info(`${modelName}: Warm up inference took: ${Date.now() - fakeStart}`);
         modelReady = true;
         if (modelLoaded && modelReady) console.log(`${modelName} loaded and ready.`);
@@ -117,7 +117,7 @@ function getZeroMatrix(x, y) {
 }
 
 
-onmessage = async function listenToMainThread(msg) {
+onmessage = function listenToMainThread(msg) {
     // listen for audio features
     if (msg.data.name) {
         modelName = msg.data.name;
@@ -125,6 +125,6 @@ onmessage = async function listenToMainThread(msg) {
     } else if (msg.data.features) {
         console.log("From inference worker: I've got features!");
         // should/can this eventhandler run async functions
-        await modelPredict(msg.data.features);
+        modelPredict(msg.data.features);
     }
-}
+};

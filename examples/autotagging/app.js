@@ -1,5 +1,5 @@
 
-const extractorWorker = new Worker("extractor-worker.js", {type:'module'});
+const extractorWorker = new Worker("extractor-worker.js");
 const inferenceWorker = new Worker("inference-worker.js");
 
 extractorWorker.onmessage = e => {
