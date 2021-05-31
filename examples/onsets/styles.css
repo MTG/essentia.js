@@ -1,0 +1,153 @@
+/* GLOBALS */
+
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap');
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+:root {
+    --light-blue: #84c0f9;
+    --main-blue: #399af7;
+    --dark-blue: #1C4B78;
+
+    --meter-width: 0;
+
+    font-family: 'Lato', sans-serif;
+}
+
+body, header, h1 {
+    margin: 0;
+}
+
+body {
+    display: grid;
+    grid-template-rows: 2fr 12fr 2fr;
+    height: 100vh;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a:active {
+    color: var(--dark-blue);
+}
+
+/* HEADER */
+
+header {
+    background-color: var(--main-blue);
+    padding: 2rem 0;
+    text-align: center;
+}
+
+h1 {
+    color: #fff;
+    font-weight: 500;
+}
+
+
+/* FILE UPLOAD AREA */
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin: 1rem 1rem;
+}
+
+section {
+    border-radius: 1rem;
+    background-color: #f7f7f7;
+    margin: 0.3rem 0;
+
+    width: 80%;
+}
+
+#algorithm-controls {
+    height: 20%;
+}
+
+#file-drop-area {
+    height: 50%;
+    padding: 1% 0;
+    border: 3px dashed #BFBFBF;
+    text-align: center;
+    color: #AFAFAF;
+}
+
+#file-drop-area:hover {
+    cursor: pointer;
+    color: #7f7f7f;
+    border-color: #7f7f7f;
+}
+
+#file-drop-area > span {
+    display: inline-block;
+    line-height: normal;
+}
+
+#waveform {
+    width: 90%;
+}
+
+
+/* FOOTER */
+
+footer {
+    width: 100%;
+
+    display: flex;
+    justify-content: space-evenly;
+    align-content: center;
+    padding-top: 1rem;
+
+    color: #ffffff;
+    font-weight: 300;
+    font-size: 1rem;
+    background-color: var(--light-blue);
+
+    position: absolute;
+    bottom: 0vh;
+}
+
+.footer-block {
+    display: flex;
+
+    text-align: center;
+    align-content: center;
+    margin-bottom: 0.5rem;
+}
+
+.footer-block p {
+    margin: auto!important;
+}
+
+.footer-block a {
+    margin: auto 0;
+}
+
+.footer-block img {
+    margin-left: 2rem;
+    /* height: 2.5rem; */
+    border-radius: 5px;
+}
+
+.footer-block img:hover {
+    /* border: solid 1px white; */
+    box-shadow: 0 0 0 1px white;
+}
+
+[alt="Javascript audio analysis library Essentia.js"] {
+    height: 2.5rem;
+}
+
+[alt="Music Technology Group logo"] {
+    height: 3.5rem;
+}
