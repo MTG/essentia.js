@@ -50,8 +50,7 @@ function __generator(thisArg, body) {
     }
 }
 
-/**
- * @license
+/*
  * Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra
  *
  * This file is part of Essentia
@@ -71,10 +70,15 @@ function __generator(thisArg, body) {
  */
 // NOTE: The following code snippets are machine generated. Do not edit.
 /**
+ * @fileOverview Essentia high-level core interface
+ * @author <a href="mailto:albin.correya@upf.edu">Albin Correya</a>
+ * @version 0.0.9
+ */
+/**
  * essentia.js-core JS API
  * @class
  * @example
- * const essentia = new Essentia(EssentiaWASM);
+ * const essentia = new Essentia(EssentiaModule)
  */
 var Essentia = /** @class */ (function () {
     /**
@@ -92,37 +96,7 @@ var Essentia = /** @class */ (function () {
         this.algorithmNames = this.algorithms.algorithmNames;
     }
     /**
-     * Decode and returns the audio buffer of a given audio url or blob uri using Web Audio API.
-     * (NOTE: This method doesn't works on Safari browser)
-     * @async
-     * @method
-     * @param {string} audioURL web url or blob uri of a audio file
-     * @param {AudioContext} webAudioCtx an instance of Web Audio API `AudioContext`
-     * @returns {AudioBuffer} decoded audio buffer object
-     * @memberof Essentia
-     */
-    Essentia.prototype.getAudioBufferFromURL = function (audioURL, webAudioCtx) {
-        return __awaiter(this, void 0, void 0, function () {
-            var response, arrayBuffer, audioBuffer;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, fetch(audioURL)];
-                    case 1:
-                        response = _a.sent();
-                        return [4 /*yield*/, response.arrayBuffer()];
-                    case 2:
-                        arrayBuffer = _a.sent();
-                        return [4 /*yield*/, webAudioCtx.decodeAudioData(arrayBuffer)];
-                    case 3:
-                        audioBuffer = _a.sent();
-                        return [2 /*return*/, audioBuffer];
-                }
-            });
-        });
-    };
-    /**
-     * Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API.
-     * (NOTE: This method doesn't works on Safari browser)
+     * Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API. (NOTE: only works on modern web-browsers)
      * @async
      * @method
      * @param {string} audioURL web url or blob uri of a audio file
@@ -150,27 +124,6 @@ var Essentia = /** @class */ (function () {
                 }
             });
         });
-    };
-    /**
-     * Convert an AudioBuffer object to a Mono audio signal array. The audio signal is downmixed
-     * to mono using essentia `MonoMixer` algorithm if the audio buffer has 2 channels of audio.
-     * Throws an expection if the input AudioBuffer object has more than 2 channels of audio.
-     * @method
-     * @param {AudioBuffer} buffer `AudioBuffer` object decoded from an audio file.
-     * @returns {Float32Array} audio channel data. (downmixed to mono if its stereo signal).
-     * @memberof Essentia
-     */
-    Essentia.prototype.audioBufferToMonoSignal = function (buffer) {
-        if (buffer.numberOfChannels === 1) {
-            return buffer.getChannelData(0);
-        }
-        if (buffer.numberOfChannels === 2) {
-            var left = this.arrayToVector(buffer.getChannelData(0));
-            var right = this.arrayToVector(buffer.getChannelData(1));
-            var monoSignal = this.MonoMixer(left, right);
-            return this.vectorToArray(monoSignal);
-        }
-        throw new Error('Unexpected number of channels found in audio buffer. Only accepts mono or stereo audio buffers.');
     };
     /**
      * Method to shutdown essentia algorithm instance after it's use
@@ -3679,26 +3632,6 @@ var Essentia = /** @class */ (function () {
         if (hopSize === void 0) { hopSize = 256; }
         if (sampleRate === void 0) { sampleRate = 44100; }
         return this.algorithms.TempoTapTicks(periods, phases, frameHop, hopSize, sampleRate);
-    };
-    /**
-    * This algorithm computes mel-bands with a particular parametrization specific to MusiCNN based models. Check https://essentia.upf.edu/reference/std_TensorflowInputMusiCNN.html for more details.
-    * @method
-    * @param {VectorFloat} frame the audio frame
-    * @returns {object} {bands: 'the log compressed mel bands'}
-    * @memberof Essentia
-    */
-    Essentia.prototype.TensorflowInputMusiCNN = function (frame) {
-        return this.algorithms.TensorflowInputMusiCNN(frame);
-    };
-    /**
-    * This algorithm computes mel-bands with a particular parametrization specific to VGGish based models. Check https://essentia.upf.edu/reference/std_TensorflowInputVGGish.html for more details.
-    * @method
-    * @param {VectorFloat} frame the audio frame
-    * @returns {object} {bands: 'the log compressed mel bands'}
-    * @memberof Essentia
-    */
-    Essentia.prototype.TensorflowInputVGGish = function (frame) {
-        return this.algorithms.TensorflowInputVGGish(frame);
     };
     /**
     * This algorithm computes tonal features for an audio signal Check https://essentia.upf.edu/reference/std_TonalExtractor.html for more details.
