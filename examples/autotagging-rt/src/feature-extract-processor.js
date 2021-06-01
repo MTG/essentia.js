@@ -60,7 +60,7 @@ class FeatureExtractProcessor extends AudioWorkletProcessor {
         this.essentia = new EssentiaWASM.EssentiaJS(false);
         this._features = {
             melSpectrum: getZeroMatrix(187, 96), // init melSpectrum 187x96 matrix with zeros
-            batchSize: 187,
+            frameSize: 187, // new EssentiaModels API calls this `frameSize`: i.e. how many frames in this batch (in this case always a full patch, 187 frames)
             melBandsSize: 96,
             patchSize: 187
         };
