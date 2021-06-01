@@ -24,7 +24,7 @@ function outputPredictions(p) {
 
 async function modelPredict(features, audioIsActive) {
     if (modelReady && audioIsActive) {
-        let predictions = await model.predict(features);
+        let predictions = await model.predict(features, true); // bool: use zeroPadding
         predictions = predictions[0]; // model.predict returns a [Array(50)]
         let taggedPredictions = {};
         predictions.map( (p, i) => { taggedPredictions[msdTags[i]] = p; return 0} );
