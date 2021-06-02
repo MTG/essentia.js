@@ -22,3 +22,18 @@ Motivation: This wrapper is part of making an onsets demo web page, and is neces
     cd src/cpp/PolarFFT
     make
     ```
+
+
+## Testing
+
+1. To run the tests with Node.js, add the following code to the `*.module.js` build:
+```javascript
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename)
+```
+
+2. add a `package.json` with `"type": "module"` to the _/builds_ folder
+3. run `node test.mjs`
