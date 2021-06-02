@@ -1,8 +1,8 @@
 EIGEN_PATH=/usr/local/include/eigen3
 LIB_DIR_ESSENTIA=$(EMSCRIPTEN)/system/local/lib
-ESSENTIA_JS_WEB=polarFFT.web.js
-ESSENTIA_JS_WEB_WASM=polarFFT.web.wasm
-ESSENTIA_JS_MODULE=polarFFT.module.js
+ESSENTIA_JS_WEB=./builds/polarFFT.web.js
+ESSENTIA_JS_WEB_WASM=./builds/polarFFT.web.wasm
+ESSENTIA_JS_MODULE=./builds/polarFFT.module.js
 PRE_JS_WASM=../../js/wasm.module.pre.js
 POST_JS_WEB_WASM=../../js/wasm.webmodule.post.js
 POST_JS_ES6_WASM=./wasm.module.post.js
