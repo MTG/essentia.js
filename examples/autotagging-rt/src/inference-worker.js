@@ -6,9 +6,6 @@ let model = new EssentiaModel.TensorflowMusiCNN(tf, modelURL);
 let modelReady = false;
 const msdTags = ["rock", "pop", "alternative", "indie", "electronic", "female vocalists", "dance", "2000s", "alternative rock", "jazz", "beautiful", "metal", "chillout", "male vocalists", "classic rock", "soul", "indie rock", "mellow", "electronica", "80s", "folk", "90s", "chill", "instrumental", "punk", "oldies", "blues", "hard rock", "ambient", "acoustic", "experimental", "female vocalist", "guitar", "hip-hop", "70s", "party", "country", "easy listening", "sexy", "catchy", "funk", "electro", "heavy metal", "progressive rock", "60s", "rnb", "indie pop", "sad", "house", "happy"];
 
-const zeroPredictions = {};
-msdTags.map((v) => { zeroPredictions[v] = 0; return 0 });
-
 
 async function loadModel() {
     await model.initialize();
@@ -22,9 +19,9 @@ function outputPredictions(p) {
     });
 }
 
-async function modelPredict(features, audioIsActive) {
-    if (modelReady && audioIsActive) {
-        let predictions = await model.predict(features);
+async function modelPredict(features) {
+    if (modelReady) {
+        let predictions = await model.predict(features, true); // bool: use zeroPadding
         predictions = predictions[0]; // model.predict returns a [Array(50)]
         let taggedPredictions = {};
         predictions.map( (p, i) => { taggedPredictions[msdTags[i]] = p; return 0} );
@@ -34,8 +31,6 @@ async function modelPredict(features, audioIsActive) {
         let taggedTopPredictions = msdTags.filter(label => topPredictions.includes(taggedPredictions[label]))
         // output to main thread
         outputPredictions(taggedPredictions);
-    } else {
-        outputPredictions(zeroPredictions);
     }
 }
 
@@ -52,7 +47,7 @@ port1.onmessage = async function listenToAudioWorklet(msg) {
         console.info(`Check, check: received ${msg.data.check} from AudioWorkletProcessor!`);
     } else if (msg.data.features) {
         // should/can this eventhandler run async functions
-        await modelPredict(msg.data.features, msg.data.audioIsActive);
+        await modelPredict(msg.data.features);
     }
 }
 

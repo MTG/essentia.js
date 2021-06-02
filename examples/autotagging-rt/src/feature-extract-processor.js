@@ -24,22 +24,6 @@ class PatchHop {
     }
 }
 
-class Gate {
-    constructor(threshold, memory) {
-        this.memory = new Array(memory).fill(0);
-        this.threshold = threshold;
-    }
-
-    updateLevel(rms) {
-        this.memory.push(rms);
-        this.memory.shift();
-    }
-
-    isTriggered() {
-        return this.memory.every((value) => value > this.threshold);
-    }
-}
-
 function getZeroMatrix(x, y) {
     let matrix = new Array(x);
     for (let f = 0; f < x; f++) {
@@ -60,13 +44,12 @@ class FeatureExtractProcessor extends AudioWorkletProcessor {
         this.essentia = new EssentiaWASM.EssentiaJS(false);
         this._features = {
             melSpectrum: getZeroMatrix(187, 96), // init melSpectrum 187x96 matrix with zeros
-            batchSize: 187,
+            frameSize: 187, // new EssentiaModels API calls this `frameSize`: i.e. how many frames in this batch (in this case always a full patch, 187 frames)
             melBandsSize: 96,
             patchSize: 187
         };
 
         this._zeroMelBands = new Array(this._features.melBandsSize).fill(0);
-        this._gate = new Gate(0.05, 6);
         
         // buffersize mismatch helpers
         this._hopRingBuffer = new RingBuffer(this._hopSize, this._channelCount);
@@ -105,28 +88,15 @@ class FeatureExtractProcessor extends AudioWorkletProcessor {
                 this._frameRingBuffer.pull(this._frameData);
                 this._features.melSpectrum.push(this._extractor.compute(this._frameData[0]).melSpectrum);
                 this._features.melSpectrum.shift();
-                const rms = this.essentia.RMS(EssentiaWASM.arrayToVector(this._frameData[0])).rms;
-                this._gate.updateLevel(rms);
-                if (rms > 0.05) { 
-                    console.info(rms); 
-                //     this._features.melSpectrum.push(this._extractor.compute(this._frameData[0]).melSpectrum);
-                //     this._features.melSpectrum.shift();
-                }
-                // } else {
-                //     this._features.melSpectrum.push(this._zeroMelBands);
-                //     this._features.melSpectrum.shift();
-                // }
 
                 this._patchHop.incrementFrame();
 
                 if (this._patchHop.readyToHop() && this._workerPort) {
                     // send features to Worker for inference
                     // console.info('Computed new patch of features\n', this._features);
-                    const audioIsActive = this._gate.isTriggered();
                     this._workerPort.postMessage({
                         message: "Hi there, I've got features",
-                        features: this._features,
-                        audioIsActive: audioIsActive
+                        features: this._features
                     });
                 }
             }
