@@ -41,7 +41,7 @@ class PolarFFT {
 
     void configure(const int frameSize=1024);
 
-    val compute(const val& frame);
+    val compute(std::vector<float>& frame);
 
     void reset();
 

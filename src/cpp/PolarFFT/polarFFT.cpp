@@ -52,17 +52,16 @@ void PolarFFT::configure(const int frameSize) {
 
 
 // compute method for your extractor
-val PolarFFT::compute(const val& frame) {
+val PolarFFT::compute(std::vector<float>& frame) {
 
   // convert JS Float32 typed array into std::vector<float>
   // eg. getChannelData output from the Web Audio API AudioContext instance
-  std::vector<float> vectorFrame = float32ArrayToVector(frame);
 
   std::vector<std::complex<Real>> fftOut;
-  _fft->input("frame").set(vectorFrame);
+  _fft->input("frame").set(frame);
   _fft->output("fft").set(fftOut);
 
-  std::vector<Real> magnitude, phase;
+  std::vector<float> magnitude, phase;
   _c2p->input("complex").set(fftOut);
   _c2p->output("magnitude").set(magnitude);
   _c2p->output("phase").set(phase);
