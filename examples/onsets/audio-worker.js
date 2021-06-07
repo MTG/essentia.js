@@ -15,9 +15,15 @@ import { OnsetsWASM } from './lib/onsets.module.js';
 log("Imports went OK");
 
 let essentia = null;
-let sampleRate = 44100;
-let frameSize = 1024;
-let hopSize = 512;
+
+const allowedParams = ['sampleRate', 'frameSize', 'hopSize', 'odfs', 'odfsWeights'];
+let params = {
+    sampleRate: 44100,
+    frameSize: 1024,
+    hopSize: 512,
+    odfs: ['hfc'], // Onset Detection Function(s) list
+    odfsWeights: [1] // per ODF weights list
+}; // changing odfs should require changing odfsWeights (at least length), and viceversa
 
 try {
     essentia = new Essentia(EssentiaWASM);
@@ -30,15 +36,33 @@ onmessage = function listenToMainThread(msg) {
         case 'analyse':
             log('received analyse cmd')
             // const signal = new Float32Array(msg.data.audio);
-            essentiaAnalyse(msg.data.audio, frameSize, hopSize, ['hfc', 'complex_phase'], [0.8, 0.3]);
+            const onsetPositions = essentiaAnalyse(msg.data.audio, params.frameSize, params.hopSize, params.odfs, params.odfsWeights);
+            postMessage(onsetPositions);
             break;
         case 'updateParams':
-            if (msg.data.frameSize) { frameSize = msg.data.frameSize }
-            else if (msg.data.hopSize) { hopSize = msg.data.hopSize }
-            else if (msg.data.sampleRate) { sampleRate = msg.data.sampleRate }
-            else { throw Error('audio-worker: unknown parameter in `updateParams` command') }
+            let suppliedParamList;
+            if (msg.data.params) {
+                suppliedParamList = Object.keys(msg.data.params);
+                // check obj properties are included in allowed params
+                if (paramsAreAllowed(suppliedParamList)) {
+                    let update = msg.data.params;
+
+                    odfParamsAreOkay(suppliedParamList, update);
+
+                    params = {...params, ...update}; // update existing params obj
+                    log(`updated the following params: ${suppliedParamList.join(',')}`);
+                    log('current params are: ');
+                    console.info(params);
+                } else {
+                    error(`audio-worker: illegal parameter(s) in 'updateParams' command \n - ${getUnsupportedParams(suppliedParamList).join('\n - ')}`);
+                }
+            } else {
+                error('audio-worker: missing `params` object in the `updateParams` command');
+            }
+            break;
         default:
-            error('Received message from main thread; no matching request found!')
+            error('Received message from main thread; no matching request found!');
+            break;
     }
 };
 
@@ -47,7 +71,7 @@ onmessage = function listenToMainThread(msg) {
 // AUDIO FUNCS
 function essentiaAnalyse(signal, frameSize, hopSize, odfs, weights) {
     let PolarFFT = new PolarFFTWASM.PolarFFT(frameSize);
-    let Onsets = new OnsetsWASM.Onsets(0.1, 5, sampleRate / hopSize, 0.02);
+    let Onsets = new OnsetsWASM.Onsets(0.1, 5, params.sampleRate / hopSize, 0.02);
     let frames = essentia.FrameGenerator(signal, frameSize, hopSize);
 
     let odfArrays = {}; 
@@ -66,7 +90,7 @@ function essentiaAnalyse(signal, frameSize, hopSize, odfs, weights) {
             odfArrays[f].push(essentia.OnsetDetection(
                 essentia.arrayToVector(essentia.vectorToArray(polar.magnitude)), 
                 essentia.arrayToVector(essentia.vectorToArray(polar.phase)), 
-                f, sampleRate).onsetDetection);
+                f, params.sampleRate).onsetDetection);
         }
 
     }
@@ -81,5 +105,30 @@ function essentiaAnalyse(signal, frameSize, hopSize, odfs, weights) {
     }
     // console.info("odfMatrix: ", odfMatrix);
     const onsetPositions = Onsets.compute(odfMatrix, weights).positions;
-    console.log("Onset positions: ", essentia.vectorToArray(onsetPositions));
+    return essentia.vectorToArray(onsetPositions);
+}
+
+// UTILS
+
+function paramsAreAllowed (paramsList) {
+    return paramsList.every( (p) => allowedParams.includes(p) );
+}
+
+function getUnsupportedParams (paramsList) {
+    return paramsList.filter( (p) => !allowedParams.includes(p) );
+}
+
+function odfParamsAreOkay (paramList, paramValues) {
+    if ( ['odfs', 'odfsWeights'].some((p) => paramList.includes(p)) ) {
+        let bothOnsetParamsChanged = ['odfs', 'odfsWeights'].every( (p) => paramList.includes(p) );
+        if (bothOnsetParamsChanged) {
+            let onsetParamsAreEqualLength = paramValues.odfs.length == paramValues.odfsWeights.length;
+            if (onsetParamsAreEqualLength) { return 0 }
+            else { error('make sure `odfs` and `odfsWeights` are equal length, i.e. provide the same number of weights as ODF methods') }
+        } else {
+            error('always update both `odfs` and `odfsWeights` params');
+        }
+    } else {
+        return 0;
+    }
 }

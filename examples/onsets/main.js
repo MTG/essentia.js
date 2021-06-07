@@ -1,12 +1,22 @@
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+
 class OnsetsApp {
     constructor () {
         // Audio
-        this.audioWorker = new Worker('audio-worker.js', {type: 'module'});
         this.audioCtx = new AudioContext();
+        this.audioWorker = new Worker('audio-worker.js', {type: 'module'});
+        this.onsetPositions = null;
+        // init audio stuff
+        this.audioWorker.postMessage({
+            request: 'updateParams',
+            params: {sampleRate: this.audioCtx.sampleRate}
+        });
+        this.audioWorker.onmessage = this.listenToAudioWorker.bind(this);
 
         // UI
         this.dropInput = document.createElement('input');
         this.dropArea = document.querySelector('#file-drop-area');
+        this.waveformDisplay = null;
         this.initializeDropArea();
     }
 
@@ -49,6 +59,21 @@ class OnsetsApp {
         await this.audioCtx.resume();
         let audioBuffer = await this.audioCtx.decodeAudioData(arrayBuffer);
         return audioBuffer;
+    }
+
+    listenToAudioWorker(msg) {
+        if (msg.data instanceof Float32Array) {
+            this.onsetPositions = msg.data;
+            this.updateWaveform();
+        } else {
+            throw TypeError("Worker failed. Analysis results should be of type Float32Array");
+        }
+    }
+
+    updateWaveform() {
+        if (this.onsetPositions) {
+            console.info(this.onsetPositions);
+        }
     }
 
 }
