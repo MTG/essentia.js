@@ -9,6 +9,13 @@
         <link rel="stylesheet" href="styles.css">
         <!-- <script src="lib/essentia-wasm.web.js"></script>
         <script src="lib/essentia.js-core.umd.js"></script> -->
+        <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" integrity="sha512-8bHTC73gkZ7rZ7vpqUQThUDhqcNFyYi2xgDgPDHc+GXVGHXq+xPjynxIopALmOPqzo9JZj0k6OqqewdGO3EsrQ==" crossorigin="anonymous" />
+        <script
+        src="https://code.jquery.com/jquery-3.1.1.min.js"
+        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+        crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js" integrity="sha512-dqw6X88iGgZlTsONxZK9ePmJEFrmHwpuMrsUChjAw1mRUhUITE5QU9pkcSox+ynfLhL15Sv2al5A0LVyDCmtUw==" crossorigin="anonymous"></script> -->
+        <script src="https://unpkg.com/wavesurfer.js"></script>
         <script src="main.js" defer></script>
     </head>
     <body>
@@ -43,4 +50,27 @@
         </footer>
         
     </body>
+
+    <template id="playback-controls">
+        <div class="controls">
+            <button id="backward" class="ui button tiny">
+                <i class="step backward icon"></i>
+                Backward
+            </button>
+            <button id="play" class="ui primary button tiny">
+                <i class="play icon"></i>
+                Play/
+                <i class="pause icon"></i>
+                Pause
+            </button>
+            <button id="forward" class="ui button tiny">
+                <i class="step forward icon"></i>
+                Forward
+            </button>
+            <button id="mute" class="ui button tiny">
+                <i class="volume off icon"></i>
+                Toggle Mute
+            </button>
+        </div>
+    </template>
 </html>

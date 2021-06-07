@@ -6,6 +6,7 @@ class OnsetsApp {
         this.audioCtx = new AudioContext();
         this.audioWorker = new Worker('audio-worker.js', {type: 'module'});
         this.onsetPositions = null;
+        this.audioFile = null;
         // init audio stuff
         this.audioWorker.postMessage({
             request: 'updateParams',
@@ -14,9 +15,12 @@ class OnsetsApp {
         this.audioWorker.onmessage = this.listenToAudioWorker.bind(this);
 
         // UI
+        this.algoControls = document.querySelector('#algorithm-controls');
         this.dropInput = document.createElement('input');
         this.dropArea = document.querySelector('#file-drop-area');
-        this.waveformDisplay = null;
+        this.playbackControlsTemplate = document.querySelector('#playback-controls');
+        this.playbackControls = null;
+        this.wavesurfer = null;
         this.initializeDropArea();
     }
 
@@ -42,7 +46,8 @@ class OnsetsApp {
             alert("Only single-file uploads are supported currently");
             throw Error("Multiple file upload attempted, cannot process.");
         } else if (files.length) {
-            files[0].arrayBuffer().then((ab) => {
+            this.audioFile = files[0];
+            this.audioFile.arrayBuffer().then((ab) => {
                 this.decodeBuffer(ab).then((audioBuffer) => {
                     console.info("Done decoding audio!");
                     let audioArray = audioBuffer.getChannelData(0);
@@ -73,11 +78,61 @@ class OnsetsApp {
     updateWaveform() {
         if (this.onsetPositions) {
             console.info(this.onsetPositions);
+            this.toggleWaveformDisplay();
         }
+    }
+
+    toggleWaveformDisplay() {
+        if (this.dropArea) {
+            this.dropArea.remove();
+        }
+        const waveformDiv = document.createElement('section');
+        waveformDiv.setAttribute('id', 'waveform');
+
+        this.algoControls.after(this.playbackControlsTemplate.content.cloneNode(true));
+        this.algoControls.after(waveformDiv);
+
+        this.wavesurfer = WaveSurfer.create({
+            container: '#waveform',
+            progressColor: '#F7AF39',
+            waveColor: '#a16607'
+        });
+
+        this.wavesurfer.loadBlob(this.audioFile);
+        this.playbackControls = new PlaybackControls(this.wavesurfer);
+        this.playbackControls.toggleEnabled(true);
     }
 
 }
 
+class PlaybackControls {
+    constructor(wavesurferInstance) {
+        this.controls = {
+            backward: document.querySelector('.controls #backward'),
+            play: document.querySelector('.controls #play'),
+            forward: document.querySelector('.controls #forward'),
+            mute: document.querySelector('.controls #mute')
+        };
+
+        // set click handlers
+        this.controls.backward.onclick = () => { wavesurferInstance.skipBackward() };
+        this.controls.play.onclick = () => { wavesurferInstance.playPause() };
+        this.controls.forward.onclick = () => { wavesurferInstance.skipForward() };
+        this.controls.mute.onclick = () => { wavesurferInstance.toggleMute() };
+    }
+
+    toggleEnabled(isEnabled) {
+        if (isEnabled) {
+            for (let c in this.controls) {
+                this.controls[c].removeAttribute('disabled');
+            }
+        } else {
+            for (let c in this.controls) {
+                this.controls[c].setAttribute('disabled', '');
+            }
+        }
+    }
+}
 
 window.onload = () => {
     const app = new OnsetsApp();

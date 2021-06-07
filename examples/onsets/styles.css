@@ -94,9 +94,21 @@ section {
 }
 
 #waveform {
-    width: 90%;
+    height: 30%;
 }
 
+wave {
+    height: 100%!important;
+}
+
+.controls {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+
+    height: 5%;
+    /* margin-top: 1rem; */
+}
 
 /* FOOTER */
 
