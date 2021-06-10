@@ -79,6 +79,7 @@ class OnsetsApp {
         if (this.onsetPositions) {
             console.info(this.onsetPositions);
             this.toggleWaveformDisplay();
+            this.drawOnsets();
         }
     }
 
@@ -95,12 +96,23 @@ class OnsetsApp {
         this.wavesurfer = WaveSurfer.create({
             container: '#waveform',
             progressColor: '#F7AF39',
-            waveColor: '#a16607'
+            waveColor: '#a16607',
+            plugins: [
+                WaveSurfer.markers.create({
+                    markers: []
+                })
+            ]
         });
 
         this.wavesurfer.loadBlob(this.audioFile);
         this.playbackControls = new PlaybackControls(this.wavesurfer);
         this.playbackControls.toggleEnabled(true);
+    }
+
+    drawOnsets() {
+        console.log(this.wavesurfer.markers);
+        this.wavesurfer.initPlugin('markers');
+        this.onsetPositions.forEach( (p) => this.wavesurfer.addMarker({ time: p, position: 'top' }) );
     }
 
 }

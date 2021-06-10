@@ -1,0 +1,155 @@
+:host {
+    --primary-clr-off-lighter: hsl(209, 30%, 89%);
+    --primary-clr-off: hsl(209, 30%, 70%);
+    --primary-clr-off-darker:  hsl(209, 30%, 65%);
+    --primary-clr-off-darkest: hsl(209, 30%, 58%);
+    --text-clr-off: hsl(0, 0%, 20%);
+    --primary-clr-on: hsl(209, 92%, 70%);
+    --primary-clr-on-darker: hsl(209, 92%, 65%);
+    --primary-clr-on-darkest: hsl(209, 92%, 60%); 
+    --text-clr-on: hsl(0 0% 100%);
+    --text-clr-hover-off: hsl(0, 0%, 0%);
+    --text-clr-hover-on: hsl(0, 0%, 97%);
+}
+
+*,
+*::before,
+*::before {
+    box-sizing: border-box;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* max-width: 10rem; */
+    position: relative;
+    z-index: 0;
+}
+
+.collapsible {
+    background-color: var(--primary-clr-on);
+    width: 80%;
+    overflow: hidden;
+    border-radius: 0 0 0.4rem 0.4rem;
+    position: relative;
+    top: 0;
+    z-index: auto;
+}
+
+.collapsible::before {
+    content: '';
+    position: absolute;
+    top: -2rem;
+    width: 100%;
+
+    border-radius: .4rem .4rem 0 0;
+    background-color: var(--primary-clr-on);
+    z-index: 0;
+}
+
+.off ~ .collapsible,
+.off ~ .collapsible::before {
+    height: 0;
+}
+
+.on ~ .collapsible {
+    height: 2rem;
+    overflow: visible;
+}
+
+.on ~ .collapsible::before {
+    height: 2rem;
+}
+
+
+button {
+    display: block;
+    -webkit-appearance: none;
+    appearance: none;
+
+    width: 80%;
+    padding: 0.6rem 2rem;
+
+    border: none;
+    border-radius: 0.4rem;
+    line-height: 0.8rem;
+
+    font-weight: bold;
+    font-size: 0.8rem;
+    text-decoration: none;
+    white-space: normal;
+    position: relative;
+    z-index: 3;
+
+    transition: transform .2s ease;
+}
+
+button::after {
+    content: '';
+    height: 100%;
+    width: 100%;
+    background-color: transparent;
+    border-radius: inherit;
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-shadow: 0 2px 0.55em -.25em var(--text-clr-off);
+    transition: opacity .2s ease;
+    z-index: -1;
+}
+
+button.on::after {
+    opacity: 0;
+}
+button.off::after {
+    opacity: 1;
+}
+
+button:hover,
+button:focus {
+    cursor: pointer;
+}
+
+.on {
+    background-color: var(--primary-clr-on);
+    color: var(--text-clr-on);
+    text-shadow: 0 0 .05em var(--text-clr-off), 0 0 .7em var(--primary-clr-off-darker);
+    transform: translateY(0px);
+}
+
+.on:focus,
+.on:hover {
+    background-color: var(--primary-clr-on-darker);
+    /* color: var(--text-clr-hover-on); */
+}
+
+.on:hover {
+    text-shadow: none;
+}
+
+.on:active {
+    background-color: var(--primary-clr-on-darkest);
+}
+
+.off {
+    background-color: var(--primary-clr-off);
+    color: var(--text-clr-off);
+    transform: translateY(-2px);
+}
+
+.off:focus,
+.off:hover {
+    background-color: var(--primary-clr-off-darker);
+    color: var(--text-clr-hover-off);
+}
+
+.off:active {
+    background-color: var(--primary-clr-off-darkest);
+}
+
+input[type="number"] {
+    display: block;
+    width: 80%;
+    margin: 0.4rem auto 0;
+}

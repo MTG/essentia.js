@@ -66,16 +66,34 @@ section {
     border-radius: 1rem;
     background-color: #f7f7f7;
     margin: 0.3rem 0;
+    padding: .5rem .5rem;
 
     width: 80%;
 }
 
+p {
+    font-size: .8rem;
+    margin: .8rem .8rem;
+}
+
 #algorithm-controls {
-    height: 20%;
+    /* height: 20%; */
+    height: fit-content;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    /* flex-wrap: wrap; */
+}
+
+weight-toggle {
+    display: block;
+    height: fit-content;
+    width: 100%;
+    flex: 0 1 25%;
 }
 
 #file-drop-area {
-    height: 50%;
+    height: 30%;
     padding: 1% 0;
     border: 3px dashed #BFBFBF;
     text-align: center;

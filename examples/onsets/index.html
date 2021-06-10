@@ -16,6 +16,8 @@
         crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js" integrity="sha512-dqw6X88iGgZlTsONxZK9ePmJEFrmHwpuMrsUChjAw1mRUhUITE5QU9pkcSox+ynfLhL15Sv2al5A0LVyDCmtUw==" crossorigin="anonymous"></script> -->
         <script src="https://unpkg.com/wavesurfer.js"></script>
+        <script src="https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.markers.min.js"></script>
+        <script src="weight-toggle.js"></script>
         <script src="main.js" defer></script>
     </head>
     <body>
@@ -29,8 +31,14 @@
               </svg></sup></a></h1>
         </header>
         <main>
-            <section id="algorithm-controls">
-
+            <section id="algorithm-controls-section">
+                <p>Select Onset Detection function(s) to use, and how much each should influence the final result (weighting):</p>
+                <div id="algorithm-controls">
+                    <weight-toggle name="hfc"></weight-toggle>
+                    <weight-toggle name="complex" ></weight-toggle>
+                    <weight-toggle name="complex_phase" ></weight-toggle>
+                    <weight-toggle name="flux" ></weight-toggle>
+                </div>
             </section>
             <section id="file-drop-area">
                 <span>Drop file here or click to upload</span>
