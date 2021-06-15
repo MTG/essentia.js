@@ -32,12 +32,29 @@
         </header>
         <main>
             <section id="algorithm-controls-section">
-                <p>Select Onset Detection function(s) to use, and how much each should influence the final result (weighting):</p>
-                <div id="algorithm-controls">
+                <!-- <div id="fft-controls" class="controls-row">
+
+                </div> -->
+                <p>Select <b>Onset Detection Function(s)</b> to use, and how much each should influence the final result (weighting):</p>
+                <div id="odf-controls" class="controls-row">
+                    <div class="fft-control-wrap">
+                        <div class="fft-control">
+                            <label for="frameSize">Frame Size</label>
+                            <input type="number" name="frameSize" id="frameSize" value=1024>
+                        </div>
+                    </div>
+                    <div class="fft-control-wrap">
+                        <div class="fft-control">
+                            <label for="hopSize">Hop Size</label>
+                            <input type="number" name="hopSize" id="hopSize" value=512>
+                        </div>
+                    </div>
                     <weight-toggle name="hfc"></weight-toggle>
                     <weight-toggle name="complex" ></weight-toggle>
                     <weight-toggle name="complex_phase" ></weight-toggle>
                     <weight-toggle name="flux" ></weight-toggle>
+                    <weight-toggle name="rms"></weight-toggle>
+                    <weight-toggle name="melflux"></weight-toggle>
                 </div>
             </section>
             <section id="file-drop-area">

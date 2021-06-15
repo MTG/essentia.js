@@ -15,7 +15,9 @@ class OnsetsApp {
         this.audioWorker.onmessage = this.listenToAudioWorker.bind(this);
 
         // UI
-        this.algoControls = document.querySelector('#algorithm-controls');
+        this.algoControls = document.querySelector('#odf-controls');
+        this.odfToggles = document.querySelectorAll('weight-toggle');
+        this.initializeAlgoControls();
         this.dropInput = document.createElement('input');
         this.dropArea = document.querySelector('#file-drop-area');
         this.playbackControlsTemplate = document.querySelector('#playback-controls');
@@ -40,8 +42,51 @@ class OnsetsApp {
             this.dropInput.click();
         })
     }
+
+    initializeAlgoControls () {
+        function changeHandler (ev) {
+            const currentElem = ev.target;
+
+            let params = {
+                odfs: [],
+                odfsWeights: []
+            };
+            // check all again to see which ones are currently on
+            this.odfToggles.forEach((elem) => {
+                if (elem.isSelected()) {
+                    // grab their weights & put into new odfs and odfsWeights arrays
+                    params.odfs.push(elem.name);
+                    params.odfsWeights.push(elem.getWeight());
+                }
+            });
+
+            // ensure that at least 1 ODF is selected (the currentElem is NOT the last one) 
+            // else show short alert on div below controls and keep currentElem selected
+            if (ev.type == 'click' && params.odfs.length == 0) {
+                currentElem.click();
+                alert(`Couldn't toggle ${currentElem.name} ODF, at least one has to be selected.`);
+            } else {
+                // submit to this.worker: use 'updateParams' cmd
+                this.audioWorker.postMessage({
+                    request: 'updateParams',
+                    params: params
+                });
+            }
+
+            // check frameSize and hopSize for changes and add to params obj:
+
+            // console.info('algo change: ', params);
+        }
+
+        this.odfToggles.forEach((elem) => {
+            // init selected ODF (e.g. HFC)
+            if (elem.name == 'hfc') { elem.checkbox.click() }
+            elem.checkbox.addEventListener('click', changeHandler.bind(this));
+            elem.addEventListener('change', changeHandler.bind(this));
+        })
+    }
     
-    processFileUpload(files) {
+    processFileUpload (files) {
         if (files.length > 1) {
             alert("Only single-file uploads are supported currently");
             throw Error("Multiple file upload attempted, cannot process.");
@@ -60,13 +105,13 @@ class OnsetsApp {
         }
     }
 
-    async decodeBuffer(arrayBuffer) {
+    async decodeBuffer (arrayBuffer) {
         await this.audioCtx.resume();
         let audioBuffer = await this.audioCtx.decodeAudioData(arrayBuffer);
         return audioBuffer;
     }
 
-    listenToAudioWorker(msg) {
+    listenToAudioWorker (msg) {
         if (msg.data instanceof Float32Array) {
             this.onsetPositions = msg.data;
             this.updateWaveform();
@@ -75,7 +120,7 @@ class OnsetsApp {
         }
     }
 
-    updateWaveform() {
+    updateWaveform () {
         if (this.onsetPositions) {
             console.info(this.onsetPositions);
             this.toggleWaveformDisplay();
@@ -83,7 +128,7 @@ class OnsetsApp {
         }
     }
 
-    toggleWaveformDisplay() {
+    toggleWaveformDisplay () {
         if (this.dropArea) {
             this.dropArea.remove();
         }
@@ -109,7 +154,7 @@ class OnsetsApp {
         this.playbackControls.toggleEnabled(true);
     }
 
-    drawOnsets() {
+    drawOnsets () {
         console.log(this.wavesurfer.markers);
         this.wavesurfer.initPlugin('markers');
         this.onsetPositions.forEach( (p) => this.wavesurfer.addMarker({ time: p, position: 'top' }) );

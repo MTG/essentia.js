@@ -4,9 +4,9 @@
         <link rel="stylesheet" href="weight-toggle.css">
   
         <div class="container">
-          <button class="on"></button>
+          <button class="off"></button>
           <div class="collapsible">
-            <input type="number" step="0.01"  min="0.0" max="1.0" placeholder="weighting">
+            <input type="number" step="0.05"  min="0.0" max="1.0" placeholder="weighting" value="1.0">
           </div>
         </div>
     `;
@@ -23,7 +23,8 @@
         this.name = null;
         this.checkbox = null;
         this.weightBox = null;
-        this.label = null;
+        this.weight = null;
+        this.selected = false;
       }
   
       connectedCallback() {
@@ -32,16 +33,33 @@
         
         this.checkbox = this.shadowRoot.querySelector('button');
         this.checkbox.innerText = prettifyName(this.name);
-        this.checkbox.addEventListener("click", (e) => {
+        this.checkbox.name = this.name;
+        this.checkbox.addEventListener("click", () => {
           this.checkbox.classList.toggle("off");
           this.checkbox.classList.toggle("on");
-          this.toggleContainer();
+          if (this.checkbox.classList.contains("on")) {
+            this.selected = true;
+          } else if (this.checkbox.classList.contains("off")) {
+            this.selected = false;
+          }
         });
+
+        this.weightBox = this.shadowRoot.querySelector('input[type="number"]');
+        this.weight = parseFloat(this.weightBox.value);
+        this.weightBox.addEventListener("change", (ev) => {
+          this.weight = parseFloat(ev.target.value);
+          const changeEvent = new InputEvent('change');
+          this.dispatchEvent(changeEvent);
+        })
       }
   
       // further element-specific methods here:
-      toggleContainer() {
-        return;
+      isSelected() {
+        return this.selected;
+      }
+
+      getWeight() {
+        return this.weight;
       }
     }
   
