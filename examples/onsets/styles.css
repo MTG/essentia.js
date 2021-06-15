@@ -10,6 +10,7 @@
     --light-blue: #84c0f9;
     --main-blue: #399af7;
     --dark-blue: #1C4B78;
+    --controls-blue: #6cb5f9;
 
     --meter-width: 0;
 
@@ -76,20 +77,48 @@ p {
     margin: .8rem .8rem;
 }
 
-#algorithm-controls {
-    /* height: 20%; */
-    height: fit-content;
+.controls-row {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
     /* flex-wrap: wrap; */
 }
 
-weight-toggle {
+.controls-row:last-of-type {
+    margin-top: 1rem;
+}
+
+.fft-control-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: hsl(0 0% 100%);
+}
+
+.fft-control {
+    background-color: var(--controls-blue);
+    border-radius: .4rem;
+    padding: .6rem;
+    width: 80%;
+    text-align: center;
+}
+
+.fft-control label {
+    margin-bottom: .3rem;
+}
+
+.fft-control input[type="number"] {
     display: block;
-    height: fit-content;
+    width: 80%;
+    margin: 0.4rem auto 0;
+}
+
+weight-toggle, .fft-control-wrap {
+    /* display: block; */
     width: 100%;
-    flex: 0 1 25%;
+    flex: 0 1 12.5%;
 }
 
 #file-drop-area {

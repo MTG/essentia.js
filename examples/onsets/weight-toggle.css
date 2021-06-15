@@ -10,6 +10,8 @@
     --text-clr-on: hsl(0 0% 100%);
     --text-clr-hover-off: hsl(0, 0%, 0%);
     --text-clr-hover-on: hsl(0, 0%, 97%);
+
+    --radius: .4rem;
 }
 
 *,
@@ -31,7 +33,7 @@
     background-color: var(--primary-clr-on);
     width: 80%;
     overflow: hidden;
-    border-radius: 0 0 0.4rem 0.4rem;
+    border-radius: 0 0 var(--radius) var(--radius);
     position: relative;
     top: 0;
     z-index: auto;
@@ -43,7 +45,7 @@
     top: -2rem;
     width: 100%;
 
-    border-radius: .4rem .4rem 0 0;
+    border-radius: var(--radius) var(--radius) 0 0;
     background-color: var(--primary-clr-on);
     z-index: 0;
 }
@@ -69,10 +71,10 @@ button {
     appearance: none;
 
     width: 80%;
-    padding: 0.6rem 2rem;
+    padding: 0.6rem;
 
     border: none;
-    border-radius: 0.4rem;
+    border-radius: var(--radius);
     line-height: 0.8rem;
 
     font-weight: bold;
