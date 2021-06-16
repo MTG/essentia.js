@@ -25,6 +25,10 @@ class OnsetsApp {
         this.playbackControls = null;
         this.wavesurfer = null;
         this.initializeDropArea();
+
+        // State
+        this.scrollPosition = 0;
+        this.pluginsAreInitialised = false;
     }
 
     initializeDropArea () {
@@ -159,13 +163,55 @@ class OnsetsApp {
         this.wavesurfer.loadBlob(this.audioFile);
         this.playbackControls = new PlaybackControls(this.wavesurfer);
         this.playbackControls.toggleEnabled(true);
+        this.wavesurfer.on('plugin-initialised', () => this.pluginsAreInitialised = true);
+
+        waveformDiv.addEventListener('wheel', (ev) => {
+            ev.preventDefault();
+            const pixelMousePosition = ev.pageX - mousePositionX(waveformDiv);
+            const normalizedMousePosition = pixelMousePosition/waveformDiv.clientWidth;
+            this.zoomWaveform(normalizedMousePosition, ev.deltaY);
+        });
     }
 
     drawOnsets () {
-        this.wavesurfer.initPlugin('markers');
+        if (!this.pluginsAreInitialised) {
+            this.wavesurfer.initPlugin('markers');
+        }
+
         this.onsetPositions.forEach( (p) => this.wavesurfer.addMarker({ time: p, position: 'top' }) );
     }
 
+    zoomWaveform (xPos, scrollAmount) {
+        this.scrollPosition += -1 * scrollAmount;
+        if (this.scrollPosition < 0) this.scrollPosition = 0;
+
+        this.wavesurfer.seekAndCenter(xPos);
+        this.wavesurfer.zoom(this.scrollPosition);
+        // this.wavesurfer.drawer.recenter(xPos);
+        // this.wavesurfer.clearMarkers();
+        this.drawOnsets();
+    }
+}
+
+function getNumericStyleProperty(style, prop){
+    return parseInt(style.getPropertyValue(prop),10) ;
+}
+
+function mousePositionX(e) {
+    var x = 0;
+    var inner = true ;
+    do {
+        x += e.offsetLeft;
+        var style = getComputedStyle(e, null);
+        var borderLeft = getNumericStyleProperty(style, "border-left-width");
+        x += borderLeft;
+        if (inner){
+          var paddingLeft = getNumericStyleProperty(style, "padding-left");
+          x += paddingLeft;
+        }
+        inner = false;
+    } while (e = e.offsetParent);
+    return x;
 }
 
 class PlaybackControls {
