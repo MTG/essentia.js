@@ -182,6 +182,10 @@ class OnsetsApp {
         }
 
         this.onsetPositions.forEach( (p) => this.wavesurfer.addMarker({ time: p, position: 'top' }) );
+        this.wavesurfer.on('marker-click', (marker, ev) => {
+            console.info(marker);
+            console.info(ev);
+        });
     }
 
     addOnsetSlices () {
