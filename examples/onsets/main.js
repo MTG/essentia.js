@@ -29,6 +29,7 @@ class OnsetsApp {
         // State
         this.scrollPosition = 0;
         this.pluginsAreInitialised = false;
+        this.sliceRegions = [];
     }
 
     initializeDropArea () {
@@ -88,7 +89,7 @@ class OnsetsApp {
 
     listenToAudioWorker (msg) {
         if (msg.data instanceof Float32Array) {
-            this.onsetPositions = msg.data;
+            this.onsetPositions = Array.from(msg.data);
             this.updateWaveform();
         } else {
             throw TypeError("Worker failed. Analysis results should be of type Float32Array");
@@ -128,14 +129,11 @@ class OnsetsApp {
                 params: params
             });
         }
-        // console.info('algo change: ', params);
     }
 
     updateWaveform () {
         if (this.onsetPositions) {
-            console.info(this.onsetPositions);
             this.toggleWaveformDisplay();
-            this.drawOnsets();
         }
     }
 
@@ -156,7 +154,8 @@ class OnsetsApp {
             plugins: [
                 WaveSurfer.markers.create({
                     markers: []
-                })
+                }),
+                WaveSurfer.regions.create()
             ]
         });
 
@@ -164,6 +163,10 @@ class OnsetsApp {
         this.playbackControls = new PlaybackControls(this.wavesurfer);
         this.playbackControls.toggleEnabled(true);
         this.wavesurfer.on('plugin-initialised', () => this.pluginsAreInitialised = true);
+        this.wavesurfer.on('ready', () => {
+            this.drawOnsets();
+            this.addOnsetSlices();
+        })
 
         waveformDiv.addEventListener('wheel', (ev) => {
             ev.preventDefault();
@@ -179,6 +182,32 @@ class OnsetsApp {
         }
 
         this.onsetPositions.forEach( (p) => this.wavesurfer.addMarker({ time: p, position: 'top' }) );
+    }
+
+    addOnsetSlices () {
+        // generate region options from this.onsetPositions
+        let slices = this.onsetPositions.map( (v, i) => {
+            let endPos = this.onsetPositions[i+1];
+            // if we're on the last onset, use audio track duration (end of file) as region end:
+            if (endPos == undefined) { endPos = this.wavesurfer.getDuration(); }
+
+            return {
+                id: `slice-${i}`,
+                start: v,
+                end: endPos,
+                drag: false,
+                resize: false,
+                color: "hsl(37 92% 70% / 0.2)"
+            };
+        });
+
+        this.sliceRegions = []; // clear existing regions, if any
+        slices.forEach((s) => { this.sliceRegions.push(this.wavesurfer.addRegion(s)) });
+
+        this.wavesurfer.on('region-click', (region, ev) => {
+            ev.stopPropagation();
+            region.play();
+        })
     }
 
     zoomWaveform (xPos, scrollAmount) {
@@ -244,5 +273,5 @@ class PlaybackControls {
 }
 
 window.onload = () => {
-    const app = new OnsetsApp();
+    window.onsetsApp = new OnsetsApp();
 };
