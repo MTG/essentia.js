@@ -28,6 +28,8 @@ class OnsetsApp {
 
         // State
         this.scrollPosition = 0;
+        this.scrollFactor = 0.005;
+        this.basePxPerSecond = null;
         this.pluginsAreInitialised = false;
         this.sliceRegions = [];
     }
@@ -151,6 +153,7 @@ class OnsetsApp {
             container: '#waveform',
             progressColor: '#F7AF39',
             waveColor: '#a16607',
+            partialRender: true,
             plugins: [
                 WaveSurfer.markers.create({
                     markers: []
@@ -166,14 +169,16 @@ class OnsetsApp {
         this.wavesurfer.on('ready', () => {
             this.drawOnsets();
             this.addOnsetSlices();
-        })
+            this.basePxPerSecond = waveformDiv.clientWidth / this.wavesurfer.getDuration();
+        });
 
         waveformDiv.addEventListener('wheel', (ev) => {
             ev.preventDefault();
-            const pixelMousePosition = ev.pageX - mousePositionX(waveformDiv);
+            const pixelMousePosition = this.wavesurfer.params.pixelRatio * (ev.pageX - mousePositionX(waveformDiv));
             const normalizedMousePosition = pixelMousePosition/waveformDiv.clientWidth;
-            this.zoomWaveform(normalizedMousePosition, ev.deltaY);
+            this.zoomWaveform(pixelMousePosition, ev.deltaY);
         });
+
     }
 
     drawOnsets () {
@@ -215,13 +220,17 @@ class OnsetsApp {
     }
 
     zoomWaveform (xPos, scrollAmount) {
-        this.scrollPosition += -1 * scrollAmount;
+        this.scrollPosition += -1.5 * scrollAmount; // invert, like deprecated mousewheel event
         if (this.scrollPosition < 0) this.scrollPosition = 0;
 
-        this.wavesurfer.seekAndCenter(xPos);
-        this.wavesurfer.zoom(this.scrollPosition);
-        // this.wavesurfer.drawer.recenter(xPos);
-        // this.wavesurfer.clearMarkers();
+        let pxPerSecond = Math.round( this.basePxPerSecond + Math.exp(this.scrollPosition * this.scrollFactor) ); // offset by wavesurfer's minPxPerSec
+        if (pxPerSecond > 10000) { pxPerSecond = 10000 } // upper limit
+        // console.log('scrollPosition', this.scrollPosition);
+        // console.log('pxPerSecond', pxPerSecond);
+        // console.log('xPos', xPos);
+        this.wavesurfer.zoom(pxPerSecond);
+        // this.wavesurfer.drawer.recenterOnPosition(xPos, true);
+        this.wavesurfer.clearMarkers();
         this.drawOnsets();
     }
 }
