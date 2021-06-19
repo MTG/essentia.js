@@ -21,7 +21,11 @@ class OnsetsApp {
         this.initializeAlgoControls();
         this.dropInput = document.createElement('input');
         this.dropArea = document.querySelector('#file-drop-area');
-        this.playbackControlsTemplate = document.querySelector('#playback-controls');
+        this.waveformContainer = document.createElement('section');
+        this.waveformContainer.setAttribute('id', 'waveform');
+        this.playbackControlsElement = document.querySelector('#playback-controls').content.cloneNode(true);
+        this.noOnsetsNoticeElement = document.querySelector('#no-onsets-notice').content.cloneNode(true);
+
         this.playbackControls = null;
         this.wavesurfer = null;
         this.initializeDropArea();
@@ -32,6 +36,8 @@ class OnsetsApp {
         this.basePxPerSecond = null;
         this.pluginsAreInitialised = false;
         this.sliceRegions = [];
+
+        this.noOnsetsNoticeIsShown = false;
     }
 
     initializeDropArea () {
@@ -91,8 +97,15 @@ class OnsetsApp {
 
     listenToAudioWorker (msg) {
         if (msg.data instanceof Float32Array) {
-            this.onsetPositions = Array.from(msg.data);
-            this.updateWaveform();
+            if (msg.data.length == 0) {
+                console.info('empty onsets array');
+                this.onsetPositions = [];
+                this.updateWaveform();
+                this.toggleNoOnsetsNotice();
+            } else {
+                this.onsetPositions = Array.from(msg.data);
+                this.updateWaveform();
+            }
         } else {
             throw TypeError("Worker failed. Analysis results should be of type Float32Array");
         }
@@ -143,11 +156,9 @@ class OnsetsApp {
         if (this.dropArea) {
             this.dropArea.remove();
         }
-        const waveformDiv = document.createElement('section');
-        waveformDiv.setAttribute('id', 'waveform');
 
-        this.algoControls.after(this.playbackControlsTemplate.content.cloneNode(true));
-        this.algoControls.after(waveformDiv);
+        this.algoControls.after(this.playbackControlsElement);
+        this.algoControls.after(this.waveformContainer);
 
         this.wavesurfer = WaveSurfer.create({
             container: '#waveform',
@@ -169,13 +180,13 @@ class OnsetsApp {
         this.wavesurfer.on('ready', () => {
             this.drawOnsets();
             this.addOnsetSlices();
-            this.basePxPerSecond = waveformDiv.clientWidth / this.wavesurfer.getDuration();
+            this.basePxPerSecond = this.waveformContainer.clientWidth / this.wavesurfer.getDuration();
         });
 
-        waveformDiv.addEventListener('wheel', (ev) => {
+        this.waveformContainer.addEventListener('wheel', (ev) => {
             ev.preventDefault();
-            const pixelMousePosition = this.wavesurfer.params.pixelRatio * (ev.pageX - mousePositionX(waveformDiv));
-            const normalizedMousePosition = pixelMousePosition/waveformDiv.clientWidth;
+            const pixelMousePosition = this.wavesurfer.params.pixelRatio * (ev.pageX - mousePositionX(this.waveformContainer));
+            const normalizedMousePosition = pixelMousePosition/this.waveformContainer.clientWidth;
             this.zoomWaveform(pixelMousePosition, ev.deltaY);
         });
 
@@ -232,6 +243,15 @@ class OnsetsApp {
         // this.wavesurfer.drawer.recenterOnPosition(xPos, true);
         this.wavesurfer.clearMarkers();
         this.drawOnsets();
+    }
+
+    toggleNoOnsetsNotice() {
+        if (this.noOnsetsNoticeIsShown) {
+            this.noOnsetsNoticeElement.remove()
+        } else {
+            this.waveformContainer.after(this.noOnsetsNoticeElement);
+            this.noOnsetsNoticeIsShown = true;
+        }
     }
 }
 

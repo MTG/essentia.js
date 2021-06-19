@@ -105,7 +105,9 @@ function essentiaAnalyse(signal, frameSize, hopSize, odfs, weights) {
     }
     // console.info("odfMatrix: ", odfMatrix);
     const onsetPositions = Onsets.compute(odfMatrix, weights).positions;
-    return essentia.vectorToArray(onsetPositions);
+    // check possibly all zeros onsetPositions
+    if (onsetPositions.size() == 0) { return new Float32Array(0) }
+    else { return essentia.vectorToArray(onsetPositions); }
 }
 
 // UTILS
