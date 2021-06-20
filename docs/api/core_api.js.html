@@ -41,7 +41,7 @@
 				}
 			</style>
 		<script type="text/javascript">
-			window.TEMPLATE_OPTIONS = {"includeDate":false,"dateFormat":"Do MMM YYYY","systemName":"Essentia.js","systemSummary":"JavaScript library for Music/Audio analysis, powered by Essentia WebAssembly backend.","systemLogo":"","systemColor":"black","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"https://essentia.upf.edu","copyright":"Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra","linenums":true,"collapseSymbols":true,"inverseNav":true,"inlineNav":false,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":false,"favicon":null,"stylesheets":[],"scripts":[],"monospaceLinks":false,"cleverLinks":true};
+			window.TEMPLATE_OPTIONS = {"includeDate":false,"dateFormat":"Do MMM YYYY","systemName":"Essentia.js","systemSummary":"JavaScript library for Music/Audio analysis, powered by Essentia WebAssembly backend.","systemLogo":"","systemColor":"black","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"https://essentia.upf.edu","copyright":"Copyright (C) 2006-2021  Music Technology Group - Universitat Pompeu Fabra","linenums":true,"collapseSymbols":true,"inverseNav":true,"inlineNav":false,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":false,"favicon":null,"stylesheets":[],"scripts":[],"monospaceLinks":false,"cleverLinks":true};
 			window.DOCLET_TOC_ENABLED = false;
 			window.DOCLET_AFILTER_ENABLED = false;
 		</script>
@@ -63,12 +63,17 @@
 			</div>
 			<div class="navbar-collapse collapse" id="topNavigation">
 				<ul class="nav navbar-nav">
+								
 								<li class="dropdown">
 									<a href="list_class.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 									<ul class="dropdown-menu">
 											<li><a href="Essentia.html">Essentia</a></li>
+											<li><a href="EssentiaTensorflowJSModel.html">EssentiaTensorflowJSModel</a></li>
+											<li><a href="EssentiaTFInputExtractor.html">EssentiaTFInputExtractor</a></li>
+											<li><a href="TensorflowMusiCNN.html">TensorflowMusiCNN</a></li>
+											<li><a href="TensorflowVGGish.html">TensorflowVGGish</a></li>
 											<li><a href="EssentiaExtractor.html">EssentiaExtractor</a></li>
-											<li><a href="EssentiaPlot.html">EssentiaPlot</a></li>
+                                            <li><a href="EssentiaPlot.html">EssentiaPlot</a></li>
 											<li><a href="PlotHeatmap.html">PlotHeatmap</a></li>
 											<li><a href="PlotMelodyContour.html">PlotMelodyContour</a></li>
 									</ul>
@@ -76,8 +81,10 @@
 								<li class="dropdown">
 									<a href="list_tutorial.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
 									<ul class="dropdown-menu">
-											<li><a href="tutorial-1. Getting Started.html">1. Getting Started</a></li>
-											<li><a href="tutorial-2. Building from Source.html">2. Building from Source</a></li>
+											<li><a href="tutorial-1. Getting started.html">1. Getting started</a></li>
+											<li><a href="tutorial-2. Real-time analysis.html">2. Real-time analysis</a></li>
+											<li><a href="tutorial-3. Machine learning inference with Essentia.js.html">3. Machine learning inference with Essentia.js</a></li>
+											<li><a href="tutorial-4. Building from source.html">4. Building from source</a></li>
 									</ul>
 								</li>
 				</ul>
@@ -96,7 +103,8 @@
 		<section class="source-section">
 			<article></article>
 			<pre class="prettyprint source language-javascript line-numbers"><code class="language-javascript">"use strict";
-/*
+/**
+ * @license
  * Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra
  *
  * This file is part of Essentia
@@ -153,15 +161,10 @@ var __generator = (this &amp;&amp; this.__generator) || function (thisArg, body)
 exports.__esModule = true;
 // NOTE: The following code snippets are machine generated. Do not edit.
 /**
- * @fileOverview Essentia high-level core interface
- * @author &lt;a href="mailto:albin.correya@upf.edu">Albin Correya&lt;/a>
- * @version 0.0.9
- */
-/**
  * essentia.js-core JS API
  * @class
  * @example
- * const essentia = new Essentia(EssentiaModule)
+ * const essentia = new Essentia(EssentiaWASM);
  */
 var Essentia = /** @class */ (function () {
     /**
@@ -179,7 +182,37 @@ var Essentia = /** @class */ (function () {
         this.algorithmNames = this.algorithms.algorithmNames;
     }
     /**
-     * Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API. (NOTE: only works on modern web-browsers)
+     * Decode and returns the audio buffer of a given audio url or blob uri using Web Audio API.
+     * (NOTE: This method doesn't works on Safari browser)
+     * @async
+     * @method
+     * @param {string} audioURL web url or blob uri of a audio file
+     * @param {AudioContext} webAudioCtx an instance of Web Audio API `AudioContext`
+     * @returns {AudioBuffer} decoded audio buffer object
+     * @memberof Essentia
+     */
+    Essentia.prototype.getAudioBufferFromURL = function (audioURL, webAudioCtx) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response, arrayBuffer, audioBuffer;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(audioURL)];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.arrayBuffer()];
+                    case 2:
+                        arrayBuffer = _a.sent();
+                        return [4 /*yield*/, webAudioCtx.decodeAudioData(arrayBuffer)];
+                    case 3:
+                        audioBuffer = _a.sent();
+                        return [2 /*return*/, audioBuffer];
+                }
+            });
+        });
+    };
+    /**
+     * Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API.
+     * (NOTE: This method doesn't works on Safari browser)
      * @async
      * @method
      * @param {string} audioURL web url or blob uri of a audio file
@@ -207,6 +240,27 @@ var Essentia = /** @class */ (function () {
                 }
             });
         });
+    };
+    /**
+     * Convert an AudioBuffer object to a Mono audio signal array. The audio signal is downmixed
+     * to mono using essentia `MonoMixer` algorithm if the audio buffer has 2 channels of audio.
+     * Throws an expection if the input AudioBuffer object has more than 2 channels of audio.
+     * @method
+     * @param {AudioBuffer} buffer `AudioBuffer` object decoded from an audio file.
+     * @returns {Float32Array} audio channel data. (downmixed to mono if its stereo signal).
+     * @memberof Essentia
+     */
+    Essentia.prototype.audioBufferToMonoSignal = function (buffer) {
+        if (buffer.numberOfChannels === 1) {
+            return buffer.getChannelData(0);
+        }
+        if (buffer.numberOfChannels === 2) {
+            var left = this.arrayToVector(buffer.getChannelData(0));
+            var right = this.arrayToVector(buffer.getChannelData(1));
+            var monoSignal = this.MonoMixer(left, right);
+            return this.vectorToArray(monoSignal);
+        }
+        throw new Error('Unexpected number of channels found in audio buffer. Only accepts mono or stereo audio buffers.');
     };
     /**
      * Method to shutdown essentia algorithm instance after it's use
@@ -3717,6 +3771,26 @@ var Essentia = /** @class */ (function () {
         return this.algorithms.TempoTapTicks(periods, phases, frameHop, hopSize, sampleRate);
     };
     /**
+    * This algorithm computes mel-bands with a particular parametrization specific to MusiCNN based models. Check https://essentia.upf.edu/reference/std_TensorflowInputMusiCNN.html for more details.
+    * @method
+    * @param {VectorFloat} frame the audio frame
+    * @returns {object} {bands: 'the log compressed mel bands'}
+    * @memberof Essentia
+    */
+    Essentia.prototype.TensorflowInputMusiCNN = function (frame) {
+        return this.algorithms.TensorflowInputMusiCNN(frame);
+    };
+    /**
+    * This algorithm computes mel-bands with a particular parametrization specific to VGGish based models. Check https://essentia.upf.edu/reference/std_TensorflowInputVGGish.html for more details.
+    * @method
+    * @param {VectorFloat} frame the audio frame
+    * @returns {object} {bands: 'the log compressed mel bands'}
+    * @memberof Essentia
+    */
+    Essentia.prototype.TensorflowInputVGGish = function (frame) {
+        return this.algorithms.TensorflowInputVGGish(frame);
+    };
+    /**
     * This algorithm computes tonal features for an audio signal Check https://essentia.upf.edu/reference/std_TonalExtractor.html for more details.
     * @method
     * @param {VectorFloat} signal the audio input signal
@@ -4071,8 +4145,8 @@ exports["default"] = Essentia;
 	</div>
 	<footer>
 				<div class="footer-option">https://essentia.upf.edu</div>
-				<div class="copyright">Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra</div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+				<div class="copyright">Copyright (C) 2006-2021  Music Technology Group - Universitat Pompeu Fabra</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
