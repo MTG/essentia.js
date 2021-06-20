@@ -173,6 +173,7 @@ class EssentiaTensorflowJSModel {
  * using `EssentiaTFInputExtractor`.
  * @class 
  * @example
+ * 
  * // FEATURE EXTRACTION
  * // Create `EssentiaTFInputExtractor` instance by passing 
  * // essentia-wasm import `EssentiaWASM` global object and `extractorType=musicnn`.
@@ -180,7 +181,7 @@ class EssentiaTensorflowJSModel {
  * // Compute feature for a given audio signal
  * let inputMusiCNN = inputFeatureExtractor.computeFrameWise(audioSignal);
  * // INFERENCE
- * const modelURL = "./models/autotagging/msd/msd-musicnn-1/model.json"
+ * const modelURL = "./autotagging/msd/msd-musicnn-1/model.json"
  * // Where `tf` is the global import object from the `@tensorflow/tfjs*` package.
  * const musicnn = new TensorflowMusiCNN(tf, modelURL);
  * // Promise for loading the model
@@ -228,10 +229,10 @@ class TensorflowMusiCNN extends EssentiaTensorflowJSModel {
 
 
 /**
- * Class with methods for computing common feature input representations
- * required for the inference of Essentia-Tensorflow.js VGGish-based 
- * pre-trained models using Essentia WASM backend. The predict method 
- * expect an input audio feature computed using `EssentiaTFInputExtractor`.
+* Class with methods for computing inference of 
+ * Essentia-Tensorflow.js VGGish-based pre-trained models.
+ * The `predict` method expect an input audio feature computed
+ * using `EssentiaTFInputExtractor`.
  * @class 
  * @example
  * // FEATURE EXTRACTION
@@ -241,7 +242,7 @@ class TensorflowMusiCNN extends EssentiaTensorflowJSModel {
  * // Compute feature for a given audio signal array
  * let inputVGGish = inputFeatureExtractor.computeFrameWise(audioSignal);
  * // INFERENCE
- * const modelURL = "./models/classifiers/danceability/danceability-vggish-audioset-1/model.json"
+ * const modelURL = "./classifiers/danceability/danceability-vggish-audioset-1/model.json"
  * // Where `tf` is the global import object from the `@tensorflow/tfjs*` package.
  * const vggish = new TensorflowVGGish(tf, modelURL);
  * // Promise for loading the model
