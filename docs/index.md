@@ -27,7 +27,9 @@ Imports a custom [Emscripten WASM Module](https://emscripten.org/docs/api_refere
 
 - `essentia-wasm.web.wasm` - Essentia WASM back-end for asynchronous imports. 
 - `essentia-wasm.web.js` - JS glue code for loading `essentia-wasm-web.wasm` (can be used with HTML `<script>` tag).
-- `essentia-wasm.module.js` -  Essentia WASM back-end for synchronous imports (ES6 style import and AudioWorklet support).
+- `essentia-wasm.umd.js` -  Essentia WASM back-end for synchronous imports (UMD import and AudioWorklet support).
+- `essentia-wasm.es.js` -  Essentia WASM back-end for synchronous imports (ES6 style import and AudioWorklet support).
+
 
 #### Essentia WASM back-end
 
@@ -40,12 +42,14 @@ The detailed documentation for Essentia C++ algorithms can be found [here](https
 
 #### `EssentiaModel`
 
-- `essentia.js-model*.js` - IIFE import for  web browsers.
+Run pre-trained Essentia-Tensorflow audio ML models for music analysis.
+
+- `essentia.js-model*.js` - IIFE import for web browsers.
 - `essentia.js-model.umd*.js` - UMD import.
 - `essentia.js-model.es*.js` - ES6 import.
 
 #### `EssentiaPlot`
-- `essentia.js-plot*.js` - IIFE import for  web browsers.
+- `essentia.js-plot*.js` - IIFE import for web browsers.
 - `essentia.js-plot.umd*.js` - UMD import.
 - `essentia.js-plot.es*.js` - ES6 import.
 
@@ -60,4 +64,4 @@ The detailed documentation for Essentia C++ algorithms can be found [here](https
 
 ## TypeScript Interface
 
-Essentia.js also provides TypeScript programming interface which can be found along with the builds. The source code can be found [here](https://github.com/MTG/essentia.js/tree/master/src/typescript).
+Essentia.js also provides TypeScript programming interface which can be found along with the builds. The build files (`*.d.ts`) can be found within the [dist](https://www.jsdelivr.com/package/npm/essentia.js?path=dist) directory bundled on NPM. The source code can be found [here](https://github.com/MTG/essentia.js/tree/master/src/typescript).
