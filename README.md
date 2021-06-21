@@ -7,20 +7,24 @@
 [![](https://data.jsdelivr.com/v1/package/npm/essentia.js/badge)](https://www.jsdelivr.com/package/npm/essentia.js)
 
 
-`Essentia.js` is a JavaScript (JS) library for music/audio signal analysis and processing for both real-time and offline use-cases on the web, developed at the [Music Tehnology Group, UPF, Barcelona](https://www.upf.edu/web/mtg/). The core of library is powered by [Essentia C++ library](https://essentia.upf.edu) back-end using [WebAssembly](https://webassembly.org/) built via [Emscripten](https://emscripten.org/) along with a high-level JS and TypeScript API and add-on utility modules. ie, You can run an extensive colleciton of music/audio processing and analysis algorithms/models on your web browser or Node.js runtime applications with ease-of-use. 
+`Essentia.js` is a JavaScript (JS) library for music/audio signal analysis and processing developed at the [Music Technology Group, UPF, Barcelona](https://www.upf.edu/web/mtg/). The core of library is powered by [Essentia C++ library](https://essentia.upf.edu) back-end using [WebAssembly](https://webassembly.org/) built via [Emscripten](https://emscripten.org/) along with a high-level JS and TypeScript API and add-on utility modules. ie, You can run an extensive collection of music/audio processing and analysis algorithms/models on your web browser or Node.js runtime applications. It supports both real-time and offline audio analysis use-cases.  
 
-The bundled add-on modules includes configurable feature extractors for some selected features, interface for feature extraction and inference of a collection of pre-trained audio ML models using [Tensorflow.js](https://www.tensorflow.org/js), some helper classes for visualizing common music processing features directly into your HTML web page using [Plotly.js](https://plotly.com/javascript/) library.
+The packaged add-on modules includes configurable feature extractors for some selected features, interface for feature extraction and inference of a collection of pre-trained audio ML models using [Tensorflow.js](https://www.tensorflow.org/js), some helper classes for visualizing common music processing features directly into your HTML web page using [Plotly.js](https://plotly.com/javascript/) library.
 
+- License: [https://essentia.upf.edu/licensing_information.html](https://essentia.upf.edu/licensing_information.html)
 
 - Repository: [https://github.com/MTG/essentia.js](https://github.com/MTG/essentia.js)
 
 - Releases: [https://github.com/MTG/essentia.js/releases](https://github.com/MTG/essentia.js/releases)
 
-- License: [https://essentia.upf.edu/licensing_information.html](https://essentia.upf.edu/licensing_information.html)
+
+- Live demos: [https://mtg.github.io/essentia.js/examples](https://mtg.github.io/essentia.js/examples)
+
 
 - Documentation: [https://mtg.github.io/essentia.js/docs/api](https://mtg.github.io/essentia.js/docs/api/)
+
+- Tutorials: [https://mtg.github.io/essentia.js/docs/api/list_tutorial.html](https://mtg.github.io/essentia.js/docs/api/list_tutorial.html)
   
-- Examples: [https://mtg.github.io/essentia.js/examples](https://mtg.github.io/essentia.js/examples)
 
 You are also most welcome to [contribute](CONTRIBUTING.md) to `essentia.js`. 
 
