@@ -12,10 +12,13 @@ INCLUDE_ESSENTIAJS=src/cpp/includes/essentiajs.cpp
 ESSENTIA_JS_WEB=$(BUILD_DIR_ES)/essentia-wasm.web.js
 ESSENTIA_JS_WEB_WASM=$(BUILD_DIR_ES)/essentia-wasm.web.wasm
 ESSENTIA_JS_MODULE=$(BUILD_DIR_ES)/essentia-wasm.module.js
+ESSENTIA_WASM_UMD_MODULE=$(BUILD_DIR_ES)/essentia-wasm.umd.js
+ESSENTIA_WASM_ES6_MODULE=$(BUILD_DIR_ES)/essentia-wasm.es.js
 ## Path to custom --pre-js and --post-js files for Emscripten
 PRE_JS_WASM=src/js/wasm.module.pre.js
 POST_JS_WEB_WASM=src/js/wasm.webmodule.post.js
 POST_JS_ES6_WASM=src/js/wasm.es6module.post.js
+POST_JS_UMD_WASM=src/js/wasm.umd.post.js
 
 codegen:
 	@echo "Generating cpp source code from essentia python bindings ..."
@@ -58,12 +61,21 @@ build:
 
 	@cat $(PRE_JS_WASM) $(ESSENTIA_JS_WEB) > $$.tmp && mv $$.tmp $(ESSENTIA_JS_WEB)
 	@cat $(PRE_JS_WASM) $(ESSENTIA_JS_MODULE) > $$.tmp && mv $$.tmp $(ESSENTIA_JS_MODULE)
-	@cat $(POST_JS_ES6_WASM) >> $(ESSENTIA_JS_MODULE)
+
+	@cp -f $(ESSENTIA_JS_MODULE) $(ESSENTIA_WASM_ES6_MODULE)
+	@cat $(POST_JS_ES6_WASM) >> $(ESSENTIA_WASM_ES6_MODULE)
+
+	@cp -f $(ESSENTIA_JS_MODULE) $(ESSENTIA_WASM_UMD_MODULE)
+	@cat $(POST_JS_UMD_WASM) >> $(ESSENTIA_WASM_UMD_MODULE)
+
+	@rm -f $(ESSENTIA_JS_MODULE)
 
 	@mkdir -p $(DIST_DIR_ES)
 	@cp -f $(ESSENTIA_JS_WEB) $(DIST_DIR_ES)/
 	@cp -f $(ESSENTIA_JS_WEB_WASM) $(DIST_DIR_ES)/
-	@cp -f $(ESSENTIA_JS_MODULE) $(DIST_DIR_ES)/
+	@cp -f $(ESSENTIA_WASM_UMD_MODULE) $(DIST_DIR_ES)/
+	@cp -f $(ESSENTIA_WASM_ES6_MODULE) $(DIST_DIR_ES)/
+
 	@echo "Done ..."
 
 	@echo "Removing unnecessary files ..."
