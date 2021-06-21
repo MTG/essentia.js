@@ -29,8 +29,6 @@ MusicExtractorSVM
 TensorflowPredict
 TensorflowPredictMusiCNN
 TensorflowPredictVGGish
-TensorflowInputMusiCNN
-TensorflowInputVGGish
 BpmHistogram
 FadeDetection
 HumDetector

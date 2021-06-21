@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2021-06-20
+
+### Added
+
+- Added `essentia.js-model` add-on module to facilitate the end-to-end use of a collection of pre-trained tensorflow.js audio ML models.
+- Added both realtime and offline use-case examples for using essentia.js and tensorflow.js along with documentation.
+
+
+### Changes
+
+- Changed namespaces in node.js entrypoint. ie. Now, all the add-on modules are also exposed in the node.js import (see #50).
+- Re-organized the directory structure of the source code and related scripts in terms of category of the module.
+- Essentia WASM backend sync build files are now distributed as both UMD and ES6 compatiable formats (`essentia-wasm.umd.js` and `essentia-wasm.es.js`).
 
 ## [0.1.0] - 2020-09-14
 

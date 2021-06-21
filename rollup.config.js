@@ -20,6 +20,11 @@ let defaultBuildOpts = [{
     format: 'es' // the preferred format
     },
     {
+      file: DIST_DIR + '/essentia.js-core.umd.js',
+      format: 'umd',
+      name: 'Essentia' // the global which can be used during imports
+    },
+    {
     file: DIST_DIR + '/essentia.js-core.js',
     format: 'iife',
     name: 'Essentia' // the global which can be used in a browser
@@ -31,12 +36,40 @@ let defaultBuildOpts = [{
     }),
   ]
 }, {
- input: 'src/typescript/plot.ts', // our source file
+  input: 'src/typescript/machinelearning/index.ts', // our source file
+  output: [
+   {
+    file: DIST_DIR + '/essentia.js-model.es.js',
+    format: 'es' // the preferred format
+   },
+   {
+    file: DIST_DIR + '/essentia.js-model.umd.js',
+    format: 'umd',
+    name: 'EssentiaModel' // the global which can be used during imports
+   },
+   {
+    file: DIST_DIR + '/essentia.js-model.js',
+    format: 'iife',
+    name: 'EssentiaModel' // the global which can be used in a browser
+   }
+  ],
+  plugins: [
+   typescript({
+    typescript: require('typescript'),
+   }),
+  ]
+ }, {
+ input: 'src/typescript/display/plot.ts', // our source file
  output: [
   {
    file: DIST_DIR + '/essentia.js-plot.es.js',
    format: 'es' // the preferred format
   },
+  {
+    file: DIST_DIR + '/essentia.js-plot.umd.js',
+    format: 'umd',
+    name: 'EssentiaPlot' // the global which can be used during imports
+   },
   {
    file: DIST_DIR + '/essentia.js-plot.js',
    format: 'iife',
@@ -49,11 +82,16 @@ let defaultBuildOpts = [{
   }),
  ]
 }, {
-  input: 'src/typescript/extractor.ts', // our source file
+  input: 'src/typescript/extractor/extractor.ts', // our source file
   output: [
    {
     file: DIST_DIR + '/essentia.js-extractor.es.js',
     format: 'es' // the preferred format
+   },
+   {
+    file: DIST_DIR + '/essentia.js-extractor.umd.js',
+    format: 'umd',
+    name: 'EssentiaExtractor' // the global which can be used during imports
    },
    {
     file: DIST_DIR + '/essentia.js-extractor.js',
@@ -66,7 +104,7 @@ let defaultBuildOpts = [{
     typescript: require('typescript'),
    }),
   ]
- },
+ }
 ]
 
 // code snippet to adapt cmd-line options for building builds with/without add-on modules.

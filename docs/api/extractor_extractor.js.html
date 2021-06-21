@@ -1,0 +1,328 @@
+<!-- start:source.tmpl.hbs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+		<title>extractor/extractor.js</title>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: black;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: black;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: black;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: black;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":false,"dateFormat":"Do MMM YYYY","systemName":"Essentia.js","systemSummary":"JavaScript library for Music/Audio analysis, powered by Essentia WebAssembly backend.","systemLogo":"","systemColor":"black","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"https://essentia.upf.edu","copyright":"Copyright (C) 2006-2021  Music Technology Group - Universitat Pompeu Fabra","linenums":true,"collapseSymbols":true,"inverseNav":true,"inlineNav":false,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":false,"favicon":null,"stylesheets":[],"scripts":[],"monospaceLinks":false,"cleverLinks":true};
+			window.DOCLET_TOC_ENABLED = false;
+			window.DOCLET_AFILTER_ENABLED = false;
+		</script>
+</head>
+<body>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="index.html">
+					Essentia.js
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+								
+								<li class="dropdown">
+									<a href="list_class.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+									<ul class="dropdown-menu">
+											<li><a href="Essentia.html">Essentia</a></li>
+											<li><a href="EssentiaTensorflowJSModel.html">EssentiaTensorflowJSModel</a></li>
+											<li><a href="EssentiaTFInputExtractor.html">EssentiaTFInputExtractor</a></li>
+											<li><a href="TensorflowMusiCNN.html">TensorflowMusiCNN</a></li>
+											<li><a href="TensorflowVGGish.html">TensorflowVGGish</a></li>
+											<li><a href="EssentiaExtractor.html">EssentiaExtractor</a></li>
+                                            <li><a href="EssentiaPlot.html">EssentiaPlot</a></li>
+											<li><a href="PlotHeatmap.html">PlotHeatmap</a></li>
+											<li><a href="PlotMelodyContour.html">PlotMelodyContour</a></li>
+									</ul>
+								</li>
+								<li class="dropdown">
+									<a href="list_tutorial.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
+									<ul class="dropdown-menu">
+											<li><a href="tutorial-1. Getting started.html">1. Getting started</a></li>
+											<li><a href="tutorial-2. Real-time analysis.html">2. Real-time analysis</a></li>
+											<li><a href="tutorial-3. Machine learning inference with Essentia.js.html">3. Machine learning inference with Essentia.js</a></li>
+											<li><a href="tutorial-4. Building from source.html">4. Building from source</a></li>
+									</ul>
+								</li>
+				</ul>
+			</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">source</span>
+				<h1><span class="name">extractor/extractor.js</span></h1>
+			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-12 main-content">
+		<section class="source-section">
+			<article></article>
+			<pre class="prettyprint source language-javascript line-numbers"><code class="language-javascript">"use strict";
+/**
+ * @license
+ * Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra
+ *
+ * This file is part of Essentia
+ *
+ * Essentia is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation (FSF), either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the Affero GNU General Public License
+ * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
+ */
+var __extends = (this &amp;&amp; this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array &amp;&amp; function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+exports.__esModule = true;
+var core_api_1 = require("../core_api");
+/**
+ * EssentiaExtractor
+ * This class provides one-liner methods which implements the whole chain of algorithms
+ * required for computing features such as log-scaled mel spectrogram, HPCP chroma features etc.
+ * This can be extended according to your needs.
+ * @class
+ * @extends {Essentia}
+ */
+var EssentiaExtractor = /** @class */ (function (_super) {
+    __extends(EssentiaExtractor, _super);
+    /**
+     *Creates an instance of EssentiaExtractor.
+    * @param {*} EssentiaWASM
+    * @param {boolean} [isDebug=false]
+    * @constructs
+    */
+    function EssentiaExtractor(EssentiaWASM, isDebug) {
+        if (isDebug === void 0) { isDebug = false; }
+        var _this = _super.call(this, EssentiaWASM, isDebug) || this;
+        _this.EssentiaWASM = EssentiaWASM;
+        _this.isDebug = isDebug;
+        _this.sampleRate = 44100;
+        _this.frameSize = 2048;
+        _this.profile = {
+            Windowing: {
+                normalized: false,
+                size: 1024,
+                type: "hann",
+                zeroPadding: 0,
+                zeroPhase: true
+            },
+            Spectrum: {
+                size: _this.frameSize
+            },
+            MelBands: {
+                highFrequencyBound: Math.floor(_this.sampleRate / 2),
+                inputSize: Math.floor(_this.frameSize / (2 + 1)),
+                log: false,
+                lowFrequencyBound: 0,
+                normalize: 'unit_tri',
+                numberBands: 96,
+                sampleRate: _this.sampleRate,
+                type: 'power',
+                warpingFormula: 'slaneyMel',
+                weighting: 'linear'
+            },
+            SpectralPeaks: {
+                magnitudeThreshold: 0,
+                maxFrequency: 4500,
+                maxPeaks: 100,
+                minFrequency: 80,
+                orderBy: 'frequency',
+                sampleRate: _this.sampleRate
+            },
+            SpectralWhitening: {
+                maxFrequency: 4500,
+                sampleRate: _this.sampleRate
+            },
+            HPCP: {
+                bandPreset: true,
+                bandSplitFrequency: 500,
+                harmonics: 0,
+                maxFrequency: 4500,
+                maxShifted: false,
+                minFrequency: 80,
+                nonLinear: false,
+                normalized: 'unitMax',
+                referenceFrequency: 440,
+                sampleRate: _this.sampleRate,
+                size: 12,
+                weightType: 'squaredCosine',
+                windowSize: 1
+            }
+        };
+        return _this;
+    }
+    /**
+     * Compute log-scaled mel spectrogram for a given audio signal frame along with an optional extractor profile configuration
+     * @method
+     * @param {Float32Array} audioFrame a frame of decoded audio signal as Float32 typed array.
+     * @param {number} sampleRate Sample rate of the input audio signal.
+     * @param {boolean} [asVector=false] whether to output the spectrogram as a vector float type for chaining with other essentia algorithms.
+     * @param {*} [config=this.profile]
+     * @returns {Array} Log-scaled Mel Spectrum
+     * @memberof EssentiaExtractor
+     */
+    EssentiaExtractor.prototype.melSpectrumExtractor = function (audioFrame, sampleRate, asVector, config) {
+        if (sampleRate === void 0) { sampleRate = this.sampleRate; }
+        if (asVector === void 0) { asVector = false; }
+        if (config === void 0) { config = this.profile; }
+        var signalFrame = this.arrayToVector(audioFrame);
+        var _frameSize = audioFrame.length;
+        // we need to compute the following signal process chain 
+        // audio frame => windowing => spectrum => mel bands => log scale
+        var windowOut = this.Windowing(signalFrame, config.Windowing.normalized, config.Windowing.size, config.Windowing.type, config.Windowing.zeroPadding, config.Windowing.zeroPhase);
+        var spectrumOut = this.Spectrum(windowOut.frame, _frameSize);
+        var melOut = this.MelBands(spectrumOut.spectrum, config.MelBands.highFrequencyBound, Math.floor(_frameSize / (2 + 1)), config.MelBands.log, config.MelBands.lowFrequencyBound, config.MelBands.normalize, config.MelBands.numberBands, sampleRate, config.MelBands.type, config.MelBands.warpingFormula, config.MelBands.weighting);
+        // shift operation of mel-spectrograms
+        var shift = this.UnaryOperator(melOut.bands, 10000, 1);
+        // logarithmic compression of mel-spectrograms
+        var logComp = this.UnaryOperator(shift.array, 1, 0, "log10");
+        // return the output of the feature extractor either as VectorFloat type or as JavaScript Float32 typed array
+        if (asVector) {
+            // fallback to free the std vectors
+            //delete windowOut.frame;
+            delete spectrumOut.spectrum;
+            delete melOut.bands;
+            delete shift.array;
+            return logComp.array;
+        }
+        else {
+            // convert type to JS array
+            var logMelBands = this.vectorToArray(logComp.array);
+            // fallback to free the std vectors
+            //delete windowOut.frame;
+            delete spectrumOut.spectrum;
+            delete melOut.bands;
+            delete shift.array;
+            delete logComp.array;
+            return logMelBands;
+        }
+    };
+    /**
+     * Compute HPCP chroma feature for a given audio signal frame along with an optional extractor profile configuration
+     * @method
+     * @param {Float32Array} audioFrame a decoded audio signal frame as Float32 typed array.
+     * @param {number} sampleRate Sample rate of the input audio signal.
+     * @param {boolean} [asVector=false] whether to output the hpcpgram as a vector float type for chaining with other essentia algorithms.
+     * @param {*} [config=this.profile]
+     * @returns {Array} Frame-wise HPCP
+     * @memberof EssentiaExtractor
+     */
+    EssentiaExtractor.prototype.hpcpExtractor = function (audioFrame, sampleRate, asVector, config) {
+        if (sampleRate === void 0) { sampleRate = this.sampleRate; }
+        if (asVector === void 0) { asVector = false; }
+        if (config === void 0) { config = this.profile; }
+        var signalFrame = this.arrayToVector(audioFrame);
+        var _frameSize = audioFrame.length;
+        // we need to compute the following signal process chain 
+        // audio frame => windowing => spectrum => spectral peak => spectral whitening => HPCP
+        var windowOut = this.Windowing(signalFrame, config.Windowing.normalized, config.Windowing.size, config.Windowing.type, config.Windowing.zeroPadding, config.Windowing.zeroPhase);
+        var spectrumOut = this.Spectrum(windowOut.frame, _frameSize);
+        var peaksOut = this.SpectralPeaks(spectrumOut.spectrum, config.SpectralPeaks.magnitudeThreshold, config.SpectralPeaks.maxFrequency, config.SpectralPeaks.maxPeaks, config.SpectralPeaks.minFrequency, config.SpectralPeaks.orderBy, sampleRate);
+        var whiteningOut = this.SpectralWhitening(spectrumOut.spectrum, peaksOut.frequencies, peaksOut.magnitudes, config.SpectralWhitening.maxFrequency, sampleRate);
+        var hpcpOut = this.HPCP(peaksOut.frequencies, whiteningOut.magnitudes, config.HPCP.bandPreset, config.HPCP.bandSplitFrequency, config.HPCP.harmonics, config.HPCP.maxFrequency, config.HPCP.maxShifted, config.HPCP.minFrequency, config.HPCP.nonLinear, config.HPCP.normalized, config.HPCP.referenceFrequency, sampleRate, config.HPCP.size, config.HPCP.weightType, config.HPCP.windowSize);
+        // return the output of the feature extractor either as VectorFloat type or as JavaScript Float32 typed array
+        if (asVector) {
+            // fallback to free the std vectors
+            delete windowOut.frame;
+            delete spectrumOut.spectrum;
+            delete peaksOut.frequencies;
+            delete peaksOut.magnitudes;
+            delete whiteningOut.magnitudes;
+            return hpcpOut.hpcp;
+        }
+        else {
+            // convert type to JS array
+            var hpcpFrame = this.vectorToArray(hpcpOut.hpcp);
+            delete windowOut.frame;
+            delete spectrumOut.spectrum;
+            delete peaksOut.frequencies;
+            delete peaksOut.magnitudes;
+            delete whiteningOut.magnitudes;
+            delete hpcpOut.hpcp;
+            return hpcpFrame;
+        }
+    };
+    return EssentiaExtractor;
+}(core_api_1["default"]));
+exports["default"] = EssentiaExtractor;
+</code></pre>
+		</section>
+			</div>
+		</div>
+	</div>
+	<footer>
+				<div class="footer-option">https://essentia.upf.edu</div>
+				<div class="copyright">Copyright (C) 2006-2021  Music Technology Group - Universitat Pompeu Fabra</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+	
+</body>
+</html>
+<!-- end:source.tmpl.hbs -->

@@ -1,4 +1,5 @@
-/*
+/** 
+ * @license
  * Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra
  *
  * This file is part of Essentia
@@ -20,16 +21,10 @@
 // NOTE: The following code snippets are machine generated. Do not edit.
 
 /**
- * @fileOverview Essentia high-level core interface
- * @author <a href="mailto:albin.correya@upf.edu">Albin Correya</a>
- * @version 0.1.0-dev
- */
-
-/**
  * essentia.js-core JS API
  * @class 
  * @example
- * const essentia = new Essentia(EssentiaModule)
+ * const essentia = new Essentia(EssentiaWASM);
  */
 class Essentia {
   /** 
@@ -55,7 +50,25 @@ class Essentia {
   }
 
   /**
-   * Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API. (NOTE: only works on modern web-browsers)
+   * Decode and returns the audio buffer of a given audio url or blob uri using Web Audio API. 
+   * (NOTE: This method doesn't works on Safari browser)
+   * @async
+   * @method
+   * @param {string} audioURL web url or blob uri of a audio file
+   * @param {AudioContext} webAudioCtx an instance of Web Audio API `AudioContext`
+   * @returns {AudioBuffer} decoded audio buffer object
+   * @memberof Essentia
+   */
+  async getAudioBufferFromURL(audioURL: string, webAudioCtx: AudioContext) {
+    const response = await fetch(audioURL);
+    const arrayBuffer = await response.arrayBuffer();
+    const audioBuffer = await webAudioCtx.decodeAudioData(arrayBuffer);
+    return audioBuffer;
+  }
+
+  /**
+   * Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API. 
+   * (NOTE: This method doesn't works on Safari browser)
    * @async
    * @method
    * @param {string} audioURL web url or blob uri of a audio file
@@ -72,11 +85,33 @@ class Essentia {
   }
 
   /**
+   * Convert an AudioBuffer object to a Mono audio signal array. The audio signal is downmixed
+   * to mono using essentia `MonoMixer` algorithm if the audio buffer has 2 channels of audio.
+   * Throws an expection if the input AudioBuffer object has more than 2 channels of audio.
+   * @method
+   * @param {AudioBuffer} buffer `AudioBuffer` object decoded from an audio file.
+   * @returns {Float32Array} audio channel data. (downmixed to mono if its stereo signal).
+   * @memberof Essentia
+   */
+  audioBufferToMonoSignal(buffer: AudioBuffer): Float32Array {
+    if (buffer.numberOfChannels === 1) {
+      return buffer.getChannelData(0);
+    }
+    if (buffer.numberOfChannels === 2) {
+      const left = this.arrayToVector(buffer.getChannelData(0));
+      const right = this.arrayToVector(buffer.getChannelData(1));
+      let monoSignal = this.MonoMixer(left, right);
+      return this.vectorToArray(monoSignal);
+    }
+    throw new Error('Unexpected number of channels found in audio buffer. Only accepts mono or stereo audio buffers.');
+  }
+
+  /**
    * Method to shutdown essentia algorithm instance after it's use
    * @method
    * @memberof Essentia
    */
-  shutdown() {
+  shutdown(): void {
     this.algorithms.shutdown();
   }
 
@@ -85,7 +120,7 @@ class Essentia {
    * @method
    * @memberof Essentia
    */
-  reinstantiate() {
+  reinstantiate(): void {
     this.algorithms = new this.module.EssentiaJS(this.isDebug);
   }
 
@@ -94,7 +129,7 @@ class Essentia {
    * @method
    * @memberof Essentia
    */
-  delete() {
+  delete(): void {
     this.algorithms.delete();
   }
 
@@ -116,7 +151,7 @@ class Essentia {
    * @returns {Float32Array} returns converted JS typed array
    * @memberof Essentia
    */
-  vectorToArray(inputVector: any) {
+  vectorToArray(inputVector: any): Float32Array {
     return this.module.vectorToArray(inputVector);
   }
 
@@ -3078,6 +3113,28 @@ class Essentia {
   */
   TempoTapTicks(periods: any, phases: any, frameHop: number=512, hopSize: number=256, sampleRate: number=44100) {
     return this.algorithms.TempoTapTicks(periods, phases, frameHop, hopSize, sampleRate);
+  }
+   
+  /**
+  * This algorithm computes mel-bands with a particular parametrization specific to MusiCNN based models. Check https://essentia.upf.edu/reference/std_TensorflowInputMusiCNN.html for more details.
+  * @method
+  * @param {VectorFloat} frame the audio frame
+  * @returns {object} {bands: 'the log compressed mel bands'}
+  * @memberof Essentia
+  */
+  TensorflowInputMusiCNN(frame: any) {
+    return this.algorithms.TensorflowInputMusiCNN(frame);
+  }
+   
+  /**
+  * This algorithm computes mel-bands with a particular parametrization specific to VGGish based models. Check https://essentia.upf.edu/reference/std_TensorflowInputVGGish.html for more details.
+  * @method
+  * @param {VectorFloat} frame the audio frame
+  * @returns {object} {bands: 'the log compressed mel bands'}
+  * @memberof Essentia
+  */
+  TensorflowInputVGGish(frame: any) {
+    return this.algorithms.TensorflowInputVGGish(frame);
   }
    
   /**

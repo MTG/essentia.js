@@ -1,8 +1,12 @@
-# Contribute to `essentia.js`
+# How to contribute to Essentia.js?
 
-You are more than welcome to collaborate and submit your contributions to `Essentia.js`. The best practice of submitting your code is by creating pull requests to our GitHub [repository](https://github.com/MTG/essentia.js) following our contribution policy. 
+Everyone is welcome to contribute, and we value everybody's contribution. Code is thus not the only way to help the community. Answering questions, filling issues, feature requests, helping others, reaching out and improving the documentations are immensely valuable to the community. It also helps us if you spread the word thorugh reference of the library in your projects or shout-out on Twitter.
 
-By submitting your code you authorize that it complies with the Developer's Certificate of Origin.
+Whichever way you choose to contribute, please be mindful to respect our [code of conduct](https://berlincodeofconduct.org/).
+
+## Code contribution
+
+The best practice of submitting code is by creating pull requests to the [dev branch](https://github.com/MTG/essentia.js/tree/dev) our GitHub [repository](https://github.com/MTG/essentia.js) following the contribution policy. By submitting your code you authorize that it complies with the Developer's Certificate of Origin.
 
 > ### Developer’s Certificate of Origin
 
@@ -17,7 +21,3 @@ By submitting your code you authorize that it complies with the Developer's Cert
 > (d) I understand and agree that this project and the contribution are public and that a record of the contribution (including all personal information I submit with it, including my sign-off) is maintained indefinitely and may be redistributed consistent with this project or the open source license(s) involved.
 
 Based on https://gcc.gnu.org/contribute.html and http://elinux.org/Developer_Certificate_Of_Origin
-
-We encourage sharing with us any ideas on how we can improve Essentia.js and the best way to do this is by creating github issues for bug reports, feature requests and improvement ideas.
-
-You are also more than welcome to suggest any improvements, including proposals for new algorithms, etc.

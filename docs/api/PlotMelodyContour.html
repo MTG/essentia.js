@@ -40,7 +40,7 @@
 				}
 			</style>
 		<script type="text/javascript">
-			window.TEMPLATE_OPTIONS = {"includeDate":false,"dateFormat":"Do MMM YYYY","systemName":"Essentia.js","systemSummary":"JavaScript library for Music/Audio analysis, powered by Essentia WebAssembly backend.","systemLogo":"","systemColor":"black","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"https://essentia.upf.edu","copyright":"Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra","linenums":true,"collapseSymbols":true,"inverseNav":true,"inlineNav":false,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":false,"favicon":null,"stylesheets":[],"scripts":[],"monospaceLinks":false,"cleverLinks":true};
+			window.TEMPLATE_OPTIONS = {"includeDate":false,"dateFormat":"Do MMM YYYY","systemName":"Essentia.js","systemSummary":"JavaScript library for Music/Audio analysis, powered by Essentia WebAssembly backend.","systemLogo":"","systemColor":"black","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"https://essentia.upf.edu","copyright":"Copyright (C) 2006-2021  Music Technology Group - Universitat Pompeu Fabra","linenums":true,"collapseSymbols":true,"inverseNav":true,"inlineNav":false,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":false,"favicon":null,"stylesheets":[],"scripts":[],"monospaceLinks":false,"cleverLinks":true};
 			window.DOCLET_TOC_ENABLED = true;
 			window.DOCLET_AFILTER_ENABLED = true;
 		</script>
@@ -62,25 +62,28 @@
 			</div>
 			<div class="navbar-collapse collapse" id="topNavigation">
 				<ul class="nav navbar-nav">
+								
 								<li class="dropdown">
 									<a href="list_class.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 									<ul class="dropdown-menu">
 											<li><a href="Essentia.html">Essentia</a></li>
-											
+											<li><a href="EssentiaTensorflowJSModel.html">EssentiaTensorflowJSModel</a></li>
+											<li><a href="EssentiaTFInputExtractor.html">EssentiaTFInputExtractor</a></li>
+											<li><a href="TensorflowMusiCNN.html">TensorflowMusiCNN</a></li>
+											<li><a href="TensorflowVGGish.html">TensorflowVGGish</a></li>
 											<li><a href="EssentiaExtractor.html">EssentiaExtractor</a></li>
-											
-											<li><a href="EssentiaPlot.html">EssentiaPlot</a></li>
+                                            <li><a href="EssentiaPlot.html">EssentiaPlot</a></li>
 											<li><a href="PlotHeatmap.html">PlotHeatmap</a></li>
-								
 											<li><a href="PlotMelodyContour.html">PlotMelodyContour</a></li>
 									</ul>
 								</li>
 								<li class="dropdown">
 									<a href="list_tutorial.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
 									<ul class="dropdown-menu">
-											<li><a href="tutorial-1. Getting Started.html">1. Getting Started</a></li>
-											<li><a href="tutorial-2. Building from Source.html">2. Building from Source</a></li>
-												
+											<li><a href="tutorial-1. Getting started.html">1. Getting started</a></li>
+											<li><a href="tutorial-2. Real-time analysis.html">2. Real-time analysis</a></li>
+											<li><a href="tutorial-3. Machine learning inference with Essentia.js.html">3. Machine learning inference with Essentia.js</a></li>
+											<li><a href="tutorial-4. Building from source.html">4. Building from source</a></li>
 									</ul>
 								</li>
 				</ul>
@@ -181,7 +184,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="plot.js.html">plot.js</a>, <a href="plot.js.html#line-154">line 154</a></p>
+									<p class="form-control-static"><a href="display_plot.js.html">display/plot.js</a>, <a href="display_plot.js.html#line-155">line 155</a></p>
 								</div>
 							</div>
 			
@@ -272,7 +275,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="plot.js.html">plot.js</a>, <a href="plot.js.html#line-125">line 125</a></p>
+									<p class="form-control-static"><a href="display_plot.js.html">display/plot.js</a>, <a href="display_plot.js.html#line-126">line 126</a></p>
 								</div>
 							</div>
 			
@@ -351,7 +354,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="plot.js.html">plot.js</a>, <a href="plot.js.html#line-171">line 171</a></p>
+									<p class="form-control-static"><a href="display_plot.js.html">display/plot.js</a>, <a href="display_plot.js.html#line-172">line 172</a></p>
 								</div>
 							</div>
 			
@@ -388,7 +391,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="plot.js.html">plot.js</a>, <a href="plot.js.html#line-200">line 200</a></p>
+									<p class="form-control-static"><a href="display_plot.js.html">display/plot.js</a>, <a href="display_plot.js.html#line-201">line 201</a></p>
 								</div>
 							</div>
 			
@@ -409,8 +412,8 @@
 	</div>
 	<footer>
 				<div class="footer-option">https://essentia.upf.edu</div>
-				<div class="copyright">Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra</div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+				<div class="copyright">Copyright (C) 2006-2021  Music Technology Group - Universitat Pompeu Fabra</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>

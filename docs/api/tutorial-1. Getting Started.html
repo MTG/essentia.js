@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-		<title>1. Getting Started</title>
+		<title>1. Getting started</title>
 		<!--[if lt IE 9]>
 		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
@@ -41,7 +41,7 @@
 				}
 			</style>
 		<script type="text/javascript">
-			window.TEMPLATE_OPTIONS = {"includeDate":false,"dateFormat":"Do MMM YYYY","systemName":"Essentia.js","systemSummary":"JavaScript library for Music/Audio analysis, powered by Essentia WebAssembly backend.","systemLogo":"","systemColor":"black","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"https://essentia.upf.edu","copyright":"Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra","linenums":true,"collapseSymbols":true,"inverseNav":true,"inlineNav":false,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":false,"favicon":null,"stylesheets":[],"scripts":[],"monospaceLinks":false,"cleverLinks":true};
+			window.TEMPLATE_OPTIONS = {"includeDate":false,"dateFormat":"Do MMM YYYY","systemName":"Essentia.js","systemSummary":"JavaScript library for Music/Audio analysis, powered by Essentia WebAssembly backend.","systemLogo":"","systemColor":"black","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"https://essentia.upf.edu","copyright":"Copyright (C) 2006-2021  Music Technology Group - Universitat Pompeu Fabra","linenums":true,"collapseSymbols":true,"inverseNav":true,"inlineNav":false,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":false,"favicon":null,"stylesheets":[],"scripts":[],"monospaceLinks":false,"cleverLinks":true};
 			window.DOCLET_TOC_ENABLED = true;
 			window.DOCLET_AFILTER_ENABLED = false;
 		</script>
@@ -63,25 +63,28 @@
 			</div>
 			<div class="navbar-collapse collapse" id="topNavigation">
 				<ul class="nav navbar-nav">
+								
 								<li class="dropdown">
 									<a href="list_class.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 									<ul class="dropdown-menu">
 											<li><a href="Essentia.html">Essentia</a></li>
-											
+											<li><a href="EssentiaTensorflowJSModel.html">EssentiaTensorflowJSModel</a></li>
+											<li><a href="EssentiaTFInputExtractor.html">EssentiaTFInputExtractor</a></li>
+											<li><a href="TensorflowMusiCNN.html">TensorflowMusiCNN</a></li>
+											<li><a href="TensorflowVGGish.html">TensorflowVGGish</a></li>
 											<li><a href="EssentiaExtractor.html">EssentiaExtractor</a></li>
-											
-											<li><a href="EssentiaPlot.html">EssentiaPlot</a></li>
+                                            <li><a href="EssentiaPlot.html">EssentiaPlot</a></li>
 											<li><a href="PlotHeatmap.html">PlotHeatmap</a></li>
-											
 											<li><a href="PlotMelodyContour.html">PlotMelodyContour</a></li>
 									</ul>
 								</li>
 								<li class="dropdown">
 									<a href="list_tutorial.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
 									<ul class="dropdown-menu">
-											<li><a href="tutorial-1. Getting Started.html">1. Getting Started</a></li>
-											<li><a href="tutorial-2. Building from Source.html">2. Building from Source</a></li>
-											
+											<li><a href="tutorial-1. Getting started.html">1. Getting started</a></li>
+											<li><a href="tutorial-2. Real-time analysis.html">2. Real-time analysis</a></li>
+											<li><a href="tutorial-3. Machine learning inference with Essentia.js.html">3. Machine learning inference with Essentia.js</a></li>
+											<li><a href="tutorial-4. Building from source.html">4. Building from source</a></li>
 									</ul>
 								</li>
 				</ul>
@@ -91,7 +94,7 @@
 	<!-- end:navbar.hbs -->		<div class="page-header">
 			<div class="container">
 				<span class="kind">tutorial</span>
-				<h1><span class="title">1. Getting Started</span></h1>
+				<h1><span class="title">1. Getting started</span></h1>
 			</div>
 		</div>
 	<div class="container content">
@@ -100,7 +103,7 @@
 						<ol class="breadcrumb">
 							<li><a href="index.html">Home</a></li>
 							<li><a href="list_tutorial.html">Tutorials</a></li>
-							<li class="active">1. Getting Started</li>
+							<li class="active">1. Getting started</li>
 						</ol>
 		<section class="tutorial-section">
 			<article><h1>Getting started</h1>
@@ -110,27 +113,24 @@
 <h3>Using CDN</h3>
 </li>
 </ul>
-<p>CDN links are available for serving <code>essentia.js</code> from <a href="https://www.jsdelivr.com/package/npm/essentia.js">jsDelivr</a> and <a href="https://unpkg.com/browse/essentia.js@0.0.9/">unpkg</a>.</p>
+<p>CDN links are available for serving <code>essentia.js</code> from <a href="https://www.jsdelivr.com/package/npm/essentia.js">jsDelivr</a> and <a href="https://unpkg.com/browse/essentia.js@0.1.1/">unpkg</a>.</p>
 <p>You can also find the latest releases on <a href="https://github.com/MTG/essentia.js/releases">Github releases</a>.</p>
 <ul>
 <li>
 <h4>HTML <code>&lt;script&gt;</code> tag</h4>
 </li>
 </ul>
-<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia-wasm.web.js&quot;>&lt;/script>
-&lt;script src=&quot;https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia.js-core.js&quot;>&lt;/script>
-&lt;script src=&quot;https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia.js-plot.js&quot;>&lt;/script>
-&lt;script src=&quot;https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia.js-extractor.js&quot;>&lt;/script>
+<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://cdn.jsdelivr.net/npm/essentia.js@&lt;version>/dist/essentia-wasm.web.js&quot;>&lt;/script>
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/essentia.js@&lt;version>/dist/essentia.js-*.js&quot;>&lt;/script>
 </code></pre>
-<p>Check out this <a href="https://github.com/MTG/essentia.js/blob/master/examples/script-node-processor/example.html">example</a>.</p>
 <ul>
 <li>
 <h4>ES6 style import</h4>
 </li>
 </ul>
-<pre class="prettyprint source lang-javascript"><code>import Essentia from 'https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia.js-core.es.js';
+<pre class="prettyprint source lang-javascript"><code>import Essentia from 'https://cdn.jsdelivr.net/npm/essentia.js@&lt;version>/dist/essentia.js-core.es.js';
 // import essentia-wasm-module
-import { EssentiaWASM } from 'https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia-wasm.module.js';
+import { EssentiaWASM } from 'https://cdn.jsdelivr.net/npm/essentia.js@&lt;version>/dist/essentia-wasm.es.js';
   
 const essentia = new Essentia(EssentiaWASM);
 
@@ -140,10 +140,8 @@ console.log(essentia.version)
 // prints all the available algorithm methods in Essentia
 console.log(essentia.algorithmNames)
 </code></pre>
-<p>Check out this <a href="../examples/audio-worklets/essentia-worklet-processor.js">example</a>.</p>
 <blockquote>
-<p>Note: You shouldn't import the <code>essentia-wasm.module.js</code> on the main thread. The ideal way is to use it along with the AudioWorklet design pattern or with WebWorkers.
-Also, it is recommended to use local files instead of CDN in production.</p>
+<p>Note: You shouldn't import the <code>essentia-wasm.es.js</code> on the main thread. The ideal way is to use it along with the AudioWorklet design pattern or with WebWorkers. For async load of the library on main UI thread use <code>essentia-wasm.web.js</code>.</p>
 </blockquote>
 <ul>
 <li>
@@ -156,7 +154,9 @@ Also, it is recommended to use local files instead of CDN in production.</p>
 <pre class="prettyprint source lang-bash"><code>yarn add essentia.js
 </code></pre>
 <h4>Usage example</h4>
-<pre class="prettyprint source lang-javascript"><code>const essentia = require('essentia.js');
+<pre class="prettyprint source lang-javascript"><code>let esPkg = require('essentia.js');
+
+const essentia = new esPkg.Essentia(esPkg.EssentiaWASM);
 
 // prints version of the essentia wasm backend
 console.log(essentia.version)
@@ -165,9 +165,13 @@ console.log(essentia.version)
 console.log(essentia.algorithmNames)
 </code></pre>
 <p>Try it live on <a href="https://npm.runkit.com/essentia.js">Runkit</a>.</p>
-<h2>Usages in Javscript</h2>
+<h2>Usages in Javascript</h2>
 <p>After succesfully loading <code>essentia.js-core**</code> and <code>essentia-wasm.**</code> files on the JavaScript end, a typical usage would be like the following.</p>
-<pre class="prettyprint source lang-javascript"><code>// create essentia object with all the methods to run various algorithms
+<pre class="prettyprint source lang-javascript"><code>import Essentia from './essentia.js-core.es.js';
+// import essentia-wasm-module
+import { EssentiaWASM } from './essentia-wasm.es.js';
+
+// create essentia object with all the methods to run various algorithms
 // by loading the wasm back-end.
 // here, `EssentiaModule` is an emscripten module object imported to the global namespace
 let essentia = new Essentia(EssentiaWASM);
@@ -184,16 +188,14 @@ yourOutput.'&lt;your_output-key>'
 let audioURL = &quot;https://freesound.org/data/previews/328/328857_230356-lq.mp3&quot;;
 
 // decode audio data
-const audioData = await essentia.getAudioChannelDataFromURL(audioURL, 
-                                                        audioCtx, // AudioContext
-                                                        0); // channel            
+const audioBuffer = await essentia.getAudioBufferFromURL(audioURL, audioCtx);            
 
 /* OR
-* you could also decode audio of synthesis audio from any other 
+* you could also decode audio from any other 
 * source and pass to an essentia algorithm. */
 
 // convert the JS float32 typed array into std::vector&lt;float>
-const inputSignalVector = essentia.arrayToVector(randomAudioData);
+const inputSignalVector = essentia.arrayToVector(audioBuffer.getChannelData(0));
 
 
 // Computing ReplayGain from an input audio signal vector
@@ -209,7 +211,7 @@ console.log(outputRG.replayGain);
 // check https://essentia.upf.edu/reference/std_PitchYinProbabilistic.html
 let outputPyYin = essentia.PitchYinProbabilistic(inputSignalVector, // input
                                           // parameters (optional)
-                                          4096, // frameSize
+                                          4096, // frameSize 
                                           256, // hopSize
                                           0.1, // lowRMSThreshold
                                           'zero', // outputUnvoiced,
@@ -222,25 +224,28 @@ let voicedProbabilities = essentia.vectorToArray(outputPyYin.voicedProbabilities
 console.log(pitch);
 console.log(voicedProbabilities);
 
-delete outputPyYin;
+outputPyYin.pitch.delete()
+outputPyYin.voicedProbabilities.delete()
 
-// free memory 
-essentia.delete();
-// shutdown essentia algorithm instance
+// CAUTION: only use the `shutdown` and `delete` methods below if you've finished your analysis and don't plan on re-using Essentia again in your program lifecycle.
+
+// call internal essentia::shutdown C++ method
 essentia.shutdown();
+// delete EssentiaJS instance, free JS memory 
+essentia.delete();
 </code></pre>
 <p>Similarly, you could use any of the algorithms specified in the <a href="https://mtg.github.io/essentia.js/docs/api/Essentia.html">Essentia JS Core API</a>.</p>
 <h2>Examples</h2>
 <h3>Simple web example</h3>
 <pre class="prettyprint source lang-html"><code>&lt;html lang=&quot;en&quot;>
   &lt;head>
-    &lt;script src=&quot;https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia-wasm.web.js&quot;>&lt;/script>
-    &lt;script src=&quot;https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia.js-core.js&quot;>&lt;/script>
+    &lt;script src=&quot;https://cdn.jsdelivr.net/npm/essentia.js@&lt;version>/dist/essentia-wasm.web.js&quot;>&lt;/script>
+    &lt;script src=&quot;https://cdn.jsdelivr.net/npm/essentia.js@&lt;version>/dist/essentia.js-core.js&quot;>&lt;/script>
     &lt;script>
       let essentia;
 
-      EssentiaWASM().then( function(EssentiaWasmModule) {
-        essentia = new Essentia(EssentiaWasmModule);
+      EssentiaWASM().then( function(EssentiaWasm) {
+        essentia = new Essentia(EssentiaWasm);
         // prints version of the essentia wasm backend
         console.log(essentia.version)
         // prints all the available algorithms in essentia.js 
@@ -270,16 +275,7 @@ for (var i=0; i&lt;frames.size(); i++) {
 
   // we can add any essentia algorithms here to the compute frame-wise audio feature
 }
-</code></pre>
-<h3>Realtime audio feature extraction using the Web Audio API</h3>
-<h4>Using WebAudioAPI with ScriptProcessorNode.</h4>
-<p>You can find some examples <a href="https://github.com/MTG/essentia.js/tree/master/examples/script-node-processor">here</a> on how to use essentia as a feature extractor using the depreciated <a href="https://developer.mozilla.org/en-US/docs/Web/API/ScriptProcessorNode"><code>ScriptProcessorNode</code></a>.</p>
-<h4>Using WebAudioAPI with AudioWorklets.</h4>
-<p>You can find some examples using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/AudioWorkletProcessor"><code>AudioWorkletProcessor</code></a> and <a href="https://developer.mozilla.org/en-US/docs/Web/API/AudioWorkletNode"><code>AudioWorkletNode</code></a> build <a href="https://github.com/MTG/essentia.js/tree/master/examples/audio-worklets">here</a>.</p>
-<h3>Interactive demos</h3>
-<p><a href="https://mtg.github.io/essentia.js/examples">https://mtg.github.io/essentia.js/examples</a></p>
-<h4>On Glitch platform (editable)</h4>
-<p><a href="https://glitch.com/@albincorreya/essentia-js-examples">https://glitch.com/@albincorreya/essentia-js-examples</a></p></article>
+</code></pre></article>
 		</section>
 			</div>
 				<div class="col-md-3 side-content">
@@ -289,8 +285,8 @@ for (var i=0; i&lt;frames.size(); i++) {
 	</div>
 	<footer>
 				<div class="footer-option">https://essentia.upf.edu</div>
-				<div class="copyright">Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra</div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+				<div class="copyright">Copyright (C) 2006-2021  Music Technology Group - Universitat Pompeu Fabra</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>

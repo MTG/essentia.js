@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Mood Audio Analysis with Essentia.js Models</title>
+        <meta name="description" content="Mood Audio Descriptors using Essentia.js and Deep Learning Models">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" integrity="sha512-8bHTC73gkZ7rZ7vpqUQThUDhqcNFyYi2xgDgPDHc+GXVGHXq+xPjynxIopALmOPqzo9JZj0k6OqqewdGO3EsrQ==" crossorigin="anonymous" />
+        <script
+        src="https://code.jquery.com/jquery-3.1.1.min.js"
+        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+        crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js" integrity="sha512-dqw6X88iGgZlTsONxZK9ePmJEFrmHwpuMrsUChjAw1mRUhUITE5QU9pkcSox+ynfLhL15Sv2al5A0LVyDCmtUw==" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <header>
+           <h1>Mood Audio Analysis with <a id="essentia-header-link" href="https://mtg.github.io/essentia.js/" target="_blank">Essentia.js <sup><i class="tiny external alternate icon"></i></sup></a> Models</h1>
+        </header>
+        <main id="main">
+            <div id="file-select-area">
+                <!-- <button id="file-select-btn">Select Audio</button> -->
+                <div id="file-drop-area">
+                    <span>Drop file here or click to upload</span>
+                </div>
+            </div>
+            
+            <div id="results">
+                <div id="loader" class="ui disabled dimmer">
+                    <div class="ui indeterminate text loader">Analyzing track... This may take a few seconds.</div>
+                </div>
+                <div id="danceability" class="classifier">
+                    <span>💃🏻</span>
+                    <!-- <h2>Danceability</h2> -->
+                    <div class="classifier-meter" data-classifier="Danceability"></div>
+                </div>
+                <div id="mood_happy" class="classifier">
+                    <span>😁</span>
+                    <!-- <h2>Happy</h2> -->
+                    <div class="classifier-meter" data-classifier="Happy"></div>
+                </div>
+                <div id="mood_sad" class="classifier">
+                    <span>😢</span>
+                    <!-- <h2>Sad</h2> -->
+                    <div class="classifier-meter" data-classifier="Sad"></div>
+                </div>
+                <div id="mood_relaxed" class="classifier">
+                    <span>😌</span>
+                    <!-- <h2>Relaxed</h2> -->
+                    <div class="classifier-meter" data-classifier="Relaxed"></div>
+                </div>
+                <div id="mood_aggressive" class="classifier">
+                    <span>👊</span>
+                    <!-- <h2>Aggressiveness</h2> -->
+                    <div class="classifier-meter" data-classifier="Aggressiveness"></div>
+                </div>
+                <div id="bpm-and-key">
+                    <div id="bpm" class="row-container">
+                        <div class="tag">BPM</div>
+                        <div id="bpm-value"></div>
+                    </div>
+                    <div id="key" class="row-container">
+                        <div class="tag">Key</div>
+                        <div id="key-value"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer id="links">
+            <div id="mtg-logo" class="footer-block">
+                <p>Made at</p>
+                <a href="https://www.upf.edu/web/mtg/" target="_blank"><img src="images/mtg-logo.png" alt="Music Technology Group logo"></a> 
+            </div>
+            <div id="essentiajs-logo" class="footer-block">
+                <p>Using audio analysis from</p> 
+                <a href="https://mtg.github.io/essentia.js/" target="_blank"><img src="images/essentia.js-logo.png" alt="Javascript audio analysis library Essentia.js"></a>
+            </div>
+        </footer>
+
+        <script src="https://unpkg.com/wavesurfer.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia-wasm.web.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia.js-core.js"></script>
+        <script src="src/main.js" type="module" async defer></script>
+
+        <template id="playback-controls">
+            <div class="controls">
+                <button id="backward" class="ui button tiny">
+                    <i class="step backward icon"></i>
+                    Backward
+                </button>
+                <button id="play" class="ui primary button tiny">
+                    <i class="play icon"></i>
+                    Play/
+                    <i class="pause icon"></i>
+                    Pause
+                </button>
+                <button id="forward" class="ui button tiny">
+                    <i class="step forward icon"></i>
+                    Forward
+                </button>
+                <button id="mute" class="ui button tiny">
+                    <i class="volume off icon"></i>
+                    Toggle Mute
+                </button>
+            </div>
+        </template>
+    </body>
+</html>

@@ -178,6 +178,8 @@ TempoTap
 TempoTapDegara
 TempoTapMaxAgreement
 TempoTapTicks
+TensorflowInputMusiCNN
+TensorflowInputVGGish
 TonalExtractor
 TonicIndianArtMusic
 TriangularBands

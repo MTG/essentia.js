@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+		<title>TensorflowMusiCNN</title>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: black;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: black;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: black;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: black;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":false,"dateFormat":"Do MMM YYYY","systemName":"Essentia.js","systemSummary":"JavaScript library for Music/Audio analysis, powered by Essentia WebAssembly backend.","systemLogo":"","systemColor":"black","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"https://essentia.upf.edu","copyright":"Copyright (C) 2006-2021  Music Technology Group - Universitat Pompeu Fabra","linenums":true,"collapseSymbols":true,"inverseNav":true,"inlineNav":false,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":false,"favicon":null,"stylesheets":[],"scripts":[],"monospaceLinks":false,"cleverLinks":true};
+			window.DOCLET_TOC_ENABLED = true;
+			window.DOCLET_AFILTER_ENABLED = true;
+		</script>
+</head>
+<body>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="index.html">
+					Essentia.js
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+								
+								<li class="dropdown">
+									<a href="list_class.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+									<ul class="dropdown-menu">
+											<li><a href="Essentia.html">Essentia</a></li>
+											<li><a href="EssentiaTensorflowJSModel.html">EssentiaTensorflowJSModel</a></li>
+											<li><a href="EssentiaTFInputExtractor.html">EssentiaTFInputExtractor</a></li>
+											<li><a href="TensorflowMusiCNN.html">TensorflowMusiCNN</a></li>
+											<li><a href="TensorflowVGGish.html">TensorflowVGGish</a></li>
+											<li><a href="EssentiaExtractor.html">EssentiaExtractor</a></li>
+                                            <li><a href="EssentiaPlot.html">EssentiaPlot</a></li>
+											<li><a href="PlotHeatmap.html">PlotHeatmap</a></li>
+											<li><a href="PlotMelodyContour.html">PlotMelodyContour</a></li>
+									</ul>
+								</li>
+								<li class="dropdown">
+									<a href="list_tutorial.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
+									<ul class="dropdown-menu">
+											<li><a href="tutorial-1. Getting started.html">1. Getting started</a></li>
+											<li><a href="tutorial-2. Real-time analysis.html">2. Real-time analysis</a></li>
+											<li><a href="tutorial-3. Machine learning inference with Essentia.js.html">3. Machine learning inference with Essentia.js</a></li>
+											<li><a href="tutorial-4. Building from source.html">4. Building from source</a></li>
+									</ul>
+								</li>
+				</ul>
+			</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">class</span>
+				<h1><span class="name">TensorflowMusiCNN</span></h1>
+			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-9 main-content">
+						<ol class="breadcrumb">
+							<li><a href="index.html">Home</a></li>
+							<li><a href="list_class.html">Classes</a></li>
+							<li class="active">TensorflowMusiCNN</li>
+						</ol>
+						<div class="access-filter">
+								<label class="checkbox-inline">
+									<input class="toggle-inherited" type="checkbox" value="" checked>
+									Inherited
+								</label>
+								<label class="checkbox-inline">
+									<input class="toggle-public" type="checkbox" value="" checked>
+									Public
+								</label>
+						</div>
+					<section>
+							<dl class="symbol primary">
+								<dt class="symbol-title class collapsible-symbol expanded">
+			<h2 class="class"><span class="signature-new">new&nbsp;</span><span class="name">TensorflowMusiCNN</span><span class="signature-params">()</span><span class="signature-type"></span></h2>
+</dt>
+<dd class="symbol-details class  collapsible-symbol expanded" style="max-height: 9999px;">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Class with methods for computing inference of
+			Essentia-Tensorflow.js MusiCNN-based pre-trained models.
+			The <code>predict</code> method expect an input audio feature computed
+			using <code>EssentiaTFInputExtractor</code>.</p></div>
+			</div>			<div class="callout callout-example"><h5>Examples</h5>		<div class="example-code">
+						<pre class="prettyprint source language-javascript"><code class="language-javascript">// FEATURE EXTRACTION
+			// Create &#x60;EssentiaTFInputExtractor&#x60; instance by passing
+			// essentia-wasm import &#x60;EssentiaWASM&#x60; global object and &#x60;extractorType&#x3D;musicnn&#x60;.
+			const inputFeatureExtractor &#x3D; new EssentiaTFInputExtractor(EssentiaWASM, &quot;musicnn&quot;);
+			// Compute feature for a given audio signal
+			let inputMusiCNN &#x3D; inputFeatureExtractor.computeFrameWise(audioSignal);
+			// INFERENCE
+			const modelURL &#x3D; &quot;./autotagging/msd/msd-musicnn-1/model.json&quot;
+			// Where &#x60;tf&#x60; is the global import object from the &#x60;@tensorflow/tfjs*&#x60; package.
+			const musicnn &#x3D; new TensorflowMusiCNN(tf, modelURL);
+			// Promise for loading the model
+			await musicnn.initialize();
+			// Compute predictions for a given input feature.
+			let predictions &#x3D; await musicnn.predict(inputMusiCNN);</code></pre>
+					</div>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+							<!-- augments -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Augments</label>
+								<div class="col-sm-9">
+										<p class="form-control-static"><a href="EssentiaTensorflowJSModel.html">EssentiaTensorflowJSModel</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="machinelearning_tfjs_models.js.html">machinelearning/tfjs_models.js</a>, <a href="machinelearning_tfjs_models.js.html#line-240">line 240</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+							</dl>
+							<article class="secondary">
+									<h3>Methods</h3>
+									<dl class="symbol">
+											<hr/>
+											<dt class="symbol-title function public inherited collapsible-symbol">
+			<h4 id="initialize" class="function public inherited"><span class="signature-attribs">&lt;async> </span><span class="name">initialize</span><span class="signature-params">()</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public inherited  collapsible-symbol">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Promise for loading &amp; initialise an Essentia.js-TensorFlow.js model.</p></div>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+							<!-- inherits -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Inherited From</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="EssentiaTensorflowJSModel.html#initialize">EssentiaTensorflowJSModel#initialize</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="machinelearning_tfjs_models.js.html">machinelearning/tfjs_models.js</a>, <a href="machinelearning_tfjs_models.js.html#line-98">line 98</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public inherited collapsible-symbol">
+			<h4 id="arrayToTensorAsBatches" class="function public inherited"><span class="name">arrayToTensorAsBatches</span><span class="signature-params">( <span class="signature-param">inputFeatureArray</span>, <span class="signature-param">inputShape</span>, <span class="signature-param">patchSize</span> [,&nbsp;<span class="signature-param">zeroPadding</span>&nbsp;]&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{tf.Tensor3D}</span></h4>
+		</dt>
+<dd class="symbol-details function public inherited  collapsible-symbol">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Converts an input 1D or 2D array into a 3D tensor (tfjs) given it's shape and required
+			patchSize. If <code>padding=true</code>, this method will zero-pad the input feature.</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+							<th>Attributes</th>
+							<th>Default</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>inputFeatureArray</code></td>
+							<td><span class="param-type">Float32Array</span> | <span class="param-type">Array.&lt;any></span></td>
+								<td class="attributes"></td>
+								<td></td>
+							<td class="last">
+									<p>input feature array as either 1D or 2D array</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>inputShape</code></td>
+							<td><span class="param-type">Array.&lt;any></span></td>
+								<td class="attributes"></td>
+								<td></td>
+							<td class="last">
+									<p>shape of the input feature array in 2D.</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>patchSize</code></td>
+							<td><span class="param-type">number</span></td>
+								<td class="attributes"></td>
+								<td></td>
+							<td class="last">
+									<p>required patchSize to dynamically make batches of feature</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>zeroPadding</code></td>
+							<td><span class="param-type">boolean</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+								<td>false</td>
+							<td class="last">
+									<p>whether to enable zero-padding if less frames found for a batch.</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">tf.Tensor3D</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>returns the computed frame-wise feature for the given audio signal.</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+							<!-- inherits -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Inherited From</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="EssentiaTensorflowJSModel.html#arrayToTensorAsBatches">EssentiaTensorflowJSModel#arrayToTensorAsBatches</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="machinelearning_tfjs_models.js.html">machinelearning/tfjs_models.js</a>, <a href="machinelearning_tfjs_models.js.html#line-126">line 126</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public collapsible-symbol">
+			<h4 id="predict" class="function public"><span class="name">predict</span><span class="signature-params">( <span class="signature-param">inputFeature</span> [,&nbsp;<span class="signature-param">zeroPadding</span>&nbsp;]&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{array}</span></h4>
+		</dt>
+<dd class="symbol-details function public  collapsible-symbol">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Run inference on the given audio feature input and returns the activations</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+							<th>Attributes</th>
+							<th>Default</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>inputFeature</code></td>
+							<td><span class="param-type">InputMusiCNN</span></td>
+								<td class="attributes"></td>
+								<td></td>
+							<td class="last">
+									<p>audio feature required by the MusiCNN model.</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>zeroPadding</code></td>
+							<td><span class="param-type">boolean</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+								<td>false</td>
+							<td class="last">
+									<p>whether to do zero-padding to the input feature.</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">array</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>activations of the output layer of the model</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="machinelearning_tfjs_models.js.html">machinelearning/tfjs_models.js</a>, <a href="machinelearning_tfjs_models.js.html#line-255">line 255</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+									</dl>
+							</article>
+					</section>
+			</div>
+				<div class="col-md-3 side-content">
+					<nav class="toc hidden-print hidden-sm hidden-xs"></nav>
+				</div>
+		</div>
+	</div>
+	<footer>
+				<div class="footer-option">https://essentia.upf.edu</div>
+				<div class="copyright">Copyright (C) 2006-2021  Music Technology Group - Universitat Pompeu Fabra</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+	
+</body>
+</html>

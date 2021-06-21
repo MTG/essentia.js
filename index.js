@@ -1,5 +1,19 @@
 "use strict"
-// make entrypoint to ES6 class using esm
-require = require('esm')(module)
-const Essentia = require('./src/js/es6module.main.js');
-module.exports = Essentia.default;
+
+const EssentiaWASM = require("./dist/essentia-wasm.umd");
+const Essentia = require("./dist/essentia.js-core.umd");
+const EssentiaModel = require("./dist/essentia.js-model.umd");
+const EssentiaExtractor = require("./dist/essentia.js-extractor.umd");
+const EssentiaPlot = require("./dist/essentia.js-plot.umd");
+
+
+module.exports = {
+    // WASM backend
+    EssentiaWASM,
+    // Core JS API
+    Essentia,
+    // Add-on modules
+    EssentiaModel,
+    EssentiaExtractor,
+    EssentiaPlot
+};

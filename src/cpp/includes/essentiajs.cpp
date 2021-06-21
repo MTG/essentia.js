@@ -3168,6 +3168,34 @@ val EssentiaJS::TempoTapTicks(std::vector<float>& input_periods, std::vector<flo
   return outputTempoTapTicks;
 }
  
+// check https://essentia.upf.edu/reference/std_TensorflowInputMusiCNN.html
+val EssentiaJS::TensorflowInputMusiCNN(std::vector<float>& input_frame) {
+  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+  Algorithm* algoTensorflowInputMusiCNN = factory.create("TensorflowInputMusiCNN");
+  algoTensorflowInputMusiCNN->input("frame").set(input_frame);
+  std::vector<float> output_bands;
+  algoTensorflowInputMusiCNN->output("bands").set(output_bands);
+  algoTensorflowInputMusiCNN->compute();
+  val outputTensorflowInputMusiCNN(val::object());
+  outputTensorflowInputMusiCNN.set("bands", output_bands);
+  delete algoTensorflowInputMusiCNN;
+  return outputTensorflowInputMusiCNN;
+}
+ 
+// check https://essentia.upf.edu/reference/std_TensorflowInputVGGish.html
+val EssentiaJS::TensorflowInputVGGish(std::vector<float>& input_frame) {
+  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+  Algorithm* algoTensorflowInputVGGish = factory.create("TensorflowInputVGGish");
+  algoTensorflowInputVGGish->input("frame").set(input_frame);
+  std::vector<float> output_bands;
+  algoTensorflowInputVGGish->output("bands").set(output_bands);
+  algoTensorflowInputVGGish->compute();
+  val outputTensorflowInputVGGish(val::object());
+  outputTensorflowInputVGGish.set("bands", output_bands);
+  delete algoTensorflowInputVGGish;
+  return outputTensorflowInputVGGish;
+}
+ 
 // check https://essentia.upf.edu/reference/std_TonalExtractor.html
 val EssentiaJS::TonalExtractor(std::vector<float>& input_signal, const int frameSize, const int hopSize, const float tuningFrequency) {
   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();

@@ -1,4 +1,4 @@
-ARG EMSCRIPTEN_VERSION=latest
+ARG EMSCRIPTEN_VERSION=1.39.19
 FROM emscripten/emsdk:${EMSCRIPTEN_VERSION}
 
 ENV LANG C.UTF-8
@@ -8,7 +8,7 @@ RUN apt-get update \
     && apt-get install -y cmake curl nano python-dev python-numpy-dev libpython2.7 python-pip libeigen3-dev \
     && mkdir /essentia && cd /essentia && git clone https://github.com/MTG/essentia.git \
     && cd /essentia/essentia/packaging/debian_3rdparty \
-    && bash -C "./build_eigen3.sh" && cd ../../ \
+    && bash -C "./build_eigen3.sh" && cd ../../  && chmod +x waf \
     && emconfigure sh -c './waf configure --prefix=$EMSCRIPTEN/system/local/ --build-static --fft=KISS --emscripten --static-dependencies' \
     && emmake ./waf && emmake ./waf install \
     &&  apt-get remove -y python-dev libeigen3-dev \

@@ -41,7 +41,7 @@
 				}
 			</style>
 		<script type="text/javascript">
-			window.TEMPLATE_OPTIONS = {"includeDate":false,"dateFormat":"Do MMM YYYY","systemName":"Essentia.js","systemSummary":"JavaScript library for Music/Audio analysis, powered by Essentia WebAssembly backend.","systemLogo":"","systemColor":"black","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"https://essentia.upf.edu","copyright":"Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra","linenums":true,"collapseSymbols":true,"inverseNav":true,"inlineNav":false,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":false,"favicon":null,"stylesheets":[],"scripts":[],"monospaceLinks":false,"cleverLinks":true};
+			window.TEMPLATE_OPTIONS = {"includeDate":false,"dateFormat":"Do MMM YYYY","systemName":"Essentia.js","systemSummary":"JavaScript library for Music/Audio analysis, powered by Essentia WebAssembly backend.","systemLogo":"","systemColor":"black","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"https://essentia.upf.edu","copyright":"Copyright (C) 2006-2021  Music Technology Group - Universitat Pompeu Fabra","linenums":true,"collapseSymbols":true,"inverseNav":true,"inlineNav":false,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":false,"favicon":null,"stylesheets":[],"scripts":[],"monospaceLinks":false,"cleverLinks":true};
 			window.DOCLET_TOC_ENABLED = true;
 			window.DOCLET_AFILTER_ENABLED = false;
 		</script>
@@ -63,25 +63,28 @@
 			</div>
 			<div class="navbar-collapse collapse" id="topNavigation">
 				<ul class="nav navbar-nav">
+								
 								<li class="dropdown">
 									<a href="list_class.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 									<ul class="dropdown-menu">
 											<li><a href="Essentia.html">Essentia</a></li>
-										
+											<li><a href="EssentiaTensorflowJSModel.html">EssentiaTensorflowJSModel</a></li>
+											<li><a href="EssentiaTFInputExtractor.html">EssentiaTFInputExtractor</a></li>
+											<li><a href="TensorflowMusiCNN.html">TensorflowMusiCNN</a></li>
+											<li><a href="TensorflowVGGish.html">TensorflowVGGish</a></li>
 											<li><a href="EssentiaExtractor.html">EssentiaExtractor</a></li>
-											
 											<li><a href="EssentiaPlot.html">EssentiaPlot</a></li>
 											<li><a href="PlotHeatmap.html">PlotHeatmap</a></li>
-											
 											<li><a href="PlotMelodyContour.html">PlotMelodyContour</a></li>
 									</ul>
 								</li>
 								<li class="dropdown">
 									<a href="list_tutorial.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
 									<ul class="dropdown-menu">
-											<li><a href="tutorial-1. Getting Started.html">1. Getting Started</a></li>
-											<li><a href="tutorial-2. Building from Source.html">2. Building from Source</a></li>
-											
+											<li><a href="tutorial-1. Getting started.html">1. Getting started</a></li>
+											<li><a href="tutorial-2. Real-time analysis.html">2. Real-time analysis</a></li>
+											<li><a href="tutorial-3. Machine learning inference with Essentia.js.html">3. Machine learning inference with Essentia.js</a></li>
+											<li><a href="tutorial-4. Building from source.html">4. Building from source</a></li>
 									</ul>
 								</li>
 				</ul>
@@ -101,34 +104,54 @@
 			<article><p><img src="https://user-images.githubusercontent.com/14850001/66190489-67098d80-e68c-11e9-9a7c-35b82f6635e1.png" alt="alt text"></p>
 <p><a href="https://travis-ci.org/MTG/essentia.js"><img src="https://travis-ci.org/MTG/essentia.js.svg?branch=master" alt="Build Status"></a>
 <a href="https://badge.fury.io/js/essentia.js"><img src="https://badge.fury.io/js/essentia.js.svg" alt="npm version"></a>
-<a href="https://www.gnu.org/licenses/agpl-3.0"><img src="https://img.shields.io/badge/License-AGPL%20v3-blue.svg" alt="License: AGPL v3"></a></p>
-<p><a href="https://essentia.upf.edu/essentiajs">essentia.js</a> enables state-of-the-art music/audio analysis algorithms on your web-client and/or Node.js applications.</p>
+<a href="https://www.gnu.org/licenses/agpl-3.0"><img src="https://img.shields.io/badge/License-AGPL%20v3-blue.svg" alt="License: AGPL v3"></a>
+<a href="https://www.jsdelivr.com/package/npm/essentia.js"><img src="https://data.jsdelivr.com/v1/package/npm/essentia.js/badge" alt=""></a></p>
+<p><a href="https://essentia.upf.edu/essentiajs">Essentia.js</a> enables extensive collection of music/audio analysis algorithms on your web-client and/or Node.js applications.</p>
 <p>You can find the latest releases on <a href="https://github.com/MTG/essentia.js/releases">Github</a> or on <a href="https://www.npmjs.com/package/essentia.js">npm</a>.</p>
 <h2>Builds Reference</h2>
 <h3>Core JS API</h3>
+<p>Imports core JS API interface as <code>Essentia</code> namespace.</p>
 <ul>
-<li><code>essentia.js-core.*.js</code> - <code>Essentia</code> main JS interface for web browsers.</li>
-<li><code>essentia.js-core.es.*.js</code> - <code>Essentia</code> main JS interface for ES6 imports.</li>
+<li><code>essentia.js-core*.js</code> - IIFE import for web browsers.</li>
+<li><code>essentia.js-core.umd*.js</code> - UMD import.</li>
+<li><code>essentia.js-core.es*.js</code> - ES6 style import.</li>
 </ul>
-<h3>WASM modules</h3>
-<p>Imports an <a href="https://emscripten.org/docs/api_reference/module.html">Emscripten WASM Module</a> object <code>EssentiaWASM</code> to the global namespace which has JS bindings to essentia C++ library WASM back-end.</p>
+<h3>WebAssembly (WASM) modules</h3>
+<p>Imports a custom <a href="https://emscripten.org/docs/api_reference/module.html">Emscripten WASM Module</a> object <code>EssentiaWASM</code> to the global namespace which has JS bindings to Essentia WASM back-end.</p>
 <ul>
-<li><code>essentia-wasm.web.wasm</code> - essentia WASM back-end for asynchronous imports.</li>
+<li><code>essentia-wasm.web.wasm</code> - Essentia WASM back-end for asynchronous imports.</li>
 <li><code>essentia-wasm.web.js</code> - JS glue code for loading <code>essentia-wasm-web.wasm</code> (can be used with HTML <code>&lt;script&gt;</code> tag).</li>
-<li><code>essentia-wasm.module.js</code> -  essentia WASM back-end for synchronous imports (ES6 style import and AudioWorklet support).</li>
+<li><code>essentia-wasm.umd.js</code> -  Essentia WASM back-end for synchronous imports (UMD import and AudioWorklet support).</li>
+<li><code>essentia-wasm.es.js</code> -  Essentia WASM back-end for synchronous imports (ES6 style import and AudioWorklet support).</li>
 </ul>
-<p>The documentation for essentia C++ algorithms can be found <a href="https://essentia.upf.edu/algorithms_reference.html">here</a>.</p>
+<h4>Essentia WASM back-end</h4>
+<p>The Essentia WASM back-end allows us to use all the <a href="https://essentia.upf.edu/documentation.html">essentia standard mode</a> C++ algorithms except the ones mentioned <a href="https://github.com/MTG/essentia.js/blob/master/src/python/excluded_algos.md">here</a> in JavaScript. The WASM back-end provides JS bindings to the generated custom C++ wrapper using <a href="https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html">emscripten embind</a> through <a href="https://github.com/MTG/essentia.js/blob/a0985aacac01296b86ba00a21f60ca017e7b38c0/src/cpp/bindings_essentiajs.cpp#L29"><code>EssentiaJS</code></a> class.</p>
+<p>The detailed documentation for Essentia C++ algorithms can be found <a href="https://essentia.upf.edu/algorithms_reference.html">here</a>.</p>
 <h3>Add-on JS modules</h3>
+<h4><code>EssentiaModel</code></h4>
+<p>Run pre-trained Essentia-Tensorflow audio ML models for music analysis.</p>
 <ul>
-<li><code>essentia.js-extractor.*.js</code> - <code>EssentiaExtractor</code> import for  web browsers</li>
-<li><code>essentia.js-extractor.es.*.js</code> - <code>EssentiaExtractor</code> for ES6 imports.</li>
-<li><code>essentia.js-plot.*.js</code> - <code>EssentiaPlot</code> import for  web browsers</li>
-<li><code>essentia.js-plot.es.*.js</code> - <code>EssentiaPlot</code> import for ES6 imports.</li>
+<li><code>essentia.js-model*.js</code> - IIFE import for web browsers.</li>
+<li><code>essentia.js-model.umd*.js</code> - UMD import.</li>
+<li><code>essentia.js-model.es*.js</code> - ES6 import.</li>
 </ul>
-<h3>Essentia WebAssembly (WASM) back-end</h3>
-<p>The essentia WASM back-end allows us to use all the <a href="https://essentia.upf.edu/documentation.html">essentia standard mode</a> C++ algorithms except the ones mentioned <a href="https://github.com/MTG/essentia.js/blob/master/src/python/excluded_algos.md">here</a> in JavaScript. The WASM back-end provides JS bindings to the generated custom C++ wrapper using <a href="https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html">emscripten embind</a> through <a href="https://github.com/MTG/essentia.js/blob/a0985aacac01296b86ba00a21f60ca017e7b38c0/src/cpp/bindings_essentiajs.cpp#L29"><code>EssentiaJS</code></a> class.</p>
-<h3>Typescript interface</h3>
-<p>essentia.js also provides a typscript programming interface which can be found <a href="https://github.com/MTG/essentia.js/tree/master/src/typescript">here</a>.</p></article>
+<h4><code>EssentiaPlot</code></h4>
+<ul>
+<li><code>essentia.js-plot*.js</code> - IIFE import for web browsers.</li>
+<li><code>essentia.js-plot.umd*.js</code> - UMD import.</li>
+<li><code>essentia.js-plot.es*.js</code> - ES6 import.</li>
+</ul>
+<h4><code>EssentiaExtractor</code></h4>
+<ul>
+<li><code>essentia.js-extractor*.js</code> - IIFE import for web browsers.</li>
+<li><code>essentia.js-extractor.umd*.js</code> - UMD import.</li>
+<li><code>essentia.js-extractor.es*.js</code> - ES6 import.</li>
+</ul>
+<blockquote>
+<p>Note: '*' corresponds to whether it's a minified build or not.</p>
+</blockquote>
+<h2>TypeScript Interface</h2>
+<p>Essentia.js also provides TypeScript programming interface which can be found along with the builds. The build files (<code>*.d.ts</code>) can be found within the <a href="https://www.jsdelivr.com/package/npm/essentia.js?path=dist">dist</a> directory bundled on NPM. The source code can be found <a href="https://github.com/MTG/essentia.js/tree/master/src/typescript">here</a>.</p></article>
 		</section>
 			</div>
 				<div class="col-md-3 side-content">
@@ -138,8 +161,8 @@
 	</div>
 	<footer>
 				<div class="footer-option">https://essentia.upf.edu</div>
-				<div class="copyright">Copyright (C) 2006-2020  Music Technology Group - Universitat Pompeu Fabra</div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+				<div class="copyright">Copyright (C) 2006-2021  Music Technology Group - Universitat Pompeu Fabra</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>

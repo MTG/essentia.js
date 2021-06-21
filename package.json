@@ -1,18 +1,18 @@
 {
   "name": "essentia.js",
-  "version": "0.1.0-dev",
-  "description": "JavaScript library for music/audio analysis and processing for both real-time and offline audio feature extraction, powered by WebAssembly",
+  "version": "0.1.1",
+  "description": "JavaScript library for music/audio analysis and processing, powered by Essentia WebAssembly",
   "homepage": "https://mtg.github.io/essentia.js/",
-  "author": "Albin Correya <albin.correya@upf.edu> (http://mtg.upf.edu)",
+  "author": "Albin Correya <mtg@upf.edu> (http://mtg.upf.edu)",
   "license": "AGPL-3.0",
   "main": "index.js",
   "files": [
     "dist/*",
-    "src/js/es6module.main.js",
     "index.js",
-    "LICENSE.md",
+    "LICENSE",
     "README.md",
-    "AUTHORS"
+    "AUTHORS.md",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "gen-code": "make -f Makefile.essentiajs codegen",
@@ -26,22 +26,17 @@
     "example": "examples",
     "test": "test"
   },
-  "dependencies": {
-    "esm": "3.2.25"
-  },
-  "bundledDependencies": [
-    "esm"
-  ],
   "devDependencies": {
+    "@tensorflow/tfjs-node": "^3.7.0",
     "chai": "^4.2.0",
     "esm": "^3.2.25",
     "foodoc": "0.0.9",
     "jsdoc": "^3.6.3",
-    "mocha": "^8.1.3",
+    "mocha": "^8.4.0",
     "rollup": "^2.11.2",
     "rollup-plugin-terser": "^5.3.0",
     "rollup-plugin-typescript2": "^0.26.0",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.10"
   },
   "repository": {
     "type": "git",
@@ -50,8 +45,8 @@
   "keywords": [
     "audio-signal-processing",
     "music-information-retrieval",
+    "machine-learning",
     "webaudio",
-    "audio",
     "music",
     "webassembly",
     "emscripten",
@@ -60,5 +55,7 @@
   "bugs": {
     "url": "https://github.com/MTG/essentia.js/issues"
   },
-  "publishConfig": {"registry": "https://npm.pkg.github.com/"}
+  "dependencies": {
+    "node-wav": "0.0.2"
+  }
 }
