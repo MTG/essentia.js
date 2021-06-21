@@ -1,4 +1,6 @@
-//
+// Tests related to essentia.js-model add-on module
+// TODO: add more tests to increase the scope
+
 var fs = require('fs');
 var chai = require('chai');
 var esLib = require('../index');
