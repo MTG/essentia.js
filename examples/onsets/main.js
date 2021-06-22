@@ -31,6 +31,7 @@ class OnsetsApp {
         this.initializeDropArea();
 
         // State
+        this.waveformHasBeenLoaded = false;
         this.scrollPosition = 0;
         this.scrollFactor = 0.005;
         this.basePxPerSecond = null;
@@ -100,12 +101,18 @@ class OnsetsApp {
             if (msg.data.length == 0) {
                 console.info('empty onsets array');
                 this.onsetPositions = [];
-                this.updateWaveform();
+                if (!this.waveformHasBeenLoaded) {
+                    this.toggleWaveformDisplay();
+                }
                 this.toggleNoOnsetsNotice();
             } else {
                 this.onsetPositions = Array.from(msg.data);
-                this.updateWaveform();
+                if (!this.waveformHasBeenLoaded) {
+                    this.toggleWaveformDisplay();
+                }
             }
+            this.drawOnsets();
+            this.addOnsetSlices();
         } else {
             throw TypeError("Worker failed. Analysis results should be of type Float32Array");
         }
@@ -146,12 +153,6 @@ class OnsetsApp {
         }
     }
 
-    updateWaveform () {
-        if (this.onsetPositions) {
-            this.toggleWaveformDisplay();
-        }
-    }
-
     toggleWaveformDisplay () {
         if (this.dropArea) {
             this.dropArea.remove();
@@ -178,9 +179,11 @@ class OnsetsApp {
         this.playbackControls.toggleEnabled(true);
         this.wavesurfer.on('plugin-initialised', () => this.pluginsAreInitialised = true);
         this.wavesurfer.on('ready', () => {
-            this.drawOnsets();
-            this.addOnsetSlices();
-            this.basePxPerSecond = this.waveformContainer.clientWidth / this.wavesurfer.getDuration();
+            if (this.onsetPositions) {
+                this.drawOnsets();
+                this.addOnsetSlices();
+                this.basePxPerSecond = this.waveformContainer.clientWidth / this.wavesurfer.getDuration();
+            }
         });
 
         this.waveformContainer.addEventListener('wheel', (ev) => {
@@ -190,6 +193,7 @@ class OnsetsApp {
             this.zoomWaveform(pixelMousePosition, ev.deltaY);
         });
 
+        this.waveformHasBeenLoaded = true;
     }
 
     drawOnsets () {
@@ -197,6 +201,7 @@ class OnsetsApp {
             this.wavesurfer.initPlugin('markers');
         }
 
+        this.wavesurfer.clearMarkers();
         this.onsetPositions.forEach( (p) => this.wavesurfer.addMarker({ time: p, position: 'top' }) );
         this.wavesurfer.on('marker-click', (marker, ev) => {
             console.info(marker);
@@ -221,6 +226,7 @@ class OnsetsApp {
             };
         });
 
+        this.sliceRegions.map( (sr) => sr.remove() );
         this.sliceRegions = []; // clear existing regions, if any
         slices.forEach((s) => { this.sliceRegions.push(this.wavesurfer.addRegion(s)) });
 
