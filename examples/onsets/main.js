@@ -23,8 +23,8 @@ class OnsetsApp {
         this.dropArea = document.querySelector('#file-drop-area');
         this.waveformContainer = document.createElement('section');
         this.waveformContainer.setAttribute('id', 'waveform');
-        this.playbackControlsElement = document.querySelector('#playback-controls').content.cloneNode(true);
-        this.noOnsetsNoticeElement = document.querySelector('#no-onsets-notice').content.cloneNode(true);
+        this.playbackControlsElement = document.querySelector('#playback-controls').content.cloneNode(true).querySelector('div.controls');
+        this.noOnsetsNoticeElement = document.querySelector('#no-onsets-notice').content.cloneNode(true).querySelector('div.notice');
 
         this.playbackControls = null;
         this.wavesurfer = null;
@@ -104,11 +104,14 @@ class OnsetsApp {
                 if (!this.waveformHasBeenLoaded) {
                     this.toggleWaveformDisplay();
                 }
-                this.toggleNoOnsetsNotice();
+                this.toggleNoOnsetsNotice('on');
             } else {
                 this.onsetPositions = Array.from(msg.data);
                 if (!this.waveformHasBeenLoaded) {
                     this.toggleWaveformDisplay();
+                }
+                if (this.noOnsetsNoticeIsShown) {
+                    this.toggleNoOnsetsNotice('off');
                 }
             }
             this.drawOnsets();
@@ -251,12 +254,17 @@ class OnsetsApp {
         this.drawOnsets();
     }
 
-    toggleNoOnsetsNotice() {
-        if (this.noOnsetsNoticeIsShown) {
-            this.noOnsetsNoticeElement.remove()
-        } else {
-            this.waveformContainer.after(this.noOnsetsNoticeElement);
-            this.noOnsetsNoticeIsShown = true;
+    toggleNoOnsetsNotice(state) {
+        switch (state) {
+            case 'on':
+                this.noOnsetsNoticeIsShown = true;
+                this.playbackControlsElement.after(this.noOnsetsNoticeElement);
+                break;
+        
+            case 'off':
+                this.noOnsetsNoticeIsShown = false;
+                this.noOnsetsNoticeElement.remove()
+                break;
         }
     }
 }
