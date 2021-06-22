@@ -118,7 +118,7 @@ p {
 weight-toggle, .fft-control-wrap {
     /* display: block; */
     width: 100%;
-    flex: 0 1 12.5%;
+    flex: 0 1 16%;
 }
 
 #file-drop-area {
