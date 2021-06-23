@@ -27,6 +27,8 @@ class OnsetsApp {
         this.noOnsetsNoticeElement = document.querySelector('#no-onsets-notice').content.cloneNode(true).querySelector('div.notice');
 
         this.playbackControls = null;
+        // wait these ms to send 'updateParams' cmd to audioWorker, in case user is still tweaking parameters
+        this.interactionDelay = 2000;
         this.wavesurfer = null;
         this.initializeDropArea();
 
@@ -62,12 +64,12 @@ class OnsetsApp {
         this.odfToggles.forEach((elem) => {
             // init selected ODF (e.g. HFC)
             if (elem.name == 'hfc') { elem.checkbox.click() }
-            elem.checkbox.addEventListener('click', this.inputHandler.bind(this));
-            elem.addEventListener('change', this.inputHandler.bind(this));
+            elem.checkbox.addEventListener('click', this.algoControlsHandler.bind(this));
+            elem.addEventListener('change', this.algoControlsHandler.bind(this));
         });
 
         this.fftControlInputs.forEach((elem) => {
-            elem.addEventListener('change', this.inputHandler.bind(this))
+            elem.addEventListener('change', this.algoControlsHandler.bind(this))
         })
     }
     
@@ -121,7 +123,7 @@ class OnsetsApp {
         }
     }
 
-    inputHandler (ev) {
+    algoControlsHandler (ev) {
         const currentElem = ev.target;
 
         let params = {
@@ -149,11 +151,19 @@ class OnsetsApp {
             alert(`Couldn't toggle ${currentElem.name} ODF, at least one has to be selected.`);
         } else {
             // submit to this.worker: use 'updateParams' cmd
-            this.audioWorker.postMessage({
-                request: 'updateParams',
-                params: params
-            });
+            if (this.timeoutId) {
+                clearTimeout(this.timeoutId);
+            }
+            this.timeoutId = setTimeout(this.sendToWorkerAfterTimeout.bind(this), this.interactionDelay, params);
         }
+    }
+
+    sendToWorkerAfterTimeout (params) {
+        this.timeoutId = null;
+        this.audioWorker.postMessage({
+            request: 'updateParams',
+            params: params
+        });
     }
 
     toggleWaveformDisplay () {
