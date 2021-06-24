@@ -100,7 +100,7 @@ class Essentia {
     if (buffer.numberOfChannels === 2) {
       const left = this.arrayToVector(buffer.getChannelData(0));
       const right = this.arrayToVector(buffer.getChannelData(1));
-      let monoSignal = this.MonoMixer(left, right);
+      let monoSignal = this.MonoMixer(left, right).audio;
       return this.vectorToArray(monoSignal);
     }
     throw new Error('Unexpected number of channels found in audio buffer. Only accepts mono or stereo audio buffers.');
