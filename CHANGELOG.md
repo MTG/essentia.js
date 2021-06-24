@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Fix TypeError on audioBufferToMonoSignal in `essentia.js-core` (see #58)
-- Add a basic Node.js example to the repo (see ##44).
+- Fix TypeError on audioBufferToMonoSignal in `essentia.js-core` (see [#58](https://github.com/MTG/essentia.js/issues/58))
+- Add a basic Node.js example to the repo (see [#44](https://github.com/MTG/essentia.js/issues/44)).
 
 
 
@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changes
 
-- Fix TypeError on audioBufferToMonoSignal in `essentia.js-model` (see #58)
+- Fix TypeError on audioBufferToMonoSignal in `essentia.js-model` (see [#58](https://github.com/MTG/essentia.js/issues/58))
 
 
 
