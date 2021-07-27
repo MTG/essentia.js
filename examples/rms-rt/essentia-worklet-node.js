@@ -22,7 +22,9 @@ const workletProcessorCode = ["https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/di
 export async function createEssentiaNode (context) {
   class EssentiaNode extends AudioWorkletNode {
     constructor(context) {
-      super(context, 'essentia-worklet-processor');
+      super(context, 'essentia-worklet-processor', {
+        outputChannelCount: [1]
+      });
     }
   }
   try {
