@@ -13,6 +13,6 @@ Vue.use(BootstrapVue);
 Vue.use(BootstrapVueIcons);
 
 new Vue({
-  el: '#app',
+  el: '#vue-root',
   render: h => h(App)
 })
