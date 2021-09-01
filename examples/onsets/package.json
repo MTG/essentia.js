@@ -19,7 +19,7 @@
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.0",
     "babel-preset-stage-3": "^6.24.1",
-    "bootstrap": "^5.1.0",
+    "bootstrap": "^4.5.3",
     "bootstrap-vue": "^2.21.2",
     "cross-env": "^5.0.5",
     "css-loader": "^0.28.7",
