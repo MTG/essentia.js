@@ -1,38 +1,34 @@
 <template>
-    <footer>
-      <div id="mtg-logo" class="footer-block">
-          <p>Made at</p>
-          <a href="https://www.upf.edu/web/mtg/" target="_blank"><img src="src/assets/mtg-logo.png" alt="Music Technology Group logo"></a> 
-      </div>
-      <div id="essentiajs-logo" class="footer-block">
-          <p>Using audio analysis from</p> 
-          <a href="https://mtg.github.io/essentia.js/" target="_blank"><img src="src/assets/essentia.js-logo.png" alt="Javascript audio analysis library Essentia.js"></a>
-      </div>
-    </footer>
+    <div id="footer-wrapper" class="container-fluid bg-light">
+        <footer class="d-flex justify-content-around text-muted font-weight-light">
+            <div id="mtg-logo" class="d-flex align-items-center footer-block">
+                <p>Made at</p>
+                <a id="mtg-link" href="https://www.upf.edu/web/mtg/" target="_blank">
+                    <mtg-logo></mtg-logo>
+                </a> 
+            </div>
+            <div id="essentiajs-logo" class="d-flex align-items-center footer-block">
+                <p>Using audio analysis from</p> 
+                <a id="essentiajs-link" href="https://mtg.github.io/essentia.js/" target="_blank">
+                    <essentiajs-logo></essentiajs-logo>
+                </a>
+            </div>
+        </footer>
+    </div>
 </template>
 
 <script>
+import MtgLogo from './MTGLogo.vue';
+import EssentiajsLogo from './EssentiajsLogo.vue';
 export default {
-
+    components: { MtgLogo, EssentiajsLogo }
 }
 </script>
 
 <style lang="scss">
     @import '../assets/styles/globals.scss';
 
-    footer {
-        width: 100%;
-
-        display: flex;
-        justify-content: space-evenly;
-        align-content: center;
-        padding-top: 1rem;
-
-        color: #ffffff;
-        font-weight: 300;
-        font-size: 1rem;
-        background-color: $main-bg;
-
+    #footer-wrapper {
         position: absolute;
         bottom: 0vh;
     }
@@ -40,9 +36,9 @@ export default {
     .footer-block {
         display: flex;
 
-        text-align: center;
-        align-content: center;
-        margin-bottom: 0.5rem;
+        // text-align: center;
+        // align-content: center;
+        // margin-bottom: 0.5rem;
     }
 
     .footer-block p {
@@ -59,16 +55,16 @@ export default {
         border-radius: 5px;
     }
 
-    .footer-block img:hover {
-        /* border: solid 1px white; */
-        box-shadow: 0 0 0 1px white;
-    }
+    // .footer-block img:hover {
+    //     /* border: solid 1px white; */
+    //     box-shadow: 0 0 3px 1px white;
+    // }
 
-    [alt="Javascript audio analysis library Essentia.js"] {
+    #essentiajs-link {
         height: 2.5rem;
     }
 
-    [alt="Music Technology Group logo"] {
+    #mtg-link {
         height: 3.5rem;
     }
 </style>

@@ -1,8 +1,12 @@
 <template>
-    <header class="container-fluid center-block text-center">
-        <h1>Audio slicer fun!</h1>
-        <p>Create weighted combinations of multiple onset detection functions for different segmentation results.</p>
-    </header>
+    <div class="bg-light py-1">
+        <header class="container text-center d-flex flex-row justify-content-between">
+            <h4 class="my-auto">Audio slicer fun!</h4>
+            <p class="my-auto text-muted">
+                <small>Create weighted combinations of multiple onset detection functions for different segmentation results.</small>
+            </p>
+        </header>
+    </div>
 </template>
 
 <script>
@@ -10,26 +14,3 @@ export default {
     
 }
 </script>
-
-<style lang="scss">
-    @import '../assets/styles/globals.scss';
-    header, h1 {
-        margin: 0;
-    }
-
-    header {
-        background-color: $main-bg;
-        padding: 1rem 0;
-        text-align: center;
-    }
-
-    h1 {
-        color: #fff;
-        font-weight: 500;
-        font-size: 1.7rem;
-    }
-
-    p {
-        color: #f7f7f7;
-    }
-</style>
