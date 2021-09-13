@@ -1,7 +1,6 @@
 <template>
   <div id="app">
-      <demos-header v-if="instructionsClosed"></demos-header>
-      <main>
+      <div id="instructions" v-if="!instructionsClosed">
         <!-- using placeholder GIFs -->
         <instructions-modal img-link="https://media.giphy.com/media/eDOsXo70WqUU0/giphy.gif,
                                         https://media.giphy.com/media/AUlBq9xqbWu0E/giphy.gif,
@@ -11,8 +10,12 @@
           <template slot="lead">Create weighted combinations of multiple onset detection functions for different audio segmentation results.</template>
           <template slot="dismiss">Got it!</template>
         </instructions-modal>
+      </div>
+      <main v-if="instructionsClosed" class="d-flex flex-column justify-content-center align-items-center">
+        <demos-header></demos-header>
+        <browse-display></browse-display>
+        <demos-footer></demos-footer>
       </main>
-      <demos-footer v-if="instructionsClosed"></demos-footer>
   </div>
 </template>
 
@@ -20,13 +23,15 @@
 import InstructionsModal from './components/InstructionsModal.vue';
 import DemosFooter from './components/DemosFooter.vue';
 import DemosHeader from './components/DemosHeader.vue';
+import BrowseDisplay from './components/BrowseDisplayPanel.vue';
 
 export default {
   name: 'app',
-  components: { InstructionsModal, DemosFooter, DemosHeader },
+  components: { InstructionsModal, DemosFooter, DemosHeader, BrowseDisplay },
   data () {
     return {
-      instructionsClosed: false 
+      instructionsClosed: false,
+      audioUploaded: false
     }
   }
 }
@@ -35,5 +40,6 @@ export default {
 <style lang="scss">
   main {
     height: 100vh;
+    width: 100vw;
   }
 </style>

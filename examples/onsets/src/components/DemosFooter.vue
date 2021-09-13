@@ -1,20 +1,18 @@
 <template>
-    <div id="footer-wrapper" class="container-fluid bg-light">
-        <footer class="d-flex justify-content-around text-muted font-weight-light">
-            <div id="mtg-logo" class="d-flex align-items-center footer-block">
-                <p>Made at</p>
-                <a id="mtg-link" href="https://www.upf.edu/web/mtg/" target="_blank">
-                    <mtg-logo></mtg-logo>
-                </a> 
-            </div>
-            <div id="essentiajs-logo" class="d-flex align-items-center footer-block">
-                <p>Using audio analysis from</p> 
-                <a id="essentiajs-link" href="https://mtg.github.io/essentia.js/" target="_blank">
-                    <essentiajs-logo></essentiajs-logo>
-                </a>
-            </div>
-        </footer>
-    </div>
+    <footer id="footer-wrapper" class="d-flex justify-content-around text-muted font-weight-light container-fluid bg-light">
+        <div id="mtg-logo" class="d-flex align-items-center footer-block">
+            <p>Made at</p>
+            <a id="mtg-link" href="https://www.upf.edu/web/mtg/" target="_blank">
+                <mtg-logo></mtg-logo>
+            </a> 
+        </div>
+        <div id="essentiajs-logo" class="d-flex align-items-center footer-block">
+            <p>Using audio analysis from</p> 
+            <a id="essentiajs-link" href="https://mtg.github.io/essentia.js/" target="_blank">
+                <essentiajs-logo></essentiajs-logo>
+            </a>
+        </div>
+    </footer>
 </template>
 
 <script>
