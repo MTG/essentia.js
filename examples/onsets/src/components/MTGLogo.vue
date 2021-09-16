@@ -352,6 +352,6 @@
     .mtg-logo-text:hover {
         /* border: solid 1px white; */
         cursor: pointer;
-        fill: #d3d3d3;
+        fill: #E4454A;
     }
 </style>
