@@ -20,6 +20,8 @@
 </template>
 
 <script>
+import EventBus from './core/event-bus';
+
 import InstructionsModal from './components/InstructionsModal.vue';
 import DemosFooter from './components/DemosFooter.vue';
 import DemosHeader from './components/DemosHeader.vue';
@@ -33,6 +35,9 @@ export default {
       instructionsClosed: false,
       audioUploaded: false
     }
+  },
+  created () {
+    // EventBus.$on()
   }
 }
 </script>
