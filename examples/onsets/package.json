@@ -35,6 +35,6 @@
   },
   "dependencies": {
     "freesound": "^0.0.4",
-    "wavesurfer": "^1.3.4"
+    "wavesurfer.js": "^5.0.1"
   }
 }

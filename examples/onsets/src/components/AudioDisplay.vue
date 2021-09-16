@@ -23,7 +23,14 @@
 </template>
 
 <script>
+import WaveSurfer from 'wavesurfer.js';
+import MarkersPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.markers';
+import RegionsPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.regions';
+
+let wavesurfer = null;
+
 export default {
+    props: ['file'],
     data () {
         return {
             isPlaying: false,
@@ -40,6 +47,24 @@ export default {
         handleDownload () {
 
         }
+    },
+    mounted () {
+        wavesurfer = WaveSurfer.create({
+            container: '#display',
+            progressColor: '#F7AF39',
+            waveColor: '#a16607',
+            partialRender: true,
+            plugins: [
+                MarkersPlugin.create({
+                    markers: []
+                }),
+                RegionsPlugin.create()
+            ]
+        });
+
+        fetch(this.file)
+        .then(resp => resp.blob())
+        .then(blob => wavesurfer.loadBlob(blob))
     }
 }
 </script>
