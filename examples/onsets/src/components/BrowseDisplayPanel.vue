@@ -4,7 +4,7 @@
             <b-row class="my-3">
                 <b-col sm="8">
                     <b-input-group>
-                        <b-form-input v-model="searchTerm" placeholder="Search Freesound.org" @input="searchFreesound"></b-form-input>
+                        <b-form-input v-model="searchTerm" placeholder="Search Freesound.org" @change="searchFreesound"></b-form-input>
                         <b-input-group-append>
                             <b-button variant="light" class="px-4">
                                 <b-icon icon="search"></b-icon>
@@ -22,7 +22,7 @@
                 </b-col>
             </b-row>
         </div>
-        <audio-display v-show="!showFreesoundResults"></audio-display>
+        <audio-display v-show="!showFreesoundResults" :file="audioURL"></audio-display>
     </section>
 </template>
 
@@ -36,19 +36,35 @@ export default {
     data () {
         return {
             showFreesoundResults: false,
-            searchTerm: ""
+            searchTerm: "",
+            audioURL: "../assets/acoustic-drums.wav"
         }
     },
     methods: {
         searchFreesound () {
-
+            let searchOptions = {
+                page: 1,
+                filter: "duration:[1.0 TO 30.0]",
+                sort: "rating_desc",
+                page_size: 10,
+                fields: "id,name,url,previews"
+            };
+            freesound.textSearch(this.searchTerm, searchOptions, this.handleSearchSuccess, this.handleSearchFailure);
+        },
+        handleSearchSuccess (sounds) {
+            console.log("Retrieved the following from FS: ", sounds);
+            this.showFreesoundResults = true;
+        },
+        handleSearchFailure (error) {
+            console.error("Freesound search failed", error);
         }
     },
     created () {
         // set FS API key
-        freesound.setToken("")
+        console.info("FS token set");
     }
 }
+
 </script>
 
 <style lang="scss" scoped>
