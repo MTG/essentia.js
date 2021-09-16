@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import EventBus from '../core/event-bus';
 import WaveSurfer from 'wavesurfer.js';
 import MarkersPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.markers';
 import RegionsPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.regions';

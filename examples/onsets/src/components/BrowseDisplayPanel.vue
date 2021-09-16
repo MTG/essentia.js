@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import EventBus from '../core/event-bus';
 import AudioDisplay from './AudioDisplay.vue';
 import FreesoundResults from './FreesoundResults.vue';
 import freesound from 'freesound';
