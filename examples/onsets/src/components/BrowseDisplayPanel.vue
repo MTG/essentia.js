@@ -31,13 +31,15 @@ import AudioDisplay from './AudioDisplay.vue';
 import FreesoundResults from './FreesoundResults.vue';
 import freesound from 'freesound';
 
+import audioURL from '../assets/acoustic-drums.wav';
+
 export default {
     components: { AudioDisplay, FreesoundResults },
     data () {
         return {
             showFreesoundResults: false,
             searchTerm: "",
-            audioURL: "../assets/acoustic-drums.wav"
+            audioURL: audioURL
         }
     },
     methods: {

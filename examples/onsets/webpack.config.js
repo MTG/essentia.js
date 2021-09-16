@@ -9,6 +9,7 @@ module.exports = {
     publicPath: '/public/',
     filename: 'build.js'
   },
+  target: 'web',
   module: {
     rules: [
       {
@@ -66,6 +67,13 @@ module.exports = {
         loader: 'file-loader',
         options: {
           name: '[name].[ext]?[hash]'
+        }
+      },
+      {
+        test: /\.(mp3|wav)$/i,
+        loader: 'file-loader',
+        query: {
+          name: 'assets/[name].[hash:8].[ext]'
         }
       }
     ]
