@@ -22,6 +22,7 @@
                 </b-col>
             </b-row>
         </div>
+        <freesound-results v-show="showFreesoundResults"></freesound-results>
         <audio-display v-show="!showFreesoundResults" :file="audioURL"></audio-display>
     </section>
 </template>
@@ -55,7 +56,7 @@ export default {
             freesound.textSearch(this.searchTerm, searchOptions, this.handleSearchSuccess, this.handleSearchFailure);
         },
         handleSearchSuccess (sounds) {
-            console.log("Retrieved the following from FS: ", sounds);
+            EventBus.$emit("successful-fs-search", sounds.results);
             this.showFreesoundResults = true;
         },
         handleSearchFailure (error) {
