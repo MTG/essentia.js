@@ -32,6 +32,7 @@ import EventBus from '../core/event-bus';
 import AudioDisplay from './AudioDisplay.vue';
 import FreesoundResults from './FreesoundResults.vue';
 import freesound from 'freesound';
+import apiKey from '../.env/key';
 
 import audioURL from '../assets/acoustic-drums.wav';
 
@@ -65,6 +66,7 @@ export default {
     },
     created () {
         // set FS API key
+        freesound.setToken(apiKey);
         console.info("FS token set");
     }
 }
