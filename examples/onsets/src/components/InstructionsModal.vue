@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-modal v-model="showModal" footer-class="d-flex justify-content-center" class="w-100" title="Instructions" @close="closeModal">
+        <b-modal v-model="showModal" footer-class="d-flex justify-content-center" class="w-100" title="Instructions" @close="closeModal" @hide="closeModal">
             <div class="d-block text-center">
                 <h1>
                     <slot name="header"></slot>
