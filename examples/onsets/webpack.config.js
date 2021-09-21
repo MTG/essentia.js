@@ -2,7 +2,7 @@ var path = require('path')
 var webpack = require('webpack')
 
 module.exports = {
-  entry: './src/main.js',
+  entry: ['babel-polyfill', './src/main.js'],
   output: {
     // use "public" since "dist" and "builds" are excluded by toplevel .gitignore
     path: path.resolve(__dirname, './public'),
