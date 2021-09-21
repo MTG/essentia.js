@@ -1,8 +1,8 @@
 <template>
     <section class="mx-2 p-3">
         <div id="audio-search-upload">
-            <b-row class="my-3">
-                <b-col sm="8">
+            <b-row class="my-3 justify-content-between">
+                <b-col sm="5" class="px-0">
                     <b-input-group>
                         <b-form-input v-model="searchTerm" placeholder="Search Freesound.org" @change="searchFreesound"></b-form-input>
                         <b-input-group-append>
@@ -12,18 +12,24 @@
                         </b-input-group-append>
                     </b-input-group>
                 </b-col>
-                <b-col sm="4">
-                    <b-button variant="light" >
-                        <b-icon icon="upload"></b-icon>
-                        <span class="ml-2">
-                            Open file
-                        </span>
-                    </b-button>
+                <span sm="2" class="my-auto">Or</span>
+                <b-col sm="5" class="px-0">
+                    <b-input-group>
+                        <b-form-input placeholder="Upload from computer" readonly @click="uploadLabel.click()"></b-form-input>
+                        <b-input-group-append>
+                            <b-button variant="light" class="px-4" @click="uploadLabel.click()">
+                                <b-icon icon="upload"></b-icon>
+                            </b-button>
+                        </b-input-group-append>
+                    </b-input-group>
+                    <label id="file-upload-label" class="d-none">
+                        <input type="file" accept="audio/*, .m4a" @change="handleSoundUpload">
+                    </label>
                 </b-col>
             </b-row>
         </div>
-        <freesound-results v-show="showFreesoundResults"></freesound-results>
-        <audio-display v-show="!showFreesoundResults" :file="audioURL"></audio-display>
+        <freesound-results :class="[{ 'd-flex': showFreesoundResults }, { 'd-none': !showFreesoundResults }]"></freesound-results>
+        <audio-display v-show="!showFreesoundResults"></audio-display>
     </section>
 </template>
 
@@ -34,15 +40,13 @@ import FreesoundResults from './FreesoundResults.vue';
 import freesound from 'freesound';
 import apiKey from '../.env/key';
 
-import audioURL from '../assets/acoustic-drums.wav';
-
 export default {
     components: { AudioDisplay, FreesoundResults },
     data () {
         return {
             showFreesoundResults: false,
             searchTerm: "",
-            audioURL: audioURL
+            uploadLabel: null
         }
     },
     methods: {
@@ -56,6 +60,19 @@ export default {
             };
             freesound.textSearch(this.searchTerm, searchOptions, this.handleSearchSuccess, this.handleSearchFailure);
         },
+        handleSoundUpload (event) {
+            event.preventDefault();
+
+            let files = null;
+            if (event.type == "change") {
+                files = event.target.files;
+            }
+            if (event.type == "drop") {
+                files = event.dataTransfer.files;
+            }
+
+            EventBus.$emit("sound-read", files[0]);
+        },
         handleSearchSuccess (sounds) {
             EventBus.$emit("successful-fs-search", sounds.results);
             this.showFreesoundResults = true;
@@ -68,6 +85,13 @@ export default {
         // set FS API key
         freesound.setToken(apiKey);
         console.info("FS token set");
+
+        EventBus.$on("sound-selected", () => {
+            this.showFreesoundResults = false;
+        })
+    },
+    mounted () {
+        this.uploadLabel = document.querySelector("#file-upload-label");
     }
 }
 
@@ -76,5 +100,8 @@ export default {
 <style lang="scss" scoped>
     section {
         width: 80%;
+    }
+    #file-upload {
+        display: none;
     }
 </style>

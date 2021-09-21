@@ -28,14 +28,14 @@ import WaveSurfer from 'wavesurfer.js';
 import MarkersPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.markers';
 import RegionsPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.regions';
 
-let wavesurfer = null;
+import audioURL from '../assets/acoustic-drums.wav';
 
 export default {
-    props: ['file'],
     data () {
         return {
             isPlaying: false,
-            soundOn: true
+            soundOn: true,
+            wavesurfer: null
         }
     },
     methods: {
@@ -49,23 +49,30 @@ export default {
 
         }
     },
-    mounted () {
-        wavesurfer = WaveSurfer.create({
-            container: '#display',
-            progressColor: '#F7AF39',
-            waveColor: '#a16607',
-            partialRender: true,
-            plugins: [
-                MarkersPlugin.create({
-                    markers: []
-                }),
-                RegionsPlugin.create()
-            ]
+    mounted () {        
+        EventBus.$on("sound-read", (blob) => {
+            if (this.wavesurfer) {
+                console.info("attempting to destroy wavesurfer");
+                this.wavesurfer.destroy();
+            }
+
+            this.wavesurfer = WaveSurfer.create({
+                container: '#display',
+                progressColor: '#F7AF39',
+                waveColor: '#a16607',
+                partialRender: true,
+                plugins: [
+                    MarkersPlugin.create({
+                        markers: []
+                    }),
+                    RegionsPlugin.create()
+                ]
+            });
+
+            this.wavesurfer.loadBlob(blob);
         });
 
-        fetch(this.file)
-        .then(resp => resp.blob())
-        .then(blob => wavesurfer.loadBlob(blob))
+        EventBus.$emit("sound-selected", audioURL);
     }
 }
 </script>

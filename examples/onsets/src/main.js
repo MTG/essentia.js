@@ -1,5 +1,9 @@
 import Vue from 'vue';
 import App from './App.vue';
+// import EventBus from './core/event-bus';
+import DSP from './core/processing';
+
+const centralProcessing = new DSP();
 
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 
