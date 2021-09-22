@@ -40,10 +40,18 @@ export default {
     },
     methods: {
         handleMute () {
+            if (!this.wavesurfer) {
+                return
+            }
             this.soundOn = !this.soundOn;
+            this.wavesurfer.toggleMute();
         },
         handlePlay () {
+            if (!this.wavesurfer) {
+                return
+            }
             this.isPlaying = !this.isPlaying;
+            this.wavesurfer.playPause();
         },
         handleDownload () {
 
@@ -52,7 +60,6 @@ export default {
     mounted () {        
         EventBus.$on("sound-read", (blob) => {
             if (this.wavesurfer) {
-                console.info("attempting to destroy wavesurfer");
                 this.wavesurfer.destroy();
             }
 
@@ -70,6 +77,10 @@ export default {
             });
 
             this.wavesurfer.loadBlob(blob);
+
+            this.wavesurfer.on("finish", () => {
+                if (this.isPlaying) this.isPlaying = false;
+            })
         });
 
         EventBus.$emit("sound-selected", audioURL);
