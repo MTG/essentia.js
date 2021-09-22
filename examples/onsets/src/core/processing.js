@@ -9,6 +9,22 @@ export default class DSP {
     constructor () {
         this.audioCtx = new (AudioContext || webkitAudioContext)();
         // create audio worker, set up comms
+        this.audioWorker = new Worker("./audio-worker.js", {type: "module"});
+        this.audioWorker.postMessage({
+            request: 'updateParams',
+            params: {sampleRate: this.audioCtx.sampleRate}
+        });
+        this.audioWorker.onmessage = function listenToWorker (msg) {
+            if (msg.data instanceof Float32Array) {
+                if (msg.data.length == 0) {
+                    console.info('analysis-finished-empty');
+                } else {
+                    console.info('analysis-finished-onsets')
+                }
+            } else {
+                throw TypeError("Worker failed. Analysis results should be of type Float32Array");
+            }
+        };
 
         // set up global event handlers
         EventBus.$on("sound-selected", (url) => this.handleSoundSelect(url) );
@@ -33,8 +49,12 @@ export default class DSP {
 
     async decodeSoundBlob (blob) {
         let buffer = await blob.arrayBuffer();
-        let audioArray = await this.decodeBuffer(buffer);
+        let audioBuffer = await this.decodeBuffer(buffer);
+        let audioArray = audioBuffer.getChannelData(0);
         // send audioArray to Worker
-        
+        this.audioWorker.postMessage({
+            request: 'analyse',
+            audio: audioArray
+        });
     }
 }

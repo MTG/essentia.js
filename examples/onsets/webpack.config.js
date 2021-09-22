@@ -1,6 +1,7 @@
-var path = require('path')
-var webpack = require('webpack')
-var VueLoaderPlugin = require('vue-loader/lib/plugin')
+var path = require('path');
+var webpack = require('webpack');
+var VueLoaderPlugin = require('vue-loader/lib/plugin');
+var WorkerPlugin = require('worker-plugin');
 
 module.exports = {
   entry: ['babel-polyfill', './src/main.js'],
@@ -79,8 +80,14 @@ module.exports = {
       }
     ]
   },
+  node: {
+    fs: 'empty'
+  },
   plugins: [
-    new VueLoaderPlugin()
+    new VueLoaderPlugin(),
+    new WorkerPlugin({
+      preserveTypeModule: true
+    })
   ],
   resolve: {
     alias: {
