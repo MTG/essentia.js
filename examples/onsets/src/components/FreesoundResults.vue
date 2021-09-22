@@ -27,6 +27,7 @@ export default {
         handleSelect (sound) {
             let selectedAudioURL = sound.previews["preview-hq-mp3"];
             EventBus.$emit("sound-selected", selectedAudioURL);
+            this.selected = "";
         }
     },
     created () {

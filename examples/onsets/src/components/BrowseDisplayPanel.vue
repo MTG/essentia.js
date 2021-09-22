@@ -6,7 +6,7 @@
                     <b-input-group>
                         <b-form-input v-model="searchTerm" placeholder="Search Freesound.org" @change="searchFreesound"></b-form-input>
                         <b-input-group-append>
-                            <b-button variant="light" class="px-4">
+                            <b-button variant="light" class="px-4" @click="searchFreesound">
                                 <b-icon icon="search"></b-icon>
                             </b-button>
                         </b-input-group-append>
@@ -76,6 +76,7 @@ export default {
         handleSearchSuccess (sounds) {
             EventBus.$emit("successful-fs-search", sounds.results);
             this.showFreesoundResults = true;
+            this.searchTerm = "";
         },
         handleSearchFailure (error) {
             console.error("Freesound search failed", error);
