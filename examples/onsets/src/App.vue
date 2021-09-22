@@ -11,7 +11,7 @@
           <template slot="dismiss">Got it!</template>
         </instructions-modal>
       </div>
-      <main v-if="instructionsClosed" class="d-flex flex-column justify-content-center align-items-center">
+      <main v-if="instructionsClosed" class="d-flex flex-column justify-content-between align-items-center">
         <demos-header></demos-header>
         <browse-display></browse-display>
         <demos-footer></demos-footer>

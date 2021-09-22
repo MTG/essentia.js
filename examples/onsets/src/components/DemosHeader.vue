@@ -14,8 +14,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    #header-wrapper {
-        position: absolute;
-        top: 0vh;
-    }
+    // #header-wrapper {
+    //     position: absolute;
+    //     top: 0vh;
+    // }
 </style>

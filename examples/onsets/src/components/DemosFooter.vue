@@ -26,10 +26,10 @@ export default {
 <style lang="scss">
     @import '../assets/styles/globals.scss';
 
-    #footer-wrapper {
-        position: absolute;
-        bottom: 0vh;
-    }
+    // #footer-wrapper {
+    //     position: absolute;
+    //     bottom: 0vh;
+    // }
 
     .footer-block {
         display: flex;

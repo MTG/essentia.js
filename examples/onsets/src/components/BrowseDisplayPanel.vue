@@ -1,5 +1,5 @@
 <template>
-    <section class="mx-2 p-3">
+    <section class="mx-2">
         <div id="audio-search-upload">
             <b-row class="my-3 justify-content-between">
                 <b-col sm="5" class="px-0">
