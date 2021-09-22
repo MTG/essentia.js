@@ -15,7 +15,7 @@
                 <span sm="2" class="my-auto">Or</span>
                 <b-col sm="5" class="px-0">
                     <b-input-group>
-                        <b-form-input placeholder="Upload from computer" readonly @click="uploadLabel.click()"></b-form-input>
+                        <b-form-input id="file-upload" placeholder="Upload from computer" readonly @click="uploadLabel.click()"></b-form-input>
                         <b-input-group-append>
                             <b-button variant="light" class="px-4" @click="uploadLabel.click()">
                                 <b-icon icon="upload"></b-icon>
@@ -103,6 +103,6 @@ export default {
         width: 80%;
     }
     #file-upload {
-        display: none;
+        background-color: inherit;
     }
 </style>

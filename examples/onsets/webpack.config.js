@@ -1,12 +1,13 @@
 var path = require('path')
 var webpack = require('webpack')
+var VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 module.exports = {
   entry: ['babel-polyfill', './src/main.js'],
   output: {
     // use "public" since "dist" and "builds" are excluded by toplevel .gitignore
     path: path.resolve(__dirname, './public'),
-    publicPath: '/public/',
+    publicPath: '/',
     filename: 'build.js'
   },
   target: 'web',
@@ -78,6 +79,9 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    new VueLoaderPlugin()
+  ],
   resolve: {
     alias: {
       'vue$': 'vue/dist/vue.esm.js'
@@ -86,8 +90,8 @@ module.exports = {
   },
   devServer: {
     historyApiFallback: true,
-    noInfo: true,
-    overlay: true
+    // noInfo: true,
+    // overlay: true
   },
   performance: {
     hints: false

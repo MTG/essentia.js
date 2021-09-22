@@ -43,8 +43,6 @@ export default {
 </script>
 
 <style lang="scss">
-  @import './assets/styles/globals.scss';
-
   main {
     height: 100vh;
     width: 100vw;
