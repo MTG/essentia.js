@@ -88,7 +88,6 @@ function preAnalysis (signal) {
     // algo instantiation
     let PolarFFT = new PolarFFTWASM.PolarFFT(self.params.frameSize);
     // frame cutting, windowing
-    log(signal);
     let frames = self.essentia.FrameGenerator(signal, self.params.frameSize, self.params.hopSize);
 
     for (let i = 0; i < frames.size(); i++) {
@@ -122,7 +121,7 @@ function onsetsAnalysis () {
         odfMatrix.push(Float32Array.from(odfArray));
     }
 
-    console.table(odfMatrix);
+    // console.table(odfMatrix);
     const onsetPositions = Onsets.compute(odfMatrix, self.params.odfsWeights).positions;
     Onsets.shutdown();
     // check possibly all zeros onsetPositions

@@ -35,7 +35,10 @@ export default {
         return {
             isPlaying: false,
             soundOn: true,
-            wavesurfer: null
+            wavesurfer: null,
+            pluginsInitialised: false,
+            onsetPositions: [],
+            sliceRegions: []
         }
     },
     methods: {
@@ -55,6 +58,48 @@ export default {
         },
         handleDownload () {
 
+        },
+        drawOnsets () {
+            if (!this.pluginsInitialised) {
+                this.wavesurfer.initPlugin('markers');
+            }
+
+            this.wavesurfer.clearMarkers();
+            this.onsetPositions.forEach( (p) => this.wavesurfer.addMarker({ time: p, position: 'top' }) );
+        },
+        drawOnsetSlices () {
+            // generate region options from this.onsetPositions
+            let slices = this.onsetPositions.map( (v, i) => {
+                let endPos = this.onsetPositions[i+1];
+                // if we're on the last onset, use audio track duration (end of file) as region end:
+                if (endPos == undefined) { endPos = this.wavesurfer.getDuration(); }
+
+                return {
+                    id: `slice-${i}`,
+                    start: v,
+                    end: endPos,
+                    drag: false,
+                    resize: false,
+                    color: "hsl(37 92% 70% / 0.2)"
+                };
+            });
+
+            if (this.sliceRegions.length == 0) {
+                this.sliceRegions.map( (sr) => sr.remove() );
+                this.sliceRegions = []; // clear existing regions, if any
+            } 
+            slices.forEach((s) => { this.sliceRegions.push(this.wavesurfer.addRegion(s)) });
+
+            this.wavesurfer.on('region-click', (region, ev) => {
+                ev.stopPropagation();
+                region.play();
+            })
+        }
+    },
+    watch: {
+        onsetPositions: function () {
+            this.drawOnsets();
+            this.drawOnsetSlices();
         }
     },
     mounted () {        
@@ -80,8 +125,14 @@ export default {
 
             this.wavesurfer.on("finish", () => {
                 if (this.isPlaying) this.isPlaying = false;
-            })
+            });
+
+            this.wavesurfer.on("plugin-initialised", () => this.pluginsInitialised = true );
         });
+
+        EventBus.$on("analysis-finished-onsets", (onsets) => {
+            this.onsetPositions = onsets;
+        })
 
         EventBus.$emit("sound-selected", audioURL);
     }

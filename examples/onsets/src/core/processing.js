@@ -17,9 +17,9 @@ export default class DSP {
         this.audioWorker.onmessage = function listenToWorker (msg) {
             if (msg.data instanceof Float32Array) {
                 if (msg.data.length == 0) {
-                    console.info('analysis-finished-empty');
+                    EventBus.$emit("analysis-finished-empty");
                 } else {
-                    console.info('analysis-finished-onsets')
+                    EventBus.$emit("analysis-finished-onsets", Array.from(msg.data));
                 }
             } else {
                 throw TypeError("Worker failed. Analysis results should be of type Float32Array");
