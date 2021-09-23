@@ -13,7 +13,10 @@
       </div>
       <main v-if="instructionsClosed" class="d-flex flex-column justify-content-between align-items-center">
         <demos-header></demos-header>
-        <browse-display></browse-display>
+        <section id="middle-screen" class="d-flex flex-column justify-content-between align-items-center container-fluid">
+          <browse-display></browse-display>
+          <div id="algo-controls"></div>
+        </section>
         <demos-footer></demos-footer>
       </main>
   </div>
@@ -46,5 +49,13 @@ export default {
   main {
     height: 100vh;
     width: 100vw;
+  }
+  #middle-screen {
+    flex-grow: 1;
+  }
+  
+  #algo-controls {
+    height: 200px;
+    width: 90%;
   }
 </style>

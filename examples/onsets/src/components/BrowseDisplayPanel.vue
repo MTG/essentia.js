@@ -100,7 +100,7 @@ export default {
 
 <style lang="scss" scoped>
     section {
-        width: 80%;
+        width: 90%;
     }
     #file-upload {
         background-color: inherit;
