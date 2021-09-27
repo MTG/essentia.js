@@ -1,7 +1,7 @@
 <template>
     <div>
         <div id="display"></div>
-        <div class="d-flex flex-row justify-content-between">
+        <div class="d-flex flex-row justify-content-between my-2">
             <b-button-group>
                 <b-button id="play" class="px-4" @click="handlePlay" variant="light">
                     <b-icon icon="play-fill" v-show="!isPlaying"></b-icon>
@@ -102,7 +102,7 @@ export default {
             this.drawOnsetSlices();
         }
     },
-    mounted () {        
+    mounted () {
         EventBus.$on("sound-read", (blob) => {
             if (this.wavesurfer) {
                 this.wavesurfer.destroy();
@@ -110,6 +110,8 @@ export default {
 
             this.wavesurfer = WaveSurfer.create({
                 container: '#display',
+                height: this.$el.querySelector("#display").clientHeight,
+                responsive: true,
                 progressColor: '#F7AF39',
                 waveColor: '#a16607',
                 partialRender: true,
@@ -138,3 +140,9 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+    #display {
+        height: 25vh;
+    }
+</style>

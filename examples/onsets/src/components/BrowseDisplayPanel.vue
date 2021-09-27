@@ -1,32 +1,30 @@
 <template>
     <section class="mx-2">
-        <div id="audio-search-upload">
-            <b-row class="my-3 justify-content-between">
-                <b-col sm="5" class="px-0">
-                    <b-input-group>
-                        <b-form-input v-model="searchTerm" placeholder="Search Freesound.org" @change="searchFreesound"></b-form-input>
-                        <b-input-group-append>
-                            <b-button variant="light" class="px-4" @click="searchFreesound">
-                                <b-icon icon="search"></b-icon>
-                            </b-button>
-                        </b-input-group-append>
-                    </b-input-group>
-                </b-col>
-                <span sm="2" class="my-auto">Or</span>
-                <b-col sm="5" class="px-0">
-                    <b-input-group>
-                        <b-form-input id="file-upload" placeholder="Upload from computer" readonly @click="uploadLabel.click()"></b-form-input>
-                        <b-input-group-append>
-                            <b-button variant="light" class="px-4" @click="uploadLabel.click()">
-                                <b-icon icon="upload"></b-icon>
-                            </b-button>
-                        </b-input-group-append>
-                    </b-input-group>
-                    <label id="file-upload-label" class="d-none">
-                        <input type="file" accept="audio/*, .m4a" @change="handleSoundUpload">
-                    </label>
-                </b-col>
-            </b-row>
+        <div id="audio-search-upload" class="my-2 mx-0 row justify-content-between">
+            <div class="px-0 col-5">
+                <b-input-group>
+                    <b-form-input v-model="searchTerm" placeholder="Search Freesound.org" @change="searchFreesound"></b-form-input>
+                    <b-input-group-append>
+                        <b-button variant="light" class="px-4" @click="searchFreesound">
+                            <b-icon icon="search"></b-icon>
+                        </b-button>
+                    </b-input-group-append>
+                </b-input-group>
+            </div>
+            <span class="my-auto col-2">Or</span>
+            <div class="px-0 col-5">
+                <b-input-group>
+                    <b-form-input id="file-upload" placeholder="Upload from computer" readonly @click="uploadLabel.click()"></b-form-input>
+                    <b-input-group-append>
+                        <b-button variant="light" class="px-4" @click="uploadLabel.click()">
+                            <b-icon icon="upload"></b-icon>
+                        </b-button>
+                    </b-input-group-append>
+                </b-input-group>
+                <label id="file-upload-label" class="d-none">
+                    <input type="file" accept="audio/*, .m4a" @change="handleSoundUpload">
+                </label>
+            </div>
         </div>
         <freesound-results :class="[{ 'd-flex': showFreesoundResults }, { 'd-none': !showFreesoundResults }]"></freesound-results>
         <audio-display v-show="!showFreesoundResults"></audio-display>
@@ -104,5 +102,8 @@ export default {
     }
     #file-upload {
         background-color: inherit;
+    }
+    span {
+        text-align: center;
     }
 </style>
