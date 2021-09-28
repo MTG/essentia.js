@@ -24,6 +24,7 @@
     "babel-preset-stage-3": "^6.24.1",
     "bootstrap": "^4.5.3",
     "bootstrap-vue": "^2.21.2",
+    "bootstrap5": "npm:bootstrap@^5.1.1",
     "cross-env": "^5.0.5",
     "css-loader": "^0.28.7",
     "file-loader": "^1.1.4",

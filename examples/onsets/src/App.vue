@@ -15,7 +15,7 @@
         <demos-header></demos-header>
         <section id="middle-screen" class="d-flex flex-column justify-content-between align-items-center container-fluid">
           <browse-display></browse-display>
-          <div id="algo-controls"></div>
+          <algorithm-controls></algorithm-controls>
         </section>
         <demos-footer></demos-footer>
       </main>
@@ -29,10 +29,11 @@ import InstructionsModal from './components/InstructionsModal.vue';
 import DemosFooter from './components/DemosFooter.vue';
 import DemosHeader from './components/DemosHeader.vue';
 import BrowseDisplay from './components/BrowseDisplayPanel.vue';
+import AlgorithmControls from './components/AlgorithmControls.vue';
 
 export default {
   name: 'app',
-  components: { InstructionsModal, DemosFooter, DemosHeader, BrowseDisplay },
+  components: { InstructionsModal, DemosFooter, DemosHeader, BrowseDisplay, AlgorithmControls },
   data () {
     return {
       instructionsClosed: false,
@@ -53,9 +54,8 @@ export default {
   #middle-screen {
     flex-grow: 1;
   }
-  
-  #algo-controls {
-    height: 200px;
-    width: 90%;
-  }
+
+  // #algo-controls {
+  //   height: 200px;
+  // }
 </style>
