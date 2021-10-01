@@ -17,30 +17,15 @@
 
 <script>
 const tagColor = '#dee2e6dd';
-const TAGS = [
-                {
-                    name: "HFC",
-                    color: tagColor
-                },
-                {
-                    name: "Complex",
-                    color: tagColor
-                },
-                {
-                    name: "Flux",
-                    color: tagColor
-                },
-                {
-                    name: "Complex Phase",
-                    color: tagColor
-                }
-            ];
 
 import TagSection from "./ProportionTag.vue";
-import { ref, onMounted } from "@vue/composition-api";
+import { ref } from "@vue/composition-api";
 import { getPercentage, limitNumberWithinRange, nearestN } from "./utils.js";
 
 export default {
+    props: {
+        tagsData: Object
+    },
     components: { TagSection },
     setup () {
         return {
@@ -49,11 +34,19 @@ export default {
     },
     data () {
         return {
-            tags: TAGS,
-            widths: new Array(TAGS.length).fill(100 / TAGS.length),
+            tags: this.tagsData.names.map( name => { return {name: name, color: tagColor}; } ),
+            widths: this.tagsData.values,
             percentageMovedOld: 0,
             showTagPercentage: false
         };
+    },
+    watch: {
+        tags () {
+            this.controlsChanged();
+        },
+        widths () {
+            this.controlsChanged();
+        }
     },
     methods: {
         onSliderSelect (selectEvent, index) {
@@ -164,6 +157,14 @@ export default {
             }
 
             this.widths = widths;
+        },
+        controlsChanged () {
+            const tags = {
+                names: this.tags.map(t => t.name.toLowerCase().replace(" ", "_") ),
+                values: this.widths.map(w => w * 0.01)
+            };
+
+            this.$emit('slider-changed', tags);
         }
     }
 }

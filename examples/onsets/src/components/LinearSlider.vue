@@ -8,9 +8,9 @@
             <label :for="label" id="slider-label" class="slider-text">
                 {{ formattedLabel }}
             </label>
-            <span id="slider-value" class="slider-text" v-show="isClicked">{{ value }}{{ unit }}</span>
+            <span id="slider-value" class="slider-text" v-show="isClicked">{{ sliderValue }}{{ unit }}</span>
         </div>
-        <input type="range" class="form-range" :id="label" :min="min" :max="max" :value="value" :step="step"
+        <input type="range" class="form-range" :id="label" :min="min" :max="max" :step="step" v-model="sliderValue"
             @mousedown="isClicked=true" @mouseup="isClicked=false" @input="handleInput">
     </div>
 </template>
@@ -18,10 +18,10 @@
 <script>
 
 export default {
-    props: ["label", "min", "max", "step", "initialValue", "unit"],
+    props: ["label", "min", "max", "step", "unit", "value"],
     data () {
         return {
-            value: this.initialValue,
+            sliderValue: this.value,
             isClicked: false
         }
     },
@@ -34,7 +34,7 @@ export default {
     },
     methods: {
         handleInput (event) {
-            this.value = Number(event.target.value);
+            this.$emit("slider-changed", this.sliderValue);
         }
     }
 }
@@ -43,7 +43,7 @@ export default {
 <style lang="scss">
     // variable overrides
     $primary: #E4454A;
-    
+
     @import "node_modules/bootstrap5/scss/_functions.scss";
     @import "node_modules/bootstrap5/scss/_variables.scss";
     @import "node_modules/bootstrap5/scss/mixins/_gradients.scss";

@@ -21,9 +21,9 @@ export default {
     props: ["label", "min", "max", "expStep", "initialValue"],
     data () {
         return {
+            sliderValue: this.initialValue,
             realValue: 0,
             realStep: 0,
-            sliderValue: this.initialValue,
             isClicked: false,
             validValues: [],
             validValuesNorm: []
@@ -38,17 +38,9 @@ export default {
     },
     methods: {
         handleInput (event) {
-            // let currentValue = event.target.value;
-            // // this.sliderValue = Math.pow(2, Math.round(Math.log2(event.target.value)));
-            // let distanceValueMap = {};
-            // let distances = this.validValuesNorm.map( (v) => {
-            //     let d = Math.abs(currentValue - v);
-            //     distanceValueMap[d] = v;
-            //     return d;
-            // });
-            // distances.sort();
             this.realValue = Number(event.target.value);
             this.sliderValue = this.validValues[this.validValuesNorm.indexOf(this.realValue)];
+            this.$emit("slider-changed", this.sliderValue);
         }
     },
     created () {
