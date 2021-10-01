@@ -6,7 +6,8 @@
         :style="{ ...styles.tagText }"
         v-show="!isClicked"
         :class="[{ hoveredTag: isHovered }, 'tag-text']"
-        @pointerover="handleHoverIn" @pointerleave="handleHoverOut">{{ renderedName }}</span>
+        @pointerover="handleHoverIn" @pointerleave="handleHoverOut"
+        @pointerdown="handleTagClicked">{{ name }}</span>
         <span 
         :style="{ ...styles.tagText, fontSize: 12 }"
         v-show="isClicked"> {{ width }} % </span>
@@ -28,7 +29,6 @@ export default {
     },
     data () {
         return {
-            renderedName: this.name,
             tagColor: this.color,
             styles: {
                 tag: {
@@ -77,6 +77,9 @@ export default {
         }
     },
     methods: {
+        handleTagClicked (ev) {
+            this.$emit('tag-clicked', this.name)
+        },
         handlePointerDown (ev) {
             this.$emit('slider-select', ev);
             this.isClicked = true;
@@ -84,12 +87,10 @@ export default {
         handleHoverIn (ev) {
             this.tagColor = '#e8abad';
             this.isHovered = true;
-            this.renderedName = `Remove ${this.name}`;
         },
         handleHoverOut (ev) {
             this.tagColor = this.color;
             this.isHovered = false;
-            this.renderedName = this.name;
         }
     }
 }
@@ -120,6 +121,7 @@ export default {
     .hoveredTag {
         cursor: pointer;
         color: #631E20;
+        text-decoration: line-through 20%;
     }
 
     .slider-button {

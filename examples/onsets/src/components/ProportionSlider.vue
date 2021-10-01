@@ -6,7 +6,8 @@
             :name="tag.name" 
             :color="tag.color" 
             :width="widths[index]"
-            @slider-select="onSliderSelect($event, index)">
+            @slider-select="onSliderSelect($event, index)"
+            @tag-clicked="removeTag">
             </tag-section>
         </div>
     </div>
@@ -136,6 +137,29 @@ export default {
 
             window.addEventListener("touchend", handleEventUp);
             window.addEventListener("pointerup", handleEventUp);
+        },
+        removeTag (name) {
+            // guard: DONT remove if only one is left
+            if (this.tags.length === 1) {
+                return
+            }
+            let idx = null;
+            let widths = this.widths.slice();
+            this.tags = this.tags.filter((t,i) => {
+                if (t.name === name) {
+                    idx = i;
+                }
+                return t.name !== name;
+            });
+            let removedTagWidth = widths.splice(idx, 1);
+
+            if (widths[idx+1]) {
+                widths[idx+1] += removedTagWidth[0];
+            } else if (widths[idx-1]) {
+                widths[idx-1] += removedTagWidth[0];
+            }
+
+            this.widths = widths;
         }
     }
 }
