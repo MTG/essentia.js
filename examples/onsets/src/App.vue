@@ -13,7 +13,7 @@
       </div>
       <main v-if="instructionsClosed" class="d-flex flex-column justify-content-between align-items-center">
         <demos-header></demos-header>
-        <section id="middle-screen" class="d-flex flex-column justify-content-between align-items-center container-fluid">
+        <section id="middle-screen" class="d-flex flex-column justify-content-around align-items-center container-fluid">
           <browse-display></browse-display>
           <algorithm-controls></algorithm-controls>
         </section>

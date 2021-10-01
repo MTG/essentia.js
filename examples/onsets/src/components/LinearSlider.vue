@@ -41,6 +41,9 @@ export default {
 </script>
 
 <style lang="scss">
+    // variable overrides
+    $primary: #E4454A;
+    
     @import "node_modules/bootstrap5/scss/_functions.scss";
     @import "node_modules/bootstrap5/scss/_variables.scss";
     @import "node_modules/bootstrap5/scss/mixins/_gradients.scss";

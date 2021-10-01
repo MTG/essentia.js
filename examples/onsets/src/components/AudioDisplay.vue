@@ -80,7 +80,7 @@ export default {
                     end: endPos,
                     drag: false,
                     resize: false,
-                    color: "hsl(37 92% 70% / 0.2)"
+                    color: "hsl(358 57% 79% / 0.2)"
                 };
             });
 
@@ -112,8 +112,8 @@ export default {
                 container: '#display',
                 height: this.$el.querySelector("#display").clientHeight,
                 responsive: true,
-                progressColor: '#F7AF39',
-                waveColor: '#a16607',
+                progressColor: '#E4454A',
+                waveColor: '#631E20',
                 partialRender: true,
                 plugins: [
                     MarkersPlugin.create({
