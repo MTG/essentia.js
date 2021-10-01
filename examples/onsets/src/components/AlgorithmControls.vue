@@ -1,21 +1,26 @@
 <template>
-    <section class="mx-2 row">
-        <div class="range-sliders col-4">
-            <exp-slider 
-            label="frame-size" min="64" max="8192" expStep="2" :initialValue="frameSize"
-            @slider-changed="value => frameSize = value"></exp-slider>
-            <linear-slider 
-            label="hop-size" min="5" max="100" step="5" :value="hopSizePercentage" unit="%"
-            @slider-changed="value => hopSizePercentage = value"></linear-slider>
-            <linear-slider 
-            label="sensitivity" min="0.1" max="1" step="0.05" :value="sensitivity" unit=""
-            @slider-changed="value => sensitivity = value"></linear-slider>
+    <section class="mx-2">
+        <div class="row">
+            <div class="range-sliders col-4">
+                <exp-slider 
+                label="frame-size" min="64" max="8192" expStep="2" :initialValue="frameSize"
+                @slider-changed="value => frameSize = value"></exp-slider>
+                <linear-slider 
+                label="hop-size" min="5" max="100" step="5" :value="hopSizePercentage" unit="%"
+                @slider-changed="value => hopSizePercentage = value"></linear-slider>
+                <linear-slider 
+                label="sensitivity" min="0.1" max="1" step="0.05" :value="sensitivity" unit=""
+                @slider-changed="value => sensitivity = value"></linear-slider>
+            </div>
+            <div class="col-6">
+                <label for="odf-ratios">Onset Detection Function (ODF) ratios</label>
+                <proportion-slider id="odf-ratios" @slider-changed="data => odfs = data" :tagsData="odfs"></proportion-slider>
+            </div>
+            <div class="col-2"></div>
         </div>
-        <div class="col-6">
-            <label for="odf-ratios">Onset Detection Function (ODF) ratios</label>
-            <proportion-slider id="odf-ratios" @slider-changed="data => odfs = data" :tagsData="odfs"></proportion-slider>
+        <div>
+            <b-button block variant="primary" @click="handleFormUpdate" v-show="paramsChanged">Update</b-button>
         </div>
-        <div class="col-2"></div>
     </section>
 </template>
 
@@ -61,14 +66,14 @@ export default {
     methods: {
         handleFormUpdate () {
             console.info("algoparams form was updated");
-            // EventBus.$emit("algo-params-updated", this.params);
-            // this.paramsChanged = false;
+            EventBus.$emit("algo-params-updated", this.params);
+            this.paramsChanged = false;
         }
     }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
     section {
         width: 90%;
         font-size: .85rem;

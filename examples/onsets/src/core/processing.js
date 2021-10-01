@@ -28,7 +28,8 @@ export default class DSP {
 
         // set up global event handlers
         EventBus.$on("sound-selected", (url) => this.handleSoundSelect(url) );
-        EventBus.$on("sound-read", (blob) => this.decodeSoundBlob(blob) )
+        EventBus.$on("sound-read", (blob) => this.decodeSoundBlob(blob) );
+        EventBus.$on("algo-params-updated", (parameters) => this.updateAlgoParams(parameters) );
     }
 
     async getAudioFile (url) {
@@ -56,5 +57,12 @@ export default class DSP {
             request: 'analyse',
             audio: audioArray
         });
+    }
+
+    updateAlgoParams (params) {
+        this.audioWorker.postMessage({
+            request: 'updateParams',
+            params: params
+        })
     }
 }

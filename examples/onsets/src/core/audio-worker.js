@@ -16,13 +16,14 @@ log("Imports went OK");
 
 self.essentia = null;
 
-self.allowedParams = ['sampleRate', 'frameSize', 'hopSize', 'odfs', 'odfsWeights'];
+self.allowedParams = ['sampleRate', 'frameSize', 'hopSize', 'odfs', 'odfsWeights', 'sensitivity'];
 self.params = {
     sampleRate: 44100,
     frameSize: 1024,
     hopSize: 512,
     odfs: ['hfc'], // Onset Detection Function(s) list
-    odfsWeights: [1] // per ODF weights list
+    odfsWeights: [1], // per ODF weights list
+    sensitivity: 0.1
 }; // changing odfs should require changing odfsWeights (at least length), and viceversa
 self.polarFrames = null;
 
@@ -109,7 +110,8 @@ function preAnalysis (signal) {
 }
 
 function onsetsAnalysis () {
-    const Onsets = new OnsetsWASM.Onsets(0.1, 5, self.params.sampleRate / self.params.hopSize, 0.02);
+    const alpha = self.params.sensitivity;
+    const Onsets = new OnsetsWASM.Onsets(alpha, 5, self.params.sampleRate / self.params.hopSize, 0.02);
 
     // create ODF matrix to be input to the Onsets algorithm
     const odfMatrix = [];
