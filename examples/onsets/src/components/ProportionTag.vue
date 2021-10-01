@@ -4,16 +4,15 @@
     :style="{ ...styles.tag, background: tagColor, width: width + '%' }">
         <span 
         :style="{ ...styles.tagText }"
-        v-show="!isClicked"
+        v-show="!showPercentage"
         :class="[{ hoveredTag: isHovered }, 'tag-text']"
         @pointerover="handleHoverIn" @pointerleave="handleHoverOut"
         @pointerdown="handleTagClicked">{{ name }}</span>
         <span 
         :style="{ ...styles.tagText, fontSize: 12 }"
-        v-show="isClicked"> {{ width }} % </span>
+        v-show="showPercentage"> {{ width }} % </span>
         <div class="slider-button" :style="{ ...styles.sliderButton }" 
-        @pointerdown="handlePointerDown"
-        @pointerup="isClicked=false">
+        @pointerdown="handlePointerDown" @pointerup="handlePointerUp">
             <b-icon icon="chevron-compact-left"></b-icon>
             <b-icon icon="chevron-compact-right"></b-icon>
         </div>
@@ -25,7 +24,8 @@ export default {
     props: {
         color: String,
         width: Number,
-        name: String
+        name: String,
+        showPercentage: Boolean
     },
     data () {
         return {
@@ -81,8 +81,10 @@ export default {
             this.$emit('tag-clicked', this.name)
         },
         handlePointerDown (ev) {
-            this.$emit('slider-select', ev);
-            this.isClicked = true;
+            this.$emit('slider-select-on', ev);
+        },
+        handlePointerUp (ev) {
+            this.$emit('slider-select-off')
         },
         handleHoverIn (ev) {
             this.tagColor = '#e8abad';

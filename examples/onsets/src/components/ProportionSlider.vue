@@ -6,7 +6,9 @@
             :name="tag.name" 
             :color="tag.color" 
             :width="widths[index]"
-            @slider-select="onSliderSelect($event, index)"
+            :show-percentage="showTagPercentage"
+            @slider-select-on="onSliderSelect($event, index)"
+            @slider-select-off="showTagPercentage=false"
             @tag-clicked="removeTag">
             </tag-section>
         </div>
@@ -50,10 +52,12 @@ export default {
             tags: TAGS,
             widths: new Array(TAGS.length).fill(100 / TAGS.length),
             percentageMovedOld: 0,
+            showTagPercentage: false
         };
     },
     methods: {
         onSliderSelect (selectEvent, index) {
+            this.showTagPercentage = true;
             // console.log("onSliderSelect: ", index);
             selectEvent.preventDefault();
             document.body.style.cursor = "ew-resize";
