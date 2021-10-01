@@ -1,10 +1,12 @@
 <template>
     <div 
-    class="tag" 
-    :style="{ ...styles.tag, background: color,  width: width + '%' }">
+    class="tag tag-borders" 
+    :style="{ ...styles.tag, background: tagColor, width: width + '%' }">
         <span 
         :style="{ ...styles.tagText }"
-        v-show="!isClicked">{{ name }}</span>
+        v-show="!isClicked"
+        :class="[{ hoveredTag: isHovered }, 'tag-text']"
+        @pointerover="handleHoverIn" @pointerleave="handleHoverOut">{{ renderedName }}</span>
         <span 
         :style="{ ...styles.tagText, fontSize: 12 }"
         v-show="isClicked"> {{ width }} % </span>
@@ -26,37 +28,36 @@ export default {
     },
     data () {
         return {
+            renderedName: this.name,
+            tagColor: this.color,
             styles: {
                 tag: {
-                    padding: 20,
+                    padding: "auto 1rem",
                     textAlign: "center",
                     position: "relative",
                     borderRightWidth: ".1em",
                     borderRightStyle: "solid",
-                    borderRightColor: "white",
                     boxSizing: "border-box",
                     borderLeftWidth: ".1em",
                     borderLeftStyle: "solid",
-                    borderLeftColor: "white",
-                    // height: "100%"
                     // my own addition to center tagText labels
                     display: "flex",
-                    flexDirection: "column",
+                    flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "center"
                 },
                 tagText: {
-                    color: "black",
                     fontWeight: 500,
                     userSelect: "none",
                     display: "block",
                     overflow: "hidden",
-                    fontFamily: "sans-serif"
+                    fontFamily: "sans-serif",
+                    flex: "1 1 100%"
                 },
                 sliderButton: {
                     width: "2em",
                     height: "2em",
-                    backgroundColor: "white",
+                    backgroundColor: "#E4454A",
                     position: "absolute",
                     borderRadius: "2em",
                     right: "calc(-1.1em)",
@@ -71,26 +72,60 @@ export default {
                     userSelect: "none"
                 }
             },
-            isClicked: false
+            isClicked: false,
+            isHovered: false
         }
     },
     methods: {
         handlePointerDown (ev) {
             this.$emit('slider-select', ev);
             this.isClicked = true;
+        },
+        handleHoverIn (ev) {
+            this.tagColor = '#e8abad';
+            this.isHovered = true;
+            this.renderedName = `Remove ${this.name}`;
+        },
+        handleHoverOut (ev) {
+            this.tagColor = this.color;
+            this.isHovered = false;
+            this.renderedName = this.name;
         }
     }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+    .tag-borders {
+        border-left-color: #E4454A;
+        border-right-color: #E4454A;
+    }
+
     .tag:first-of-type {
-    border-radius: 50px 0px 0px 50px;
+        border-radius: 50px 0px 0px 50px;
+        border-left-color: transparent;
     }
     .tag:last-of-type {
-    border-radius: 0px 50px 50px 0px;
+        border-radius: 0px 50px 50px 0px;
+        border-right-color: transparent;
     }
     .tag:last-of-type>.slider-button {
-    display:none !important;
+        display:none !important;
+    }
+
+    .tag-text {
+        color: #323232;
+    }
+
+    .hoveredTag {
+        cursor: pointer;
+        color: #631E20;
+    }
+
+    .slider-button {
+        color: #fff;
+        &:hover {
+            color: #631E20;
+        }
     }
 </style>

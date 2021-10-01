@@ -1,5 +1,5 @@
 <template>
-    <div style="height: 100%;">
+    <div style="height: 50%;">
         <div style="width: 100%; display: flex; background-color: transparent; height: 100%;" ref="TagSliderRef">
             <tag-section 
             v-for="(tag, index) in tags" :key="index" 
@@ -13,22 +13,23 @@
 </template>
 
 <script>
+const tagColor = '#dee2e6dd';
 const TAGS = [
                 {
                     name: "HFC",
-                    color: "#e8e8e8"
+                    color: tagColor
                 },
                 {
                     name: "Complex",
-                    color: "#e8e8e8"
+                    color: tagColor
                 },
                 {
                     name: "Flux",
-                    color: "#e8e8e8"
+                    color: tagColor
                 },
                 {
                     name: "Complex Phase",
-                    color: "#e8e8e8"
+                    color: tagColor
                 }
             ];
 
@@ -98,22 +99,22 @@ export default {
                     _widths[nextSectionIndex] = nextSectionWidth;
 
                     this.percentageMovedOld = percentageMoved;
-                }
 
-                // if (this.tags.length > 2) {
-                //     if (_widths[index] === 0) {
-                //         _widths[nextSectionIndex] = maxPercent;
-                //         _widths.splice(index, 1);
-                //         this.tags = this.tags.filter((t, i) => i !== index);
-                //         removeEventListener();
-                //     }
-                //     if (_widths[nextSectionIndex] === 0) {
-                //         _widths[index] = maxPercent;
-                //         _widths.splice(nextSectionIndex, 1);
-                //         this.tags = this.tags.filter((t, i) => i !== nextSectionIndex);
-                //         removeEventListener();
-                //     }
-                // }
+                    if (this.tags.length > 2) {
+                        if (_widths[index] === 5) {
+                            _widths[nextSectionIndex] = maxPercent;
+                            _widths.splice(index, 1);
+                            this.tags = this.tags.filter((t, i) => i !== index);
+                            removeEventListener();
+                        }
+                        if (_widths[nextSectionIndex] === 5) {
+                            _widths[index] = maxPercent;
+                            _widths.splice(nextSectionIndex, 1);
+                            this.tags = this.tags.filter((t, i) => i !== nextSectionIndex);
+                            removeEventListener();
+                        }
+                    }
+                }
 
                 this.widths = _widths;
             };
@@ -136,10 +137,6 @@ export default {
             window.addEventListener("touchend", handleEventUp);
             window.addEventListener("pointerup", handleEventUp);
         }
-    },
-    created () {
-        // this.widths = new Array(this.tags.length).fill(100 / this.tags.length);
-        // this.$refs.Widths = new Array(this.tags.length).fill(100 / this.tags.length);
     }
 }
 </script>

@@ -6,7 +6,8 @@
             <linear-slider label="sensitivity" min="0.1" max="1" step="0.05" initialValue="0.3" unit=""></linear-slider>
         </div>
         <div class="col-6">
-            <proportion-slider></proportion-slider>
+            <label for="odf-ratios">Onset Detection Function (ODF) ratios</label>
+            <proportion-slider id="odf-ratios"></proportion-slider>
         </div>
         <div class="col-2"></div>
     </section>
