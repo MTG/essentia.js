@@ -44,31 +44,33 @@ onmessage = function listenToMainThread(msg) {
             postMessage(onsetPositions);
             break;
         case 'updateParams':
-            let suppliedParamList;
-            if (msg.data.params) {
-                suppliedParamList = Object.keys(msg.data.params);
-                // check obj properties are included in allowed params
-                if (paramsAreAllowed(suppliedParamList)) {
-                    let update = msg.data.params;
-
-                    odfParamsAreOkay(suppliedParamList, update);
-
-                    self.params = {...self.params, ...update}; // update existing params obj
-                    log(`updated the following params: ${suppliedParamList.join(',')}`);
-                    log('current params are: ');
-                    console.info(self.params);
-
-                    if (self.polarFrames !== null && self.polarFrames.length !== 0) {
-                        // updateParams after file upload
-                        const onsetPositions = onsetsAnalysis();
-                        postMessage(onsetPositions);
-                    } // else: file hasn't been uploaded and analysed for 1st time, or it has been cleared
-                } else {
-                    error(`audio-worker: illegal parameter(s) in 'updateParams' command \n - ${getUnsupportedParams(suppliedParamList).join('\n - ')}`);
-                }
-            } else {
+            // guard: check for empty params obj
+            if (!msg.data.params) {
                 error('audio-worker: missing `params` object in the `updateParams` command');
+                return;
             }
+            let suppliedParamList = Object.keys(msg.data.params);
+
+            // guard: check obj properties for forbidden params
+            if (!paramsAreAllowed(suppliedParamList)) {
+                error(`audio-worker: illegal parameter(s) in 'updateParams' command \n - ${getUnsupportedParams(suppliedParamList).join('\n - ')}`);
+                return;
+            }
+
+            let update = msg.data.params;
+
+            odfParamsAreOkay(suppliedParamList, update);
+
+            self.params = {...self.params, ...update}; // update existing params obj
+            log(`updated the following params: ${suppliedParamList.join(',')}`);
+            log('current params are: ');
+            console.info(self.params);
+
+            if (self.polarFrames !== null && self.polarFrames.length !== 0) {
+                // updateParams after file upload
+                const onsetPositions = onsetsAnalysis();
+                postMessage(onsetPositions);
+            } // else: file hasn't been uploaded and analysed for 1st time, or it has been cleared
             break;
         case 'clear':
             console.info('audio worker state and saved analysis should be cleared');
