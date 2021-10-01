@@ -9,8 +9,7 @@ const centralProcessing = new DSP();
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 
 // Import Bootstrap and BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
+import './assets/styles/globals.scss';
 
 Vue.use(VueCompositionAPI);
 // Make BootstrapVue available throughout your project
