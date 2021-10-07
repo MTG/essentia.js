@@ -27,7 +27,10 @@ self.params = {
 }; // changing odfs should require changing odfsWeights (at least length), and viceversa
 self.polarFrames = null;
 
-// log(EssentiaWASM);
+// global storage for slicing
+self.signal = null;
+self.onsetPositions = null;
+
 try {
     self.essentia = new Essentia(EssentiaWASM.EssentiaWASM);
 } catch (err) { error(err) }
@@ -40,21 +43,21 @@ onmessage = function listenToMainThread(msg) {
             log('received analyse cmd')
             // const signal = new Float32Array(msg.data.audio);
             preAnalysis(msg.data.audio);
-            const onsetPositions = onsetsAnalysis();
+            self.onsetPositions = onsetsAnalysis();
 
-            postMessage(onsetPositions);
+            postMessage(self.onsetPositions);
             break;
         case 'updateParams':
             // guard: check for empty params obj
             if (!msg.data.params) {
-                error('audio-worker: missing `params` object in the `updateParams` command');
+                error('missing `params` object in the `updateParams` command');
                 return;
             }
             let suppliedParamList = Object.keys(msg.data.params);
 
             // guard: check obj properties for forbidden params
             if (!paramsAreAllowed(suppliedParamList)) {
-                error(`audio-worker: illegal parameter(s) in 'updateParams' command \n - ${getUnsupportedParams(suppliedParamList).join('\n - ')}`);
+                error(`illegal parameter(s) in 'updateParams' command \n - ${getUnsupportedParams(suppliedParamList).join('\n - ')}`);
                 return;
             }
 
@@ -69,12 +72,26 @@ onmessage = function listenToMainThread(msg) {
 
             if (self.polarFrames !== null && self.polarFrames.length !== 0) {
                 // updateParams after file upload
-                const onsetPositions = onsetsAnalysis();
-                postMessage(onsetPositions);
+                self.onsetPositions = onsetsAnalysis();
+                postMessage(self.onsetPositions);
             } // else: file hasn't been uploaded and analysed for 1st time, or it has been cleared
             break;
+        case 'slice':
+            if (!self.signal) {
+                error('no audio signal available for slicing');
+                break;
+            }
+            if (!self.onsetPositions || self.onsetPositions.length <= 0) {
+                error('no onset positions available for slicing');
+                break;
+            }
+
+            const slices = sliceAudio();
+            // log(slices);
+            postMessage(slices);
+            break;
         case 'clear':
-            console.info('audio worker state and saved analysis should be cleared');
+            // audio worker state and saved analysis should be cleared
             break;
         default:
             error('Received message from main thread; no matching request found!');
@@ -87,6 +104,7 @@ onmessage = function listenToMainThread(msg) {
 // AUDIO FUNCS
 
 function preAnalysis (signal) {
+    self.signal = signal;
     self.polarFrames = []; // clear frames from previous computation
     // algo instantiation
     let PolarFFT = new PolarFFTWASM.PolarFFT(self.params.frameSize);
@@ -131,6 +149,13 @@ function onsetsAnalysis () {
     // check possibly all zeros onsetPositions
     if (onsetPositions.size() == 0) { return new Float32Array(0) }
     else { return self.essentia.vectorToArray(onsetPositions); }
+}
+
+function sliceAudio () {
+    // onsets: seconds to samples
+    const onsetSamplePositions = Array.from(self.onsetPositions.map( (pos) => Math.round(pos * self.params.sampleRate) ));
+    // if onsetSamplePositions[index+1] == undefined, we've reached the last onset and slice will extract from samp till the end of the array
+    return onsetSamplePositions.map( (samp, index) => self.signal.slice(samp, onsetSamplePositions[index+1]) );
 }
 
 // UTILS

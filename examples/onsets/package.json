@@ -41,8 +41,10 @@
     "worker-plugin": "^5.0.1"
   },
   "dependencies": {
+    "audio-encoder": "^1.0.2",
     "essentia.js": "^0.1.3",
     "freesound": "^0.0.4",
+    "jszip": "^3.7.1",
     "wavesurfer.js": "^5.0.1"
   }
 }
