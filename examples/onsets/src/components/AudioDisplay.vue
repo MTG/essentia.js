@@ -13,7 +13,7 @@
                 </b-button>
             </b-button-group>
             <b-button-group>
-                <b-button id="download" @click="handleDownload" variant="light">
+                <b-button id="download" @click="handleDownload" variant="light" :disabled="!downloadEnabled">
                     <b-icon icon="download"></b-icon>
                     Download
                 </b-button>
@@ -57,7 +57,7 @@ export default {
             this.wavesurfer.playPause();
         },
         handleDownload () {
-
+            EventBus.$emit('download-slices');
         },
         drawOnsets () {
             if (!this.pluginsInitialised) {
@@ -102,6 +102,14 @@ export default {
             this.drawOnsetSlices();
         }
     },
+    computed: {
+        downloadEnabled () {
+            if (this.onsetPositions.length > 0) {
+                return true;
+            }
+            return false;
+        }
+    },
     mounted () {
         EventBus.$on("sound-read", (blob) => {
             if (this.wavesurfer) {
@@ -134,7 +142,11 @@ export default {
 
         EventBus.$on("analysis-finished-onsets", (onsets) => {
             this.onsetPositions = onsets;
-        })
+        });
+
+        EventBus.$on("analysis-finished-empty", () => { this.onsetPositions = [] });
+
+        EventBus.$on("sound-read", () => { this.onsetPositions = [] } );
 
         EventBus.$emit("sound-selected", audioURL);
     }
