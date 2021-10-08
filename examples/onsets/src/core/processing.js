@@ -42,6 +42,7 @@ export default class DSP {
 
         this.fileURL = '';
         this.filename = '';
+        this.fileSampleRate = this.audioCtx.sampleRate;
         
         // set up global event handlers
         EventBus.$on("sound-selected", (url) => this.handleSoundSelect(url) );
@@ -71,6 +72,7 @@ export default class DSP {
     async decodeSoundBlob (blob) {
         let buffer = await blob.arrayBuffer();
         let audioBuffer = await this.decodeBuffer(buffer);
+        this.fileSampleRate = audioBuffer.sampleRate;
         let audioArray = audioBuffer.getChannelData(0);
         // send audioArray to Worker
         this.audioWorker.postMessage({
@@ -95,18 +97,24 @@ export default class DSP {
     async encodeSlices (slicesArray) {
         const filenameItems = this.fileURL.split('/').slice(-1)[0].split('.');
         const filename = filenameItems.slice(0, -1)[0];
-        const extension = filenameItems.slice(-1)[0];
+        // const extension = filenameItems.slice(-1)[0];
         this.filename = filename;
 
-        let blobPromises = slicesArray.map( (slice) => {
-            // console.log(slice.buffer);
-            let buffer = this.audioCtx.createBuffer(1, slice.length, 44100);
+        let resampledSlices = [];
+    
+        for (let i = 0; i < slicesArray.length; i++) {
+            let buffer = this.audioCtx.createBuffer(1, slicesArray[i].length, this.fileSampleRate);
             let data = buffer.getChannelData(0);
-            for (let i = 0; i < slice.length; i++) data[i] = slice[i];
+            for (let j = 0; j < slicesArray[i].length; j++) data[j] = slicesArray[i][j];
+            let resampledBuffer = await this.resample(buffer, 44100); // audioEncoder only supports 44100hz sampling rate
+            resampledSlices.push(resampledBuffer);
+        }
 
-            return audioEncoder(buffer, 'WAV', null);
+        console.log({resampledSlices});
+
+        let blobPromises = resampledSlices.map( (sliceBuffer) => {
+            return audioEncoder(sliceBuffer, 'WAV', null);
         });
-
         let blobs = await Promise.all(blobPromises);
 
         let encodedSlices = blobs.map( (b, idx) => {
@@ -141,4 +149,18 @@ export default class DSP {
             EventBus.$emit('slices-downloaded');
         })
     }
+
+    async resample (sourceAudioBuffer, targetSampleRate) {
+        let offlineCtx = new OfflineAudioContext(sourceAudioBuffer.numberOfChannels,
+            sourceAudioBuffer.duration * targetSampleRate,
+            targetSampleRate);
+
+        // Play it from the beginning.
+        let offlineSource = offlineCtx.createBufferSource();
+        offlineSource.buffer = sourceAudioBuffer;
+        offlineSource.connect(offlineCtx.destination);
+        offlineSource.start();
+        let resampled = await offlineCtx.startRendering();
+        return resampled;
+    } 
 }
