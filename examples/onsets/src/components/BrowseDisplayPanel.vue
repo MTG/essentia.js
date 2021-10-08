@@ -61,15 +61,15 @@ export default {
         handleSoundUpload (event) {
             event.preventDefault();
 
-            let files = null;
+            let file = null;
             if (event.type == "change") {
-                files = event.target.files;
+                file = event.target.files[0];
             }
             if (event.type == "drop") {
-                files = event.dataTransfer.files;
+                file = event.dataTransfer.files[0];
             }
 
-            EventBus.$emit("sound-read", files[0]);
+            EventBus.$emit("sound-read", {blob: file, url: file.name});
         },
         handleSearchSuccess (sounds) {
             EventBus.$emit("successful-fs-search", sounds.results);

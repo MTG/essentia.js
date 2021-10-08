@@ -46,7 +46,7 @@ export default class DSP {
         
         // set up global event handlers
         EventBus.$on("sound-selected", (url) => this.handleSoundSelect(url) );
-        EventBus.$on("sound-read", (blob) => this.decodeSoundBlob(blob) );
+        EventBus.$on("sound-read", (sound) => this.decodeSoundBlob(sound) );
         EventBus.$on("algo-params-updated", (parameters) => this.updateAlgoParams(parameters) );
         EventBus.$on("download-slices", this.handleDownload.bind(this));
     }
@@ -63,14 +63,14 @@ export default class DSP {
     }
     
     async handleSoundSelect (url) {
-        this.fileURL = url;
         console.info(this.fileURL);
         let blob = await this.getAudioFile(url);
-        EventBus.$emit("sound-read", blob);
+        EventBus.$emit("sound-read", {blob: blob, url: url});
     }
 
-    async decodeSoundBlob (blob) {
-        let buffer = await blob.arrayBuffer();
+    async decodeSoundBlob (sound) {
+        this.fileURL = sound.url;
+        let buffer = await sound.blob.arrayBuffer();
         let audioBuffer = await this.decodeBuffer(buffer);
         this.fileSampleRate = audioBuffer.sampleRate;
         let audioArray = audioBuffer.getChannelData(0);

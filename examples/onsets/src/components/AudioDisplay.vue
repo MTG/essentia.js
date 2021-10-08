@@ -111,7 +111,9 @@ export default {
         }
     },
     mounted () {
-        EventBus.$on("sound-read", (blob) => {
+        EventBus.$on("sound-read", (sound) => {
+            this.onsetPositions = [];
+
             if (this.wavesurfer) {
                 this.wavesurfer.destroy();
             }
@@ -131,7 +133,7 @@ export default {
                 ]
             });
 
-            this.wavesurfer.loadBlob(blob);
+            this.wavesurfer.loadBlob(sound.blob);
 
             this.wavesurfer.on("finish", () => {
                 if (this.isPlaying) this.isPlaying = false;
@@ -145,8 +147,6 @@ export default {
         });
 
         EventBus.$on("analysis-finished-empty", () => { this.onsetPositions = [] });
-
-        EventBus.$on("sound-read", () => { this.onsetPositions = [] } );
 
         EventBus.$emit("sound-selected", audioURL);
     }
