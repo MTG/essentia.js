@@ -1,0 +1,52 @@
+name: Continuous Integration
+
+on: 
+  push:
+    branches:
+      - dev
+      - master
+    paths:
+      - 'src/**'
+      # - 'test/**'
+      - 'build-libs.sh'
+      - 'Dockerfile'
+      - 'Makefile.essentiajs'
+      - 'rollup*.js'
+      - 'tsconfig.json'
+      - '!docs/**'
+      - '!examples/**'
+  pull_request:
+    branches:
+      - dev
+      - master
+    paths:
+      - 'src/**'
+      # - 'test/**'
+      - 'build-libs.sh'
+      - 'Dockerfile'
+      - 'Makefile.essentiajs'
+      - 'rollup*.js'
+      - 'tsconfig.json'
+      - '!docs/**'
+      - '!examples/**'
+    types:
+      - opened
+      - edited
+      - reopened
+
+jobs: 
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: docker://mtgupf/essentia-emscripten:latest
+      volumes: 
+        - ${{ env.GITHUB_WORKSPACE }}:/essentia/
+      options: --rm
+    steps:
+      - uses: actions/checkout@v2
+      - uses: kurocha/setup-cpp # necessary?
+      - run: /essentia/build-libs.sh
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - run: essentia/deploy_builds.sh
