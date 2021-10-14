@@ -1,0 +1,34 @@
+name: deploy
+
+on: 
+  pull_request:
+    branches:
+      - dev
+      - master
+    paths:
+      - 'src/**'
+      # - 'test/**'
+      - 'build-libs.sh'
+      - 'Dockerfile'
+      - 'Makefile.essentiajs'
+      - 'rollup*.js'
+      - 'tsconfig.json'
+      - '!docs/**'
+      - '!examples/**'
+    types:
+      - closed # run when PR has been approved and closed
+
+jobs: 
+  build-deploy:
+    runs-on: ubuntu-latest
+    container:
+      image: docker://mtgupf/essentia-emscripten:latest
+      volumes: 
+        - ${{ env.GITHUB_WORKSPACE }}:/essentia/
+      options: --rm
+    steps:
+      - uses: actions/checkout@v2
+      # - uses: kurocha/setup-cpp@v1 # necessary?
+      - run: /essentia/build-libs.sh
+      - run: cd /essentia/
+      - run: ./ci/deploy_builds.sh
