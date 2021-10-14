@@ -48,8 +48,3 @@ jobs:
       - run: /essentia/build-libs.sh
 
   # unit-test:
-
-  # deploy:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - run: essentia/ci/deploy_builds.sh
