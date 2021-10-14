@@ -1,6 +1,11 @@
 <template>
-    <div>
-        <div id="display"></div>
+    <div id="audio-display-wrap">
+        <div id="audio-display" class="display"></div>
+        <div id="load-overlay" class="d-flex justify-content-center align-items-center w-100 display" v-if="waitingOnsets"></div>
+        <div id="load-spinner" class="d-flex flex-column justify-content-center align-items-center w-100 display" v-if="waitingOnsets">
+            <strong class="mb-2">{{waitingOnsetsMsg}}</strong>
+            <b-spinner variant="light"></b-spinner>
+        </div>
         <div class="d-flex flex-row justify-content-between my-2">
             <b-button-group>
                 <b-button id="play" class="px-4" @click="handlePlay" variant="light">
@@ -38,7 +43,10 @@ export default {
             wavesurfer: null,
             pluginsInitialised: false,
             onsetPositions: [],
-            sliceRegions: []
+            sliceRegions: [],
+            waitingOnsets: false,
+            waitingOnsetsMsg: "Finding onsets...",
+            height: 0
         }
     },
     methods: {
@@ -84,7 +92,7 @@ export default {
                 };
             });
 
-            if (this.sliceRegions.length == 0) {
+            if (this.sliceRegions.length > 0) {
                 this.sliceRegions.map( (sr) => sr.remove() );
                 this.sliceRegions = []; // clear existing regions, if any
             } 
@@ -111,11 +119,14 @@ export default {
         }
     },
     mounted () {
+        this.height = this.$el.querySelector("#audio-display").clientHeight;
         let setPause = () => {
             if (this.isPlaying) this.isPlaying = false;
         };
 
         EventBus.$on("sound-read", (sound) => {
+            this.waitingOnsetsMsg = "Finding onsets...";
+            this.waitingOnsets = true;
             this.onsetPositions = [];
 
             if (this.wavesurfer) {
@@ -123,8 +134,8 @@ export default {
             }
 
             this.wavesurfer = WaveSurfer.create({
-                container: '#display',
-                height: this.$el.querySelector("#display").clientHeight,
+                container: '#audio-display',
+                height: this.height,
                 responsive: true,
                 progressColor: '#E4454A',
                 waveColor: '#631E20',
@@ -148,9 +159,18 @@ export default {
 
         EventBus.$on("analysis-finished-onsets", (onsets) => {
             this.onsetPositions = onsets;
+            this.waitingOnsets = false;
         });
 
-        EventBus.$on("analysis-finished-empty", () => { this.onsetPositions = [] });
+        EventBus.$on("analysis-finished-empty", () => { 
+            this.onsetPositions = [];
+            this.waitingOnsets = false;
+        });
+
+        EventBus.$on("algo-params-updated", () => {
+            this.waitingOnsetsMsg = "Recalculating...";
+            this.waitingOnsets = true;
+        })
 
         EventBus.$emit("sound-selected", audioURL);
     }
@@ -158,7 +178,28 @@ export default {
 </script>
 
 <style scoped>
-    #display {
+    #audio-display-wrap {
+        position: relative;
+    }
+
+    .display {
         height: 25vh;
+    }
+
+    #load-overlay {
+        background-color: #000;
+        opacity: 0.65;
+        z-index: 10;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    #load-spinner {
+        color: #fff;
+        z-index: 20;
+        position: absolute;
+        top: 0;
+        left: 0;
     }
 </style>
