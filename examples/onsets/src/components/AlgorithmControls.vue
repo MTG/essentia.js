@@ -10,7 +10,7 @@
                 @slider-changed="value => hopSizePercentage = value"></linear-slider>
                 <linear-slider 
                 label="sensitivity" min="0.1" max="1" step="0.05" :value="sensitivity" unit=""
-                @slider-changed="value => sensitivity = value"></linear-slider>
+                @slider-changed="value => sensitivity = Number(value)"></linear-slider>
             </div>
             <div class="col-6">
                 <label for="odf-ratios">Onset Detection Function (ODF) ratios</label>
@@ -43,7 +43,7 @@ export default {
                 names: ODFS,
                 values: new Array(ODFS.length).fill(100 / ODFS.length)
             },
-            sensitivity: 0.1,
+            sensitivity: 0.3,
             paramsChanged: false
         }
     },

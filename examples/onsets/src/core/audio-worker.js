@@ -23,12 +23,12 @@ self.params = {
     hopSize: 512,
     odfs: ['hfc'], // Onset Detection Function(s) list
     odfsWeights: [1], // per ODF weights list
-    sensitivity: 0.1
+    sensitivity: 0.3
 }; // changing odfs should require changing odfsWeights (at least length), and viceversa
-self.polarFrames = null;
 
 // global storage for slicing
 self.signal = null;
+self.polarFrames = null;
 self.onsetPositions = null;
 
 try {
@@ -42,8 +42,9 @@ onmessage = function listenToMainThread(msg) {
         case 'analyse':
             log('received analyse cmd')
             // const signal = new Float32Array(msg.data.audio);
-            preAnalysis(msg.data.audio);
-            self.onsetPositions = onsetsAnalysis();
+            self.signal = msg.data.audio;
+            computeFFT();
+            self.onsetPositions = computeOnsets();
 
             postMessage(self.onsetPositions);
             break;
@@ -61,20 +62,34 @@ onmessage = function listenToMainThread(msg) {
                 return;
             }
 
-            let update = msg.data.params;
+            let newParams = msg.data.params;
 
-            odfParamsAreOkay(suppliedParamList, update);
+            odfParamsAreOkay(suppliedParamList, newParams);
 
-            self.params = {...self.params, ...update}; // update existing params obj
+            self.params = {...self.params, ...newParams}; // update existing params obj
             log(`updated the following params: ${suppliedParamList.join(',')}`);
             log('current params are: ');
             console.info(self.params);
+            
+            if (suppliedParamList.length == 1 && suppliedParamList[0] == 'sampleRate') {
+                // if only sample rate was updated, do not run any of the analysis
+                break;
+            }
 
-            if (self.polarFrames !== null && self.polarFrames.length !== 0) {
-                // updateParams after file upload
-                self.onsetPositions = onsetsAnalysis();
-                postMessage(self.onsetPositions);
-            } // else: file hasn't been uploaded and analysed for 1st time, or it has been cleared
+            if (self.polarFrames === null || self.polarFrames.length === 0) {    
+                // file hasn't been uploaded and analysed for 1st time, or it has been cleared
+                error("Audio file has NOT been provided yet. Please upload an audio file and send it to the worker.")
+                break;
+            }
+
+            if (suppliedParamList.includes('frameSize') || suppliedParamList.includes('hopSize')) {
+                // re-compute FFT analysis if updated params affect it (frame or hop size changed)
+                computeFFT();
+            }
+            // always re-compute onset positions after params update
+            self.onsetPositions = computeOnsets();
+            postMessage(self.onsetPositions);
+
             break;
         case 'slice':
             if (!self.signal) {
@@ -103,13 +118,12 @@ onmessage = function listenToMainThread(msg) {
 
 // AUDIO FUNCS
 
-function preAnalysis (signal) {
-    self.signal = signal;
+function computeFFT () {
     self.polarFrames = []; // clear frames from previous computation
     // algo instantiation
     let PolarFFT = new PolarFFTWASM.PolarFFT(self.params.frameSize);
     // frame cutting, windowing
-    let frames = self.essentia.FrameGenerator(signal, self.params.frameSize, self.params.hopSize);
+    let frames = self.essentia.FrameGenerator(self.signal, self.params.frameSize, self.params.hopSize);
 
     for (let i = 0; i < frames.size(); i++) {
         let currentFrame = frames.get(i);
@@ -127,8 +141,8 @@ function preAnalysis (signal) {
     PolarFFT.shutdown();
 }
 
-function onsetsAnalysis () {
-    const alpha = self.params.sensitivity;
+function computeOnsets () {
+    const alpha = 1 - self.params.sensitivity; 
     const Onsets = new OnsetsWASM.Onsets(alpha, 5, self.params.sampleRate / self.params.hopSize, 0.02);
 
     // create ODF matrix to be input to the Onsets algorithm
