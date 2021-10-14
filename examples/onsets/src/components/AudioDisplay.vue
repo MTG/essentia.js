@@ -111,6 +111,10 @@ export default {
         }
     },
     mounted () {
+        let setPause = () => {
+            if (this.isPlaying) this.isPlaying = false;
+        };
+
         EventBus.$on("sound-read", (sound) => {
             this.onsetPositions = [];
 
@@ -135,9 +139,9 @@ export default {
 
             this.wavesurfer.loadBlob(sound.blob);
 
-            this.wavesurfer.on("finish", () => {
-                if (this.isPlaying) this.isPlaying = false;
-            });
+            this.wavesurfer.on("finish", setPause);
+            this.wavesurfer.on("pause", setPause);
+            this.wavesurfer.on("play", () => this.isPlaying = true );
 
             this.wavesurfer.on("plugin-initialised", () => this.pluginsInitialised = true );
         });
