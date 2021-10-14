@@ -44,7 +44,7 @@ jobs:
       options: --rm
     steps:
       - uses: actions/checkout@v2
-      - uses: kurocha/setup-cpp # necessary?
+      # - uses: kurocha/setup-cpp@v1 # necessary?
       - run: /essentia/build-libs.sh
   # deploy:
   #   runs-on: ubuntu-latest
