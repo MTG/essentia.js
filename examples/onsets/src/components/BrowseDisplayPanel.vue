@@ -26,6 +26,12 @@
                 </label>
             </div>
         </div>
+        <b-alert id="no-fs-results" show dismissible v-show="showNoResultsFoundBanner" @dismissed="showNoResultsFoundBanner = false; searchTerm=''">
+            Sorry, no results were found for "{{searchTerm}}" on Freesound. Try something different or upload your own.
+        </b-alert>
+        <b-alert id="search-failure" show dismissible v-show="showSearchFailureBanner" @dismissed="showSearchFailureBanner = false; searchTerm=''">
+            Sorry, Freesound search is currently not available. Try uploading a sound instead.
+        </b-alert>
         <freesound-results :class="[{ 'd-flex': showFreesoundResults }, { 'd-none': !showFreesoundResults }]"></freesound-results>
         <audio-display v-show="!showFreesoundResults"></audio-display>
     </section>
@@ -44,7 +50,9 @@ export default {
         return {
             showFreesoundResults: false,
             searchTerm: "",
-            uploadLabel: null
+            uploadLabel: null,
+            showSearchFailureBanner: false,
+            showNoResultsFoundBanner: false
         }
     },
     methods: {
@@ -72,11 +80,17 @@ export default {
             EventBus.$emit("sound-read", {blob: file, url: file.name});
         },
         handleSearchSuccess (sounds) {
+            // guard: are results empty?
+            if (sounds.results.length < 1) {
+                this.showNoResultsFoundBanner = true;
+                return;
+            }
             EventBus.$emit("successful-fs-search", sounds.results);
             this.showFreesoundResults = true;
-            this.searchTerm = "";
         },
         handleSearchFailure (error) {
+            this.showFreesoundResults = false;
+            this.showSearchFailureBanner = true;
             console.error("Freesound search failed", error);
         }
     },
@@ -87,6 +101,7 @@ export default {
 
         EventBus.$on("sound-selected", () => {
             this.showFreesoundResults = false;
+            this.searchTerm = "";
         })
     },
     mounted () {
