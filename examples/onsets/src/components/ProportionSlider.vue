@@ -1,32 +1,39 @@
 <template>
     <div style="height: 50%;">
-        <div style="width: 100%; display: flex; background-color: transparent; height: 100%;" ref="TagSliderRef">
-            <tag-section 
-            v-for="(tag, index) in tags" :key="index" 
+        <div class="h-100 w-100 d-flex mb-2" id="multislider" ref="TagSliderRef">
+            <proportion-tag 
+            v-for="(tag, index) in tagsOn" :key="index" 
             :name="tag.name" 
             :color="tag.color" 
             :width="widths[index]"
             :show-percentage="showTagPercentage"
             @slider-select-on="onSliderSelect($event, index)"
             @slider-select-off="showTagPercentage=false"
-            @tag-clicked="removeTag">
-            </tag-section>
+            @tag-clicked="removeTag"
+            class="flex-grow-1">
+            </proportion-tag>
         </div>
+        <b-button variant="light" size="sm" v-for="(tag, index) in tagsOff" :key="index" :class="{'ml-2': buttonIsNotFirst(index) }" @click="handleTagReset(tag.name)">
+            <b-icon icon="arrow-counterclockwise"></b-icon>
+            {{tag.name}}
+        </b-button>
     </div>
 </template>
 
 <script>
 const tagColor = '#dee2e6dd';
 
-import TagSection from "./ProportionTag.vue";
+import ProportionTag from "./ProportionTag.vue";
 import { ref } from "@vue/composition-api";
 import { getPercentage, limitNumberWithinRange, nearestN } from "./utils.js";
+
+let resize;
 
 export default {
     props: {
         tagsData: Object
     },
-    components: { TagSection },
+    components: { ProportionTag },
     setup () {
         return {
             TagSliderRef: ref(null)
@@ -34,14 +41,15 @@ export default {
     },
     data () {
         return {
-            tags: this.tagsData.names.map( name => { return {name: name, color: tagColor}; } ),
+            tagsOn: this.tagsData.names.map( (name, index) => { return {name: name, color: tagColor, position: index}; } ),
             widths: this.tagsData.values,
+            tagsOff: [],
             percentageMovedOld: 0,
             showTagPercentage: false
         };
     },
     watch: {
-        tags () {
+        tagsOn () {
             this.controlsChanged();
         },
         widths () {
@@ -59,7 +67,7 @@ export default {
             // console.log({startDragX});
             const sliderWidth = this.$refs.TagSliderRef.offsetWidth;
 
-            const resize = (resizeEvent) => {
+            resize = (resizeEvent) => {
                 const _widths = this.widths.slice();
                 // console.log("resize: ", e.target);
                 resizeEvent.preventDefault();
@@ -82,6 +90,7 @@ export default {
                         0,
                         maxPercent
                     );
+                    if (currentSectionWidth < 10) return;
                     // console.log({currentSectionWidth});
                     _widths[index] = currentSectionWidth;
 
@@ -98,20 +107,6 @@ export default {
 
                     this.percentageMovedOld = percentageMoved;
 
-                    if (this.tags.length > 2) {
-                        if (_widths[index] === 5) {
-                            _widths[nextSectionIndex] = maxPercent;
-                            _widths.splice(index, 1);
-                            this.tags = this.tags.filter((t, i) => i !== index);
-                            removeEventListener();
-                        }
-                        if (_widths[nextSectionIndex] === 5) {
-                            _widths[index] = maxPercent;
-                            _widths.splice(nextSectionIndex, 1);
-                            this.tags = this.tags.filter((t, i) => i !== nextSectionIndex);
-                            removeEventListener();
-                        }
-                    }
                 }
 
                 this.widths = _widths;
@@ -120,16 +115,10 @@ export default {
             window.addEventListener("pointermove", resize);
             window.addEventListener("touchmove", resize);
 
-            const removeEventListener = () => {
-                window.removeEventListener("pointermove", resize);
-                window.removeEventListener("touchmove", resize);
-                this.percentageMovedOld = 0;
-            };
-
             const handleEventUp = (eventUp) => {
                 eventUp.preventDefault();
                 document.body.style.cursor = "initial";
-                removeEventListener();
+                this.removeEventListener();
             };
 
             window.addEventListener("touchend", handleEventUp);
@@ -137,17 +126,19 @@ export default {
         },
         removeTag (name) {
             // guard: DONT remove if only one is left
-            if (this.tags.length === 1) {
-                return
-            }
+            if (this.tagsOn.length === 1) return;
             let idx = null;
             let widths = this.widths.slice();
-            this.tags = this.tags.filter((t,i) => {
+            this.tagsOn = this.tagsOn.filter((t) => {
                 if (t.name === name) {
-                    idx = i;
+                    idx = t.position;
+                    this.tagsOff.push(t);
                 }
                 return t.name !== name;
             });
+
+            this.removeEventListener();
+
             let removedTagWidth = widths.splice(idx, 1);
 
             if (widths[idx+1]) {
@@ -158,17 +149,45 @@ export default {
 
             this.widths = widths;
         },
+        removeEventListener () {
+            window.removeEventListener("pointermove", resize);
+            window.removeEventListener("touchmove", resize);
+            this.percentageMovedOld = 0;
+        },
         controlsChanged () {
             const tags = {
-                names: this.tags.map(t => t.name.toLowerCase().replace(" ", "_") ),
+                names: this.tagsOn.map(t => t.name.toLowerCase().replace(" ", "_") ),
                 values: this.widths.map(w => w * 0.01)
             };
 
             this.$emit('slider-changed', tags);
+        },
+        buttonIsNotFirst (i) {
+            return i > 0;
+        },
+        handleTagReset (name) {
+            this.tagsOff = this.tagsOff.filter((t) => {
+                if (t.name === name) {
+                    this.tagsOn.splice(t.position, 0, t);
+                }
+                return t.name !== name;
+            });
+            const numTagsOn = this.tagsOn.length;
+            this.widths = new Array(numTagsOn).fill(100 / numTagsOn);
         }
     }
 }
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
+    #multislider {
+        background-color: transparent;
+    }
+
+    b-button {
+        margin-left: 1rem;
+        &:first-of-type {
+            margin-left: none;
+        }
+    }
 </style>

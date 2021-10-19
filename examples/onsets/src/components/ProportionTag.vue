@@ -10,7 +10,7 @@
         @pointerdown="handleTagClicked">{{ name }}</span>
         <span 
         :style="{ ...styles.tagText, fontSize: 12 }"
-        v-show="showPercentage"> {{ width }} % </span>
+        v-show="showPercentage"> {{ Math.round(width) }} % </span>
         <div class="slider-button" :style="{ ...styles.sliderButton }" 
         @pointerdown="handlePointerDown" @pointerup="handlePointerUp">
             <b-icon icon="chevron-compact-left"></b-icon>
@@ -105,11 +105,11 @@ export default {
     }
 
     .tag:first-of-type {
-        border-radius: 50px 0px 0px 50px;
+        // border-radius: 50px 0px 0px 50px;
         border-left-color: transparent;
     }
     .tag:last-of-type {
-        border-radius: 0px 50px 50px 0px;
+        // border-radius: 0px 50px 50px 0px;
         border-right-color: transparent;
     }
     .tag:last-of-type>.slider-button {
