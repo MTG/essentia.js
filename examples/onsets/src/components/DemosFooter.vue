@@ -60,6 +60,7 @@ export default {
 
     #essentiajs-link {
         height: 2.5rem;
+        margin-left: .5rem;
     }
 
     #mtg-link {
