@@ -14,9 +14,9 @@
             <span class="my-auto col-2">Or</span>
             <div class="px-0 col-5">
                 <b-input-group>
-                    <b-form-input id="file-upload" placeholder="Upload from computer" readonly @click="uploadLabel.click()"></b-form-input>
+                    <b-form-input id="file-upload" placeholder="Upload from computer" readonly @click="uploadLabel.click()" :disabled="showFreesoundResults"></b-form-input>
                     <b-input-group-append>
-                        <b-button variant="light" class="px-4" @click="uploadLabel.click()">
+                        <b-button variant="light" class="px-4" @click="uploadLabel.click()" :disabled="showFreesoundResults">
                             <b-icon icon="upload"></b-icon>
                         </b-button>
                     </b-input-group-append>
@@ -68,6 +68,8 @@ export default {
         },
         handleSoundUpload (event) {
             event.preventDefault();
+            // guard: no files chosen (e.g. upload was cancelled)
+            if (event.target.files.length == 0) return;
 
             let file = null;
             if (event.type == "change") {
@@ -117,6 +119,9 @@ export default {
     }
     #file-upload {
         background-color: inherit;
+        &[disabled] {
+            background-color: #dee2e6dd;
+        }
     }
     span {
         text-align: center;
