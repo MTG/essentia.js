@@ -15,7 +15,9 @@
             @pointerleave="$emit('pointerleave')">
             </proportion-tag>
         </div>
-        <b-button variant="light" size="sm" v-for="(tag, index) in tagsOff" :key="index" :class="{'ml-2': buttonIsNotFirst(index) }" @click="handleTagReset(tag.name)">
+        <b-button variant="light" size="sm" v-for="(tag, index) in tagsOff" :key="index" 
+        :class="{'ml-2': buttonIsNotFirst(index) }" @click="handleTagReset(tag.name)"
+        v-b-tooltip.hover :title="`Add ${tag.name} to selected functions`">
             <b-icon icon="arrow-counterclockwise"></b-icon>
             {{tag.name}}
         </b-button>
@@ -121,6 +123,7 @@ export default {
                 eventUp.preventDefault();
                 document.body.style.cursor = "initial";
                 this.removeEventListener();
+                this.showTagPercentage = false;
             };
 
             window.addEventListener("touchend", handleEventUp);
