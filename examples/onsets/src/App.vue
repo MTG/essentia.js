@@ -2,9 +2,7 @@
   <div id="app">
       <div id="instructions" v-if="!instructionsClosed">
         <!-- using placeholder GIFs -->
-        <instructions-modal img-link="https://media.giphy.com/media/eDOsXo70WqUU0/giphy.gif,
-                                        https://media.giphy.com/media/AUlBq9xqbWu0E/giphy.gif,
-                                        https://media.giphy.com/media/LSpDvtSVoq4yA/giphy.gif"
+        <instructions-modal :img-link="instructionsGifs"
                             @closed="instructionsClosed=true">
           <template slot="header">Audio slicer fun!</template>
           <template slot="lead">Create weighted combinations of multiple onset detection functions for different audio segmentation results.</template>
@@ -31,13 +29,19 @@ import DemosHeader from './components/DemosHeader.vue';
 import BrowseDisplay from './components/BrowseDisplayPanel.vue';
 import AlgorithmControls from './components/AlgorithmControls.vue';
 
+import gif1 from './assets/onset-instructions-1.gif';
+import gif2 from './assets/onset-instructions-2.gif';
+import gif3 from './assets/onset-instructions-3.gif';
+import gif4 from './assets/onset-instructions-4.gif';
+
 export default {
   name: 'app',
   components: { InstructionsModal, DemosFooter, DemosHeader, BrowseDisplay, AlgorithmControls },
   data () {
     return {
       instructionsClosed: false,
-      audioUploaded: false
+      audioUploaded: false,
+      instructionsGifs: [gif1, gif2, gif3, gif4]
     }
   },
   created () {

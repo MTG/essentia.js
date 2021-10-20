@@ -13,7 +13,7 @@
             <div id="instructions-carousel" class="p-3">
                 <b-carousel
                     fade
-                    :interval="3000"
+                    :interval="interval"
                     controls
                     indicators
                     background="#ababab"
@@ -22,7 +22,7 @@
                     img-height="300"
                     ref="instructionsCarousel"
                 >
-                    <b-carousel-slide v-for="(link, index) in this.imgLink.split(',')"
+                    <b-carousel-slide v-for="(link, index) in this.imgLink"
                     :key="index"
                     :img-src="link"
                     :caption="`${index+=1}.`"
@@ -48,7 +48,8 @@ export default {
     props: ['img-link'],
     data () {
         return {
-            showModal: true
+            showModal: true,
+            interval: 0
         };
     },
     methods: {
@@ -60,8 +61,3 @@ export default {
 }
 
 </script>
-
-
-<style>
-
-</style>
