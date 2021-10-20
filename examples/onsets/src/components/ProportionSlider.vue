@@ -10,7 +10,9 @@
             @slider-select-on="onSliderSelect($event, index)"
             @slider-select-off="showTagPercentage=false"
             @tag-clicked="removeTag"
-            class="flex-grow-1">
+            class="flex-grow-1"
+            @pointerenter="(name) => $emit('pointerenter', name)"
+            @pointerleave="$emit('pointerleave')">
             </proportion-tag>
         </div>
         <b-button variant="light" size="sm" v-for="(tag, index) in tagsOff" :key="index" :class="{'ml-2': buttonIsNotFirst(index) }" @click="handleTagReset(tag.name)">

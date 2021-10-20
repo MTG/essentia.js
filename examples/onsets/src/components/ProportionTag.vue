@@ -1,7 +1,9 @@
 <template>
     <div 
     class="tag tag-borders" 
-    :style="{ ...styles.tag, background: tagColor, width: width + '%' }">
+    :style="{ ...styles.tag, background: tagColor, width: width + '%' }"
+    @pointerenter="$emit('pointerenter', name)"
+    @pointerleave="$emit('pointerleave')">
         <span 
         :style="{ ...styles.tagText }"
         v-show="!showPercentage"
