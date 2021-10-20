@@ -47,7 +47,7 @@ import EventBus from "../core/event-bus";
 const quickhelpContents = {
     "frame-size": "Size of the audio frames used for analysis. A bigger frame will have greater frequency resolution, but poorer temporal resolution, and viceversa.",
     "hop-size": "Rate at which audio is cut in frames for analysis. Given as a percentage of the frame size. At 100% there's no overlap between consecutive frames. Lower values mean higher frame rate, thus greater temporal resolution.",
-    sensitivity: "Regulates the threshold for onset detection. Higher sensitivity tends to produce more false positives. Lower values might miss some onsets.",
+    sensitivity: "Regulates the threshold for onset detection. Higher values tend to produce more false positives. Increase it if you know that your chosen audio has onsets but none are being displayed.",
     odf: "Four functions are available to use as the basis for onset detection. They can be combined and be given different ratios such that some have a greater effect than others. At least one has to be selected.",
     HFC: "This function computes the high frequency content (HFC) of an audio spectrum. Particularly good for percussive events. ",
     Complex: "Detects changes in magnitude and phase. Emphasizes significant energy changes in the magnitude spectrum and/or deviation from the expected values in the phase spectrum, caused by changes in pitch.",
