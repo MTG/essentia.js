@@ -1,6 +1,6 @@
 <template>
     <div style="height: 50%;">
-        <div class="h-100 w-100 d-flex mb-2" id="multislider" ref="TagSliderRef">
+        <div class="h-100 w-100 d-flex mb-2 rounded-lg" id="multislider" ref="TagSliderRef">
             <proportion-tag 
             v-for="(tag, index) in tagsOn" :key="index" 
             :name="tag.name" 
@@ -35,7 +35,8 @@ let resize;
 
 export default {
     props: {
-        tagsData: Object
+        tags: Object,
+        tagsOrder: Array
     },
     components: { ProportionTag },
     setup () {
@@ -45,9 +46,9 @@ export default {
     },
     data () {
         return {
-            tagsOn: this.tagsData.names.map( (name, index) => { return {name: name, color: tagColor, position: index}; } ),
-            widths: this.tagsData.values,
-            tagsOff: [],
+            tagsOn: this.tags.on.names.map( (name) => { return {name: name, color: tagColor, position: this.tagsOrder.indexOf(name)}; } ),
+            widths: this.tags.on.values,
+            tagsOff: this.tags.off.names.map( (name) => { return {name: name, color: tagColor, position: this.tagsOrder.indexOf(name)}; } ),
             percentageMovedOld: 0,
             showTagPercentage: false
         };
@@ -134,9 +135,9 @@ export default {
             if (this.tagsOn.length === 1) return;
             let idx = null;
             let widths = this.widths.slice();
-            this.tagsOn = this.tagsOn.filter((t) => {
+            this.tagsOn = this.tagsOn.filter((t, i) => {
                 if (t.name === name) {
-                    idx = t.position;
+                    idx = i;
                     this.tagsOff.push(t);
                 }
                 return t.name !== name;
@@ -161,8 +162,13 @@ export default {
         },
         controlsChanged () {
             const tags = {
-                names: this.tagsOn.map(t => t.name.toLowerCase().replace(" ", "_") ),
-                values: this.widths.map(w => w * 0.01)
+                on: {
+                    names: this.tagsOn.map(t => t.name.toLowerCase().replace(" ", "_") ),
+                    values: this.widths.map(w => w * 0.01)
+                },
+                off: {
+                    names: this.tagsOff.map(t => t.name.toLowerCase().replace(" ", "_") )
+                }
             };
 
             this.$emit('slider-changed', tags);
@@ -173,10 +179,12 @@ export default {
         handleTagReset (name) {
             this.tagsOff = this.tagsOff.filter((t) => {
                 if (t.name === name) {
-                    this.tagsOn.splice(t.position, 0, t);
+                    // this.tagsOn.splice(t.position, 0, t);
+                    this.tagsOn.push(t);
                 }
                 return t.name !== name;
             });
+            this.tagsOn.sort( (elem1, elem2) => { return elem1.position - elem2.position; });
             const numTagsOn = this.tagsOn.length;
             this.widths = new Array(numTagsOn).fill(100 / numTagsOn);
         }

@@ -21,8 +21,8 @@ self.params = {
     sampleRate: 44100,
     frameSize: 1024,
     hopSize: 512,
-    odfs: ['hfc'], // Onset Detection Function(s) list
-    odfsWeights: [1], // per ODF weights list
+    odfs: ['hfc', 'complex'], // Onset Detection Function(s) list
+    odfsWeights: [1, 1], // per ODF weights list
     sensitivity: 0.3
 }; // changing odfs should require changing odfsWeights (at least length), and viceversa
 

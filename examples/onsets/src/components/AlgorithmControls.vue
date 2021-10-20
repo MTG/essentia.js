@@ -21,7 +21,7 @@
             <div class="col-6">
                 <label for="odf-ratios" @pointerenter="currentlyHovered='odf'" 
                 @pointerleave="currentlyHovered='none'"><a href="https://en.wikipedia.org/wiki/Onset_(audio)" target="_blank">Onset</a> detection functions</label>
-                <proportion-slider id="odf-ratios" @slider-changed="data => odfs = data" :tagsData="odfs" 
+                <proportion-slider id="odf-ratios" @slider-changed="data => odfs = data" :tags="odfs" :tagsOrder="['HFC', 'Complex', 'Flux', 'Complex Phase']"
                 @pointerenter="name => currentlyHovered=name"
                 @pointerleave="currentlyHovered='none'"></proportion-slider>
             </div>
@@ -44,8 +44,6 @@ import ProportionSlider from "./ProportionSlider.vue";
 
 import EventBus from "../core/event-bus";
 
-const ODFS = ["HFC", "Complex", "Flux", "Complex Phase"];
-
 const quickhelpContents = {
     "frame-size": "Size of the audio frames used for analysis. A bigger frame will have greater frequency resolution, but poorer temporal resolution, and viceversa.",
     "hop-size": "Rate at which audio is cut in frames for analysis. Given as a percentage of the frame size. At 100% there's no overlap between consecutive frames. Lower values mean higher frame rate, thus greater temporal resolution.",
@@ -65,8 +63,13 @@ export default {
             frameSize: 1024,
             hopSizePercentage: 50,
             odfs: {
-                names: ODFS,
-                values: new Array(ODFS.length).fill(100 / ODFS.length)
+                on: {
+                    names: ["HFC", "Complex"],
+                    values: [50, 50]
+                },
+                off: {
+                    names: ["Flux", "Complex Phase"]
+                }
             },
             sensitivity: 0.3,
             paramsChanged: false,
@@ -78,8 +81,8 @@ export default {
             return {
                 frameSize: this.frameSize,
                 hopSize: this.hopSizePercentage * this.frameSize * 0.01,
-                odfs: this.odfs.names,
-                odfsWeights: this.odfs.values,
+                odfs: this.odfs.on.names,
+                odfsWeights: this.odfs.on.values,
                 sensitivity: this.sensitivity
             }
         },
