@@ -22,8 +22,8 @@ export default class DSP {
         // create audio worker, set up comms
         this.audioWorker = new Worker("./audio-worker.js", {type: "module"});
         this.audioWorker.postMessage({
-            request: 'updateParams',
-            params: {sampleRate: this.audioCtx.sampleRate}
+            request: 'updateSampleRate',
+            sr: this.audioCtx.sampleRate
         });
 
         this.audioWorker.onmessage = (msg) => {
@@ -34,6 +34,10 @@ export default class DSP {
                     break;
                 case 'saturation':
                     EventBus.$emit("saturation-finished", msg.data.results);
+                    break;
+                case 'silence':
+                    console.log(msg.data.results);
+                    EventBus.$emit("silence-finished", msg.data.results);
                     break;
                 default:
                     console.log('No matching response type for received msg');

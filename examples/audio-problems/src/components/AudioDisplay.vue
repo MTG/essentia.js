@@ -33,7 +33,7 @@ import WaveSurfer from 'wavesurfer.js';
 import MarkersPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.markers';
 import RegionsPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.regions';
 
-import audioURL from '../assets/song_saturation_and_end_cut.wav';
+import audioURL from '../assets/song_saturation_and_start_cut_silence_end.wav';
 
 export default {
     data () {
@@ -46,6 +46,8 @@ export default {
             startStopRegions: [],
             saturationResults: {},
             saturationRegions: [],
+            silenceResults: {},
+            silenceRegions: [],
             waitingOnsets: false,
             waitingOnsetsMsg: "Finding onsets...",
             height: 0
@@ -113,7 +115,7 @@ export default {
             }
 
             let newRegions = [];
-            const widthPixels = this.wavesurfer.mediaContainer.clientWidth;
+            // const widthPixels = this.wavesurfer.mediaContainer.clientWidth;
             // generate region options from this.saturationResults
 
             console.log("saturationResults", this.saturationResults);
@@ -136,7 +138,36 @@ export default {
                 })
             }
 
-            newRegions.forEach((s) => { this.startStopRegions.push(this.wavesurfer.addRegion(s)) });
+            newRegions.forEach((s) => { this.saturationRegions.push(this.wavesurfer.addRegion(s)) });
+
+            this.wavesurfer.on('region-click', (region, ev) => {
+                ev.stopPropagation();
+                region.play();
+            })
+        },
+        drawSilence () {
+            if (this.silenceRegions.length > 0) {
+                this.silenceRegions.map( (sr) => sr.remove() );
+                this.silenceRegions = []; // clear existing regions, if any
+            }
+
+            let newRegions = [];
+            // const widthPixels = this.wavesurfer.mediaContainer.clientWidth;
+
+            console.log("silenceResults", this.silenceResults);
+
+            for (let prop in this.silenceResults) {
+                newRegions.push({
+                    id: `silence-${prop}`,
+                    start: prop == 'start' ? 0 : this.silenceResults.end,
+                    end: prop == 'start' ? this.silenceResults.start : this.wavesurfer.getDuration(),
+                    drag: false,
+                    resize: false,
+                    color: "#21252994"
+                })
+            }
+
+            newRegions.forEach((s) => { this.silenceRegions.push(this.wavesurfer.addRegion(s)) });
 
             this.wavesurfer.on('region-click', (region, ev) => {
                 ev.stopPropagation();
@@ -150,6 +181,9 @@ export default {
         },
         saturationResults: function () {
             this.drawSaturation();
+        },
+        silenceResults: function () {
+            this.drawSilence();
         }
     },
     computed: {
@@ -207,6 +241,11 @@ export default {
 
         EventBus.$on("saturation-finished", (results) => {
             this.saturationResults = results;
+            this.waitingOnsets = false;
+        });
+
+        EventBus.$on("silence-finished", (results) => {
+            this.silenceResults = results;
             this.waitingOnsets = false;
         });
 
