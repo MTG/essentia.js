@@ -25,7 +25,8 @@ build:
 	@echo "Done ..."
 	   
 	# Sync builds for ES6 import and AudioWorklet support ...
-	@emcc --bind -Oz bindings_extractor.cpp essentia_custom_extractor.cpp ${LIB_DIR_ESSENTIA}/essentia.a \
+	@emcc -I $(EIGEN_PATH) \
+		--bind -Oz bindings_extractor.cpp essentia_custom_extractor.cpp ${LIB_DIR_ESSENTIA}/essentia.a \
 		-s WASM=1 \
 		-o $(ESSENTIA_JS_MODULE) \
 		-s BINARYEN_ASYNC_COMPILATION=0 \
