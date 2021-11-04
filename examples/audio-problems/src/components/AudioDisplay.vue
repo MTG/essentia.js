@@ -44,6 +44,8 @@ export default {
             pluginsInitialised: false,
             startStopCutResults: {},
             startStopRegions: [],
+            saturationResults: {},
+            saturationRegions: [],
             waitingOnsets: false,
             waitingOnsetsMsg: "Finding onsets...",
             height: 0
@@ -67,7 +69,7 @@ export default {
         handleDownload () {
             EventBus.$emit('download-slices');
         },
-        drawAudioProblems () {
+        drawStartStopCut () {
             if (this.startStopRegions.length > 0) {
                 this.startStopRegions.map( (sr) => sr.remove() );
                 this.startStopRegions = []; // clear existing regions, if any
@@ -103,11 +105,51 @@ export default {
                 ev.stopPropagation();
                 region.play();
             })
+        },
+        drawSaturation () {
+            if (this.saturationRegions.length > 0) {
+                this.saturationRegions.map( (sr) => sr.remove() );
+                this.saturationRegions = []; // clear existing regions, if any
+            }
+
+            let newRegions = [];
+            const widthPixels = this.wavesurfer.mediaContainer.clientWidth;
+            // generate region options from this.saturationResults
+
+            console.log("saturationResults", this.saturationResults);
+            if (this.saturationResults.starts.length < 0 || this.saturationResults.ends.length < 0) {
+                return;
+            }
+            if (this.saturationResults.starts.length !== this.saturationResults.ends.length) {
+                console.error("Saturation: different number of start and end points");
+                return;
+            }
+
+            for (let i = 0; i < this.saturationResults.starts.length; i++) {
+                newRegions.push({
+                    id: `saturation-${i}`,
+                    start: this.saturationResults.starts[i],
+                    end: this.saturationResults.ends[i],
+                    drag: false,
+                    resize: false,
+                    color: "#21252994"
+                })
+            }
+
+            newRegions.forEach((s) => { this.startStopRegions.push(this.wavesurfer.addRegion(s)) });
+
+            this.wavesurfer.on('region-click', (region, ev) => {
+                ev.stopPropagation();
+                region.play();
+            })
         }
     },
     watch: {
         startStopCutResults: function () {
-            this.drawAudioProblems();
+            this.drawStartStopCut();
+        },
+        saturationResults: function () {
+            this.drawSaturation();
         }
     },
     computed: {
@@ -160,6 +202,11 @@ export default {
 
         EventBus.$on("startstopcut-finished", (results) => {
             this.startStopCutResults = results;
+            this.waitingOnsets = false;
+        });
+
+        EventBus.$on("saturation-finished", (results) => {
+            this.saturationResults = results;
             this.waitingOnsets = false;
         });
 

@@ -25,24 +25,28 @@ export default class DSP {
             request: 'updateParams',
             params: {sampleRate: this.audioCtx.sampleRate}
         });
+
         this.audioWorker.onmessage = (msg) => {
             console.log('worker data:', msg);
-            if (msg.data.type == "startStopCut") {
-                EventBus.$emit("startstopcut-finished", msg.data.results);
-            }
-            else if(msg.data instanceof Float32Array) {
-                if (msg.data.length == 0) {
-                    EventBus.$emit("analysis-finished-empty");
-                } else {
-                    EventBus.$emit("analysis-finished-onsets", Array.from(msg.data));
-                }
-            } else if (msg.data instanceof Array && msg.data[0] instanceof Float32Array) {
-                console.info('worker returned sliced audio', msg.data);
-                this.downloadSlicesAsZip(msg.data);
-            } else {
-                throw TypeError("Worker failed. Analysis results should be of type Float32Array");
+            switch (msg.data.type) {
+                case 'startStopCut':
+                    EventBus.$emit("startstopcut-finished", msg.data.results);
+                    break;
+                case 'saturation':
+                    EventBus.$emit("saturation-finished", msg.data.results);
+                    break;
+                default:
+                    console.log('No matching response type for received msg');
+                    break;
             }
         };
+
+        // this.signal = [];
+        // this.saturationResults = {'starts': null , 'ends': null};
+
+        // EssentiaWASMSaturation().then( module => {
+        //     this.saturationExtractor = new module.SaturationDetectorExtractor();
+        // });
 
         this.fileURL = '';
         this.filename = '';
@@ -53,7 +57,7 @@ export default class DSP {
         EventBus.$on("sound-read", (sound) => {
             this.decodeSoundBlob(sound);
         });
-        EventBus.$on("algo-params-updated", (parameters) => this.updateAlgoParams(parameters) );
+        // EventBus.$on("algo-params-updated", (parameters) => this.updateAlgoParams(parameters) );
         EventBus.$on("download-slices", this.handleDownload.bind(this));
     }
 
@@ -85,6 +89,8 @@ export default class DSP {
             request: 'analyse',
             audio: audioArray
         });
+        // this.signal = audioArray;
+        // this.computeSaturation();
     }
 
     updateAlgoParams (params) {
@@ -168,5 +174,10 @@ export default class DSP {
         offlineSource.start();
         let resampled = await offlineCtx.startRendering();
         return resampled;
+    }
+    computeSaturation () {
+        console.log(this.signal);
+        this.saturationResults['starts'] = this.saturationExtractor.computeStarts(this.signal);
+        this.saturationResults['ends'] = this.saturationExtractor.computeEnds(this.signal);
     } 
 }

@@ -10,26 +10,21 @@ self.error = function (msg) {
 // INIT
 import { Essentia, EssentiaWASM } from 'essentia.js';
 // import Essentia from './lib/essentia.js-core.es.js';
-// import { EssentiaWASMSaturation } from './lib/essentia-custom-extractor.web.js';
+import { EssentiaWASMSaturation } from './lib/saturation-extractor.module.js';
+// import { EssentiaWASMSilence } from './lib/start-stop-silence.module.js';
 log("Imports went OK");
 
 self.essentia = null;
-self.saturationExtractor = null;
-self.allowedParams = ['sampleRate', 'frameSize', 'hopSize', 'odfs', 'odfsWeights', 'sensitivity'];
-self.params = {
-    sampleRate: 44100,
-    frameSize: 1024,
-    hopSize: 512,
-    odfs: ['hfc', 'complex'], // Onset Detection Function(s) list
-    odfsWeights: [1, 1], // per ODF weights list
-    sensitivity: 0.3
-}; // changing odfs should require changing odfsWeights (at least length), and viceversa
+self.saturationExtractor = new EssentiaWASMSaturation.SaturationDetectorExtractor(1024, 512);
+// self.silenceExtractor = new EssentiaWASMSilence.StartStopSilenceExtractor(1024, 512);
+
+log(saturationExtractor);
 
 // global storage for slicing
 self.signal = null;
-self.polarFrames = null;
 self.saturationResults = {'starts': null , 'ends': null};
 self.startStopCutResults = null;
+self.silenceResults = {'starts': null , 'ends': null};
 
 try {
     self.essentia = new Essentia(EssentiaWASM.EssentiaWASM);
@@ -49,11 +44,23 @@ onmessage = function listenToMainThread(msg) {
             self.signal = msg.data.audio;
             // self.saturationResults = computeSaturation();
             computeStartStopCut();
+            computeSaturation();
+            // computeSilence();
 
             postMessage({
                 type: 'startStopCut',
                 results: self.startStopCutResults
             });
+
+            postMessage({
+                type: 'saturation',
+                results: self.saturationResults
+            })
+
+            // postMessage({
+            //     type: 'silence',
+            //     results: self.silenceResults
+            // })
             break;
         case 'updateParams':
             // guard: check for empty params obj
@@ -61,41 +68,6 @@ onmessage = function listenToMainThread(msg) {
                 error('missing `params` object in the `updateParams` command');
                 return;
             }
-            let suppliedParamList = Object.keys(msg.data.params);
-
-            // guard: check obj properties for forbidden params
-            if (!paramsAreAllowed(suppliedParamList)) {
-                error(`illegal parameter(s) in 'updateParams' command \n - ${getUnsupportedParams(suppliedParamList).join('\n - ')}`);
-                return;
-            }
-
-            let newParams = msg.data.params;
-
-            odfParamsAreOkay(suppliedParamList, newParams);
-
-            self.params = {...self.params, ...newParams}; // update existing params obj
-            log(`updated the following params: ${suppliedParamList.join(',')}`);
-            log('current params are: ');
-            console.info(self.params);
-            
-            if (suppliedParamList.length == 1 && suppliedParamList[0] == 'sampleRate') {
-                // if only sample rate was updated, do not run any of the analysis
-                break;
-            }
-
-            if (self.polarFrames === null || self.polarFrames.length === 0) {    
-                // file hasn't been uploaded and analysed for 1st time, or it has been cleared
-                error("Audio file has NOT been provided yet. Please upload an audio file and send it to the worker.")
-                break;
-            }
-
-            if (suppliedParamList.includes('frameSize') || suppliedParamList.includes('hopSize')) {
-                // re-compute FFT analysis if updated params affect it (frame or hop size changed)
-                computeFFT();
-            }
-            // always re-compute onset positions after params update
-            self.saturationResults = computeOnsets();
-            postMessage(self.saturationResults);
 
             break;
         case 'slice':
@@ -126,14 +98,18 @@ onmessage = function listenToMainThread(msg) {
 // AUDIO FUNCS
 
 function computeSaturation () {
-    this.saturationResults['starts'] = this.saturationExtractor.computeStarts(this.leftChannel);
-    this.saturationResults['ends'] = this.saturationExtractor.computeEnds(this.leftChannel);
+    let algoOutput = self.saturationExtractor.compute(self.signal);
+    self.saturationResults.starts = essentia.vectorToArray(algoOutput.starts);
+    self.saturationResults.ends = essentia.vectorToArray(algoOutput.ends);
+}
+
+function computeSilence () {
+    self.silenceResults['starts'] = self.silenceExtractor.computeStartframe(self.signal);
+    self.silenceResults['ends'] = self.silenceExtractor.computeStopframe(self.signal);
 }
 
 function computeStartStopCut () {
     self.startStopCutResults = self.essentia.StartStopCut(self.essentia.arrayToVector(self.signal));
-    log('startStopCutResults');
-    log(self.startStopCutResults);
 }
 
 
