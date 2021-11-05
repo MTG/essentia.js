@@ -87,7 +87,7 @@ export default {
                     end: this.wavesurfer.getDuration() * 5 / widthPixels,
                     drag: false,
                     resize: false,
-                    color: "#21252994"
+                    color: "#43a21db5"
                 })
             }
             if (this.startStopCutResults.stopCut === 1){
@@ -97,7 +97,7 @@ export default {
                     end: this.wavesurfer.getDuration(),
                     drag: false,
                     resize: false,
-                    color: "#21252994"
+                    color: "#43a21db5"
                 }) 
             }
 
@@ -127,19 +127,31 @@ export default {
                 return;
             }
 
-            for (let i = 0; i < this.saturationResults.starts.length; i++) {
-                newRegions.push({
+            let firstSaturation = this.saturationResults.starts[0];
+            let lastSaturation = this.saturationResults.starts[0];
+            let isRegion = true;
+            for (let i = 1; i < this.saturationResults.starts.length; i++) {
+
+              if(isRegion){
+                if( i == this.saturationResults.starts.length -1 || this.saturationResults.starts[i] - lastSaturation > 0.5){
+                  isRegion = false;
+                  newRegions.push({
                     id: `saturation-${i}`,
-                    start: this.saturationResults.starts[i],
-                    end: this.saturationResults.ends[i],
+                    start: firstSaturation,
+                    end: this.saturationResults.ends[i-1],
                     drag: false,
                     resize: false,
-                    color: "#21252994"
-                })
+                    color: "#a2241db5"
+                  })
+                }
+                lastSaturation = this.saturationResults.starts[i];
+              }else{
+                firstSaturation = this.saturationResults.starts[i];
+                lastSaturation = this.saturationResults.starts[i];
+                isRegion = true;
+              }
             }
-
             newRegions.forEach((s) => { this.saturationRegions.push(this.wavesurfer.addRegion(s)) });
-
             this.wavesurfer.on('region-click', (region, ev) => {
                 ev.stopPropagation();
                 region.play();
@@ -159,11 +171,11 @@ export default {
             for (let prop in this.silenceResults) {
                 newRegions.push({
                     id: `silence-${prop}`,
-                    start: prop == 'start' ? 0 : this.silenceResults.end,
-                    end: prop == 'start' ? this.silenceResults.start : this.wavesurfer.getDuration(),
+                    start: prop === 'start' ? 0 : this.silenceResults.end,
+                    end: prop === 'start' ? this.silenceResults.start : this.wavesurfer.getDuration(),
                     drag: false,
                     resize: false,
-                    color: "#21252994"
+                    color: "#1c4e80b5"
                 })
             }
 
@@ -220,7 +232,9 @@ export default {
                     MarkersPlugin.create({
                         markers: []
                     }),
-                    RegionsPlugin.create()
+                    RegionsPlugin.create({
+                      regionsMinLength: 0.1
+                    })
                 ]
             });
 
