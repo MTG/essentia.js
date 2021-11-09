@@ -3,3 +3,7 @@ $primary: #E4454A;
 
 @import '~bootstrap/scss/bootstrap.scss';
 @import '~bootstrap-vue/src/index.scss';
+
+body {
+    overflow: hidden;
+}
