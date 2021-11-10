@@ -58,6 +58,12 @@ export default {
     },
     methods: {
         searchFreesound () {
+            const isSearchById = /#\d+$/.test(this.searchTerm); // match regex for #<id_number>
+            if (isSearchById) {
+                freesound.getSound(this.searchTerm.split('#').pop(), this.handleSearchSuccess, this.handleSearchFailure);
+                return;
+            }
+
             let searchOptions = {
                 page: 1,
                 filter: "duration:[1.0 TO 30.0]",
