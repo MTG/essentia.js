@@ -88,13 +88,18 @@ export default {
 
             EventBus.$emit("sound-read", {blob: file, url: file.name});
         },
-        handleSearchSuccess (sounds) {
+        handleSearchSuccess (sound) {
+            // guard: sound collection or single sound?
+            if (sound.results == undefined && 'id' in sound) { // deal with it as single sound (id search)
+                EventBus.$emit("successful-fs-search", sound);
+                return;
+            }
             // guard: are results empty?
-            if (sounds.results.length < 1) {
+            if (sound.results.length < 1) {
                 this.showNoResultsFoundBanner = true;
                 return;
             }
-            EventBus.$emit("successful-fs-search", sounds.results);
+            EventBus.$emit("successful-fs-search", sound.results);
             this.showFreesoundResults = true;
         },
         handleSearchFailure (error) {
