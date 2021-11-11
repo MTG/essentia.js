@@ -31,6 +31,7 @@ import ProportionTag from "./ProportionTag.vue";
 import { ref } from "@vue/composition-api";
 import { getPercentage, limitNumberWithinRange, nearestN } from "./utils.js";
 
+const formattedTagNames = {hfc: "HFC",complex: "Complex",flux: "Flux",complex_phase: "Complex Phase"};
 let resize;
 
 export default {
@@ -46,9 +47,9 @@ export default {
     },
     data () {
         return {
-            tagsOn: this.tags.on.names.map( (name) => { return {name: name, color: tagColor, position: this.tagsOrder.indexOf(name)}; } ),
-            widths: this.tags.on.values,
-            tagsOff: this.tags.off.names.map( (name) => { return {name: name, color: tagColor, position: this.tagsOrder.indexOf(name)}; } ),
+            tagsOn: this.tags.on.names.map( (name) => { return {name: formattedTagNames[name], color: tagColor, position: this.tagsOrder.indexOf(name)}; } ),
+            widths: this.tags.on.values.map(v => v * 100),
+            tagsOff: this.tags.off.names.map( (name) => { return {name: formattedTagNames[name], color: tagColor, position: this.tagsOrder.indexOf(name)}; } ),
             percentageMovedOld: 0,
             showTagPercentage: false
         };

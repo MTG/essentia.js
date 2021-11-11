@@ -21,7 +21,7 @@
             <div class="col-6">
                 <label for="odf-ratios" @pointerenter="currentlyHovered='odf'" 
                 @pointerleave="currentlyHovered='none'"><a href="https://en.wikipedia.org/wiki/Onset_(audio)" target="_blank">Onset</a> detection functions</label>
-                <proportion-slider id="odf-ratios" @slider-changed="data => odfs = data" :tags="odfs" :tagsOrder="['HFC', 'Complex', 'Flux', 'Complex Phase']"
+                <proportion-slider id="odf-ratios" @slider-changed="data => odfs = data" :tags="odfs" :tagsOrder="['hfc', 'complex', 'flux', 'complex_phase']"
                 @pointerenter="name => currentlyHovered=name"
                 @pointerleave="currentlyHovered='none'"></proportion-slider>
             </div>
@@ -64,11 +64,11 @@ export default {
             hopSizePercentage: 50,
             odfs: {
                 on: {
-                    names: ["HFC", "Complex"],
-                    values: [50, 50]
+                    names: ["hfc", "complex"],
+                    values: [0.5, 0.5]
                 },
                 off: {
-                    names: ["Flux", "Complex Phase"]
+                    names: ["flux", "complex_phase"]
                 }
             },
             sensitivity: 0.3,
