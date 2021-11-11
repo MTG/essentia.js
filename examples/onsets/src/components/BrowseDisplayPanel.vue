@@ -91,7 +91,8 @@ export default {
         handleSearchSuccess (sound) {
             // guard: sound collection or single sound?
             if (sound.results == undefined && 'id' in sound) { // deal with it as single sound (id search)
-                EventBus.$emit("successful-fs-search", sound);
+                EventBus.$emit("successful-fs-search", [sound]);
+                this.showFreesoundResults = true;
                 return;
             }
             // guard: are results empty?
