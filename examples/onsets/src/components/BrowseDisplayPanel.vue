@@ -78,6 +78,12 @@ export default {
             // guard: no files chosen (e.g. upload was cancelled)
             if (event.target.files.length == 0) return;
 
+            // guard: avoid excessively large files
+            if (event.target.files[0].size > 5000000) {
+                alert("File size limit is 5MB. Please upload a shorter audio file.");
+                return;
+            }
+
             let file = null;
             if (event.type == "change") {
                 file = event.target.files[0];
