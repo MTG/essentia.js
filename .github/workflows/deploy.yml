@@ -26,6 +26,15 @@ jobs:
       options: --rm
     steps:
       - uses: actions/checkout@v2
-      - run: ${{ env.GITHUB_WORKSPACE }}/build-libs.sh
-      - run: cd ${{ env.GITHUB_WORKSPACE }}
-      - run: ./ci/deploy_builds.sh
+      - name: Build library
+        run: |
+          chmod +x ./build-libs.sh
+          ./build-libs.sh
+        working-directory: ${{ github.workspace }}
+        shell: bash
+      - name: Deploy built library
+        run: |
+          chmod +x ./ci/deploy_builds.sh
+          ./ci/deploy_builds.sh
+        working-directory: ${{ github.workspace }}
+
