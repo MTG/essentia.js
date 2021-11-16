@@ -22,12 +22,10 @@ jobs:
   build-deploy:
     runs-on: ubuntu-latest
     container:
-      image: docker://mtgupf/essentia-emscripten:latest
-      volumes: 
-        - ${{ env.GITHUB_WORKSPACE }}:/essentia/
+      image: mtgupf/essentia-emscripten:latest
       options: --rm
     steps:
       - uses: actions/checkout@v2
-      - run: /essentia/build-libs.sh
-      - run: cd /essentia/
+      - run: ${{ env.GITHUB_WORKSPACE }}/build-libs.sh
+      - run: cd ${{ env.GITHUB_WORKSPACE }}
       - run: ./ci/deploy_builds.sh
