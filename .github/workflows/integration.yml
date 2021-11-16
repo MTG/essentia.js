@@ -43,7 +43,7 @@ jobs:
       options: --rm
     steps:
       - uses: actions/checkout@v2
-      - run: ls -la
+      - run: sh ./build_libs.sh
         working-directory: ${{ github.workspace }}
 
   # unit-test:
