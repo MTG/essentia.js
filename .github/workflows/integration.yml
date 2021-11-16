@@ -43,6 +43,6 @@ jobs:
       options: --rm
     steps:
       - uses: actions/checkout@v2
-      - run: ${{ env.GITHUB_WORKSPACE }}/build-libs.sh
+      - run: "$GITHUB_WORKSPACE"/build-libs.sh
 
   # unit-test:
