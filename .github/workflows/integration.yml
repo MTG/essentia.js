@@ -43,9 +43,10 @@ jobs:
       options: --rm
     steps:
       - uses: actions/checkout@v2
-      - run: |
-          chmod +x ./build_libs.sh
-          sh ./build_libs.sh
+      - name: Build library
+        run: |
+          chmod +x ./build-libs.sh
+          ./build-libs.sh
         working-directory: ${{ github.workspace }}
         shell: bash
 
