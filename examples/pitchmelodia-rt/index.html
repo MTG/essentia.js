@@ -352,12 +352,20 @@
                         const testSAB = new SharedArrayBuffer(1);
                         delete testSAB;
                     } catch (e) {
-                        if (e instanceof ReferenceError) {
+                        if (e instanceof ReferenceError && !crossOriginIsolated) {
                             $("#recordButton").prop("disabled", true);
-                            if (confirm("This demo will NOT work in this browser: SharedArrayBuffer is not available or the necessary security headers are missing. We have hosted a version compatible with Firefox, and Chrome version 91 or later, at 'https://essentiajs-pitchmelodia.netlify.app', would you like to check it out?")) {
-                                window.open('https://essentiajs-pitchmelodia.netlify.app');
-                            }
+                            // redirect to cross-origin isolated SAB-capable version on Netlify
+                            window.location = "https://essentiajs-pitchmelodia.netlify.app";
+                            return;
                         }
+
+                        // Unknown malfunction: alert user and offer alternative
+                        $("#recordButtonContainer").before(`
+                            <div class="ui message">
+                                <div class="header">Unable to run app</div>
+                                <p><a href="https://essentiajs-melspectrogram.netlify.app">Check out this version! <i class="external alternate icon"></i><a/></p>
+                                <p style="font-weight: 300;"><a href="https://github.com/MTG/essentia.js/issues">Let us know <i class="icon comment"></i></a></p>
+                            </div>`);
                     }
                 });
             })();
