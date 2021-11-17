@@ -1,0 +1,52 @@
+name: CI
+
+on: 
+  push:
+    branches:
+      - dev
+      - master
+    paths:
+      - 'src/**'
+      # - 'test/**'
+      - 'build-libs.sh'
+      - 'Dockerfile'
+      - 'Makefile.essentiajs'
+      - 'rollup*.js'
+      - 'tsconfig.json'
+      - '!docs/**'
+      - '!examples/**'
+  pull_request:
+    branches:
+      - dev
+      - master
+    paths:
+      - 'src/**'
+      # - 'test/**'
+      - 'build-libs.sh'
+      - 'Dockerfile'
+      - 'Makefile.essentiajs'
+      - 'rollup*.js'
+      - 'tsconfig.json'
+      - '!docs/**'
+      - '!examples/**'
+    types:
+      - opened
+      - edited
+      - reopened
+
+jobs: 
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: mtgupf/essentia-emscripten:latest
+      options: --rm
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build library
+        run: |
+          chmod +x ./build-libs.sh
+          ./build-libs.sh
+        working-directory: ${{ github.workspace }}
+        shell: bash
+
+  # unit-test:

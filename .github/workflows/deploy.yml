@@ -1,0 +1,40 @@
+name: Deployment
+
+on: 
+  pull_request:
+    branches:
+      - dev
+      - master
+    paths:
+      - 'src/**'
+      # - 'test/**'
+      - 'build-libs.sh'
+      - 'Dockerfile'
+      - 'Makefile.essentiajs'
+      - 'rollup*.js'
+      - 'tsconfig.json'
+      - '!docs/**'
+      - '!examples/**'
+    types:
+      - closed # run when PR has been approved and closed
+
+jobs: 
+  build-deploy:
+    runs-on: ubuntu-latest
+    container:
+      image: mtgupf/essentia-emscripten:latest
+      options: --rm
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build library
+        run: |
+          chmod +x ./build-libs.sh
+          ./build-libs.sh
+        working-directory: ${{ github.workspace }}
+        shell: bash
+      - name: Deploy built library
+        run: |
+          chmod +x ./ci/deploy_builds.sh
+          ./ci/deploy_builds.sh
+        working-directory: ${{ github.workspace }}
+
