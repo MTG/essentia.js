@@ -1,5 +1,4 @@
 // avoid ES Module imports: not available on workers in Firefox nor Safari 
-var exports = {};
 let essentia = new Essentia(Module);
 
 function Float32Concat(first, second)

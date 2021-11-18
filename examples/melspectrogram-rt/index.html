@@ -92,6 +92,7 @@
                     return Promise
                         .all(promises)
                         .then((texts) => {
+                            texts.unshift("var exports = {};"); // hack to make injected umd modules work
                             const text = texts.join('');
                             const blob = new Blob([text], {type: "application/javascript"});
 
@@ -327,9 +328,10 @@
                         gain = audioCtx.createGain();
                         gain.gain.setValueAtTime(0, audioCtx.currentTime);
 
-                        let codeForProcessorModule = ["https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia-wasm.module.js", 
-                                                                                    "https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia.js-extractor.es.js", 
-                                                                                    "melspectrogram-processor.js", "https://unpkg.com/ringbuf.js@0.1.0/dist/index.js"];
+                        let codeForProcessorModule = ["https://cdn.jsdelivr.net/npm/essentia.js@0.1.3/dist/essentia-wasm.umd.js",
+                        "https://cdn.jsdelivr.net/npm/essentia.js@0.1.3/dist/essentia.js-extractor.umd.js", 
+                        "melspectrogram-processor.js",
+                        "https://unpkg.com/ringbuf.js@0.1.0/dist/index.js"];
 
                         // inject Essentia.js code into AudioWorkletGlobalScope context, then setup audio graph and start animation
                         URLFromFiles(codeForProcessorModule)
