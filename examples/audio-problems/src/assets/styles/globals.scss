@@ -1,5 +1,16 @@
 // $main-bg: #c4c4c4;
 $primary: #E4454A;
 
+marker.wavesurfer-marker span {
+    z-index: 10;
+    color: #7F1A14;
+    background-color: rgba(255, 255, 255, 0.479);
+    text-shadow: black 0px 0px 1px;
+}
+
+.wavesurfer-region {
+    z-index: -10 !important;
+}
+
 @import '~bootstrap/scss/bootstrap.scss';
 @import '~bootstrap-vue/src/index.scss';

@@ -36,245 +36,264 @@ import RegionsPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.regions';
 import audioURL from '../assets/song_saturation_and_start_cut_silence_end.wav';
 
 export default {
-    data () {
-        return {
-            isPlaying: false,
-            soundOn: true,
-            wavesurfer: null,
-            pluginsInitialised: false,
-            startStopCutResults: {},
-            startStopRegions: [],
-            saturationResults: {},
-            saturationRegions: [],
-            silenceResults: {},
-            silenceRegions: [],
-            waitingOnsets: false,
-            waitingOnsetsMsg: "Finding onsets...",
-            height: 0
-        }
-    },
-    methods: {
-        handleMute () {
-            if (!this.wavesurfer) {
-                return
-            }
-            this.soundOn = !this.soundOn;
-            this.wavesurfer.toggleMute();
-        },
-        handlePlay () {
-            if (!this.wavesurfer) {
-                return
-            }
-            this.isPlaying = !this.isPlaying;
-            this.wavesurfer.playPause();
-        },
-        handleDownload () {
-            EventBus.$emit('download-slices');
-        },
-        drawStartStopCut () {
-            if (this.startStopRegions.length > 0) {
-                this.startStopRegions.map( (sr) => sr.remove() );
-                this.startStopRegions = []; // clear existing regions, if any
-            }
+	data() {
+		return {
+			isPlaying: false,
+			soundOn: true,
+			wavesurfer: null,
+			pluginsInitialised: false,
+			startStopCutResults: {},
+			startStopRegions: [],
+			saturationResults: {},
+			saturationRegions: [],
+			saturationMarkers: [],
+			silenceResults: {},
+			silenceRegions: [],
+			waitingOnsets: false,
+			waitingOnsetsMsg: "Finding onsets...",
+			height: 0
+		}
+	},
+	methods: {
+		handleMute() {
+			if (!this.wavesurfer) {
+				return
+			}
+			this.soundOn = !this.soundOn;
+			this.wavesurfer.toggleMute();
+		},
+		handlePlay() {
+			if (!this.wavesurfer) {
+				return
+			}
+			this.isPlaying = !this.isPlaying;
+			this.wavesurfer.playPause();
+		},
+		handleDownload() {
+			EventBus.$emit('download-slices');
+		},
+		drawStartStopCut() {
+			if (this.startStopRegions.length > 0) {
+				this.startStopRegions.map((sr) => sr.remove());
+				this.startStopRegions = []; // clear existing regions, if any
+			}
 
-            let newRegions = [];
-            const widthPixels = this.wavesurfer.mediaContainer.clientWidth;
-            // generate region options from this.startStopCutResults
-            if (this.startStopCutResults.startCut === 1){
-                newRegions.push({
-                    id: `startCut`,
-                    start: 0,
-                    end: this.wavesurfer.getDuration() * 5 / widthPixels,
-                    drag: false,
-                    resize: false,
-                    color: "#43a21db5"
-                })
-            }
-            if (this.startStopCutResults.stopCut === 1){
-                newRegions.push({
-                    id: `stopCut`,
-                    start: this.wavesurfer.getDuration() * (widthPixels - 5)/widthPixels,
-                    end: this.wavesurfer.getDuration(),
-                    drag: false,
-                    resize: false,
-                    color: "#43a21db5"
-                }) 
-            }
+			let newRegions = [];
+			const widthPixels = this.wavesurfer.mediaContainer.clientWidth;
+			// generate region options from this.startStopCutResults
+			if (this.startStopCutResults.startCut === 1) {
+				newRegions.push({
+					id: `startCut`,
+					start: 0,
+					end: this.wavesurfer.getDuration() * 5 / widthPixels,
+					drag: false,
+					resize: false,
+					color: "#43a21db5"
+				})
+			}
+			if (this.startStopCutResults.stopCut === 1) {
+				newRegions.push({
+					id: `stopCut`,
+					start: this.wavesurfer.getDuration() * (widthPixels - 5) / widthPixels,
+					end: this.wavesurfer.getDuration(),
+					drag: false,
+					resize: false,
+					color: "#43a21db5"
+				})
+			}
 
-            newRegions.forEach((s) => { this.startStopRegions.push(this.wavesurfer.addRegion(s)) });
+			newRegions.forEach((s) => {
+				this.startStopRegions.push(this.wavesurfer.addRegion(s))
+			});
 
-            this.wavesurfer.on('region-click', (region, ev) => {
-                ev.stopPropagation();
-                region.play();
-            })
-        },
-        drawSaturation () {
-            if (this.saturationRegions.length > 0) {
-                this.saturationRegions.map( (sr) => sr.remove() );
-                this.saturationRegions = []; // clear existing regions, if any
-            }
+			this.wavesurfer.on('region-click', (region, ev) => {
+				ev.stopPropagation();
+				region.play();
+			})
+		},
+		drawSaturation() {
+			if (this.saturationRegions.length > 0) {
+				this.saturationRegions.map((sr) => sr.remove());
+				this.saturationRegions = []; // clear existing regions, if any
+			}
 
-            let newRegions = [];
-            // const widthPixels = this.wavesurfer.mediaContainer.clientWidth;
-            // generate region options from this.saturationResults
+			let newRegions = [];
+			let markers = [];
+			// const widthPixels = this.wavesurfer.mediaContainer.clientWidth;
+			// generate region options from this.saturationResults
 
-            console.log("saturationResults", this.saturationResults);
-            if (this.saturationResults.starts.length < 0 || this.saturationResults.ends.length < 0) {
-                return;
-            }
-            if (this.saturationResults.starts.length !== this.saturationResults.ends.length) {
-                console.error("Saturation: different number of start and end points");
-                return;
-            }
+			console.log("saturationResults", this.saturationResults);
+			if (this.saturationResults.starts.length < 0 || this.saturationResults.ends.length < 0) {
+				return;
+			}
+			if (this.saturationResults.starts.length !== this.saturationResults.ends.length) {
+				console.error("Saturation: different number of start and end points");
+				return;
+			}
 
-            let firstSaturation = this.saturationResults.starts[0];
-            let lastSaturation = this.saturationResults.starts[0];
-            let isRegion = true;
-            for (let i = 1; i < this.saturationResults.starts.length; i++) {
+			let firstSaturation = this.saturationResults.starts[0];
+			let lastSaturation = this.saturationResults.starts[0];
+			let isRegion = true;
+			for (let i = 1; i < this.saturationResults.starts.length; i++) {
 
-              if(isRegion){
-                if( i == this.saturationResults.starts.length -1 || this.saturationResults.starts[i] - lastSaturation > 0.5){
-                  isRegion = false;
-                  newRegions.push({
-                    id: `saturation-${i}`,
-                    start: firstSaturation,
-                    end: this.saturationResults.ends[i-1],
-                    drag: false,
-                    resize: false,
-                    color: "#a2241db5"
-                  })
-                }
-                lastSaturation = this.saturationResults.starts[i];
-              }else{
-                firstSaturation = this.saturationResults.starts[i];
-                lastSaturation = this.saturationResults.starts[i];
-                isRegion = true;
-              }
-            }
-            newRegions.forEach((s) => { this.saturationRegions.push(this.wavesurfer.addRegion(s)) });
-            this.wavesurfer.on('region-click', (region, ev) => {
-                ev.stopPropagation();
-                region.play();
-            })
-        },
-        drawSilence () {
-            if (this.silenceRegions.length > 0) {
-                this.silenceRegions.map( (sr) => sr.remove() );
-                this.silenceRegions = []; // clear existing regions, if any
-            }
+				if (isRegion) {
+					if (i == this.saturationResults.starts.length - 1 || this.saturationResults.starts[i] - lastSaturation > 0.5) {
+						isRegion = false;
+						newRegions.push({
+							id: `saturation-${i}`,
+							start: firstSaturation,
+							end: this.saturationResults.ends[i - 1],
+							drag: false,
+							resize: false,
+							color: "#a2241d44"
+						});
+						markers.push({
+							time: firstSaturation,
+							label: "Saturation",
+							color: "#7F1A14",
+							position: "bottom"
+						})
+					}
+					lastSaturation = this.saturationResults.starts[i];
+				} else {
+					firstSaturation = this.saturationResults.starts[i];
+					lastSaturation = this.saturationResults.starts[i];
+					isRegion = true;
+				}
+			}
+			newRegions.forEach((s) => {
+				this.saturationRegions.push(this.wavesurfer.addRegion(s))
+			});
 
-            let newRegions = [];
-            // const widthPixels = this.wavesurfer.mediaContainer.clientWidth;
+			markers.forEach((m) => {
+				this.saturationMarkers.push(this.wavesurfer.addMarker(m))
+			});
 
-            console.log("silenceResults", this.silenceResults);
+			this.wavesurfer.on('region-click', (region, ev) => {
+				ev.stopPropagation();
+				region.play();
+			})
+		},
+		drawSilence() {
+			if (this.silenceRegions.length > 0) {
+				this.silenceRegions.map((sr) => sr.remove());
+				this.silenceRegions = []; // clear existing regions, if any
+			}
 
-            for (let prop in this.silenceResults) {
-                newRegions.push({
-                    id: `silence-${prop}`,
-                    start: prop === 'start' ? 0 : this.silenceResults.end,
-                    end: prop === 'start' ? this.silenceResults.start : this.wavesurfer.getDuration(),
-                    drag: false,
-                    resize: false,
-                    color: "#1c4e80b5"
-                })
-            }
+			let newRegions = [];
+			// const widthPixels = this.wavesurfer.mediaContainer.clientWidth;
 
-            newRegions.forEach((s) => { this.silenceRegions.push(this.wavesurfer.addRegion(s)) });
+			console.log("silenceResults", this.silenceResults);
 
-            this.wavesurfer.on('region-click', (region, ev) => {
-                ev.stopPropagation();
-                region.play();
-            })
-        }
-    },
-    watch: {
-        startStopCutResults: function () {
-            this.drawStartStopCut();
-        },
-        saturationResults: function () {
-            this.drawSaturation();
-        },
-        silenceResults: function () {
-            this.drawSilence();
-        }
-    },
-    computed: {
-        downloadEnabled () {
-            if (this.startStopCutResults.length > 0) {
-                return true;
-            }
-            return false;
-        }
-    },
-    mounted () {
-        this.height = this.$el.querySelector("#audio-display").clientHeight;
-        let setPause = () => {
-            if (this.isPlaying) this.isPlaying = false;
-        };
+			for (let prop in this.silenceResults) {
+				newRegions.push({
+					id: `silence-${prop}`,
+					start: prop === 'start' ? 0 : this.silenceResults.end,
+					end: prop === 'start' ? this.silenceResults.start : this.wavesurfer.getDuration(),
+					drag: false,
+					resize: false,
+					color: "#1c4e80c9"
+				})
+			}
 
-        EventBus.$on("sound-read", (sound) => {
-            // this.waitingOnsetsMsg = "Finding onsets...";
-            // this.waitingOnsets = true;
-            this.startStopCutResults = {};
+			newRegions.forEach((s) => {
+				this.silenceRegions.push(this.wavesurfer.addRegion(s))
+			});
 
-            if (this.wavesurfer) {
-                this.wavesurfer.destroy();
-            }
+			this.wavesurfer.on('region-click', (region, ev) => {
+				ev.stopPropagation();
+				region.play();
+			})
+		}
+	},
+	watch: {
+		startStopCutResults: function () {
+			this.drawStartStopCut();
+		},
+		saturationResults: function () {
+			this.drawSaturation();
+		},
+		silenceResults: function () {
+			this.drawSilence();
+		}
+	},
+	computed: {
+		downloadEnabled() {
+			if (this.startStopCutResults.length > 0) {
+				return true;
+			}
+			return false;
+		}
+	},
+	mounted() {
+		this.height = this.$el.querySelector("#audio-display").clientHeight;
+		let setPause = () => {
+			if (this.isPlaying) this.isPlaying = false;
+		};
 
-            this.wavesurfer = WaveSurfer.create({
-                container: '#audio-display',
-                height: this.height,
-                responsive: true,
-                progressColor: '#E4454A',
-                waveColor: '#631E20',
-                partialRender: true,
-                plugins: [
-                    MarkersPlugin.create({
-                        markers: []
-                    }),
-                    RegionsPlugin.create({
-                      regionsMinLength: 0.1
-                    })
-                ]
-            });
+		EventBus.$on("sound-read", (sound) => {
+			// this.waitingOnsetsMsg = "Finding onsets...";
+			// this.waitingOnsets = true;
+			this.startStopCutResults = {};
 
-            this.wavesurfer.loadBlob(sound.blob);
+			if (this.wavesurfer) {
+				this.wavesurfer.destroy();
+			}
 
-            this.wavesurfer.on("finish", setPause);
-            this.wavesurfer.on("pause", setPause);
-            this.wavesurfer.on("play", () => this.isPlaying = true );
+			this.wavesurfer = WaveSurfer.create({
+				container: '#audio-display',
+				height: this.height,
+				responsive: true,
+				progressColor: '#E4454A',
+				waveColor: '#B7B7B7',
+				partialRender: true,
+				plugins: [
+					MarkersPlugin.create({
+						markers: []
+					}),
+					RegionsPlugin.create({
+						regionsMinLength: 0.1
+					})
+				]
+			});
 
-            this.wavesurfer.on("plugin-initialised", () => this.pluginsInitialised = true );
-            console.log(this.wavesurfer);
-        });
+			this.wavesurfer.loadBlob(sound.blob);
 
-        EventBus.$on("startstopcut-finished", (results) => {
-            this.startStopCutResults = results;
-            this.waitingOnsets = false;
-        });
+			this.wavesurfer.on("finish", setPause);
+			this.wavesurfer.on("pause", setPause);
+			this.wavesurfer.on("play", () => this.isPlaying = true);
 
-        EventBus.$on("saturation-finished", (results) => {
-            this.saturationResults = results;
-            this.waitingOnsets = false;
-        });
+			this.wavesurfer.on("plugin-initialised", () => this.pluginsInitialised = true);
+			console.log(this.wavesurfer);
+		});
 
-        EventBus.$on("silence-finished", (results) => {
-            this.silenceResults = results;
-            this.waitingOnsets = false;
-        });
+		EventBus.$on("startstopcut-finished", (results) => {
+			this.startStopCutResults = results;
+			this.waitingOnsets = false;
+		});
 
-        EventBus.$on("analysis-finished-empty", () => { 
-            this.startStopCutResults = [];
-            this.waitingOnsets = false;
-        });
+		EventBus.$on("saturation-finished", (results) => {
+			this.saturationResults = results;
+			this.waitingOnsets = false;
+		});
 
-        EventBus.$on("algo-params-updated", () => {
-            // this.waitingOnsetsMsg = "Recalculating...";
-            // this.waitingOnsets = true;
-        })
+		EventBus.$on("silence-finished", (results) => {
+			this.silenceResults = results;
+			this.waitingOnsets = false;
+		});
 
-        EventBus.$emit("sound-selected", audioURL);
-    }
+		EventBus.$on("analysis-finished-empty", () => {
+			this.startStopCutResults = [];
+			this.waitingOnsets = false;
+		});
+
+		EventBus.$on("algo-params-updated", () => {
+			// this.waitingOnsetsMsg = "Recalculating...";
+			// this.waitingOnsets = true;
+		})
+
+		EventBus.$emit("sound-selected", audioURL);
+	}
 }
 </script>
 
