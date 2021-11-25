@@ -1,6 +1,5 @@
-// avoid ES Module imports: not available on workers in Firefox nor Safari 
-var exports = {};
-let essentiaExtractor = new EssentiaExtractor(Module);
+// avoid ES Module imports: not available on workers in Firefox nor Safari
+let essentiaExtractor = new EssentiaExtractor(exports.EssentiaWASM);
 
 function Float32Concat(first, second)
 {

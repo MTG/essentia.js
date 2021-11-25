@@ -17,7 +17,7 @@
 
         <div class="ui main_wrapper landing-image">
             <div class="ui header centered" id="header">
-                <a href="index.html">
+                <a href="https://mtg.github.io/essentia.js/" target="_blank">
                     <img
                         id="header-img"
                         src="./images/essentiajsbanner.png"
@@ -25,7 +25,7 @@
                 </a>
                 <div>
                     <h2 class="ui header white-text" style="color: azure;">
-                        LogMelSpectrogram extraction using Web Audio API (AudioWorklets)
+                        Real-time mel-spectrogram visualization
                     </h2>
                     <div class="ui basic large button">
                         <a href="https://github.com/MTG/essentia.js/tree/dev/examples/melspectrogram-rt/" target="_blank" class="ui small button">Code<i class="right github icon"></i></a>
@@ -37,7 +37,7 @@
                 
             <div class="body-container">
                 <div class="ui centered one column grid container">
-                    <div class="ui vertical buttons row">
+                    <div class="ui vertical buttons row" id="recordButtonContainer">
                         <center>
                             <button id="recordButton" class="ui red inverted big button record-button" role="switch">
                                 Mic &nbsp;&nbsp;<i class="microphone icon"></i>
@@ -92,6 +92,7 @@
                     return Promise
                         .all(promises)
                         .then((texts) => {
+                            texts.unshift("var exports = {};"); // hack to make injected umd modules work
                             const text = texts.join('');
                             const blob = new Blob([text], {type: "application/javascript"});
 
@@ -327,9 +328,10 @@
                         gain = audioCtx.createGain();
                         gain.gain.setValueAtTime(0, audioCtx.currentTime);
 
-                        let codeForProcessorModule = ["https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia-wasm.module.js", 
-                                                                                    "https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia.js-extractor.es.js", 
-                                                                                    "melspectrogram-processor.js", "https://unpkg.com/ringbuf.js@0.1.0/dist/index.js"];
+                        let codeForProcessorModule = ["https://cdn.jsdelivr.net/npm/essentia.js@0.1.3/dist/essentia-wasm.umd.js",
+                        "https://cdn.jsdelivr.net/npm/essentia.js@0.1.3/dist/essentia.js-extractor.umd.js", 
+                        "melspectrogram-processor.js",
+                        "https://unpkg.com/ringbuf.js@0.1.0/dist/index.js"];
 
                         // inject Essentia.js code into AudioWorkletGlobalScope context, then setup audio graph and start animation
                         URLFromFiles(codeForProcessorModule)
@@ -509,12 +511,20 @@
                         // add event listeners to ui objects
                         $("#recordButton").on('click', onRecordClickHandler);
                     } catch (e) {
-                        if (e instanceof ReferenceError) {
+                        if (e instanceof ReferenceError && !crossOriginIsolated) {
                             $("#recordButton").prop('disabled', true);
-                            if (confirm("This demo will NOT work in this browser: SharedArrayBuffer is not available or the necessary security headers are missing. We have hosted a version compatible with Firefox, and Chrome version 91 or later, at 'https://essentiajs-melspectrogram.netlify.app', would you like to check it out?")) {
-                                window.open('https://essentiajs-melspectrogram.netlify.app');
-                            }
+                            // redirect to cross-origin isolated SAB-capable version on Netlify
+                            window.location = "https://essentiajs-melspectrogram.netlify.app";
+                            return;
                         }
+
+                        // Unknown malfunction: alert user and offer alternative
+                        $("#recordButtonContainer").before(`
+                            <div class="ui message">
+                                <div class="header">Unable to run app</div>
+                                <p><a href="https://essentiajs-melspectrogram.netlify.app">Check out this version! <i class="external alternate icon"></i><a/></p>
+                                <p style="font-weight: 300;"><a href="https://github.com/MTG/essentia.js/issues">Let us know <i class="icon comment"></i></a></p>
+                            </div>`);
                     }
                 });
             })();
