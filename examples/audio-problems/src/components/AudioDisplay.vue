@@ -1,11 +1,9 @@
 <template>
     <div id="audio-display-wrap">
         <div id="audio-display" class="display"></div>
-        <div id="load-overlay" class="d-flex justify-content-center align-items-center w-100 display" v-if="waitingOnsets"></div>
-        <div id="load-spinner" class="d-flex flex-column justify-content-center align-items-center w-100 display" v-if="waitingOnsets">
-            <strong class="mb-2">{{waitingOnsetsMsg}}</strong>
-            <b-spinner variant="light"></b-spinner>
-        </div>
+        <b-alert v-model="showNoIssuesAlert" variant="success" dismissible>
+          There are no issues in this audio file!
+        </b-alert>
         <div class="d-flex flex-row justify-content-between my-2">
             <b-button-group>
                 <b-button id="play" class="px-4" @click="handlePlay" variant="light">
@@ -15,12 +13,6 @@
                 <b-button id="mute" class="px-4" @click="handleMute" variant="light">
                     <b-icon icon="volume-mute-fill" v-show="!soundOn"></b-icon>
                     <b-icon icon="volume-up-fill" v-show="soundOn"></b-icon>
-                </b-button>
-            </b-button-group>
-            <b-button-group>
-                <b-button id="download" @click="handleDownload" variant="light" :disabled="!downloadEnabled">
-                    <b-icon icon="download"></b-icon>
-                    Download
                 </b-button>
             </b-button-group>
         </div>
@@ -44,14 +36,17 @@ export default {
 			pluginsInitialised: false,
 			startStopCutResults: {},
 			startStopRegions: [],
+			startStopMarkers: [],
 			saturationResults: {},
 			saturationRegions: [],
 			saturationMarkers: [],
 			silenceResults: {},
+      silenceThreshold: 5, //in seconds
+      silenceHeuristicsResults: {start:null, end:null},
 			silenceRegions: [],
-			waitingOnsets: false,
-			waitingOnsetsMsg: "Finding onsets...",
-			height: 0
+			silenceMarkers: [],
+			height: 0,
+      showNoIssuesAlert: false
 		}
 	},
 	methods: {
@@ -69,60 +64,80 @@ export default {
 			this.isPlaying = !this.isPlaying;
 			this.wavesurfer.playPause();
 		},
-		handleDownload() {
-			EventBus.$emit('download-slices');
-		},
 		drawStartStopCut() {
 			if (this.startStopRegions.length > 0) {
 				this.startStopRegions.map((sr) => sr.remove());
 				this.startStopRegions = []; // clear existing regions, if any
 			}
+      if (this.startStopMarkers.length > 0) {
+        // this.wavesurfer.clearMarkers();
+        this.startStopMarkers = []; // clear existing markers, if any
+      }
 
 			let newRegions = [];
+			let markers = [];
 			const widthPixels = this.wavesurfer.mediaContainer.clientWidth;
 			// generate region options from this.startStopCutResults
 			if (this.startStopCutResults.startCut === 1) {
 				newRegions.push({
-					id: `startCut`,
+					id: `startStopCut`,
 					start: 0,
 					end: this.wavesurfer.getDuration() * 5 / widthPixels,
 					drag: false,
 					resize: false,
-					color: "#43a21db5"
-				})
+					color: "#FEA24CA6"
+				});
+        markers.push({
+          time: this.wavesurfer.getDuration() * 5 / widthPixels,
+          label: "Cut",
+          color: "#FEA24CA6",
+          position: "bottom"
+        });
 			}
 			if (this.startStopCutResults.stopCut === 1) {
 				newRegions.push({
-					id: `stopCut`,
+					id: `startStopCut`,
 					start: this.wavesurfer.getDuration() * (widthPixels - 5) / widthPixels,
 					end: this.wavesurfer.getDuration(),
 					drag: false,
 					resize: false,
-					color: "#43a21db5"
-				})
+					color: "#FEA24CA6"
+				});
+        markers.push({
+          time: this.wavesurfer.getDuration() * (widthPixels - 5) / widthPixels,
+          label: "Cut",
+          color: "#FEA24CA6",
+          position: "bottom"
+        });
 			}
 
 			newRegions.forEach((s) => {
 				this.startStopRegions.push(this.wavesurfer.addRegion(s))
 			});
 
+      markers.forEach((m) => {
+        this.startStopMarkers.push(this.wavesurfer.addMarker(m))
+      });
+
 			this.wavesurfer.on('region-click', (region, ev) => {
 				ev.stopPropagation();
 				region.play();
-			})
+			});
 		},
 		drawSaturation() {
 			if (this.saturationRegions.length > 0) {
 				this.saturationRegions.map((sr) => sr.remove());
 				this.saturationRegions = []; // clear existing regions, if any
 			}
+      if (this.saturationMarkers.length > 0) {
+        // this.wavesurfer.clearMarkers();
+        this.saturationMarkers = []; // clear existing markers, if any
+      }
 
 			let newRegions = [];
 			let markers = [];
-			// const widthPixels = this.wavesurfer.mediaContainer.clientWidth;
 			// generate region options from this.saturationResults
 
-			console.log("saturationResults", this.saturationResults);
 			if (this.saturationResults.starts.length < 0 || this.saturationResults.ends.length < 0) {
 				return;
 			}
@@ -137,7 +152,7 @@ export default {
 			for (let i = 1; i < this.saturationResults.starts.length; i++) {
 
 				if (isRegion) {
-					if (i == this.saturationResults.starts.length - 1 || this.saturationResults.starts[i] - lastSaturation > 0.5) {
+					if (i === this.saturationResults.starts.length - 1 || this.saturationResults.starts[i] - lastSaturation > 0.5) {
 						isRegion = false;
 						newRegions.push({
 							id: `saturation-${i}`,
@@ -145,12 +160,12 @@ export default {
 							end: this.saturationResults.ends[i - 1],
 							drag: false,
 							resize: false,
-							color: "#a2241d44"
+							color: "#FF585880",
 						});
 						markers.push({
 							time: firstSaturation,
 							label: "Saturation",
-							color: "#7F1A14",
+							color: "#FF585880",
 							position: "bottom"
 						})
 					}
@@ -172,59 +187,104 @@ export default {
 			this.wavesurfer.on('region-click', (region, ev) => {
 				ev.stopPropagation();
 				region.play();
-			})
+      });
 		},
 		drawSilence() {
 			if (this.silenceRegions.length > 0) {
 				this.silenceRegions.map((sr) => sr.remove());
 				this.silenceRegions = []; // clear existing regions, if any
 			}
+      if (this.silenceMarkers.length > 0) {
+        // this.wavesurfer.clearMarkers();
+        this.silenceMarkers = []; // clear existing markers, if any
+      }
 
 			let newRegions = [];
-			// const widthPixels = this.wavesurfer.mediaContainer.clientWidth;
+			let markers = [];
 
-			console.log("silenceResults", this.silenceResults);
+      this.silenceHeuristics()
 
-			for (let prop in this.silenceResults) {
-				newRegions.push({
-					id: `silence-${prop}`,
-					start: prop === 'start' ? 0 : this.silenceResults.end,
-					end: prop === 'start' ? this.silenceResults.start : this.wavesurfer.getDuration(),
-					drag: false,
-					resize: false,
-					color: "#1c4e80c9"
-				})
+			for (let prop in this.silenceHeuristicsResults) {
+			  if (!this.silenceHeuristicsResults[prop]) {
+			    continue;
+        }
+        newRegions.push({
+          id: `startStopSilence-${prop}`,
+          start: this.silenceHeuristicsResults[prop].begin,
+          end: this.silenceHeuristicsResults[prop].finish,
+          drag: false,
+          resize: false,
+          color: "#FFD645A3"
+        });
+        markers.push({
+          time: this.silenceHeuristicsResults[prop].begin,
+          label: "Silence",
+          color: "#FFD645A3",
+          position: "bottom"
+        });
 			}
 
 			newRegions.forEach((s) => {
 				this.silenceRegions.push(this.wavesurfer.addRegion(s))
 			});
 
+      markers.forEach((m) => {
+        this.silenceMarkers.push(this.wavesurfer.addMarker(m))
+      });
+
 			this.wavesurfer.on('region-click', (region, ev) => {
 				ev.stopPropagation();
 				region.play();
 			})
-		}
+
+		},
+    silenceHeuristics(){
+		  if (this.silenceResults.start > 2){
+		    this.silenceHeuristicsResults.start = {begin:0, finish:this.silenceResults.start};
+      }
+      if (this.wavesurfer.getDuration() - this.silenceResults.end > 2){
+        this.silenceHeuristicsResults.end = {begin:this.silenceResults.end, finish:this.wavesurfer.getDuration()};
+      }
+    },
+    drawAlgorithms(){
+      if(Object.keys(this.startStopCutResults).length !== 0){
+        this.drawStartStopCut();
+        this.showNoIssuesAlert = false;
+      }
+		  if(Object.keys(this.silenceResults).length !== 0){
+        this.drawSilence();
+        this.showNoIssuesAlert = false;
+      }
+		  if(Object.keys(this.saturationResults).length !== 0){
+		    this.drawSaturation();
+        this.showNoIssuesAlert = false;
+      }
+		  if(Object.keys(this.startStopCutResults).length === 0 &&
+          Object.keys(this.silenceResults).length === 0 &&
+          Object.keys(this.saturationResults).length === 0){
+        this.showNoIssuesAlert = true;
+      }
+    },
+    redrawAlgorithms(){
+      setTimeout(()=>{
+        this.drawAlgorithms();
+      }, 150);
+    }
 	},
 	watch: {
 		startStopCutResults: function () {
-			this.drawStartStopCut();
+			this.drawAlgorithms();
 		},
 		saturationResults: function () {
-			this.drawSaturation();
+			this.drawAlgorithms();
 		},
 		silenceResults: function () {
-			this.drawSilence();
+			this.drawAlgorithms();
 		}
 	},
-	computed: {
-		downloadEnabled() {
-			if (this.startStopCutResults.length > 0) {
-				return true;
-			}
-			return false;
-		}
-	},
+  created() {
+    window.addEventListener('resize', this.redrawAlgorithms);
+  },
 	mounted() {
 		this.height = this.$el.querySelector("#audio-display").clientHeight;
 		let setPause = () => {
@@ -232,8 +292,6 @@ export default {
 		};
 
 		EventBus.$on("sound-read", (sound) => {
-			// this.waitingOnsetsMsg = "Finding onsets...";
-			// this.waitingOnsets = true;
 			this.startStopCutResults = {};
 
 			if (this.wavesurfer) {
@@ -242,10 +300,10 @@ export default {
 
 			this.wavesurfer = WaveSurfer.create({
 				container: '#audio-display',
-				height: this.height,
+				height: this.height - 22,
 				responsive: true,
-				progressColor: '#E4454A',
-				waveColor: '#B7B7B7',
+				progressColor: '#2d4c89',
+				waveColor: '#87b4f8',
 				partialRender: true,
 				plugins: [
 					MarkersPlugin.create({
@@ -258,39 +316,41 @@ export default {
 			});
 
 			this.wavesurfer.loadBlob(sound.blob);
-
 			this.wavesurfer.on("finish", setPause);
 			this.wavesurfer.on("pause", setPause);
 			this.wavesurfer.on("play", () => this.isPlaying = true);
-
 			this.wavesurfer.on("plugin-initialised", () => this.pluginsInitialised = true);
+
+      this.wavesurfer.on('region-mouseenter', (region, ev) => {
+        ev.stopPropagation();
+        EventBus.$emit("region-mouseenter", region, ev);
+      });
+      this.wavesurfer.on('region-mouseleave', (region, ev) => {
+        ev.stopPropagation();
+        EventBus.$emit("region-mouseleave", region, ev);
+      });
+      this.wavesurfer.on('marker-click', (region, ev) => {
+        ev.stopPropagation();
+        EventBus.$emit("marker-clicked", region, ev);
+      });
+
 			console.log(this.wavesurfer);
 		});
 
 		EventBus.$on("startstopcut-finished", (results) => {
 			this.startStopCutResults = results;
-			this.waitingOnsets = false;
+			this.showNoIssuesAlert = false;
 		});
 
 		EventBus.$on("saturation-finished", (results) => {
 			this.saturationResults = results;
-			this.waitingOnsets = false;
+			this.showNoIssuesAlert = false;
 		});
 
 		EventBus.$on("silence-finished", (results) => {
 			this.silenceResults = results;
-			this.waitingOnsets = false;
+			this.showNoIssuesAlert = false;
 		});
-
-		EventBus.$on("analysis-finished-empty", () => {
-			this.startStopCutResults = [];
-			this.waitingOnsets = false;
-		});
-
-		EventBus.$on("algo-params-updated", () => {
-			// this.waitingOnsetsMsg = "Recalculating...";
-			// this.waitingOnsets = true;
-		})
 
 		EventBus.$emit("sound-selected", audioURL);
 	}

@@ -45,7 +45,7 @@ import freesound from 'freesound';
 import apiKey from '../.env/key';
 
 export default {
-    components: { AudioDisplay, FreesoundResults },
+    components: { AudioDisplay, FreesoundResults},
     data () {
         return {
             showFreesoundResults: false,

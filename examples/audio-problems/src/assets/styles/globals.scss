@@ -1,16 +1,33 @@
 // $main-bg: #c4c4c4;
-$primary: #E4454A;
+$primary: #2d4c89;
 
 marker.wavesurfer-marker span {
     z-index: 10;
-    color: #7F1A14;
+    color: #2d4c89;
     background-color: rgba(255, 255, 255, 0.479);
-    text-shadow: black 0px 0px 1px;
 }
 
-.wavesurfer-region {
-    z-index: -10 !important;
+#audio-display wave canvas, #audio-display wave region{
+    height: 91% !important;
 }
+
+#audio-display wave{
+    border-right: none !important;
+}
+
+#audio-display wave:after {
+    border-right: none;
+    content: '';
+    height: 91%; //You can change this if you want smaller/bigger borders
+    width: 1px;
+
+    position: absolute;
+    right: 0;
+    top: 0; // If you want to set a smaller height and center it, change this value
+
+    background-color: rgb(51, 51, 51); // The color of your border
+}
+
 
 @import '~bootstrap/scss/bootstrap.scss';
 @import '~bootstrap-vue/src/index.scss';
