@@ -3,7 +3,7 @@
     <div id="audio-display-wrap">
       <h3>{{ title }}</h3>
       <div id="algos_info" class="algosInfoTable">
-          <div class="row" v-for="algo in algorithms" :id="algo.name.toLowerCase()">
+          <div class="row" v-for="algo in algorithms" :id="algo.name.toLowerCase()" :key="algo.name.toLowerCase()">
             <h5 class="cell" :style="{'background-color':algo.color}"><a :href="algo.href">{{ algo.name }}</a></h5>
             <p class="cell grow">{{ algo.def}}</p>
           </div>

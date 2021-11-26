@@ -17,17 +17,18 @@ self.essentia = null;
 self.frameSize = 1024;
 self.hopSize = 512;
 self.sampleRate = 44100;
-self.saturationExtractor = new EssentiaWASMSaturation.SaturationDetectorExtractor(self.frameSize, self.hopSize);
-self.silenceExtractor = new EssentiaWASMSilence.StartStopSilenceExtractor(self.frameSize, self.hopSize);
-
-log(saturationExtractor);
 
 // global storage for slicing
 self.signal = null;
-self.saturationResults = {'starts': null , 'ends': null};
+self.saturationResults = {starts: null , ends: null};
 self.startStopCutResults = null;
 self.silenceResults = null;
-self.silenceResultsSeconds = {'start': null , 'end': null};
+self.silenceResultsSeconds = {start: null , end: null};
+self.silenceThreshold = 3; //in seconds
+self.silenceHeuristicsResults = {
+    start: null,
+    end: null
+};
 
 try {
     self.essentia = new Essentia(EssentiaWASM.EssentiaWASM);
@@ -36,7 +37,6 @@ try {
 
 // COMMS
 onmessage = function listenToMainThread(msg) {
-    console.log(msg);
     switch (msg.data.request) {
         case 'analyse':
             log('received analyse cmd')
@@ -45,7 +45,14 @@ onmessage = function listenToMainThread(msg) {
             computeStartStopCut();
             computeSaturation();
             computeSilence();
-            transformSilenceResults();
+
+            if (resultsNotOkay()) {
+                postMessage({
+                    type: "empty",
+                    results: null
+                })
+                break;
+            }
 
             postMessage({
                 type: 'startStopCut',
@@ -59,7 +66,7 @@ onmessage = function listenToMainThread(msg) {
 
             postMessage({
                 type: 'silence',
-                results: self.silenceResultsSeconds
+                results: self.silenceHeuristicsResults
             })
             break;
         case 'updateSampleRate':
@@ -77,22 +84,58 @@ onmessage = function listenToMainThread(msg) {
 // AUDIO FUNCS
 
 function computeSaturation () {
+    self.saturationExtractor = new EssentiaWASMSaturation.SaturationDetectorExtractor(self.frameSize, self.hopSize);
     let algoOutput = self.saturationExtractor.compute(self.signal);
-    self.saturationResults.starts = essentia.vectorToArray(algoOutput.starts);
-    self.saturationResults.ends = essentia.vectorToArray(algoOutput.ends);
+    console.log('saturation algoOutput starts size: ', algoOutput.starts.size())
+    self.saturationResults.starts = algoOutput.starts.size() > 0 ? essentia.vectorToArray(algoOutput.starts) : [];
+    self.saturationResults.ends = algoOutput.ends.size() > 0 ? essentia.vectorToArray(algoOutput.ends): [];
+    console.log('saturationResults: ', self.saturationResults);
+    self.saturationExtractor.shutdown();
 }
 
 function computeSilence () {
+    self.silenceExtractor = new EssentiaWASMSilence.StartStopSilenceExtractor(self.frameSize, self.hopSize);
     self.silenceResults = self.silenceExtractor.compute(self.signal);
+    console.log('silenceResults: ', self.silenceResults);
+    self.silenceExtractor.shutdown()
+    transformSilenceResults();
 }
 
 function transformSilenceResults () {
     let secondsPerFrame = self.hopSize / self.sampleRate;
     self.silenceResultsSeconds.start = self.silenceResults.startFrame * secondsPerFrame;
     self.silenceResultsSeconds.end = self.silenceResults.endFrame * secondsPerFrame;
+    console.log('silenceResultsSeconds: ', self.silenceResultsSeconds)
+    silenceHeuristics();
 }
 
 function computeStartStopCut () {
     self.startStopCutResults = self.essentia.StartStopCut(self.essentia.arrayToVector(self.signal));
+    console.log('startStopCut: ', self.startStopCutResults);
 }
 
+
+function silenceHeuristics() {
+    self.silenceHeuristicsResults = {start: null, end: null};
+    let signalDuration = self.signal.length / self.sampleRate; // seconds
+    console.log('worker: signalDuration', signalDuration)
+    if (self.silenceResultsSeconds.start > self.silenceThreshold) {
+        self.silenceHeuristicsResults.start = {
+            begin: 0,
+            finish: self.silenceResultsSeconds.start
+        };
+    }
+    if (signalDuration - self.silenceResultsSeconds.end > self.silenceThreshold) {
+        self.silenceHeuristicsResults.end = {
+            begin: self.silenceResultsSeconds.end,
+            finish: signalDuration
+        };
+    }
+}
+
+function resultsNotOkay () {
+    let saturation = self.saturationResults.starts.length == 0 || self.saturationResults.ends.length == 0;
+    let silence = !self.silenceHeuristicsResults.start && !self.silenceHeuristicsResults.end;
+    let startStopCut = self.startStopCutResults.start === 0 && self.startStopCutResults.end === 0;
+    return (saturation && silence && startStopCut)
+}

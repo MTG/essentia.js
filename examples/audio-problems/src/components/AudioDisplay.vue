@@ -35,18 +35,10 @@ export default {
 			wavesurfer: null,
 			pluginsInitialised: false,
 			startStopCutResults: {},
-			startStopRegions: [],
-			startStopMarkers: [],
 			saturationResults: {},
-			saturationRegions: [],
-			saturationMarkers: [],
 			silenceResults: {},
-      silenceThreshold: 5, //in seconds
-      silenceHeuristicsResults: {start:null, end:null},
-			silenceRegions: [],
-			silenceMarkers: [],
 			height: 0,
-      showNoIssuesAlert: false
+			showNoIssuesAlert: false
 		}
 	},
 	methods: {
@@ -65,15 +57,6 @@ export default {
 			this.wavesurfer.playPause();
 		},
 		drawStartStopCut() {
-			if (this.startStopRegions.length > 0) {
-				this.startStopRegions.map((sr) => sr.remove());
-				this.startStopRegions = []; // clear existing regions, if any
-			}
-      if (this.startStopMarkers.length > 0) {
-        // this.wavesurfer.clearMarkers();
-        this.startStopMarkers = []; // clear existing markers, if any
-      }
-
 			let newRegions = [];
 			let markers = [];
 			const widthPixels = this.wavesurfer.mediaContainer.clientWidth;
@@ -87,12 +70,12 @@ export default {
 					resize: false,
 					color: "#FEA24CA6"
 				});
-        markers.push({
-          time: this.wavesurfer.getDuration() * 5 / widthPixels,
-          label: "Cut",
-          color: "#FEA24CA6",
-          position: "bottom"
-        });
+				markers.push({
+					time: this.wavesurfer.getDuration() * 5 / widthPixels,
+					label: "Cut",
+					color: "#FEA24CA6",
+					position: "bottom"
+				});
 			}
 			if (this.startStopCutResults.stopCut === 1) {
 				newRegions.push({
@@ -103,21 +86,17 @@ export default {
 					resize: false,
 					color: "#FEA24CA6"
 				});
-        markers.push({
-          time: this.wavesurfer.getDuration() * (widthPixels - 5) / widthPixels,
-          label: "Cut",
-          color: "#FEA24CA6",
-          position: "bottom"
-        });
+				markers.push({
+					time: this.wavesurfer.getDuration() * (widthPixels - 5) / widthPixels,
+					label: "Cut",
+					color: "#FEA24CA6",
+					position: "bottom"
+				});
 			}
 
-			newRegions.forEach((s) => {
-				this.startStopRegions.push(this.wavesurfer.addRegion(s))
-			});
+			newRegions.forEach(s => this.wavesurfer.addRegion(s));
 
-      markers.forEach((m) => {
-        this.startStopMarkers.push(this.wavesurfer.addMarker(m))
-      });
+			markers.forEach(m => this.wavesurfer.addMarker(m));
 
 			this.wavesurfer.on('region-click', (region, ev) => {
 				ev.stopPropagation();
@@ -125,15 +104,6 @@ export default {
 			});
 		},
 		drawSaturation() {
-			if (this.saturationRegions.length > 0) {
-				this.saturationRegions.map((sr) => sr.remove());
-				this.saturationRegions = []; // clear existing regions, if any
-			}
-      if (this.saturationMarkers.length > 0) {
-        // this.wavesurfer.clearMarkers();
-        this.saturationMarkers = []; // clear existing markers, if any
-      }
-
 			let newRegions = [];
 			let markers = [];
 			// generate region options from this.saturationResults
@@ -176,61 +146,42 @@ export default {
 					isRegion = true;
 				}
 			}
-			newRegions.forEach((s) => {
-				this.saturationRegions.push(this.wavesurfer.addRegion(s))
-			});
+			newRegions.forEach(s => this.wavesurfer.addRegion(s));
 
-			markers.forEach((m) => {
-				this.saturationMarkers.push(this.wavesurfer.addMarker(m))
-			});
+			markers.forEach(m => this.wavesurfer.addMarker(m));
 
 			this.wavesurfer.on('region-click', (region, ev) => {
 				ev.stopPropagation();
 				region.play();
-      });
+			});
 		},
 		drawSilence() {
-			if (this.silenceRegions.length > 0) {
-				this.silenceRegions.map((sr) => sr.remove());
-				this.silenceRegions = []; // clear existing regions, if any
-			}
-      if (this.silenceMarkers.length > 0) {
-        // this.wavesurfer.clearMarkers();
-        this.silenceMarkers = []; // clear existing markers, if any
-      }
-
 			let newRegions = [];
 			let markers = [];
 
-      this.silenceHeuristics()
-
-			for (let prop in this.silenceHeuristicsResults) {
-			  if (!this.silenceHeuristicsResults[prop]) {
-			    continue;
-        }
-        newRegions.push({
-          id: `startStopSilence-${prop}`,
-          start: this.silenceHeuristicsResults[prop].begin,
-          end: this.silenceHeuristicsResults[prop].finish,
-          drag: false,
-          resize: false,
-          color: "#FFD645A3"
-        });
-        markers.push({
-          time: this.silenceHeuristicsResults[prop].begin,
-          label: "Silence",
-          color: "#FFD645A3",
-          position: "bottom"
-        });
+			for (let prop in this.silenceResults) {
+				if (!this.silenceResults[prop]) {
+					continue;
+				}
+				newRegions.push({
+					id: `startStopSilence-${prop}`,
+					start: this.silenceResults[prop].begin,
+					end: this.silenceResults[prop].finish,
+					drag: false,
+					resize: false,
+					color: "#FFD645A3"
+				});
+				markers.push({
+					time: this.silenceResults[prop].begin,
+					label: "Silence",
+					color: "#FFD645A3",
+					position: "bottom"
+				});
 			}
 
-			newRegions.forEach((s) => {
-				this.silenceRegions.push(this.wavesurfer.addRegion(s))
-			});
+			newRegions.forEach(s => this.wavesurfer.addRegion(s));
 
-      markers.forEach((m) => {
-        this.silenceMarkers.push(this.wavesurfer.addMarker(m))
-      });
+			markers.forEach(m => this.wavesurfer.addMarker(m));
 
 			this.wavesurfer.on('region-click', (region, ev) => {
 				ev.stopPropagation();
@@ -238,53 +189,28 @@ export default {
 			})
 
 		},
-    silenceHeuristics(){
-		  if (this.silenceResults.start > 2){
-		    this.silenceHeuristicsResults.start = {begin:0, finish:this.silenceResults.start};
-      }
-      if (this.wavesurfer.getDuration() - this.silenceResults.end > 2){
-        this.silenceHeuristicsResults.end = {begin:this.silenceResults.end, finish:this.wavesurfer.getDuration()};
-      }
-    },
-    drawAlgorithms(){
-      if(Object.keys(this.startStopCutResults).length !== 0){
-        this.drawStartStopCut();
-        this.showNoIssuesAlert = false;
-      }
-		  if(Object.keys(this.silenceResults).length !== 0){
-        this.drawSilence();
-        this.showNoIssuesAlert = false;
-      }
-		  if(Object.keys(this.saturationResults).length !== 0){
-		    this.drawSaturation();
-        this.showNoIssuesAlert = false;
-      }
-		  if(Object.keys(this.startStopCutResults).length === 0 &&
-          Object.keys(this.silenceResults).length === 0 &&
-          Object.keys(this.saturationResults).length === 0){
-        this.showNoIssuesAlert = true;
-      }
-    },
-    redrawAlgorithms(){
-      setTimeout(()=>{
-        this.drawAlgorithms();
-      }, 150);
-    }
+		redrawAlgorithms() {
+			setTimeout(() => {
+				this.drawStartStopCut();
+				this.drawSilence();
+				this.drawSaturation();
+			}, 150);
+		}
 	},
 	watch: {
 		startStopCutResults: function () {
-			this.drawAlgorithms();
+			this.drawStartStopCut();
 		},
 		saturationResults: function () {
-			this.drawAlgorithms();
+			this.drawSaturation();
 		},
 		silenceResults: function () {
-			this.drawAlgorithms();
+			this.drawSilence();
 		}
 	},
-  created() {
-    window.addEventListener('resize', this.redrawAlgorithms);
-  },
+	created() {
+		window.addEventListener('resize', this.redrawAlgorithms);
+	},
 	mounted() {
 		this.height = this.$el.querySelector("#audio-display").clientHeight;
 		let setPause = () => {
@@ -316,23 +242,24 @@ export default {
 			});
 
 			this.wavesurfer.loadBlob(sound.blob);
+			this.wavesurfer.on("ready", () => console.log('wavesurfer.duration', this.wavesurfer.getDuration()) );
 			this.wavesurfer.on("finish", setPause);
 			this.wavesurfer.on("pause", setPause);
 			this.wavesurfer.on("play", () => this.isPlaying = true);
 			this.wavesurfer.on("plugin-initialised", () => this.pluginsInitialised = true);
 
-      this.wavesurfer.on('region-mouseenter', (region, ev) => {
-        ev.stopPropagation();
-        EventBus.$emit("region-mouseenter", region, ev);
-      });
-      this.wavesurfer.on('region-mouseleave', (region, ev) => {
-        ev.stopPropagation();
-        EventBus.$emit("region-mouseleave", region, ev);
-      });
-      this.wavesurfer.on('marker-click', (region, ev) => {
-        ev.stopPropagation();
-        EventBus.$emit("marker-clicked", region, ev);
-      });
+			this.wavesurfer.on('region-mouseenter', (region, ev) => {
+				ev.stopPropagation();
+				EventBus.$emit("region-mouseenter", region, ev);
+			});
+			this.wavesurfer.on('region-mouseleave', (region, ev) => {
+				ev.stopPropagation();
+				EventBus.$emit("region-mouseleave", region, ev);
+			});
+			this.wavesurfer.on('marker-click', (region, ev) => {
+				ev.stopPropagation();
+				EventBus.$emit("marker-clicked", region, ev);
+			});
 
 			console.log(this.wavesurfer);
 		});
@@ -351,6 +278,10 @@ export default {
 			this.silenceResults = results;
 			this.showNoIssuesAlert = false;
 		});
+
+		EventBus.$on("empty-results", () => {
+			this.showNoIssuesAlert = true;
+		})
 
 		EventBus.$emit("sound-selected", audioURL);
 	}

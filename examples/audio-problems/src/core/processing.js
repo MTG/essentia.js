@@ -39,6 +39,9 @@ export default class DSP {
                     console.log(msg.data.results);
                     EventBus.$emit("silence-finished", msg.data.results);
                     break;
+                case 'empty':
+                    console.log('empty results!!');
+                    EventBus.$emit("empty-results");
                 default:
                     console.log('No matching response type for received msg');
                     break;
