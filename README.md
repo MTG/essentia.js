@@ -30,10 +30,10 @@ You are also most welcome to [contribute](CONTRIBUTING.md) to `essentia.js`.
 
 > NOTE: Essentia.js is currently under rapid development. This means that APIs and features will evolve. It is recommended that devs who adopt essentia.js today upgrade their installation as new releases become available, as backwards compatibility is not yet guaranteed. Some of the algorithms are not yet manually tested on the JavaScript front. Please submit the issues at https://github.com/MTG/essentia.js/issues.
 
-## Citing essentia.js
-If you want to cite essentia.js in a scholarly work, please use the following reference.
+## Citing Essentia.js
+If you want to cite Essentia.js in a scholarly work, please use the following references.
 
+> Albin Correya, Jorge Marcos-Fernández, Luis Joglar-Ongay, Pablo Alonso-Jiménez, Xavier Serra, Dmitry Bogdanov. [Audio and Music Analysis on the Web using Essentia.js](http://doi.org/10.5334/tismir.111), Transactions of the International Society for Music Information Retrieval (TISMIR). 4(1), pp. 167–181. 2021.
 
-> Albin Correya, Dmitry Bogdanov, Luis Joglar-Ongay, Xavier Serra. “Essentia.js: A JavaScript Library for Music and Audio Analysis on the Web”, 21st International Society for Music Information Retrieval Conference, Montréal, Canada, pp. 605-612. 2020.
-
+> Albin Correya, Dmitry Bogdanov, Luis Joglar-Ongay, Xavier Serra. [Essentia.js: A JavaScript Library for Music and Audio Analysis on the Web](http://hdl.handle.net/10230/45451), 21st International Society for Music Information Retrieval Conference (ISMIR 2020), pp. 605-612. 2020.
 
