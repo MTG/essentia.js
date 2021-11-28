@@ -19,7 +19,7 @@ const audioLeftChannelData = essentia.arrayToVector(audio.channelData[0]);
 const audioRightChannelData = essentia.arrayToVector(audio.channelData[1]);
 const audioDownMixed = essentia.MonoMixer(audioLeftChannelData, audioRightChannelData).audio;
 
-
+// Danceability expects the whole audio file as input
 let danceability = essentia.Danceability(
     audioDownMixed, // audio frame vector
     8800, // maxTau

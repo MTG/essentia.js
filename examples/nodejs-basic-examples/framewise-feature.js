@@ -28,7 +28,7 @@ let frames = essentia.FrameGenerator(
     1024 // hopSize
 );
 
-// Iterate through frames and compute ReplayGain feature
+// Iterate through frames and compute RMS value for each overlapping frame
 for (var i=0; i < frames.size(); i++) {
     // Compute RMS for each frame of downmixed audio signal
     let rms = essentia.RMS(

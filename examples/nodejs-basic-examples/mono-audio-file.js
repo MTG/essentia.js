@@ -15,6 +15,7 @@ let audio = wav.decode(buffer);
 // Assuming your input audio file is in Mono
 const audioVector = essentia.arrayToVector(audio.channelData[0])
 
+// Danceability expects the whole audio file as input
 let danceability = essentia.Danceability(
     audioVector, // audio data
     8800, // maxTau
