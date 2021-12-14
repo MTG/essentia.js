@@ -134,8 +134,8 @@ function silenceHeuristics() {
 }
 
 function resultsNotOkay () {
-    let saturation = self.saturationResults.starts.length == 0 || self.saturationResults.ends.length == 0;
+    let saturation = self.saturationResults.starts.length === 0 || self.saturationResults.ends.length === 0;
     let silence = !self.silenceHeuristicsResults.start && !self.silenceHeuristicsResults.end;
-    let startStopCut = self.startStopCutResults.start === 0 && self.startStopCutResults.end === 0;
+    let startStopCut = self.startStopCutResults.startCut === 0 && self.startStopCutResults.stopCut === 0;
     return (saturation && silence && startStopCut)
 }
