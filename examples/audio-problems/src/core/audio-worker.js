@@ -86,10 +86,8 @@ onmessage = function listenToMainThread(msg) {
 function computeSaturation () {
     self.saturationExtractor = new EssentiaWASMSaturation.SaturationDetectorExtractor(self.frameSize, self.hopSize);
     let algoOutput = self.saturationExtractor.compute(self.signal);
-    console.log('saturation algoOutput starts size: ', algoOutput.starts.size())
     self.saturationResults.starts = algoOutput.starts.size() > 0 ? essentia.vectorToArray(algoOutput.starts) : [];
     self.saturationResults.ends = algoOutput.ends.size() > 0 ? essentia.vectorToArray(algoOutput.ends): [];
-    console.log('saturationResults: ', self.saturationResults);
     self.saturationExtractor.shutdown();
 }
 
@@ -105,20 +103,17 @@ function transformSilenceResults () {
     let secondsPerFrame = self.hopSize / self.sampleRate;
     self.silenceResultsSeconds.start = self.silenceResults.startFrame * secondsPerFrame;
     self.silenceResultsSeconds.end = self.silenceResults.endFrame * secondsPerFrame;
-    console.log('silenceResultsSeconds: ', self.silenceResultsSeconds)
     silenceHeuristics();
 }
 
 function computeStartStopCut () {
     self.startStopCutResults = self.essentia.StartStopCut(self.essentia.arrayToVector(self.signal));
-    console.log('startStopCut: ', self.startStopCutResults);
 }
 
 
 function silenceHeuristics() {
     self.silenceHeuristicsResults = {start: null, end: null};
     let signalDuration = self.signal.length / self.sampleRate; // seconds
-    console.log('worker: signalDuration', signalDuration)
     if (self.silenceResultsSeconds.start > self.silenceThreshold) {
         self.silenceHeuristicsResults.start = {
             begin: 0,

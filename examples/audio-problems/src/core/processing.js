@@ -27,7 +27,6 @@ export default class DSP {
         });
 
         this.audioWorker.onmessage = (msg) => {
-            console.log('worker data:', msg);
             switch (msg.data.type) {
                 case 'startStopCut':
                     EventBus.$emit("startstopcut-finished", msg.data.results);
@@ -36,11 +35,9 @@ export default class DSP {
                     EventBus.$emit("saturation-finished", msg.data.results);
                     break;
                 case 'silence':
-                    console.log(msg.data.results);
                     EventBus.$emit("silence-finished", msg.data.results);
                     break;
                 case 'empty':
-                    console.log('empty results!!');
                     EventBus.$emit("empty-results");
                 default:
                     console.log('No matching response type for received msg');
@@ -88,7 +85,6 @@ export default class DSP {
         this.fileURL = sound.url;
         let buffer = await sound.blob.arrayBuffer();
         let audioBuffer = await this.decodeBuffer(buffer);
-        console.log(audioBuffer);
         this.fileSampleRate = audioBuffer.sampleRate;
         let audioArray = audioBuffer.getChannelData(0);
         // send audioArray to Worker
@@ -96,8 +92,6 @@ export default class DSP {
             request: 'analyse',
             audio: audioArray
         });
-        // this.signal = audioArray;
-        // this.computeSaturation();
     }
 
     updateAlgoParams (params) {
@@ -128,8 +122,6 @@ export default class DSP {
             let resampledBuffer = await this.resample(buffer, 44100); // audioEncoder only supports 44100hz sampling rate
             resampledSlices.push(resampledBuffer);
         }
-
-        console.log({resampledSlices});
 
         let blobPromises = resampledSlices.map( (sliceBuffer) => {
             return audioEncoder(sliceBuffer, 'WAV', null);
@@ -162,7 +154,6 @@ export default class DSP {
             const link = document.createElement('a');
             link.setAttribute('href', zipURL );
             link.setAttribute('download', downloadName);
-            console.info('download link', link);
             link.click();
             URL.revokeObjectURL(zipURL);
             EventBus.$emit('slices-downloaded');
@@ -183,7 +174,6 @@ export default class DSP {
         return resampled;
     }
     computeSaturation () {
-        console.log(this.signal);
         this.saturationResults['starts'] = this.saturationExtractor.computeStarts(this.signal);
         this.saturationResults['ends'] = this.saturationExtractor.computeEnds(this.signal);
     } 

@@ -260,8 +260,6 @@ export default {
 				ev.stopPropagation();
 				EventBus.$emit("marker-clicked", region, ev);
 			});
-
-			console.log(this.wavesurfer);
 		});
 
 		EventBus.$on("startstopcut-finished", (results) => {
