@@ -1,13 +1,11 @@
 <template>
-  <section class="mb-2 mt-4">
-    <div id="audio-display-wrap">
-      <h3>{{ title }}</h3>
-      <div id="algos_info" class="algosInfoTable">
-          <div class="row" v-for="algo in algorithms" :id="algo.name.toLowerCase()" :key="algo.name.toLowerCase()">
-            <h5 class="cell" :style="{'background-color':algo.color}"><a :href="algo.href">{{ algo.name }}</a></h5>
-            <p class="cell grow">{{ algo.def}}</p>
-          </div>
-      </div>
+  <section>
+    <h3>{{ title }}</h3>
+    <div id="algos_info" class="algosInfoTable">
+        <div class="row" v-for="algo in algorithms" :id="algo.name.toLowerCase()" :key="algo.name.toLowerCase()">
+          <h5 class="cell" :style="{'background-color':algo.color}"><a :href="algo.href">{{ algo.name }}</a></h5>
+          <p class="cell grow">{{ algo.def}}</p>
+        </div>
     </div>
   </section>
 </template>
@@ -69,7 +67,9 @@ export default {
 </script>
 
 <style scoped>
-
+section {
+  height: 30vh;
+}
 .algosInfoTable {
   max-width: 850px;
   color: #2a2929;

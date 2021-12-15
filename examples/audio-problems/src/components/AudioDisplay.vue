@@ -293,7 +293,7 @@ export default {
     }
 
     .display {
-        height: 25vh;
+        height: 30vh;
     }
 
     #load-overlay {
