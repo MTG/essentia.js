@@ -191,6 +191,8 @@ export default {
 		},
 		redrawAlgorithms() {
 			setTimeout(() => {
+				this.wavesurfer.clearMarkers();
+				this.wavesurfer.clearRegions();
 				this.drawStartStopCut();
 				this.drawSilence();
 				this.drawSaturation();
