@@ -1,9 +1,9 @@
 <template>
   <section>
-    <h3>{{ title }}</h3>
+    <h2>{{ title }}</h2>
     <div id="algos_info" class="algosInfoTable">
         <div class="row" v-for="algo in algorithms" :id="algo.name.toLowerCase()" :key="algo.name.toLowerCase()">
-          <h5 class="cell" :style="{'background-color':algo.color}"><a :href="algo.href">{{ algo.name }}</a></h5>
+          <h3 class="cell" :style="{'background-color':algo.color}"><a :href="algo.href">{{ algo.name }}</a></h3>
           <p class="cell grow">{{ algo.def}}</p>
         </div>
     </div>
