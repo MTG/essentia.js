@@ -242,7 +242,6 @@ export default {
 			});
 
 			this.wavesurfer.loadBlob(sound.blob);
-			this.wavesurfer.on("ready", () => console.log('wavesurfer.duration', this.wavesurfer.getDuration()) );
 			this.wavesurfer.on("finish", setPause);
 			this.wavesurfer.on("pause", setPause);
 			this.wavesurfer.on("play", () => this.isPlaying = true);
