@@ -22,6 +22,11 @@
         font-size: 2.5rem;
       }
 
+      .ui.card {
+        box-shadow: none;
+        border: none;
+      }
+
       a.ui.button {
         justify-content: space-between;
       }
@@ -48,45 +53,91 @@
           </a>
         </div>
         
-        <div class="ui divider" style="height: 10px; width: 2px"></div>
-        <div class="ui center aligned container">
+        <div class="ui divider" style="height: 0.1rem; width: 1px"></div>
+        <div class="ui container">
           <div class="ui top attached big tabular menu">
-            <a class="item" data-tab="demos">Demo Apps</a>
-            <a class="item active" data-tab="starter-code">Interactive code examples</a>
+            <a class="item active" data-tab="demos">Demo Apps</a>
+            <a class="item" data-tab="starter-code">Interactive code examples</a>
           </div>
-          <div class="ui bottom attached tab segment" data-tab="demos">
-            <div class="ui vertical large fluid basic buttons">
-              <a href="./demos/melspectrogram-rt/" class="ui button" target="_blank"
-              data-html="<img src='./demos/screenshots/melspectrogram-rt.png' style='max-width: 100%;'></img>">
-                Melspectrogram (Real-time)<i class="external alternate icon"></i>
-              </a>
-              <a href="./demos/rms-rt/" class="ui button" target="_blank"
-              data-html="<img src='./demos/screenshots/rms-rt.png' style='max-width: 100%;'></img>">
-                RMS (Real-time)<i class="external alternate icon"></i>
-              </a>
-              <a href="./demos/pitchmelodia-rt/" class="ui button" target="_blank"
-              data-html="<img src='./demos/screenshots/pitchmelodia-rt.png' style='max-width: 100%;'></img>">
-                Pitch Melodia (Real-time)<i class="external alternate icon"></i>
-              </a>
-              <a href="./demos/onsets/public/" class="ui button" target="_blank"
-              data-html="<img src='./demos/screenshots/onsets.png' style='max-width: 100%;'></img>">
-                Onset Detection<i class="external alternate icon"></i>
-              </a>
-              <a href="./demos/autotagging-rt/" class="ui button" target="_blank"
-              data-html="<img src='./demos/screenshots/autotagging-rt.png' style='max-width: 100%;'></img>">
-                Music Autotagging (Real-time)<i class="external alternate icon"></i>
-              </a>
-              <a href="./demos/mood-classifiers/" class="ui button" target="_blank"
-              data-html="<img src='./demos/screenshots/mood-classifiers.png' style='max-width: 100%;'></img>">
-                Mood Classification plus Key & BPM<i class="external alternate icon"></i>
-              </a>
-              <a href="./demos/hpcp-chroma-rt/" class="ui button" target="_blank"
-              data-html="<img src='./demos/screenshots/hpcp-chroma-rt.png' style='max-width: 100%;'></img>">
-                HPCP Chroma (Real-time)<i class="external alternate icon"></i>
-              </a>
+          <div class="ui active bottom attached tab segment" data-tab="demos">
+            <div class="ui four column grid cards">
+              <div class="row">
+                <div class="ui fluid card column">
+                  <div class="rounded image">
+                    <img src='./demos/screenshots/melspectrogram-rt.png'></img>
+                  </div>
+                  <div class="content">
+                    <a href="./demos/melspectrogram-rt/" class="header" target="_blank">
+                      Melspectrogram (Real-time)
+                    </a>
+                  </div>
+                </div>
+                <div class="ui fluid card column">
+                  <div class="image">
+                    <img src='./demos/screenshots/rms-rt.png'></img>
+                  </div>
+                  <div class="content">
+                    <a href="./demos/rms-rt/" class="header" target="_blank">
+                      RMS (Real-time)
+                    </a>
+                  </div>
+                </div>
+                <div class="ui fluid card column">
+                  <div class="image">
+                    <img src='./demos/screenshots/pitchmelodia-rt.png'></img>
+                  </div>
+                  <div class="content">
+                    <a href="./demos/pitchmelodia-rt/" class="header" target="_blank">
+                      Pitch Melodia (Real-time)
+                    </a>
+                  </div>
+                </div>
+                <div class="ui fluid card column">
+                  <div class="image">
+                    <img src='./demos/screenshots/onsets.png'></img>
+                  </div>
+                  <div class="content">
+                    <a href="./demos/onsets/public/" class="header" target="_blank">
+                      Onset Detection
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="ui fluid card column">
+                  <div class="image">
+                    <img src='./demos/screenshots/autotagging-rt.png'></img>
+                  </div>
+                  <div class="content">
+                    <a href="./demos/autotagging-rt/" class="header" target="_blank">
+                      Music Autotagging (Real-time)
+                    </a>
+                  </div>
+                </div>
+                <div class="ui fluid card column">
+                  <div class="image">
+                    <img src='./demos/screenshots/mood-classifiers.png'></img>
+                  </div>
+                  <div class="content">
+                    <a href="./demos/mood-classifiers/" class="header" target="_blank">
+                      Mood Classification plus Key & BPM
+                    </a>
+                  </div>
+                </div>
+                <div class="ui fluid card column">
+                  <div class="image">
+                    <img src='./demos/screenshots/hpcp-chroma-rt.png'></img>
+                  </div>
+                  <div class="content">
+                    <a href="./demos/hpcp-chroma-rt/" class="header" target="_blank">
+                      HPCP Chroma (Real-time)
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="ui active bottom attached tab segment" data-tab="starter-code">
+          <div class="ui bottom attached tab segment" data-tab="starter-code">
             <div class="ui vertical large fluid basic buttons">
               <a href="https://glitch.com/edit/#!/essentiajs-melspectrogram" class="ui button" target="_blank"
                 data-html="<iframe src='https://glitch.com/edit/#!/essentiajs-melspectrogram' frameborder='0'></iframe>">
@@ -108,9 +159,7 @@
           </div>
         </div>
 
-        <div class="ui divider" style="height: 15px; width: 2px"></div>
-
-        <div class="ui center aligned fluid container" style="position: absolute; bottom: 0vh;">
+        <!-- <div class="ui center aligned fluid container" style="position: absolute; bottom: 0vh;">
           <a class="demo_logo" target="_blank" href="//essentia.upf.edu">
             <img id="logo" src="https://raw.githubusercontent.com/MTG/mtg-logos/master/essentia/essentia-RGB.svg" alt="MTG Logo"
               style="height: 70px;">
@@ -119,7 +168,7 @@
             <img class="essnt-footer_mtg-logo" src="https://raw.githubusercontent.com/MTG/mtg-logos/master/mtg/MTG_CMYK_logo-05.svg" alt="mtg logo"
               style="width:300px; height: 70px;">
           </a>
-        </div>
+        </div> -->
       </body>
 
       <script>
