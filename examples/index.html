@@ -14,7 +14,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-top: 2rem;
+        padding-top: 2rem;
       }
 
       h1 {
@@ -24,6 +24,14 @@
 
       a.ui.button {
         justify-content: space-between;
+      }
+
+      .glitch-link {
+        color: #999
+      }
+
+      .glitch-link i {
+        margin-left: .5rem;
       }
     </style>
     <title>essentia.js examples</title>
@@ -43,15 +51,27 @@
         <div class="ui divider" style="height: 10px; width: 2px"></div>
         <div class="ui center aligned container">
           <div class="ui top attached big tabular menu">
-            <a class="item active" data-tab="starter-code">Starter code</a>
-            <a class="item" data-tab="demos">Demos</a>
+            <a class="item active" data-tab="starter-code">Interactive code examples</a>
+            <a class="item" data-tab="demos">Demo Apps</a>
           </div>
           <div class="ui active bottom attached tab segment" data-tab="starter-code">
             <div class="ui vertical large fluid basic buttons">
-              <a href="./melspectrogram/" class="ui button" target="_blank">Melspectrogram<i class="external alternate icon"></i></a>
-              <a href="./pitchmelodia/" class="ui button" target="_blank">Pitch Melodia<i class="external alternate icon"></i></a>
-              <a href="./hpcp-chroma/" class="ui button" target="_blank">HPCP Chroma<i class="external alternate icon"></i></a>
-              <a href="./autotagging/" class="ui button" target="_blank">Music Autotagging<i class="external alternate icon"></i></a>
+              <a href="https://glitch.com/edit/#!/essentiajs-melspectrogram" class="ui button" target="_blank"
+                data-html="<iframe src='https://glitch.com/edit/#!/essentiajs-melspectrogram' frameborder='0'></iframe>">
+                Melspectrogram <p class="glitch-link">glitch.com<i class="external alternate icon"></i></p>
+              </a>
+              <a href="https://glitch.com/edit/#!/essentiajs-pitchmelodia" class="ui button" target="_blank"
+                data-html="<iframe src='https://glitch.com/edit/#!/essentiajs-pitchmelodia' frameborder='0'></iframe>">
+                Pitch Melodia <p class="glitch-link">glitch.com<i class="external alternate icon"></i></p>
+              </a>
+              <a href="https://glitch.com/edit/#!/essentiajs-hpcpc-chroma" class="ui button" target="_blank"
+                data-html="<iframe src='https://glitch.com/edit/#!/essentiajs-hpcpc-chroma' frameborder='0'></iframe>">
+                HPCP Chroma <p class="glitch-link">glitch.com<i class="external alternate icon"></i></p>
+              </a>
+              <a href="https://glitch.com/edit/#!/essentiajs-models-workers-non-rt" class="ui button" target="_blank"
+                data-html="<iframe src='https://glitch.com/edit/#!/essentiajs-models-workers-non-rt' frameborder='0'></iframe>">
+                Music Autotagging <p class="glitch-link">glitch.com<i class="external alternate icon"></i></p>
+              </a>
             </div>
           </div>
           <div class="ui bottom attached tab segment" data-tab="demos">
@@ -60,7 +80,8 @@
               <a href="./demos/rms-rt/" class="ui button" target="_blank">RMS (Real-time)<i class="external alternate icon"></i></a>
               <a href="./demos/pitchmelodia-rt/" class="ui button" target="_blank">Pitch Melodia (Real-time)<i class="external alternate icon"></i></a>
               <a href="./demos/onsets/public/" class="ui button" target="_blank">Onset Detection<i class="external alternate icon"></i></a>
-              <a href="./demos/autotagging-rt/" class="ui button" target="_blank">Music Autotagging (Real-time)<i class="external alternate icon"></i></a>
+              <a href="./demos/autotagging-rt/" class="ui button" target="_blank"
+              data-html="<img src='./demos/autotagging-rt/index.html'></img>">Music Autotagging (Real-time)<i class="external alternate icon"></i></a>
               <a href="./demos/mood-classifiers/" class="ui button" target="_blank">Mood Classification plus Key & BPM<i class="external alternate icon"></i></a>
               <a href="./demos/hpcp-chroma-rt/" class="ui button" target="_blank">HPCP Chroma (Real-time)<i class="external alternate icon"></i></a>
             </div>
@@ -69,7 +90,7 @@
 
         <div class="ui divider" style="height: 15px; width: 2px"></div>
 
-        <div class="ui center aligned fluid container" style="position: absolute; bottom: 1vh;">
+        <div class="ui center aligned fluid container" style="position: absolute; bottom: 0vh;">
           <a class="demo_logo" target="_blank" href="//essentia.upf.edu">
             <img id="logo" src="https://raw.githubusercontent.com/MTG/mtg-logos/master/essentia/essentia-RGB.svg" alt="MTG Logo"
               style="height: 70px;">
@@ -84,6 +105,7 @@
       <script>
         $(document).ready(function () {
           $('.menu .item').tab();
+          $('a.ui.button').popup();
         })
       </script>
 </html>
