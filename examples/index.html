@@ -48,6 +48,10 @@
       .glitch-link i {
         margin-left: .5rem;
       }
+
+      p.code-example-name {
+        margin-bottom: 0;
+      }
     </style>
     <title>essentia.js examples</title>
   </head>
@@ -149,21 +153,29 @@
       </div>
       <div class="ui bottom attached tab segment" data-tab="starter-code">
         <div class="ui vertical large fluid basic buttons">
-          <a href="https://glitch.com/edit/#!/essentiajs-melspectrogram" class="ui button" target="_blank"
-            data-html="<iframe src='https://glitch.com/edit/#!/essentiajs-melspectrogram' frameborder='0'></iframe>">
-            Melspectrogram <p class="glitch-link">glitch.com<i class="external alternate icon"></i></p>
+          <a href="https://glitch.com/edit/#!/essentiajs-melspectrogram" class="ui button" target="_blank">
+            <p class="code-example-name" data-html="<iframe src='https://glitch.com/edit/#!/essentiajs-melspectrogram' frameborder='0'></iframe>">
+              Melspectrogram
+            </p>
+            <p class="glitch-link">glitch.com<i class="external alternate icon"></i></p>
           </a>
-          <a href="https://glitch.com/edit/#!/essentiajs-pitchmelodia" class="ui button" target="_blank"
-            data-html="<iframe src='https://glitch.com/edit/#!/essentiajs-pitchmelodia' frameborder='0'></iframe>">
-            Pitch Melodia <p class="glitch-link">glitch.com<i class="external alternate icon"></i></p>
+          <a href="https://glitch.com/edit/#!/essentiajs-pitchmelodia" class="ui button" target="_blank">
+            <p class="code-example-name" data-html="<iframe src='https://glitch.com/edit/#!/essentiajs-pitchmelodia' frameborder='0'></iframe>">
+              Pitch Melodia 
+            </p>
+            <p class="glitch-link">glitch.com<i class="external alternate icon"></i></p>
           </a>
-          <a href="https://glitch.com/edit/#!/essentiajs-hpcpc-chroma" class="ui button" target="_blank"
-            data-html="<iframe src='https://glitch.com/edit/#!/essentiajs-hpcpc-chroma' frameborder='0'></iframe>">
-            HPCP Chroma <p class="glitch-link">glitch.com<i class="external alternate icon"></i></p>
+          <a href="https://glitch.com/edit/#!/essentiajs-hpcpc-chroma" class="ui button" target="_blank">
+            <p class="code-example-name" data-html="<iframe src='https://glitch.com/edit/#!/essentiajs-hpcpc-chroma' frameborder='0'></iframe>">
+              HPCP Chroma
+            </p>
+            <p class="glitch-link">glitch.com<i class="external alternate icon"></i></p>
           </a>
-          <a href="https://glitch.com/edit/#!/essentiajs-models-workers-non-rt" class="ui button" target="_blank"
-            data-html="<iframe src='https://glitch.com/edit/#!/essentiajs-models-workers-non-rt' frameborder='0'></iframe>">
-            Music Autotagging <p class="glitch-link">glitch.com<i class="external alternate icon"></i></p>
+          <a href="https://glitch.com/edit/#!/essentiajs-models-workers-non-rt" class="ui button" target="_blank">
+            <p class="code-example-name" data-html="<iframe src='https://glitch.com/edit/#!/essentiajs-models-workers-non-rt' frameborder='0'></iframe>">
+              Music Autotagging 
+            </p>
+            <p class="glitch-link">glitch.com<i class="external alternate icon"></i></p>
           </a>
         </div>
       </div>
@@ -184,7 +196,9 @@
   <script>
     $(document).ready(function () {
       $('.menu .item').tab();
-      $('a.ui.button').popup();
+      $('p.code-example-name').popup({
+        position: 'right center'
+      });
     })
   </script>
 </html>
