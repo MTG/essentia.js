@@ -114,6 +114,7 @@ section {
   align-items: center;
   justify-content: space-evenly;
   padding: 2px 2px;
+  transition: background-color .4s;
 }
 .row:hover {
    color: black;
