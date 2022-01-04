@@ -2,7 +2,7 @@
   <section>
     <h2>{{ title }}</h2>
     <div id="algos_info" class="algosInfoTable">
-        <div class="row" v-for="algo in algorithms" :id="algo.name.toLowerCase()" :key="algo.name.toLowerCase()">
+        <div class="row" :class="{'highlight': algo.isHighlighted}" v-for="algo in algorithms" :id="algo.name.toLowerCase()" :key="algo.name.toLowerCase()">
           <h3 class="cell" :style="{'background-color':algo.color}"><a :href="algo.href">{{ algo.name }}</a></h3>
           <p class="cell grow">{{ algo.def}}</p>
         </div>
@@ -18,48 +18,53 @@ export default {
     return {
       isPlaying: false,
       title: "Algorithms",
-      algorithms: [{name: "StartStopCut", href:"https://essentia.upf.edu/reference/std_StartStopCut.html", color: "#FEA24CA6", def: "Marks whether there is a cut at the beginning or at the end of the audio"},
-                  {name: "Saturation",href:"https://essentia.upf.edu/reference/std_SaturationDetector.html" , color:  "#FF585880", def: "Shows the regions where there are saturated samples"},
-                  {name: "StartStopSilence",href:"https://essentia.upf.edu/reference/std_StartStopSilence.html" , color: "#FFD645A3", def: "Shows if there are more than 5 seconds of silence at the beginning or the end of the audio"}]
+      algorithms: {
+                    startstopcut: {
+                      name: "StartStopCut", 
+                      href:"https://essentia.upf.edu/reference/std_StartStopCut.html", 
+                      color: "#FEA24CA6", def: "Marks whether there is a cut at the beginning or at the end of the audio", 
+                      isHighlighted: false
+                    },
+                    saturation: {
+                      name: "Saturation",
+                      href:"https://essentia.upf.edu/reference/std_SaturationDetector.html", 
+                      color:  "#FF585880", def: "Shows the regions where there are saturated samples", 
+                      isHighlighted: false
+                    },
+                    startstopsilence: {
+                      name: "StartStopSilence",
+                      href:"https://essentia.upf.edu/reference/std_StartStopSilence.html", 
+                      color: "#FFD645A3", 
+                      def: "Shows if there are more than 5 seconds of silence at the beginning or the end of the audio", 
+                      isHighlighted: false
+                    }
+      }
     }
   },
   methods: {
-    highlightFromRegion(obj, ev){
-      let algoName = obj.id.split('-')[0]
-      let elementTr = document.querySelector('.algosInfoTable'+ ' #'+algoName.toLowerCase());
-
-      if(ev.type === "mouseenter" && !elementTr.classList.contains("highlight")){
-        elementTr.classList.add("highlight");
-      }
-      if(ev.type === "mouseleave" && elementTr.classList.contains("highlight")){
-        elementTr.classList.remove("highlight");
-      }
+    activateHighlight (algoName) {
+      this.algorithms[algoName].isHighlighted = true;
     },
-    highlightFromMarker(obj, ev){
-      let algoName = obj.label.toLowerCase();
-      algoName = (algoName === "cut") ? "startstopcut" : algoName;
-      algoName = (algoName === "silence") ? "startstopsilence" : algoName;
-      let elementTr = document.querySelector('.algosInfoTable'+ ' #'+algoName.toLowerCase());
-      if(ev.type === "click" && !elementTr.classList.contains("highlight")){
-        elementTr.classList.add("highlight");
-        setTimeout(function (){
-          elementTr.classList.remove("highlight");
-        }, 2000);
-      }
+    deactivateHighlight (algoName) {
+      this.algorithms[algoName].isHighlighted = false;
     }
   },
-  watch: {
-  },
-  computed: {},
   mounted() {
-    EventBus.$on('region-mouseenter', (param, ev) => {
-      this.highlightFromRegion(param, ev);
+    EventBus.$on('region-mouseenter', (param) => {
+      let algoName = param.id.split('-')[0].toLowerCase();
+      this.activateHighlight(algoName);
     })
-    EventBus.$on('region-mouseleave', (param, ev) => {
-      this.highlightFromRegion(param, ev);
+    EventBus.$on('region-mouseleave', (param) => {
+      let algoName = param.id.split('-')[0].toLowerCase();
+      this.deactivateHighlight(algoName);
     })
-    EventBus.$on('marker-clicked', (param, ev) => {
-      this.highlightFromMarker(param, ev);
+    EventBus.$on('marker-clicked', (param) => {
+      let algoName = param.label.toLowerCase();
+      algoName = (algoName.includes('cut') || algoName.includes('silence')) ? 'startstop'+algoName : algoName;
+      this.activateHighlight(algoName);
+      setTimeout(() => {
+        this.deactivateHighlight(algoName);
+      }, 2000);
     })
   },
   name: "AlgorithmsInfo"
