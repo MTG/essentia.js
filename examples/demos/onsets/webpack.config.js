@@ -8,7 +8,7 @@ module.exports = {
   output: {
     // use "public" since "dist" and "builds" are excluded by toplevel .gitignore
     path: path.resolve(__dirname, './public'),
-    publicPath: '/essentia.js/examples/onsets/public/',
+    publicPath: '/essentia.js/examples/demos/onsets/public/',
     filename: 'build.js'
   },
   target: 'web',
