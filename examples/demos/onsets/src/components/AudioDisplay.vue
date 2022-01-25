@@ -20,7 +20,7 @@
             <b-button-group>
                 <b-button id="download" @click="handleDownload" variant="light" :disabled="!downloadEnabled">
                     <b-icon icon="download"></b-icon>
-                    Download
+                    Download slices
                 </b-button>
             </b-button-group>
         </div>
