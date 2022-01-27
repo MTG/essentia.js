@@ -45,7 +45,8 @@ export default {
                     id: sound.id, 
                     user: sound.username, 
                     url: selectedAudioURL, 
-                    fsLink: sound.url
+                    fsLink: sound.url,
+                    license: sound.license
                 }
             );
             this.selected = "";

@@ -69,7 +69,7 @@ export default {
                 filter: "duration:[1.0 TO 30.0]",
                 sort: "rating_desc",
                 page_size: 10,
-                fields: "id,name,url,previews,username"
+                fields: "id,name,url,previews,username,license"
             };
             freesound.textSearch(this.searchTerm, searchOptions, this.handleSearchSuccess, this.handleSearchFailure);
         },
@@ -92,7 +92,7 @@ export default {
                 file = event.dataTransfer.files[0];
             }
 
-            EventBus.$emit("sound-read", {blob: file, name: file.name.split('.')[0], id: '', user: '', url: '', fsLink: ''});
+            EventBus.$emit("sound-read", {blob: file, name: file.name.split('.')[0], id: '', user: '', url: '', fsLink: '', license: ''});
         },
         handleSearchSuccess (sound) {
             // guard: sound collection or single sound?

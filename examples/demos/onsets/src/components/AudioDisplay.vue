@@ -184,7 +184,7 @@ export default {
         })
 
         // initialize sound
-        EventBus.$emit("sound-selected", {name: 'acoustic-drums', url: audioURL, id: '', user: '', fsLink: ''});
+        EventBus.$emit("sound-selected", {name: 'acoustic-drums', url: audioURL, id: '', user: '', fsLink: '', license: ''});
     }
 }
 </script>

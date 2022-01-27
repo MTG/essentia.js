@@ -68,7 +68,7 @@ export default class DSP {
     
     async decodeSoundBlob (sound) {
         this.soundData = sound;
-        console.info(this.soundData.url);
+        console.info(this.soundData);
         let buffer = await sound.blob.arrayBuffer();
         let audioBuffer = await this.decodeBuffer(buffer);
         this.fileSampleRate = audioBuffer.sampleRate;
@@ -111,7 +111,7 @@ export default class DSP {
 
         let encodedSlices = blobs.map( (b, idx) => {
             return {
-                name: `${this.soundData.id}_${this.soundData.name}_${idx}.wav`,
+                name: `${this.soundData.id}${this.soundData.id ? '_' : ''}${this.soundData.name}_${idx}.wav`,
                 blob: b
             }
         });
@@ -120,10 +120,14 @@ export default class DSP {
     }
 
     async downloadSlicesAsZip (slicesArray) {
+        const downloadName = `onset-slices_${this.soundData.id}${this.soundData.id ? '_' : ''}${this.soundData.name}`;
         const slices = await this.encodeSlices(slicesArray);
         let zip = new JSZip();
+        if (this.soundData.license) {
+            zip.folder(downloadName).file('LICENSE.md', `File name: ${this.soundData.name}\nby Freesound user: ${this.soundData.user}\nLicensed with ${this.soundData.license}`);
+        }
         slices.forEach( (s) => {
-            zip.file(s.name, s.blob, {
+            zip.folder(downloadName).file(s.name, s.blob, {
                 compression: 'STORE' // no compression
             })
         });
@@ -131,10 +135,9 @@ export default class DSP {
         zip.generateAsync({type: 'blob', compression: 'STORE'})
         .then( zipBlob => {
             const zipURL = URL.createObjectURL(zipBlob);
-            const downloadName = `onset-slices_${this.soundData.id}_${this.soundData.name}.zip`;
             const link = document.createElement('a');
             link.setAttribute('href', zipURL );
-            link.setAttribute('download', downloadName);
+            link.setAttribute('download', downloadName+'.zip');
             console.info('download link', link);
             link.click();
             URL.revokeObjectURL(zipURL);
