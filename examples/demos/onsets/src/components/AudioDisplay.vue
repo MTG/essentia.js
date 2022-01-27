@@ -102,6 +102,14 @@ export default {
                 ev.stopPropagation();
                 region.play();
             })
+        },
+        redraw () {
+            setTimeout(() => {
+                this.wavesurfer.clearMarkers();
+                this.wavesurfer.clearRegions();
+                this.drawOnsets();
+                this.drawOnsetSlices();
+            }, 150);
         }
     },
     watch: {
@@ -117,6 +125,9 @@ export default {
             }
             return false;
         }
+    },
+    created () {
+        window.addEventListener('resize', this.redraw);
     },
     mounted () {
         this.height = this.$el.querySelector("#audio-display").clientHeight;
