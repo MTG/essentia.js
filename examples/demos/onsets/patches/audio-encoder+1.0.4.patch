@@ -1,0 +1,20 @@
+diff --git a/node_modules/audio-encoder/src/encodeWav.js b/node_modules/audio-encoder/src/encodeWav.js
+index 51a531c..3b96798 100644
+--- a/node_modules/audio-encoder/src/encodeWav.js
++++ b/node_modules/audio-encoder/src/encodeWav.js
+@@ -82,9 +82,12 @@ function encodeWav(audioBuffer, cb) {
+ 
+ 	var blob = new Blob([uint8], { type: 'audio/x-wav' })
+ 
+-	setTimeout(function () {
+-		return cb(blob);
+-	}, 30);
++	// return new Promise((resolve, _) => {
++	// 	setTimeout(function () {
++	// 		resolve(blob);
++	// 	}, 30);
++	// });
++	return blob;
+ }
+ 
+ module.exports = encodeWav;
