@@ -39,7 +39,15 @@ export default {
         },
         handleSelect (sound) {
             let selectedAudioURL = sound.previews["preview-hq-mp3"];
-            EventBus.$emit("sound-selected", selectedAudioURL);
+            EventBus.$emit("sound-selected", 
+                {
+                    name: sound.name, 
+                    id: sound.id, 
+                    user: sound.username, 
+                    url: selectedAudioURL, 
+                    fsLink: sound.url
+                }
+            );
             this.selected = "";
         }
     },

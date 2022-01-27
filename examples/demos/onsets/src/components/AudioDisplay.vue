@@ -183,7 +183,8 @@ export default {
             this.waitingOnsets = true;
         })
 
-        EventBus.$emit("sound-selected", audioURL);
+        // initialize sound
+        EventBus.$emit("sound-selected", {name: 'acoustic-drums', url: audioURL, id: '', user: '', fsLink: ''});
     }
 }
 </script>

@@ -40,8 +40,7 @@ export default class DSP {
             }
         };
 
-        this.fileURL = '';
-        this.filename = '';
+        this.soundData = {};
         this.fileSampleRate = this.audioCtx.sampleRate;
         
         // set up global event handlers
@@ -62,14 +61,14 @@ export default class DSP {
         return audioBuffer;
     }
     
-    async handleSoundSelect (url) {
-        console.info(this.fileURL);
-        let blob = await this.getAudioFile(url);
-        EventBus.$emit("sound-read", {blob: blob, url: url});
+    async handleSoundSelect (data) {
+        let blob = await this.getAudioFile(data.url);
+        EventBus.$emit("sound-read", {blob: blob, ...data});
     }
-
+    
     async decodeSoundBlob (sound) {
-        this.fileURL = sound.url;
+        this.soundData = sound;
+        console.info(this.soundData.url);
         let buffer = await sound.blob.arrayBuffer();
         let audioBuffer = await this.decodeBuffer(buffer);
         this.fileSampleRate = audioBuffer.sampleRate;
@@ -95,11 +94,6 @@ export default class DSP {
     }
 
     async encodeSlices (slicesArray) {
-        const filenameItems = this.fileURL.split('/').slice(-1)[0].split('.');
-        const filename = filenameItems.slice(0, -1)[0];
-        // const extension = filenameItems.slice(-1)[0];
-        this.filename = filename;
-
         let resampledSlices = [];
     
         for (let i = 0; i < slicesArray.length; i++) {
@@ -110,16 +104,14 @@ export default class DSP {
             resampledSlices.push(resampledBuffer);
         }
 
-        console.log({resampledSlices});
-
-        let blobPromises = resampledSlices.map( (sliceBuffer) => {
-            return audioEncoder(sliceBuffer, 'WAV', null);
+        
+        let blobs = resampledSlices.map( (sliceBuffer) => {
+            return audioEncoder(sliceBuffer, 'WAV', null, null);
         });
-        let blobs = await Promise.all(blobPromises);
 
         let encodedSlices = blobs.map( (b, idx) => {
             return {
-                name: `${filename}-${idx}.wav`,
+                name: `${this.soundData.id}_${this.soundData.name}_${idx}.wav`,
                 blob: b
             }
         });
@@ -139,7 +131,7 @@ export default class DSP {
         zip.generateAsync({type: 'blob', compression: 'STORE'})
         .then( zipBlob => {
             const zipURL = URL.createObjectURL(zipBlob);
-            const downloadName = `onset-slices_${this.filename}.zip`;
+            const downloadName = `onset-slices_${this.soundData.id}_${this.soundData.name}.zip`;
             const link = document.createElement('a');
             link.setAttribute('href', zipURL );
             link.setAttribute('download', downloadName);
