@@ -17,6 +17,15 @@
                     <b-icon icon="volume-up-fill" v-show="soundOn"></b-icon>
                 </b-button>
             </b-button-group>
+            <b-button-group v-if="receivedSound">
+                <b-link v-if="soundData.fsLink !== ''" :href="soundData.fsLink" target="_blank">
+                    {{soundData.name}} - {{soundData.user}}
+                </b-link>
+                <p v-else>
+                    {{soundData.name}}
+                </p>
+                <license-logo v-if="licenseType" :license-type="licenseType" color="#E4454A" style="margin-left: 1em;"></license-logo>
+            </b-button-group>
             <b-button-group>
                 <b-button id="download" @click="handleDownload" variant="light" :disabled="!downloadEnabled">
                     <b-icon icon="download"></b-icon>
@@ -32,10 +41,12 @@ import EventBus from '../core/event-bus';
 import WaveSurfer from 'wavesurfer.js';
 import MarkersPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.markers';
 import RegionsPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.regions';
+import LicenseLogo from './LicenseLogo.vue';
 
 import audioURL from '../assets/acoustic-drums.wav';
 
 export default {
+    components: {LicenseLogo},
     data () {
         return {
             isPlaying: false,
@@ -46,6 +57,8 @@ export default {
             sliceRegions: [],
             waitingOnsets: false,
             waitingOnsetsMsg: "Finding onsets...",
+            soundData: null,
+            receivedSound: false,
             height: 0
         }
     },
@@ -124,6 +137,14 @@ export default {
                 return true;
             }
             return false;
+        },
+        licenseType () {
+            if (this.soundData.license == '') return null;
+            if (this.soundData.license.includes('/zero/')) return 'zero';
+            if (this.soundData.license.includes('/by/')) return 'by';
+            if (this.soundData.license.includes('by-nc')) return 'by-nc';
+
+            return 'sampling';
         }
     },
     created () {
@@ -139,6 +160,9 @@ export default {
             this.waitingOnsetsMsg = "Finding onsets...";
             this.waitingOnsets = true;
             this.onsetPositions = [];
+
+            this.soundData = sound;
+            this.receivedSound = true;
 
             if (this.wavesurfer) {
                 this.wavesurfer.destroy();
