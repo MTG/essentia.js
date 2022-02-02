@@ -17,14 +17,8 @@ log("Imports went OK");
 self.essentia = null;
 
 self.allowedParams = ['sampleRate', 'frameSize', 'hopSize', 'odfs', 'odfsWeights', 'sensitivity'];
-self.params = {
-    sampleRate: 44100,
-    frameSize: 1024,
-    hopSize: 512,
-    odfs: ['hfc', 'complex'], // Onset Detection Function(s) list
-    odfsWeights: [1, 1], // per ODF weights list
-    sensitivity: 0.3
-}; // changing odfs should require changing odfsWeights (at least length), and viceversa
+self.params = {}; // changing odfs should require changing odfsWeights (at least length), and viceversa
+self.fftRecomputeNeeded = true;
 
 // global storage for slicing
 self.signal = null;
@@ -39,32 +33,30 @@ try {
 // COMMS
 onmessage = function listenToMainThread(msg) {
     switch (msg.data.request) {
-        case 'analyse':
+        case 'analyse': {
             log('received analyse cmd')
             // const signal = new Float32Array(msg.data.audio);
             self.signal = msg.data.audio;
-            computeFFT();
+
+            if (self.fftRecomputeNeeded) {
+                computeFFT()
+            }
             self.onsetPositions = computeOnsets();
 
             postMessage(self.onsetPositions);
             break;
-        case 'updateParams':
-            // guard: check for empty params obj
-            if (!msg.data.params) {
-                error('missing `params` object in the `updateParams` command');
-                return;
-            }
-            let suppliedParamList = Object.keys(msg.data.params);
+        }
+        case 'initParams': {
+            let [suppliedParamList, newParams] = checkParams(msg.data.params);
+            self.params = {...self.params, ...newParams}; // update existing params obj
+            log(`updated the following params: ${suppliedParamList.join(',')}`);
+            log('current params are: ');
+            console.info(self.params);
 
-            // guard: check obj properties for forbidden params
-            if (!paramsAreAllowed(suppliedParamList)) {
-                error(`illegal parameter(s) in 'updateParams' command \n - ${getUnsupportedParams(suppliedParamList).join('\n - ')}`);
-                return;
-            }
-
-            let newParams = msg.data.params;
-
-            odfParamsAreOkay(suppliedParamList, newParams);
+            break;
+        }
+        case 'updateParams': {
+            let [suppliedParamList, newParams] = checkParams(msg.data.params);
 
             self.params = {...self.params, ...newParams}; // update existing params obj
             log(`updated the following params: ${suppliedParamList.join(',')}`);
@@ -78,20 +70,21 @@ onmessage = function listenToMainThread(msg) {
 
             if (self.polarFrames === null || self.polarFrames.length === 0) {    
                 // file hasn't been uploaded and analysed for 1st time, or it has been cleared
-                error("Audio file has NOT been provided yet. Please upload an audio file and send it to the worker.")
-                break;
+                self.fftRecomputeNeeded = true;
             }
-
             if (suppliedParamList.includes('frameSize') || suppliedParamList.includes('hopSize')) {
                 // re-compute FFT analysis if updated params affect it (frame or hop size changed)
-                computeFFT();
+                self.fftRecomputeNeeded = true;
             }
-            // always re-compute onset positions after params update
+
+            if (self.fftRecomputeNeeded) {
+                computeFFT()
+            }
             self.onsetPositions = computeOnsets();
             postMessage(self.onsetPositions);
-
             break;
-        case 'slice':
+        }
+        case 'slice': {
             if (!self.signal) {
                 error('no audio signal available for slicing');
                 break;
@@ -105,6 +98,7 @@ onmessage = function listenToMainThread(msg) {
             // log(slices);
             postMessage(slices);
             break;
+        }
         case 'clear':
             // audio worker state and saved analysis should be cleared
             break;
@@ -139,6 +133,7 @@ function computeFFT () {
 
     frames.delete();
     PolarFFT.shutdown();
+    self.fftRecomputeNeeded = false;
 }
 
 function computeOnsets () {
@@ -173,6 +168,27 @@ function sliceAudio () {
 }
 
 // UTILS
+
+function checkParams (params) {
+    // guard: check for empty params obj
+    if (!params) {
+        error('missing `params` object in the `updateParams` command');
+        return;
+    }
+    let suppliedParamList = Object.keys(params);
+
+    // guard: check obj properties for forbidden params
+    if (!paramsAreAllowed(suppliedParamList)) {
+        error(`illegal parameter(s) in 'updateParams' command \n - ${getUnsupportedParams(suppliedParamList).join('\n - ')}`);
+        return;
+    }
+
+    let newParams = params;
+
+    odfParamsAreOkay(suppliedParamList, newParams);
+
+    return [suppliedParamList, newParams];
+}
 
 function paramsAreAllowed (paramsList) {
     return paramsList.every( (p) => self.allowedParams.includes(p) );

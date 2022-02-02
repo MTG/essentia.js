@@ -31,7 +31,7 @@
             Sorry, no results were found for "{{searchTerm}}" on Freesound. Try something different or upload your own.
         </b-alert>
         <b-alert id="search-failure" show dismissible v-show="showSearchFailureBanner" @dismissed="showSearchFailureBanner = false; searchTerm=''">
-            Sorry, Freesound search is currently not available. Try uploading a sound instead.
+            Sorry, Freesound search failed. Try another search term or sound ID, or upload your own sound instead.
         </b-alert>
         <freesound-results :class="[{ 'd-flex': showFreesoundResults }, { 'd-none': !showFreesoundResults }]"></freesound-results>
         <audio-display v-show="!showFreesoundResults"></audio-display>
@@ -124,6 +124,8 @@ export default {
             this.showFreesoundResults = false;
             this.searchTerm = "";
         })
+
+        EventBus.$on('fs-search-failed', err => this.handleSearchFailure(err));
     },
     mounted () {
         this.uploadLabel = document.querySelector("#file-upload-label");

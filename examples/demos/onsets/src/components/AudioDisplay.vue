@@ -43,8 +43,6 @@ import MarkersPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.markers';
 import RegionsPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.regions';
 import LicenseLogo from './LicenseLogo.vue';
 
-import audioURL from '../assets/acoustic-drums.wav';
-
 export default {
     components: {LicenseLogo},
     data () {
@@ -148,7 +146,9 @@ export default {
         }
     },
     created () {
-        window.addEventListener('resize', this.redraw);
+        window.addEventListener('resize', () => {
+            if (this.wavesurfer) this.redraw() 
+        });
     },
     mounted () {
         this.height = this.$el.querySelector("#audio-display").clientHeight;
@@ -206,9 +206,6 @@ export default {
             this.waitingOnsetsMsg = "Recalculating...";
             this.waitingOnsets = true;
         })
-
-        // initialize sound
-        EventBus.$emit("sound-selected", {name: 'acoustic-drums', url: audioURL, id: '', user: '', fsLink: '', license: ''});
     }
 }
 </script>

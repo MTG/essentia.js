@@ -55,23 +55,27 @@ const quickhelpContents = {
     "Complex Phase": "Similar to 'Complex' but considers only phase changes, weighted by magnitude. Good for tonal sounds such as bowed string, but tends to over-detect percussive events.",
     none: "Hover over any of the controls for more info."
 };
+const odfsNames = ['hfc', 'complex', 'flux', 'complex_phase'];
 
 export default {
     components: { ExpSlider, LinearSlider, ProportionSlider },
+    props: {
+        init: Object
+    },
     data () {
         return {
-            frameSize: 1024,
-            hopSizePercentage: 50,
+            frameSize: this.init.frameSize,
+            hopSizePercentage: this.init.hopSize * 100 / this.init.frameSize,
             odfs: {
                 on: {
-                    names: ["hfc", "complex"],
-                    values: [0.5, 0.5]
+                    names: this.init.odfs,
+                    values: this.init.odfsWeights
                 },
                 off: {
-                    names: ["flux", "complex_phase"]
+                    names: odfsNames.filter( odf => !this.init.odfs.includes(odf) )
                 }
             },
-            sensitivity: 0.3,
+            sensitivity: this.init.sensitivity,
             paramsChanged: false,
             currentlyHovered: "none"
         }
