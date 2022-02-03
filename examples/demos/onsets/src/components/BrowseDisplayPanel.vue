@@ -33,7 +33,8 @@
         <b-alert id="search-failure" show dismissible v-show="showSearchFailureBanner" @dismissed="showSearchFailureBanner = false; searchTerm=''">
             Sorry, Freesound search failed. Try another search term or sound ID, or upload your own sound instead.
         </b-alert>
-        <freesound-results :class="[{ 'd-flex': showFreesoundResults }, { 'd-none': !showFreesoundResults }]"></freesound-results>
+        <freesound-result-list v-if="showFreesoundResults" :class="[{ 'd-flex': showFreesoundResults }, { 'd-none': !showFreesoundResults }]"
+        :sounds="freesoundResults"></freesound-result-list>
         <audio-display v-show="!showFreesoundResults"></audio-display>
     </section>
 </template>
@@ -41,15 +42,16 @@
 <script>
 import EventBus from '../core/event-bus';
 import AudioDisplay from './AudioDisplay.vue';
-import FreesoundResults from './FreesoundResults.vue';
+import FreesoundResultList from './FreesoundResultList.vue';
 import freesound from 'freesound';
 import apiKey from '../.env/key';
 
 export default {
-    components: { AudioDisplay, FreesoundResults },
+    components: { AudioDisplay, FreesoundResultList },
     data () {
         return {
             showFreesoundResults: false,
+            freesoundResults: [],
             searchTerm: "",
             uploadLabel: null,
             showSearchFailureBanner: false,
@@ -57,7 +59,8 @@ export default {
         }
     },
     methods: {
-        searchFreesound () {
+        searchFreesound (ev) {
+            this.$root.$emit('bv::hide::tooltip');
             const isSearchById = /#\d+$/.test(this.searchTerm); // match regex for #<id_number>
             if (isSearchById) {
                 freesound.getSound(this.searchTerm.split('#').pop(), this.handleSearchSuccess, this.handleSearchFailure);
@@ -97,7 +100,8 @@ export default {
         handleSearchSuccess (sound) {
             // guard: sound collection or single sound?
             if (sound.results == undefined && 'id' in sound) { // deal with it as single sound (id search)
-                EventBus.$emit("successful-fs-search", [sound]);
+                // EventBus.$emit("successful-fs-search", [sound]);
+                this.freesoundResults = [sound];
                 this.showFreesoundResults = true;
                 return;
             }
@@ -106,7 +110,8 @@ export default {
                 this.showNoResultsFoundBanner = true;
                 return;
             }
-            EventBus.$emit("successful-fs-search", sound.results);
+            this.freesoundResults = sound.results;
+            // EventBus.$emit("successful-fs-search", sound.results);
             this.showFreesoundResults = true;
         },
         handleSearchFailure (error) {

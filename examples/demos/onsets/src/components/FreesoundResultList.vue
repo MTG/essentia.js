@@ -1,9 +1,8 @@
 <template>
-    <b-form-radio-group v-model="selected" class="row rounded border-0 bg-light py-1 w-100 mx-0"> 
-        <div class="col-sm px-0 w-100" v-for="col, colIdx in soundColumns" :key="colIdx">
+    <b-form-radio-group class="row rounded border-0 bg-light w-100 mx-0"> 
+        <div class="col-sm w-100 me-auto" v-for="col, colIdx in soundColumns" :key="colIdx">
             <li v-for="sound, sndIdx in col" :key="sndIdx" class="mx-auto">
-                <iframe frameborder="0" scrolling="no" :src="freesoundEmbedURL(sound.id)" width="375" height="25"></iframe>
-                <b-form-radio class="select-radio" @change="handleSelect(sound)"></b-form-radio>
+                <freesound-result :checked="selected" @selected="handleSelect(sound)" :soundResource="sound"></freesound-result>
             </li>
         </div>
     </b-form-radio-group>
@@ -11,12 +10,16 @@
 
 <script>
 import EventBus from '../core/event-bus';
+import FreesoundResult from './FreesoundResult.vue';
 
 export default {
+    components: {FreesoundResult},
+    props: {
+        sounds: Array
+    },
     data () {
         return {
-            sounds: [],
-            selected: "",
+            selected: -1,
             cols: 2
         }
     },
@@ -34,10 +37,10 @@ export default {
         freesoundEmbedURL (soundId) {
             return `https://freesound.org/embed/sound/iframe/${soundId}/simple/small/`;
         },
-        populateList (sounds) {
-            this.sounds = sounds;
-        },
         handleSelect (sound) {
+            this.selected = sound.id;
+        },
+        confirmChoice () {
             let selectedAudioURL = sound.previews["preview-hq-mp3"];
             EventBus.$emit("sound-selected", 
                 {
@@ -51,20 +54,22 @@ export default {
             );
             this.selected = "";
         }
-    },
-    created () {
-        EventBus.$on("successful-fs-search", this.populateList);
     }
 }
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import '../assets/styles/globals.scss';
+
     li {
         list-style: none;
     }
 
     .select-radio {
-        display: inline;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
     }
 </style>
