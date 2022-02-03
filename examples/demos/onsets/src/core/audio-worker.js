@@ -37,10 +37,7 @@ onmessage = function listenToMainThread(msg) {
             log('received analyse cmd')
             // const signal = new Float32Array(msg.data.audio);
             self.signal = msg.data.audio;
-
-            if (self.fftRecomputeNeeded) {
-                computeFFT()
-            }
+            computeFFT();
             self.onsetPositions = computeOnsets();
 
             postMessage(self.onsetPositions);
