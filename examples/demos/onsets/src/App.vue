@@ -115,6 +115,7 @@ export default {
   main {
     height: 100vh;
     width: 100vw;
+    overflow: scroll;
   }
   #middle-screen {
     flex-grow: 1;
