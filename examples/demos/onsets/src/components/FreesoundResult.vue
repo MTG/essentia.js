@@ -13,11 +13,11 @@
 			</div>
 			<div id="playbar-container">
 				<b-form-input type="range" id="playbar" :max="seekMax" 
-				v-model="playbackPosition" size="sm" step="any" @change="handleSeek"></b-form-input>
+				v-model="playbackPosition" size="sm" step="any" @change="handleSeek" @input="handleSeek"></b-form-input>
 			</div>
 		</div>
 		<span class="not-stretchy" id="select-container">
-			<b-form-checkbox v-model="selected" size="sm"></b-form-checkbox>
+			<b-form-radio :value="soundResource.id" v-model="selected" size="sm"></b-form-radio>
 		</span>
 	</div>
 </template>
@@ -28,12 +28,11 @@ export default {
     emits: ['selected'],
     props: {
         soundResource: Object,
-		checked: Number
     },
     data () {
         return {
             playing: false,
-            selected: false,
+            selected: -1,
 			audio: null,
 			seekMax: 100,
 			playbackPosition: 0
@@ -41,7 +40,7 @@ export default {
     },
     watch: {
         selected (isSelected) {
-            if (isSelected) this.$emit('selected');
+            if (isSelected == this.soundResource.id) this.$emit('selected');
         },
 		soundResource () {
 			if (this.audio) {
@@ -50,11 +49,6 @@ export default {
 				this.playbackPosition = 0;
 			}
 			this.setupAudioElement();
-		},
-		checked (id) {
-			if (id != this.soundResource.id) {
-				this.selected = false;
-			}
 		}
     },
 	created () {
@@ -62,18 +56,11 @@ export default {
 	},
 	methods: {
 		handlePlay () {
-			const whilePlaying = () => {
-				this.playbackPosition = this.audio.currentTime;
-				this.rAF = requestAnimationFrame(whilePlaying)
-			};
-
 			if (this.playing) {
 				this.stopAudio();
 				return;
 			}
-			this.audio.play();
-			requestAnimationFrame(whilePlaying);
-			this.playing = true;
+			this.playAudio();
 		},
 		setupAudioElement () {
 			this.audio = document.createElement('audio');
@@ -91,10 +78,19 @@ export default {
 		handleSeek (pos) {
 			this.audio.currentTime = Number(pos);
 		},
+		playAudio () {
+			this.audio.play();
+			requestAnimationFrame(this.whilePlaying.bind(this));
+			this.playing = true;
+		},
 		stopAudio () {
 			this.audio.pause();
 			cancelAnimationFrame(this.rAF)
 			this.playing = false;
+		},
+		whilePlaying () {
+			this.playbackPosition = this.audio.currentTime;
+			this.rAF = requestAnimationFrame(this.whilePlaying.bind(this))
 		}
 	}
 }

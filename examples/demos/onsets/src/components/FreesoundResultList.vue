@@ -1,11 +1,16 @@
 <template>
-    <b-form-radio-group class="row rounded border-0 bg-light w-100 mx-0"> 
-        <div class="col-sm w-100 me-auto" v-for="col, colIdx in soundColumns" :key="colIdx">
-            <li v-for="sound, sndIdx in col" :key="sndIdx" class="mx-auto">
-                <freesound-result :checked="selected" @selected="handleSelect(sound)" :soundResource="sound"></freesound-result>
-            </li>
+    <div class="d-flex flex-column rounded border-0 bg-light mb-4">
+        <b-form-radio-group class="row w-100 mx-0"> 
+            <div class="col-sm w-100 me-auto" v-for="col, colIdx in soundColumns" :key="colIdx">
+                <li v-for="sound, sndIdx in col" :key="sndIdx" class="mx-auto">
+                    <freesound-result @selected="handleSelect(sound)" :soundResource="sound"></freesound-result>
+                </li>
+            </div>
+        </b-form-radio-group>
+        <div>
+            <b-button block class="mt-2" variant="outline-primary" @click="confirmChoice" v-show="selected != -1">Load "{{selectedSoundName}}"</b-button>
         </div>
-    </b-form-radio-group>
+    </div>
 </template>
 
 <script>
@@ -31,6 +36,13 @@ export default {
                 columns.push(this.sounds.slice(col * mid, col * mid + mid));
             }
             return columns;
+        },
+        soundData () {
+            return Object.fromEntries( this.sounds.map( s => [s.id, s] ));
+        },
+        selectedSoundName () {
+            if (this.selected == -1) return '';
+            return this.soundData[this.selected].name;
         }
     },
     methods: {
@@ -38,9 +50,11 @@ export default {
             return `https://freesound.org/embed/sound/iframe/${soundId}/simple/small/`;
         },
         handleSelect (sound) {
+            console.log('select event received from: ', sound.name);
             this.selected = sound.id;
         },
         confirmChoice () {
+            const sound = this.soundData[this.selected];
             let selectedAudioURL = sound.previews["preview-hq-mp3"];
             EventBus.$emit("sound-selected", 
                 {
@@ -52,7 +66,7 @@ export default {
                     license: sound.license
                 }
             );
-            this.selected = "";
+            this.selected = -1;
         }
     }
 }
