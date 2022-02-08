@@ -5,11 +5,13 @@
 			<b-icon v-show="playing" icon="pause"></b-icon>
 		</b-button>
 		<div id="middle-section">
-			<div id="titleLink">
-				<b-link :href="soundResource.url" target="_blank">
-					{{soundResource.name}}
-					<sup><b-icon icon="box-arrow-up-right"></b-icon></sup>
-				</b-link>
+			<div id="title-container">
+				<div id="titleLink">
+					<b-link :href="soundResource.url" target="_blank">
+						{{soundResource.name}}
+					</b-link>
+				</div>
+				<sup><b-icon icon="box-arrow-up-right"></b-icon></sup>
 			</div>
 			<div id="playbar-container">
 				<b-form-input type="range" id="playbar" :max="seekMax" 
@@ -108,15 +110,23 @@ export default {
 	}
 }
 
-#titleLink {
-	font-size: 0.75rem;
-	min-width: 0;
+#title-container {
+	white-space: nowrap;
+	width: 100%;
+	display: inline-block;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
-#titleLink > a {
+#titleLink {
+	display: inline-block;
+	font-size: 0.75rem;
+	min-width: 0;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	width: 90%;
+	color: $primary;
 }
 
 #middle-section {
