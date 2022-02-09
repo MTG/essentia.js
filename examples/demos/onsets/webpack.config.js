@@ -3,12 +3,22 @@ var webpack = require('webpack');
 var VueLoaderPlugin = require('vue-loader/lib/plugin');
 var WorkerPlugin = require('worker-plugin');
 
+let publicPath = '/';
+switch (process.env.NODE_ENV) {
+  case 'development':
+    publicPath = '/';
+    break;
+  case 'production':
+    publicPath = '/essentia.js/examples/demos/onsets/public/';
+    break;
+}
+
 module.exports = {
   entry: ['babel-polyfill', './src/main.js'],
   output: {
     // use "public" since "dist" and "builds" are excluded by toplevel .gitignore
     path: path.resolve(__dirname, './public'),
-    publicPath: '/essentia.js/examples/demos/onsets/public/',
+    publicPath: publicPath,
     filename: 'build.js'
   },
   target: 'web',

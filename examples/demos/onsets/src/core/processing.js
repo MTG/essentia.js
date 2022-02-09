@@ -1,24 +1,16 @@
 import EventBus from "./event-bus";
 import JSZip from "jszip";
 import audioEncoder from "audio-encoder";
+import freesound from 'freesound';
 
 /* 
     "Signal Processing Unit" for audio-only purposes (no views)
     Connects to EventBus for responding to global events
 */
-function getMimeTypeFromExtension (ext) {
-    return {
-        'mp3': 'audio/mpeg',
-        'wav': 'audio/wav',
-        'ogg': 'audio/ogg',
-        'm4a': 'audio/aac',
-        'weba': 'audio/webm'
-    }[ext]
-}
 
 export default class DSP {
     constructor () {
-        this.audioCtx = new (AudioContext || webkitAudioContext)();
+        this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         // create audio worker, set up comms
         this.audioWorker = new Worker("./audio-worker.js", {type: "module"});
         this.audioWorker.postMessage({
@@ -26,29 +18,38 @@ export default class DSP {
             params: {sampleRate: this.audioCtx.sampleRate}
         });
         this.audioWorker.onmessage = (msg) => {
-            if (msg.data instanceof Float32Array) {
-                if (msg.data.length == 0) {
-                    EventBus.$emit("analysis-finished-empty");
-                } else {
-                    EventBus.$emit("analysis-finished-onsets", Array.from(msg.data));
-                }
-            } else if (msg.data instanceof Array && msg.data[0] instanceof Float32Array) {
-                console.info('worker returned sliced audio', msg.data);
-                this.downloadSlicesAsZip(msg.data);
+            if (msg.data.onsets.length == 0) {
+                EventBus.$emit("analysis-finished-empty");
             } else {
-                throw TypeError("Worker failed. Analysis results should be of type Float32Array");
+                EventBus.$emit("analysis-finished-onsets", Array.from(msg.data.onsets));
+                this.slices = msg.data.slices;
             }
         };
 
-        this.fileURL = '';
-        this.filename = '';
+        this.soundData = {};
+        this.slices = [];
         this.fileSampleRate = this.audioCtx.sampleRate;
         
         // set up global event handlers
         EventBus.$on("sound-selected", (url) => this.handleSoundSelect(url) );
         EventBus.$on("sound-read", (sound) => this.decodeSoundBlob(sound) );
-        EventBus.$on("algo-params-updated", (parameters) => this.updateAlgoParams(parameters) );
-        EventBus.$on("download-slices", this.handleDownload.bind(this));
+        EventBus.$on("algo-params-init", params => {
+            this.audioWorker.postMessage({
+                request: 'initParams',
+                params: params
+            })
+        });
+        EventBus.$on("algo-params-updated", params => {
+            this.audioWorker.postMessage({
+                request: 'updateParams',
+                params: params
+            })
+        });
+        EventBus.$on("download-slices", () => {
+            this.downloadSlicesAsZip(this.slices);
+        });
+
+        window.addEventListener("keydown", this.handleKeyDown.bind(this));
     }
 
     async getAudioFile (url) {
@@ -57,19 +58,31 @@ export default class DSP {
     }
     
     async decodeBuffer (arrayBuffer) {
-        await this.audioCtx.resume();
-        let audioBuffer = await this.audioCtx.decodeAudioData(arrayBuffer);
-        return audioBuffer;
+        return new Promise((resolve, reject) => {
+            this.audioCtx.decodeAudioData(arrayBuffer, resolve, reject);
+        });
     }
     
-    async handleSoundSelect (url) {
-        console.info(this.fileURL);
-        let blob = await this.getAudioFile(url);
-        EventBus.$emit("sound-read", {blob: blob, url: url});
+    async handleSoundSelect (data) {
+        if (data.url === '' && data.id) {
+            try {
+                let sound = await freesoundGetById(data.id);
+                data.name = sound.name;
+                data.url = sound.previews["preview-hq-mp3"];
+                data.user = sound.username;
+                data.fsLink = sound.url;
+                data.license = sound.license;
+            } catch (err) {
+                EventBus.$emit('fs-search-failed', err);
+                return;
+            }
+        }
+        let blob = await this.getAudioFile(data.url);
+        EventBus.$emit("sound-read", {blob: blob, ...data});
     }
-
+    
     async decodeSoundBlob (sound) {
-        this.fileURL = sound.url;
+        this.soundData = sound;
         let buffer = await sound.blob.arrayBuffer();
         let audioBuffer = await this.decodeBuffer(buffer);
         this.fileSampleRate = audioBuffer.sampleRate;
@@ -81,25 +94,7 @@ export default class DSP {
         });
     }
 
-    updateAlgoParams (params) {
-        this.audioWorker.postMessage({
-            request: 'updateParams',
-            params: params
-        })
-    }
-
-    handleDownload () {
-        this.audioWorker.postMessage({
-            request: 'slice'
-        })
-    }
-
     async encodeSlices (slicesArray) {
-        const filenameItems = this.fileURL.split('/').slice(-1)[0].split('.');
-        const filename = filenameItems.slice(0, -1)[0];
-        // const extension = filenameItems.slice(-1)[0];
-        this.filename = filename;
-
         let resampledSlices = [];
     
         for (let i = 0; i < slicesArray.length; i++) {
@@ -110,16 +105,14 @@ export default class DSP {
             resampledSlices.push(resampledBuffer);
         }
 
-        console.log({resampledSlices});
-
-        let blobPromises = resampledSlices.map( (sliceBuffer) => {
-            return audioEncoder(sliceBuffer, 'WAV', null);
+        
+        let blobs = resampledSlices.map( (sliceBuffer) => {
+            return audioEncoder(sliceBuffer, 'WAV', null, null);
         });
-        let blobs = await Promise.all(blobPromises);
 
         let encodedSlices = blobs.map( (b, idx) => {
             return {
-                name: `${filename}-${idx}.wav`,
+                name: `${this.soundData.id}${this.soundData.id ? '_' : ''}${this.soundData.name}_${idx}.wav`,
                 blob: b
             }
         });
@@ -128,10 +121,14 @@ export default class DSP {
     }
 
     async downloadSlicesAsZip (slicesArray) {
+        const downloadName = `onset-slices_${this.soundData.id}${this.soundData.id ? '_' : ''}${this.soundData.name}`;
         const slices = await this.encodeSlices(slicesArray);
         let zip = new JSZip();
+        if (this.soundData.license) {
+            zip.folder(downloadName).file('LICENSE.md', `File name: ${this.soundData.name}\nby Freesound user: ${this.soundData.user}\nLicensed with ${this.soundData.license}`);
+        }
         slices.forEach( (s) => {
-            zip.file(s.name, s.blob, {
+            zip.folder(downloadName).file(s.name, s.blob, {
                 compression: 'STORE' // no compression
             })
         });
@@ -139,10 +136,9 @@ export default class DSP {
         zip.generateAsync({type: 'blob', compression: 'STORE'})
         .then( zipBlob => {
             const zipURL = URL.createObjectURL(zipBlob);
-            const downloadName = `onset-slices_${this.filename}.zip`;
             const link = document.createElement('a');
             link.setAttribute('href', zipURL );
-            link.setAttribute('download', downloadName);
+            link.setAttribute('download', downloadName+'.zip');
             console.info('download link', link);
             link.click();
             URL.revokeObjectURL(zipURL);
@@ -162,5 +158,41 @@ export default class DSP {
         offlineSource.start();
         let resampled = await offlineCtx.startRendering();
         return resampled;
-    } 
+    }
+
+    handleKeyDown (event) {
+        if (this.slices.length == 0) return;
+
+        let pressedKeyAsNum = Number(event.key);
+        if ( Number.isNaN(pressedKeyAsNum) || event.key == ' ' ) return;
+        pressedKeyAsNum = pressedKeyAsNum == 0 ? 9 : pressedKeyAsNum - 1;
+        if ( !this.slices[pressedKeyAsNum] ) return;
+        
+        const slice = this.slices[pressedKeyAsNum];
+        this.playSlice(slice);
+    }
+    
+    playSlice (slice) {
+        if (this.audioCtx.state == 'suspended') this.audioCtx.resume();
+    
+        const buffer = this.audioCtx.createBuffer(1, slice.length, this.audioCtx.sampleRate);
+        // buffer.copyToChannel(slice, 0, 0);
+        const data = buffer.getChannelData(0);
+        for (let i=0; i < slice.length; i++) {
+            data[i] = slice[i];
+        }
+        const source = this.audioCtx.createBufferSource();
+        source.buffer = buffer;
+    
+        source.connect(this.audioCtx.destination);
+        source.start(this.audioCtx.currentTime);
+    }
+}
+
+async function freesoundGetById (id) {
+    return new Promise((res, rej) => {
+        freesound.getSound(id, sound => {
+            res(sound)
+        }, rej)
+    })
 }

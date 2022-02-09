@@ -3,7 +3,7 @@
         <div id="audio-search-upload" class="my-2 mx-0 row justify-content-between">
             <div class="px-0 col-5">
                 <b-input-group>
-                    <b-form-input v-model="searchTerm" placeholder="Search Freesound.org" @change="searchFreesound" 
+                    <b-form-input v-model="searchTerm" placeholder="Search Freesound.org" @input="window.addEventListener('keydown', searchOnEnter)"
                     v-b-tooltip.focus.bottom title="Prepend a number with # to search by Freesound ID"></b-form-input>
                     <b-input-group-append>
                         <b-button variant="light" class="px-4" @click="searchFreesound">
@@ -31,33 +31,41 @@
             Sorry, no results were found for "{{searchTerm}}" on Freesound. Try something different or upload your own.
         </b-alert>
         <b-alert id="search-failure" show dismissible v-show="showSearchFailureBanner" @dismissed="showSearchFailureBanner = false; searchTerm=''">
-            Sorry, Freesound search is currently not available. Try uploading a sound instead.
+            Sorry, Freesound search failed. Try another search term or sound ID, or upload your own sound instead.
         </b-alert>
-        <freesound-results :class="[{ 'd-flex': showFreesoundResults }, { 'd-none': !showFreesoundResults }]"></freesound-results>
+        <freesound-result-list v-if="showFreesoundResults" :class="[{ 'd-flex': showFreesoundResults }, { 'd-none': !showFreesoundResults }]"
+        :sounds="freesoundResults"></freesound-result-list>
         <audio-display v-show="!showFreesoundResults"></audio-display>
+        <b-alert id="use-num-keys" show dismissible>
+            🎹 Use number keys 0 - 9 to play with the first 10 slices!
+        </b-alert>
     </section>
 </template>
 
 <script>
 import EventBus from '../core/event-bus';
 import AudioDisplay from './AudioDisplay.vue';
-import FreesoundResults from './FreesoundResults.vue';
+import FreesoundResultList from './FreesoundResultList.vue';
 import freesound from 'freesound';
 import apiKey from '../.env/key';
 
 export default {
-    components: { AudioDisplay, FreesoundResults },
+    components: { AudioDisplay, FreesoundResultList },
     data () {
         return {
             showFreesoundResults: false,
+            freesoundResults: [],
             searchTerm: "",
             uploadLabel: null,
             showSearchFailureBanner: false,
-            showNoResultsFoundBanner: false
+            showNoResultsFoundBanner: false,
+            window: window
         }
     },
     methods: {
         searchFreesound () {
+            window.removeEventListener('keydown', this.searchOnEnter );
+            this.$root.$emit('bv::hide::tooltip');
             const isSearchById = /#\d+$/.test(this.searchTerm); // match regex for #<id_number>
             if (isSearchById) {
                 freesound.getSound(this.searchTerm.split('#').pop(), this.handleSearchSuccess, this.handleSearchFailure);
@@ -69,7 +77,7 @@ export default {
                 filter: "duration:[1.0 TO 30.0]",
                 sort: "rating_desc",
                 page_size: 10,
-                fields: "id,name,url,previews"
+                fields: "id,name,url,previews,username,license"
             };
             freesound.textSearch(this.searchTerm, searchOptions, this.handleSearchSuccess, this.handleSearchFailure);
         },
@@ -92,12 +100,13 @@ export default {
                 file = event.dataTransfer.files[0];
             }
 
-            EventBus.$emit("sound-read", {blob: file, url: file.name});
+            EventBus.$emit("sound-read", {blob: file, name: file.name.split('.')[0], id: '', user: '', url: '', fsLink: '', license: ''});
         },
         handleSearchSuccess (sound) {
             // guard: sound collection or single sound?
             if (sound.results == undefined && 'id' in sound) { // deal with it as single sound (id search)
-                EventBus.$emit("successful-fs-search", [sound]);
+                // EventBus.$emit("successful-fs-search", [sound]);
+                this.freesoundResults = [sound];
                 this.showFreesoundResults = true;
                 return;
             }
@@ -106,13 +115,19 @@ export default {
                 this.showNoResultsFoundBanner = true;
                 return;
             }
-            EventBus.$emit("successful-fs-search", sound.results);
+            this.freesoundResults = sound.results;
+            // EventBus.$emit("successful-fs-search", sound.results);
             this.showFreesoundResults = true;
         },
         handleSearchFailure (error) {
             this.showFreesoundResults = false;
             this.showSearchFailureBanner = true;
             console.error("Freesound search failed", error);
+        },
+        searchOnEnter (event) {
+            if (event.key == 'Enter') {
+                this.searchFreesound();
+            }
         }
     },
     created () {
@@ -124,6 +139,8 @@ export default {
             this.showFreesoundResults = false;
             this.searchTerm = "";
         })
+
+        EventBus.$on('fs-search-failed', err => this.handleSearchFailure(err));
     },
     mounted () {
         this.uploadLabel = document.querySelector("#file-upload-label");

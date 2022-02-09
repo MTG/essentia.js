@@ -1,6 +1,6 @@
 <template>
-    <div style="height: 50%;">
-        <div class="h-100 w-100 d-flex mb-2 rounded-lg" id="multislider" ref="TagSliderRef">
+    <div style="height: 6em;" id="multislider-container">
+        <div class="h-100 w-100 d-flex mb-2 rounded-lg flex-grow-1" id="multislider" ref="TagSliderRef">
             <proportion-tag 
             v-for="(tag, index) in tagsOn" :key="index" 
             :name="tag.name" 
@@ -10,7 +10,6 @@
             @slider-select-on="onSliderSelect($event, index)"
             @slider-select-off="showTagPercentage=false"
             @tag-clicked="removeTag"
-            class="flex-grow-1"
             @pointerenter="(name) => $emit('pointerenter', name)"
             @pointerleave="$emit('pointerleave')">
             </proportion-tag>
