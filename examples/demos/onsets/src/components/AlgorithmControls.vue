@@ -26,7 +26,7 @@
                 @pointerleave="currentlyHovered='none'"></proportion-slider>
             </div>
             <div class="col-3 py-2">
-                <b-card id="info-panel" class="h-100 text-secondary" :sub-title="quickHelpTitle" body-class="small">
+                <b-card id="info-panel" class="h-100 text-secondary" :sub-title="quickHelpTitle">
                     <b-card-text>{{quickHelpText}}</b-card-text>
                 </b-card>
             </div>
@@ -45,14 +45,14 @@ import ProportionSlider from "./ProportionSlider.vue";
 import EventBus from "../core/event-bus";
 
 const quickhelpContents = {
-    "frame-size": "Size of the audio frames used for analysis. A bigger frame will have greater frequency resolution, but poorer temporal resolution, and viceversa.",
-    "hop-size": "Rate at which audio is cut in frames for analysis. Given as a percentage of the frame size. At 100% there's no overlap between consecutive frames. Lower values mean higher frame rate, thus greater temporal resolution.",
-    sensitivity: "Regulates the threshold for onset detection. Higher values tend to produce more false positives. Increase it if you know that your chosen audio has onsets but none are being displayed.",
-    odf: "Four functions are available to use as the basis for onset detection. They can be combined and be given different ratios such that some have a greater effect than others. At least one has to be selected.",
-    HFC: "This function computes the high frequency content (HFC) of an audio spectrum. Particularly good for percussive events. ",
-    Complex: "Detects changes in magnitude and phase. Emphasizes significant energy changes in the magnitude spectrum and/or deviation from the expected values in the phase spectrum, caused by changes in pitch.",
-    Flux: "Characterizes changes in magnitude as the Euclidean distance of the difference between consecutive magnitude spectrum frames.",
-    "Complex Phase": "Similar to 'Complex' but considers only phase changes, weighted by magnitude. Good for tonal sounds such as bowed string, but tends to over-detect percussive events.",
+    "frame-size": "Size of audio chunks for analysis. Controls frequency resolution. Increase this when using the 'Complex' or 'Complex Phase' detection functions and a pitched sound.",
+    "hop-size": "Audio analysis frame rate, given as a percentage of the frame size. Lower values result in increased temporal resolution, but longer analysis time.",
+    sensitivity: "Regulates the threshold for onset detection. Higher values tend to produce more false positives. Increase it if you know that your chosen audio has onsets but few or none are being displayed.",
+    odf: "Four functions are available to use for onset detection. They can be combined and be given different ratios so that some have a greater effect than others on the results. At least one has to be selected.",
+    HFC: "This function computes the High Frequency Content (HFC) of a sound's spectrum. Great for detecting percussive events. ",
+    Complex: "Reacts to deviations in pitch and changes in the frequency components of the sound. Measures spectral differences of both magnitude and phase between frames.",
+    Flux: "Measures how quickly the frequency components of the sound are changing over time. Related to changes in timbre, works well with synthetic or found sound with no clear transients.",
+    "Complex Phase": "Similar to 'Complex' but considers only changes in phase, weighted by magnitude. Good for tonal sounds such as bowed string, but tends to over-detect percussive events.",
     none: "Hover over any of the controls for more info."
 };
 const odfsNames = ['hfc', 'complex', 'flux', 'complex_phase'];
