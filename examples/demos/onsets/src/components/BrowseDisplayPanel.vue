@@ -36,6 +36,9 @@
         <freesound-result-list v-if="showFreesoundResults" :class="[{ 'd-flex': showFreesoundResults }, { 'd-none': !showFreesoundResults }]"
         :sounds="freesoundResults"></freesound-result-list>
         <audio-display v-show="!showFreesoundResults"></audio-display>
+        <b-alert id="use-num-keys" show dismissible>
+            🎹 Use number keys 0 - 9 to play with the first 10 slices!
+        </b-alert>
     </section>
 </template>
 
