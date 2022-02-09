@@ -9,13 +9,13 @@
           <template slot="dismiss">Got it!</template>
         </instructions-modal>
       </div>
-      <main v-show="instructionsClosed" class="d-flex flex-column justify-content-between align-items-center">
+      <main v-show="instructionsClosed" class="d-flex flex-column align-items-center">
         <demos-header></demos-header>
-        <section id="middle-screen" class="d-flex flex-column justify-content-around align-items-center container-fluid">
+        <section id="middle-screen" class="d-flex flex-column align-items-center container-fluid">
           <browse-display></browse-display>
           <algorithm-controls :init="algorithmParameters"></algorithm-controls>
         </section>
-        <demos-footer></demos-footer>
+        <demos-footer class="mt-auto"></demos-footer>
       </main>
   </div>
 </template>
