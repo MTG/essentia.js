@@ -3,7 +3,7 @@
         <div id="audio-search-upload" class="my-2 mx-0 row justify-content-between">
             <div class="px-0 col-5">
                 <b-input-group>
-                    <b-form-input v-model="searchTerm" placeholder="Search Freesound.org" @change="searchFreesound" 
+                    <b-form-input v-model="searchTerm" placeholder="Search Freesound.org" @input="window.addEventListener('keydown', searchOnEnter)"
                     v-b-tooltip.focus.bottom title="Prepend a number with # to search by Freesound ID"></b-form-input>
                     <b-input-group-append>
                         <b-button variant="light" class="px-4" @click="searchFreesound">
@@ -55,11 +55,13 @@ export default {
             searchTerm: "",
             uploadLabel: null,
             showSearchFailureBanner: false,
-            showNoResultsFoundBanner: false
+            showNoResultsFoundBanner: false,
+            window: window
         }
     },
     methods: {
-        searchFreesound (ev) {
+        searchFreesound () {
+            window.removeEventListener('keydown', this.searchOnEnter );
             this.$root.$emit('bv::hide::tooltip');
             const isSearchById = /#\d+$/.test(this.searchTerm); // match regex for #<id_number>
             if (isSearchById) {
@@ -118,6 +120,11 @@ export default {
             this.showFreesoundResults = false;
             this.showSearchFailureBanner = true;
             console.error("Freesound search failed", error);
+        },
+        searchOnEnter (event) {
+            if (event.key == 'Enter') {
+                this.searchFreesound();
+            }
         }
     },
     created () {

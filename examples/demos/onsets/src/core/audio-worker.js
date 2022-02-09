@@ -36,7 +36,6 @@ onmessage = function listenToMainThread(msg) {
             log('received analyse cmd')
             // const signal = new Float32Array(msg.data.audio);
             self.signal = msg.data.audio;
-            log(self.signal);
             computeFFT();
             self.onsetPositions = computeOnsets();
             const slices = sliceAudio();
@@ -164,7 +163,6 @@ function computeOnsets () {
 function sliceAudio () {
     // onsets: seconds to samples
     const onsetSamplePositions = Array.from(self.onsetPositions.map( (pos) => Math.round(pos * self.params.sampleRate) ));
-    log(onsetSamplePositions);
     return onsetSamplePositions.map( (samp, index) => self.signal.slice(samp, onsetSamplePositions[index+1]) );
 }
 
