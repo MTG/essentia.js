@@ -18,7 +18,6 @@ self.essentia = null;
 
 self.allowedParams = ['sampleRate', 'frameSize', 'hopSize', 'odfs', 'odfsWeights', 'sensitivity'];
 self.params = {}; // changing odfs should require changing odfsWeights (at least length), and viceversa
-self.fftRecomputeNeeded = true;
 
 // global storage for slicing
 self.signal = null;
@@ -37,10 +36,15 @@ onmessage = function listenToMainThread(msg) {
             log('received analyse cmd')
             // const signal = new Float32Array(msg.data.audio);
             self.signal = msg.data.audio;
+            log(self.signal);
             computeFFT();
             self.onsetPositions = computeOnsets();
+            const slices = sliceAudio();
 
-            postMessage(self.onsetPositions);
+            postMessage({
+                onsets: self.onsetPositions,
+                slices: slices
+            });
             break;
         }
         case 'initParams': {
@@ -67,18 +71,19 @@ onmessage = function listenToMainThread(msg) {
 
             if (self.polarFrames === null || self.polarFrames.length === 0) {    
                 // file hasn't been uploaded and analysed for 1st time, or it has been cleared
-                self.fftRecomputeNeeded = true;
+                computeFFT();
             }
             if (suppliedParamList.includes('frameSize') || suppliedParamList.includes('hopSize')) {
                 // re-compute FFT analysis if updated params affect it (frame or hop size changed)
-                self.fftRecomputeNeeded = true;
+                computeFFT();
             }
 
-            if (self.fftRecomputeNeeded) {
-                computeFFT()
-            }
             self.onsetPositions = computeOnsets();
-            postMessage(self.onsetPositions);
+            const slices = sliceAudio();
+            postMessage({
+                onsets: self.onsetPositions,
+                slices: slices
+            });
             break;
         }
         case 'slice': {
@@ -130,7 +135,6 @@ function computeFFT () {
 
     frames.delete();
     PolarFFT.shutdown();
-    self.fftRecomputeNeeded = false;
 }
 
 function computeOnsets () {
@@ -160,7 +164,7 @@ function computeOnsets () {
 function sliceAudio () {
     // onsets: seconds to samples
     const onsetSamplePositions = Array.from(self.onsetPositions.map( (pos) => Math.round(pos * self.params.sampleRate) ));
-    // if onsetSamplePositions[index+1] == undefined, we've reached the last onset and slice will extract from samp till the end of the array
+    log(onsetSamplePositions);
     return onsetSamplePositions.map( (samp, index) => self.signal.slice(samp, onsetSamplePositions[index+1]) );
 }
 

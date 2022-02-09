@@ -2,7 +2,6 @@ import EventBus from "./event-bus";
 import JSZip from "jszip";
 import audioEncoder from "audio-encoder";
 import freesound from 'freesound';
-import apiKey from '../.env/key';
 
 /* 
     "Signal Processing Unit" for audio-only purposes (no views)
@@ -19,21 +18,16 @@ export default class DSP {
             params: {sampleRate: this.audioCtx.sampleRate}
         });
         this.audioWorker.onmessage = (msg) => {
-            if (msg.data instanceof Float32Array) {
-                if (msg.data.length == 0) {
-                    EventBus.$emit("analysis-finished-empty");
-                } else {
-                    EventBus.$emit("analysis-finished-onsets", Array.from(msg.data));
-                }
-            } else if (msg.data instanceof Array && msg.data[0] instanceof Float32Array) {
-                console.info('worker returned sliced audio', msg.data);
-                this.downloadSlicesAsZip(msg.data);
+            if (msg.data.onsets.length == 0) {
+                EventBus.$emit("analysis-finished-empty");
             } else {
-                throw TypeError("Worker failed. Analysis results should be of type Float32Array");
+                EventBus.$emit("analysis-finished-onsets", Array.from(msg.data.onsets));
+                this.slices = msg.data.slices;
             }
         };
 
         this.soundData = {};
+        this.slices = [];
         this.fileSampleRate = this.audioCtx.sampleRate;
         
         // set up global event handlers
@@ -52,10 +46,10 @@ export default class DSP {
             })
         });
         EventBus.$on("download-slices", () => {
-            this.audioWorker.postMessage({
-                request: 'slice'
-            })
+            this.downloadSlicesAsZip(this.slices);
         });
+
+        window.addEventListener("keydown", this.handleKeyDown.bind(this));
     }
 
     async getAudioFile (url) {
@@ -163,7 +157,31 @@ export default class DSP {
         offlineSource.start();
         let resampled = await offlineCtx.startRendering();
         return resampled;
-    } 
+    }
+
+    handleKeyDown (event) {
+        if (this.slices.length == 0) return;
+
+        let pressedKeyAsNum = Number(event.key);
+        if ( Number.isNaN(pressedKeyAsNum) || event.key == ' ' ) return;
+        pressedKeyAsNum = pressedKeyAsNum == 0 ? 9 : pressedKeyAsNum - 1;
+        if ( !this.slices[pressedKeyAsNum] ) return;
+        
+        const slice = this.slices[pressedKeyAsNum];
+        this.playSlice(slice);
+    }
+    
+    playSlice (slice) {
+        if (this.audioCtx.state == 'suspended') this.audioCtx.resume();
+    
+        const buffer = this.audioCtx.createBuffer(1, slice.length, this.audioCtx.sampleRate);
+        buffer.copyToChannel(slice, 0, 0);
+        const source = this.audioCtx.createBufferSource();
+        source.buffer = buffer;
+    
+        source.connect(this.audioCtx.destination);
+        source.start(this.audioCtx.currentTime);
+    }
 }
 
 async function freesoundGetById (id) {
