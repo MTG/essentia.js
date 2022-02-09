@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import EventBus from '../core/event-bus';
 
 export default {
     emits: ['selected'],
@@ -55,6 +56,9 @@ export default {
     },
 	created () {
 		this.setupAudioElement();
+		EventBus.$on('sound-selected', () => {
+			this.stopAudio();
+		})
 	},
 	methods: {
 		handlePlay () {
