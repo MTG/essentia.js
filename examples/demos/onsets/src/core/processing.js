@@ -10,7 +10,7 @@ import freesound from 'freesound';
 
 export default class DSP {
     constructor () {
-        this.audioCtx = new (AudioContext || webkitAudioContext)();
+        this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         // create audio worker, set up comms
         this.audioWorker = new Worker("./audio-worker.js", {type: "module"});
         this.audioWorker.postMessage({
@@ -58,8 +58,9 @@ export default class DSP {
     }
     
     async decodeBuffer (arrayBuffer) {
-        let audioBuffer = await this.audioCtx.decodeAudioData(arrayBuffer);
-        return audioBuffer;
+        return new Promise((resolve, reject) => {
+            this.audioCtx.decodeAudioData(arrayBuffer, resolve, reject);
+        });
     }
     
     async handleSoundSelect (data) {
@@ -175,7 +176,11 @@ export default class DSP {
         if (this.audioCtx.state == 'suspended') this.audioCtx.resume();
     
         const buffer = this.audioCtx.createBuffer(1, slice.length, this.audioCtx.sampleRate);
-        buffer.copyToChannel(slice, 0, 0);
+        // buffer.copyToChannel(slice, 0, 0);
+        const data = buffer.getChannelData(0);
+        for (let i=0; i < slice.length; i++) {
+            data[i] = slice[i];
+        }
         const source = this.audioCtx.createBufferSource();
         source.buffer = buffer;
     
