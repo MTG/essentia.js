@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
+src/assets/testSongs
 
 # Editor directories and files
 .vscode/*
