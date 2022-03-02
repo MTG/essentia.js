@@ -27,7 +27,7 @@
 						class="title primary--text"
 						:class="hover ? 'text' : 'text--darken-1'"
 					>
-						Drag'n drop or click to upload file!
+						Drop or click to upload file!
 					</span>
 				</v-row>
 			</v-sheet>
