@@ -8,15 +8,23 @@
 				class="d-flex flex-column"
 			>
         <v-stepper-header elevation="0">
-          <v-stepper-step step="1">Upload files</v-stepper-step>
+          <v-stepper-step 
+            step="1"
+            :complete="step > 1"
+          >Upload files</v-stepper-step>
           <v-divider></v-divider>
-          <v-stepper-step step="2">Audio analysis</v-stepper-step>
+          <v-stepper-step 
+            step="2"
+            :complete="step > 2"
+          >Audio analysis</v-stepper-step>
           <v-divider></v-divider>
           <v-stepper-step step="3">See results</v-stepper-step>
         </v-stepper-header>
         <v-stepper-items class="flex-grow-1">
           <v-stepper-content class="full-height" step="1">
-            <upload-screen></upload-screen>
+            <upload-screen
+              @analyse-tracks="triggerAnalysis"
+            ></upload-screen>
           </v-stepper-content>
           <v-stepper-content class="full-height" step="2">
             <waiting-screen></waiting-screen>
@@ -38,6 +46,8 @@ import ResultsScreen from "./components/ResultsScreen.vue";
 import DemoHeader from "./components/DemoHeader.vue";
 import DemoFooter from "./components/DemoFooter.vue";
 
+import { audioEngine } from './audio/engine.js';
+
 export default {
   components: {
     DemoHeader,
@@ -51,6 +61,16 @@ export default {
       step: 1,
     };
   },
+  methods: {
+    triggerAnalysis (tracks) {
+      this.step = 2;
+      audioEngine.batchProcess(tracks).then( analysis => {
+        console.info('analysis finished: ', analysis);
+        console.info('ready to visualise');
+        this.step = 3;
+      })
+    }
+  }
 };
 </script>
 
