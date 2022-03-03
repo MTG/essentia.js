@@ -43,17 +43,29 @@ function analyse (track) {
     // Cut frames
 	const framesLeftVector = self.essentia.FrameGenerator(track[0], self.frameSize, self.hopSize);
 	const framesRightVector = self.essentia.FrameGenerator(track[1], self.frameSize, self.hopSize);
-
+    const leftLength = framesLeftVector.size();
+    const rightLength = framesRightVector.size();
+    // check in case FrameGenerator produced one vector shorter than the other
+    const shortestVectorSize = leftLength > rightLength ? rightLength : leftLength;
     let spectralProfileFrameWise = [];
 
-	for (let f=0; f<framesLeftVector.size(); f++) {
+	for (let f=0; f < shortestVectorSize; f++) {
         const leftFrame = framesLeftVector.get(f);
         const rightFrame = framesRightVector.get(f);
+        // another check in case the last frame exists for either L/R but not the other
+        if (!rightFrame || !leftFrame) break;
         spectralProfileFrameWise.push(spectralProfile(leftFrame, rightFrame));
 	}
 
+    const loudness = getLoudness(left, right);
+
+    left.delete();
+    right.delete();
+    framesLeftVector.delete();
+    framesRightVector.delete();
+
     return {
-        loudness: getLoudness(left, right),
+        loudness: loudness,
         phaseCorrelation: {
             integrated: phaseCorrelation(track[0], track[1]),
         },
@@ -100,41 +112,16 @@ function phaseCorrelation (L, R) {
 
 function spectralProfile (left, right) {
     let chunkSize = left.size();
-    // if (chunkSize % 2 != 0) {
-    //     chunkSize--;
-    //     frame = frame.slice(0, -1);
-    // }
 
-    // console.info({chunkSize});
-    // const frameVector = self.essentia.arrayToVector(frame);
-    // let monoStart = Date.now();
     const monoMix = self.essentia.MonoMixer(left, right).audio;
-    // console.log(`MonoMix took: ${0.001 * (Date.now() - monoStart)} sec`);
-    // windowing
-    // let windowStart = Date.now();
     const windowed = self.essentia.Windowing(monoMix, true, chunkSize).frame;
-    // console.log(`Windowing took: ${0.001 * (Date.now() - windowStart)} sec`);
     monoMix.delete();
-    // spectrum
-    // let spectrumStart = Date.now();
     const spectrum = self.essentia.Spectrum(windowed, chunkSize).spectrum;
-    // console.log(`Spectrum took: ${0.001 * (Date.now() - spectrumStart)} sec`);
     windowed.delete();
-    // ERBBands
-    // let erbStart = Date.now();
-    // const erbbands = self.essentia.ERBBands(spectrum, 22050, spectrum.size(), 50).bands;
-    // console.log(`ERBBands took: ${0.001 * (Date.now() - erbStart)} sec`);
-
-    // let melStart = Date.now();
-    // const melbands = self.essentia.MelBands(spectrum, 22050, spectrum.size(), 50).bands;
-    // console.log(`MelBands took: ${0.001 * (Date.now() - melStart)} sec`);
-
-    // let barkStart = Date.now();
     const barkbands = self.essentia.BarkBands(spectrum).bands;
-    // console.log(`BarkBands took: ${0.001 * (Date.now() - barkStart)} sec`);
-
     spectrum.delete();
     const bandsArray = self.essentia.vectorToArray(barkbands);
     barkbands.delete();
+    
     return bandsArray;
 }
