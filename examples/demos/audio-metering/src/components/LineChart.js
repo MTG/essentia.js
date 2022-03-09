@@ -9,7 +9,7 @@ export default function LineChart(data, {
   z = () => 1, // given d in data, returns the (categorical) z-value
   title, // given d in data, returns the title text
   defined, // for gaps in data
-  curve = d3.curveLinear, // method of interpolation between points
+  curve = d3.curveBasisOpen, // method of interpolation between points
   marginTop = 20, // top margin, in pixels
   marginRight = 30, // right margin, in pixels
   marginBottom = 30, // bottom margin, in pixels
@@ -31,6 +31,7 @@ export default function LineChart(data, {
   strokeLinejoin, // stroke line join of line
   strokeWidth = 1.5, // stroke width of line
   strokeOpacity, // stroke opacity of line
+	fillColor = "none",
   mixBlendMode = "multiply", // blend mode of lines
   voronoi, // show a Voronoi overlay? (for debugging)
 	svgSelector
@@ -109,7 +110,7 @@ export default function LineChart(data, {
           .text(yLabel));
 
   const path = svg.append("g")
-      .attr("fill", "none")
+      .attr("fill", fillColor)
       .attr("stroke", typeof color === "string" ? color : null)
       .attr("stroke-linecap", strokeLinecap)
       .attr("stroke-linejoin", strokeLinejoin)
@@ -118,9 +119,9 @@ export default function LineChart(data, {
     .selectAll("path")
     .data(d3.group(I, i => Z[i]))
     .join("path")
-      .style("mix-blend-mode", mixBlendMode)
-      .attr("stroke", typeof color === "function" ? ([z]) => color(z) : null)
-      .attr("d", ([, I]) => line(I));
+			.style("mix-blend-mode", mixBlendMode)
+			.attr("stroke", typeof color === "function" ? ([z]) => color(z) : null)
+			.attr("d", ([,I]) => line(I));
 
   const dot = svg.append("g")
       .attr("display", "none");

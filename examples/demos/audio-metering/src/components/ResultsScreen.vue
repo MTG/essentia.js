@@ -19,10 +19,10 @@
 								:shortTerm="track.loudness.shortTerm"
 							></loudness-card>
 						</v-col>
-						<v-col cols="6">
+						<v-col cols="12">
 							<phase-card :data="track.phase"></phase-card>
 						</v-col>
-						<v-col cols="6">
+						<v-col cols="12">
 							<spectral-card :data="track.spectralProfile.integrated"></spectral-card>
 						</v-col>
 					</v-row>
