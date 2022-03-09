@@ -30,7 +30,7 @@
             <waiting-screen></waiting-screen>
           </v-stepper-content>
           <v-stepper-content class="full-height" step="3">
-            <results-screen></results-screen>
+            <results-screen :analysis-data="analysis"></results-screen>
           </v-stepper-content>
         </v-stepper-items>
       </v-stepper>
@@ -47,6 +47,8 @@ import DemoHeader from "./components/DemoHeader.vue";
 import DemoFooter from "./components/DemoFooter.vue";
 
 import { audioEngine } from './audio/engine.js';
+// developing/testing TrackResults.vue
+import exampleTrackAnalysis from '../cypress/integration/exampleAnalysis';
 
 export default {
   components: {
@@ -58,7 +60,8 @@ export default {
   },
   data() {
     return {
-      step: 1,
+      step: 3, // developing/testing TrackResults.vue
+      analysis: exampleTrackAnalysis
     };
   },
   methods: {
@@ -68,6 +71,7 @@ export default {
         console.info('analysis finished: ', analysis);
         console.info('ready to visualise');
         this.step = 3;
+        this.analysis = analysis;
       })
     }
   }
