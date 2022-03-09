@@ -128,10 +128,12 @@ function spectralProfile (left, right) {
     monoMix.delete();
     const spectrum = self.essentia.Spectrum(windowed, chunkSize).spectrum;
     windowed.delete();
-    const barkbands = self.essentia.BarkBands(spectrum).bands;
+    // const barkbands = self.essentia.BarkBands(spectrum).bands;
+    // spectrum.delete();
+    // const bandsArray = self.essentia.vectorToArray(barkbands);
+    // barkbands.delete();
+    const bandsArray = self.essentia.vectorToArray(spectrum);
     spectrum.delete();
-    const bandsArray = self.essentia.vectorToArray(barkbands);
-    barkbands.delete();
     
     return bandsArray;
 }
