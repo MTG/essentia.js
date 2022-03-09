@@ -57,6 +57,16 @@ function analyse (track) {
         spectralProfileFrameWise.push(spectralProfile(leftFrame, rightFrame));
 	}
 
+    let spectralProfileSummary = [];
+
+    for (let b=0; b < spectralProfileFrameWise[0].length; b++) {
+        let binSum = spectralProfileFrameWise.reduce(
+            (sum, currentFrame) => sum + currentFrame[b],
+            0
+        )
+        spectralProfileSummary.push(binSum / spectralProfileFrameWise.length);
+    }
+
     const loudness = getLoudness(left, right);
 
     left.delete();
@@ -70,7 +80,7 @@ function analyse (track) {
             integrated: phaseCorrelation(track[0], track[1]),
         },
         spectralProfile: {
-            momentary: spectralProfileFrameWise
+            integrated: spectralProfileSummary
         }
     }
 }
@@ -80,8 +90,8 @@ function getLoudness (left, right) {
     return {
         integrated: loudnessOut.integratedLoudness,
         range: loudnessOut.loudnessRange,
-        momentary: self.essentia.vectorToArray(loudnessOut.momentaryLoudness),
-        shortTerm: self.essentia.vectorToArray(loudnessOut.shortTermLoudness),
+        momentary: Array.from(self.essentia.vectorToArray(loudnessOut.momentaryLoudness)),
+        shortTerm: Array.from(self.essentia.vectorToArray(loudnessOut.shortTermLoudness)),
     }
 }
 
