@@ -68,7 +68,7 @@ export default {
     triggerAnalysis (tracks) {
       this.step = 2;
       audioEngine.batchProcess(tracks).then( analysis => {
-        console.info('analysis finished: ', analysis);
+        console.info('analysis finished');
         console.info('ready to visualise');
         this.step = 3;
         this.analysis = analysis;
@@ -76,6 +76,16 @@ export default {
     }
   }
 };
+
+function download(obj) {
+  let a = document.createElement('a');
+  let b = new Blob([JSON.stringify(obj)], {type: 'application/json'});
+  console.log(b);
+  let url = URL.createObjectURL(b);
+  a.setAttribute('href', url);
+  a.setAttribute('download', 'right');
+  a.click();
+}
 </script>
 
 <style scoped>

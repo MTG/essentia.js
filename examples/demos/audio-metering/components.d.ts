@@ -24,6 +24,7 @@ declare module 'vue' {
     VCardActions: typeof import('vuetify/lib')['VCardActions']
     VCardText: typeof import('vuetify/lib')['VCardText']
     VCardTitle: typeof import('vuetify/lib')['VCardTitle']
+    VCartText: typeof import('vuetify/lib')['VCartText']
     VCol: typeof import('vuetify/lib')['VCol']
     VContainer: typeof import('vuetify/lib')['VContainer']
     VContent: typeof import('vuetify/lib')['VContent']
