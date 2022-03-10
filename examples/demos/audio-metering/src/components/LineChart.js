@@ -9,7 +9,7 @@ export default function LineChart(data, {
   z = () => 1, // given d in data, returns the (categorical) z-value
   title, // given d in data, returns the title text
   defined, // for gaps in data
-  curve = d3.curveBasisOpen, // method of interpolation between points
+  curve = d3.curveMonotoneX, // method of interpolation between points
   marginTop = 20, // top margin, in pixels
   marginRight = 30, // right margin, in pixels
   marginBottom = 30, // bottom margin, in pixels
@@ -20,6 +20,7 @@ export default function LineChart(data, {
   xDomain, // [xmin, xmax]
   xRange = [marginLeft, width - marginRight], // [left, right]
 	xFormat,
+	xLabel, // a label for the x-axis
   yType = d3.scaleLinear, // type of y-scale
   yDomain, // [ymin, ymax]
   yRange = [height - marginBottom, marginTop], // [bottom, top]
@@ -93,7 +94,13 @@ export default function LineChart(data, {
 
   svg.append("g")
       .attr("transform", `translate(0,${height - marginBottom})`)
-      .call(xAxis);
+      .call(xAxis)
+			.call(g => g.append("text")
+          .attr("x", width)
+          .attr("y", marginBottom)
+          .attr("fill", "currentColor")
+          .attr("text-anchor", "end")
+          .text(xLabel));
 
   svg.append("g")
       .attr("transform", `translate(${marginLeft},0)`)

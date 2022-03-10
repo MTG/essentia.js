@@ -2,7 +2,9 @@
   <v-card elevation="0" color="secondary lighten-3">
     <v-card-title>Spectral profile</v-card-title>
 
-    <svg id="spectral-chart"></svg>
+    <v-card-text>
+      <svg id="spectral-chart"></svg>
+    </v-card-text>
   </v-card>
 </template>
 
@@ -27,9 +29,9 @@ export default {
     formattedData () {
       return this.data.map( (mag, bin) => {
         return {
-          bin: bin,
+          freq: binToFreq(bin, this.data.length * 2),
           magnitude: mag,
-          type: 'bark-bands'
+          type: ''
         }
       })
     }
@@ -37,13 +39,14 @@ export default {
   mounted () {
 		this.chart = new LineChart(this.formattedData.slice(1), {
 			svgSelector: '#spectral-chart',
-			x: d => binToFreq(d.bin, this.formattedData.length * 2),
+			x: d => d.freq,
 			y: d => d.magnitude,
       z: d => d.type,
       xType: d3.scaleLog,
+      xLabel: "Hz",
       // xDomain: [1, 27000],
 			color: '#E4454A',
-			yLabel: 'Power Spectrum',
+			yLabel: 'Energy',
       fillColor: '#e4454a44'
 		})
   }

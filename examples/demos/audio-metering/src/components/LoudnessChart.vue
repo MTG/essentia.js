@@ -1,7 +1,9 @@
 <template>
-	<div id="chart-wrapper">
+	<v-card-text>
+  <!-- <div class="pa-1"> -->
 		<svg id="loudness-chart"></svg>
-	</div>
+  <!-- </div> -->
+	</v-card-text>
 </template>
 
 <script>
@@ -26,6 +28,7 @@ export default {
 			},
 			xFormat: '%M:%S',
 			xType: d3.scaleTime,
+			xLabel: 'Time (min:sec)',
 			yLabel: 'dB',
 			yDomain: [d3.min(d3.map(this.data, d => d.dBs)) - 3, 0]
 		})
