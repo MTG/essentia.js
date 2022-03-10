@@ -76,8 +76,8 @@ function analyse (track) {
 
     return {
         loudness: loudness,
-        phaseCorrelation: {
-            integrated: phaseCorrelation(track[0], track[1]),
+        phase: {
+            correlation: phaseCorrelation(track[0], track[1])
         },
         spectralProfile: {
             integrated: spectralProfileSummary

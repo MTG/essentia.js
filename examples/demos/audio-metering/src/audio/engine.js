@@ -20,15 +20,19 @@ class AudioEngine {
     }
 
     async batchProcess (files) {
-        let analysis = {};
+        let analysis = [];
         const start = Date.now();
         const buffers = await this.#batchDecode(files);
         let idx = 0;
         for (const b of buffers) {
             const data = [b.getChannelData(0), b.getChannelData(1)];
             const analysisData = await analyseTrack(data);
-            console.info(`analysed track #${idx}:`, analysisData);
-            analysis[files[idx].name] = analysisData;
+            console.info(`analysed track #${idx}:`);
+            analysisData.name = files[idx].name;
+            analysisData.phase.channelData = Array.from(data[0]).map( (samp, pos) => {
+                return [samp, data[1][pos]];
+            });
+            analysis.push(analysisData);
             idx++;
         }
 
