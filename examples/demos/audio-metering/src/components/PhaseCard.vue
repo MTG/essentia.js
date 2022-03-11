@@ -3,7 +3,7 @@
 		<v-card-title>Phase Correlation</v-card-title>
 
 		<v-card-text>
-			<svg id="phase-goniometer"></svg>
+			<!-- <svg id="phase-goniometer"></svg> -->
 		</v-card-text>
 	</v-card>
 </template>
@@ -18,14 +18,14 @@ export default {
 			chart: null
 		}
 	},
-	mounted () {
-		this.chart = new LissajousChart(this.data.channelData, {
-			svgSelector: '#phase-goniometer',
-			color: '#e4454a44',
-			xDomain: [-1, 1],
-			yDomain: [-1, 1]
-		})
-	}
+	// mounted () {
+	// 	this.chart = new LissajousChart(this.data.channelData, {
+	// 		svgSelector: '#phase-goniometer',
+	// 		color: '#e4454a44',
+	// 		xDomain: [-1, 1],
+	// 		yDomain: [-1, 1]
+	// 	})
+	// }
 }
 </script>
 

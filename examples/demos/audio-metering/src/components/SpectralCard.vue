@@ -3,7 +3,7 @@
     <v-card-title>Spectral profile</v-card-title>
 
     <v-card-text>
-      <svg id="spectral-chart"></svg>
+      <svg :id="chartId"></svg>
     </v-card-text>
   </v-card>
 </template>
@@ -19,7 +19,7 @@ const binToFreq = (bin, fftSize) => {
 }
 
 export default {
-  props: ['data'],
+  props: ['data', 'trackname'],
   data () {
     return {
       chart: null
@@ -34,11 +34,15 @@ export default {
           type: ''
         }
       })
-    }
+    },
+    chartId () {
+			let whitespaceEscapedName = this.trackname.replace(/\s|\.|\d/g, '-');
+			return `${whitespaceEscapedName}-spectral`;
+		}
   },
   mounted () {
 		this.chart = new LineChart(this.formattedData.slice(1), {
-			svgSelector: '#spectral-chart',
+			svgSelector: `#${this.chartId}`,
 			x: d => d.freq,
 			y: d => d.magnitude,
       z: d => d.type,

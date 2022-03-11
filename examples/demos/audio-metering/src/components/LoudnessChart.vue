@@ -1,7 +1,7 @@
 <template>
 	<v-card-text>
   <!-- <div class="pa-1"> -->
-		<svg id="loudness-chart"></svg>
+		<svg :id="chartId"></svg>
   <!-- </div> -->
 	</v-card-text>
 </template>
@@ -11,15 +11,21 @@ import * as d3 from 'd3';
 import LineChart from './LineChart.js';
 
 export default {
-	props: ['data'],
+	props: ['data', 'trackname'],
 	data () {
 		return {
 			chart: null
 		}
 	},
+	computed: {
+		chartId () {
+			let whitespaceEscapedName = this.trackname.replace(/\s|\.|\d/g, '-');
+			return `${whitespaceEscapedName}-loudness`;
+		} 
+	},
 	mounted () {
 		this.chart = new LineChart(this.data, {
-			svgSelector: '#loudness-chart',
+			svgSelector: `#${this.chartId}`,
 			x: d => d3.timeParse('%M:%S:%L')(d.time),
 			y: d => d.dBs,
 			z: d => d.measurement,

@@ -17,7 +17,7 @@
 			</template>
 		</v-simple-table>
 		<v-divider></v-divider>
-		<loudness-chart :data="chartData"></loudness-chart>
+		<loudness-chart :data="chartData" :trackname="trackname"></loudness-chart>
 	</v-card>
 </template>
 
@@ -38,7 +38,8 @@ export default {
 		'integrated': Number,
 		'range': Number,
 		'momentary': Array,
-		'shortTerm': Array
+		'shortTerm': Array,
+		'trackname': String
 	},
 	components: { LoudnessChart },
 	data () {
