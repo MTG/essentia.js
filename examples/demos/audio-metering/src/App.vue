@@ -27,7 +27,7 @@
             ></upload-screen>
           </v-stepper-content>
           <v-stepper-content class="full-height" step="2">
-            <waiting-screen></waiting-screen>
+            <waiting-screen :progress="analysisProgress"></waiting-screen>
           </v-stepper-content>
           <v-stepper-content class="full-height" step="3">
             <results-screen :analysis-data="analysis"></results-screen>
@@ -48,7 +48,7 @@ import DemoFooter from "./components/DemoFooter.vue";
 
 import { audioEngine } from './audio/engine.js';
 // developing/testing TrackResults.vue
-import exampleTrackAnalysis from '../cypress/integration/exampleAnalysis';
+// import exampleTrackAnalysis from '../cypress/integration/exampleAnalysis';
 
 export default {
   components: {
@@ -60,8 +60,9 @@ export default {
   },
   data() {
     return {
-      step: 3, // developing/testing TrackResults.vue
-      analysis: exampleTrackAnalysis
+      step: 1, // developing/testing TrackResults.vue
+      analysis: null, //exampleTrackAnalysis
+      analysisProgress: 0
     };
   },
   methods: {
@@ -74,6 +75,12 @@ export default {
         this.analysis = analysis;
       })
     }
+  },
+  mounted () {
+    audioEngine.addEventListener('progress', (e) => {
+      // console.info('progress event on audioEngine', e);
+      this.analysisProgress = e.detail;
+    })
   }
 };
 

@@ -3,6 +3,15 @@ import analyseTrack from "./analysis";
 class AudioEngine {
     constructor () {
         this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        this.progress = 0;
+        this.domObj = document.createElement('div');
+    }
+
+    addEventListener(listenerName, cb) {
+        this.domObj.addEventListener(listenerName, cb);
+    }
+    dispatchEvent(event) {
+        this.domObj.dispatchEvent(event);
     }
 
     #decodeAudioData (arrayBuffer) {
@@ -28,10 +37,13 @@ class AudioEngine {
             const data = [b.getChannelData(0), b.getChannelData(1)];
             const analysisData = await analyseTrack(data);
             console.info(`analysed track #${idx}:`);
+            this.progress = 100 * (idx + 1) / buffers.length;
+            const progressEvent = new CustomEvent('progress', {detail: this.progress});
+            this.dispatchEvent(progressEvent);
             analysisData.name = files[idx].name;
-            analysisData.phase.channelData = Array.from(data[0]).map( (samp, pos) => {
-                return [samp, data[1][pos]];
-            });
+            // analysisData.phase.channelData = Array.from(data[0]).map( (samp, pos) => {
+            //     return [samp, data[1][pos]];
+            // });
             analysis.push(analysisData);
             idx++;
         }
