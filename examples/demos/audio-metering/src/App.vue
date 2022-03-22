@@ -61,7 +61,7 @@ export default {
   data() {
     return {
       step: 1, // developing/testing TrackResults.vue
-      analysis: null, //exampleTrackAnalysis
+      analysis: null,
       analysisProgress: 0
     };
   },

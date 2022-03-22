@@ -30,7 +30,10 @@
 								></loudness-card>
 							</v-col>
 							<v-col cols="12">
-								<phase-card :data="track.phase"></phase-card>
+								<phase-card 
+									:leftCh="track.phase.channelData[0]"
+									:rightCh="track.phase.channelData[1]"
+								></phase-card>
 							</v-col>
 							<v-col cols="12">
 								<spectral-card :data="track.spectralProfile.integrated" :trackname="track.name"></spectral-card>

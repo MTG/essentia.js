@@ -30,7 +30,7 @@ class AudioEngine {
 
     async batchProcess (files) {
         let analysis = [];
-        const start = Date.now();
+        console.time('tracks-analysis');
         const buffers = await this.#batchDecode(files);
         let idx = 0;
         for (const b of buffers) {
@@ -41,14 +41,12 @@ class AudioEngine {
             const progressEvent = new CustomEvent('progress', {detail: this.progress});
             this.dispatchEvent(progressEvent);
             analysisData.name = files[idx].name;
-            // analysisData.phase.channelData = Array.from(data[0]).map( (samp, pos) => {
-            //     return [samp, data[1][pos]];
-            // });
+            analysisData.phase.channelData = data;
             analysis.push(analysisData);
             idx++;
         }
 
-        console.log(`analysis took ${0.001 * (Date.now() - start)} sec`);
+        console.timeEnd('tracks-analysis');
 
         return analysis;
     }
