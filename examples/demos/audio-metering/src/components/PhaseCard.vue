@@ -15,7 +15,9 @@
 </template>
 
 <script>
-// import paper from 'paper';
+function deg2rad (degrees) {
+	return degrees * Math.PI / 180;
+}
 
 export default {
 	props: {
@@ -25,136 +27,77 @@ export default {
 	},
 	data () {
 		return {
-			chart: null,
 			ctx: null
 		}
 	},
 	mounted () {
 		// drawPhaseGoniometer(this.leftCh, this.rightCh);
 		this.ctx = this.$refs.lissajous.getContext('2d');
-		drawPhaseNative(this.leftCh, this.rightCh, this.ctx);
-	}
-}
+        console.info('drawing phase native');
+        this.drawAxes();
+		this.drawPhase();
+	},
+    methods: {
+        drawPhase () {
+            this.ctx.translate(100, 100);
+            this.ctx.rotate(deg2rad(-135));
+            
+            let pastPoint = null;
+            this.ctx.strokeStyle = '#F50E0003';
+            this.ctx.lineWidth = 2;
+            for (let s = 0; s < this.leftCh.length; s++) {
+                this.ctx.beginPath();
+                if (this.leftCh[s] == undefined || this.rightCh[s] == undefined) {
+                    console.log('reached end, no more points. s:', s);
+                    break;
+                };
+                
+                // + 100 offset is redundant: ctx.translate 
+                // applies to all subsequent objects in ctx
+                const ls = (this.leftCh[s] * 100);
+                const rs = (this.rightCh[s] * 100);
+                let sampPoint = [ls, rs];
+                if (s == 0) {
+                    this.ctx.moveTo(sampPoint[0], sampPoint[1]);
+                    pastPoint = sampPoint.slice();
+                    continue;
+                }
+                this.ctx.moveTo(pastPoint[0], pastPoint[1]);
+                this.ctx.lineTo(sampPoint[0], sampPoint[1]);
+                pastPoint = sampPoint.slice();
+                this.ctx.stroke();
+            }
+        },
+        drawAxes () {
+            const axesColor = '#BBBBBB';
 
-function drawPhaseNative (leftCh, rightCh, ctx) {
-	console.info('drawing phase native');
-	ctx.translate(100, 100);
-	ctx.rotate(deg2rad(-135));
-    
-    let pastPoint = null;
-	ctx.strokeStyle = '#F50E0003';
-	ctx.lineWidth = 2;
-    for (let s = 0; s < leftCh.length; s += 4) {
-		ctx.beginPath();
-        if (leftCh[s] == undefined || rightCh[s] == undefined) {
-            console.log('reached end, no more points. s:', s);
-            break;
-        };
-		
-		// + 100 offset is redundant: ctx.translate 
-		// applies to all subsequent objects in ctx
-        const ls = (leftCh[s] * 100);
-        const rs = (rightCh[s] * 100);
+            this.ctx.strokeStyle = axesColor;
+            this.ctx.lineWidth = 2;
+            this.ctx.fillStyle = axesColor;
+            this.ctx.font = 'bold 12px sans-serif';
 
-        let sampPoint = [ls, rs];
-        // sampPoint = sampPoint.rotate(-135, translationPoint);
-        if (s == 0) {
-            // ctx.moveTo(sampPoint[0], sampPoint[1]);
-            pastPoint = sampPoint.slice();
-            continue;
+            this.ctx.beginPath();
+
+            this.ctx.moveTo(0, 0) // left axis
+            this.ctx.lineTo(200, 200);
+            this.ctx.textAlign = "left";
+            this.ctx.fillText("L", 0, 27);
+            
+            this.ctx.moveTo(0, 200); // right axis
+            this.ctx.lineTo(200, 0);
+            this.ctx.textAlign = "right";
+            this.ctx.fillText("R", 200, 27);
+            
+            this.ctx.moveTo(100, 200); // middle axis
+            this.ctx.lineTo(100, 20);
+            this.ctx.textAlign = "center";
+            this.ctx.fillText("M", 100, 10);
+
+            this.ctx.stroke();
         }
-        // lissajousPath.add(sampPoint);
-		ctx.moveTo(pastPoint[0], pastPoint[1]);
-		ctx.lineTo(sampPoint[0], sampPoint[1]);
-        // const segm = new paper.Path.Line(pastPoint, sampPoint);
-        // segm.strokeColor = "#F50E0003";
-        // segm.closed = true;
-        // segm.smooth();
-		// lissajousPath.add(segm);
-        pastPoint = sampPoint.slice();
-		ctx.stroke();
     }
-	return 0;
 }
 
-function deg2rad (degrees) {
-	return degrees * Math.PI / 180;
-}
-
-function drawPhaseGoniometer (leftCh, rightCh) {
-    const axesColor = '#BBBBBB';
-
-    const axisL = new paper.Path();
-    axisL.strokeColor = axesColor;
-    const leftstart = new paper.Point(0, 0);
-    axisL.moveTo(leftstart);
-    axisL.lineTo(leftstart + [ 200, 200 ]);
-    axisL.closed = true;
-    
-    const axisR = new paper.Path();
-    axisR.strokeColor = axesColor;
-    const rightstart = new paper.Point(0, 200);
-    axisR.moveTo(rightstart);
-    axisR.lineTo(rightstart + [ 200, -200 ]);
-    axisR.closed = true;
-    
-    const axisMid = new paper.Path();
-    axisMid.strokeColor = axesColor;
-    const midstart = new paper.Point(100, 200);
-    axisMid.moveTo(midstart);
-    axisMid.lineTo(midstart + [0, -180]);
-    axisMid.closed = true;
-    
-    const textL = new paper.PointText([0, 27]);
-    textL.fillColor = axesColor;
-    textL.justification = "left";
-    textL.content = "L";
-    
-    const textR = new paper.PointText([200, 27]);
-    textR.fillColor = axesColor;
-    textR.justification = "right";
-    textR.content = "R";
-    
-    const textMid = new paper.PointText([100, 10]);
-    textMid.fillColor = axesColor;
-    textMid.justification = "center";
-    textMid.content = "M";
-    
-    // const axesTranslationVector = new paper.Point([100, 100]);
-    // axesTranslationVector.angle -= 135;
-	const translationPoint = new paper.Point([100, 100]);
-    
-    let pastPoint = null;   
-    const lissajousPath = new paper.Path();
-    // lissajousPath.strokeColor = "#F50E0020";
-    for (let s = 0; s < leftCh.length; s++) {
-        if (leftCh[s] == undefined || rightCh[s] == undefined) {
-            console.log('reached end, no more points. s:', s);
-            break;
-        };
-        const ls = (leftCh[s] * 100) + 100;
-        const rs = (rightCh[s] * 100) + 100;
-
-        let sampPoint = new paper.Point([ls, rs]);
-        sampPoint = sampPoint.rotate(-135, translationPoint);
-        if (s == 0) {
-            lissajousPath.moveTo(sampPoint);
-            pastPoint = sampPoint.clone();
-            continue;
-        }
-        // lissajousPath.add(sampPoint);
-
-        const segm = new paper.Path.Line(pastPoint, sampPoint);
-        segm.strokeColor = "#F50E0003";
-        segm.closed = true;
-        segm.smooth();
-		lissajousPath.add(segm);
-        pastPoint = sampPoint.clone();
-    }
-    lissajousPath.closed = true;
-    lissajousPath.simplify(5);
-	return 0;
-}
 </script>
 
 <style>
