@@ -1,4 +1,4 @@
-import analyseTrack from "./analysis";
+import analyser from "./analysis";
 
 class AudioEngine {
     constructor () {
@@ -35,7 +35,7 @@ class AudioEngine {
         let idx = 0;
         for (const b of buffers) {
             const data = [b.getChannelData(0), b.getChannelData(1)];
-            const analysisData = await analyseTrack(data);
+            const analysisData = await analyser.analyseTrack(data);
             console.info(`analysed track #${idx}:`);
             this.progress = 100 * (idx + 1) / buffers.length;
             const progressEvent = new CustomEvent('progress', {detail: this.progress});
@@ -47,7 +47,7 @@ class AudioEngine {
         }
 
         console.timeEnd('tracks-analysis');
-
+        await analyser.shutdown();
         return analysis;
     }
 }
