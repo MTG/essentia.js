@@ -24,8 +24,9 @@
 <script>
 import LoudnessChart from './LoudnessChart.vue';
 
-const timestampFromFramePosition = (framePos) => {
-	let time = framePos * 0.1; // loudness EBU default hopsize = 0.1
+const timestampFromFramePosition = (framePos, frameSize) => {
+	let time = framePos * 0.1 + frameSize*0.5; // loudness EBU default hopsize = 0.1
+	if (framePos !== 0) time += 1E-15;
 	let minutes = Math.floor(time / 60);
 	let remainder = String(time % 60).split('.');
 	let milliseconds = remainder[1] ? remainder[1].slice(0, 3) : '000';
@@ -46,14 +47,14 @@ export default {
 		let chartData = [];
 		this.momentary.map( (val, i) => {
 			chartData.push({
-				time: timestampFromFramePosition(i),
+				time: timestampFromFramePosition(i, 0.4),
 				dBs: val,
 				measurement: 'momentary'
 			});
 		})
 		this.shortTerm.map( (val, i) => {
 			chartData.push({
-				time: timestampFromFramePosition(i),
+				time: timestampFromFramePosition(i, 3),
 				dBs: val,
 				measurement: 'short-term'
 			});
