@@ -16,6 +16,7 @@
   "devDependencies": {
     "@mdi/font": "^6.5.95",
     "cypress": "^9.5.0",
+    "cypress-watch-and-reload": "^1.7.4",
     "happy-dom": "^2.31.1",
     "sass": "^1.49.8",
     "unplugin-vue-components": "^0.17.21",
