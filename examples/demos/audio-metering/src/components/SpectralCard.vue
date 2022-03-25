@@ -27,10 +27,11 @@ export default {
   },
   computed: {
     formattedData () {
+      const maxMag = Math.max(...this.data);
       return this.data.map( (mag, bin) => {
         return {
           freq: binToFreq(bin, this.data.length * 2),
-          magnitude: mag,
+          magnitude: 20 * Math.log10((mag+Number.EPSILON)/1.0), // bin magnitude in dBFS
           type: ''
         }
       })
@@ -51,6 +52,7 @@ export default {
       // xDomain: [1, 27000],
 			color: '#E4454A',
 			yLabel: 'Energy',
+      yDomain: [d3.min(d3.map(this.formattedData, d => d.magnitude)) - 3, 0],
       fillColor: '#e4454a44'
 		})
   }

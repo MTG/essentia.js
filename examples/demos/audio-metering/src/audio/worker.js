@@ -77,11 +77,15 @@ function analyse (track) {
     let spectralProfileSummary = [];
 
     for (let b=0; b < spectralProfileFrameWise[0].length; b++) {
-        const binSum = spectralProfileFrameWise.reduce(
-            (sum, currentFrame) => sum + currentFrame[b],
-            0
-        )
-        spectralProfileSummary.push(binSum / spectralProfileFrameWise.length);
+        // const binSum = spectralProfileFrameWise.reduce(
+        //     (sum, currentFrame) => sum + currentFrame[b],
+        //     0
+        // )
+        // spectralProfileSummary.push(binSum / spectralProfileFrameWise.length);
+        const binEnergies = spectralProfileFrameWise.map( currentFrame => {
+            return currentFrame[b];
+        });
+        spectralProfileSummary.push(median(binEnergies));
     }
     // console.timeEnd('summary-spectral');
     // console.time('loudness');
@@ -104,13 +108,31 @@ function analyse (track) {
     }
 }
 
+function median(arr){
+    if(arr.length ===0) throw new Error("No inputs");
+  
+    arr.sort( (a,b) => a-b );
+
+    const half = Math.floor(arr.length * 0.5);
+    
+    if (arr.length % 2) return arr[half];
+    
+    return (arr[half - 1] + arr[half]) * 0.5;
+}
+
 function getLoudness (left, right) {
     let loudnessOut = self.essentia.LoudnessEBUR128(left, right);
+    let rmsLeft = self.essentia.RMS(left).rms;
+    let rmsRight = self.essentia.RMS(right).rms;
     return {
         integrated: loudnessOut.integratedLoudness,
         range: loudnessOut.loudnessRange,
         momentary: Array.from(self.essentia.vectorToArray(loudnessOut.momentaryLoudness)),
         shortTerm: Array.from(self.essentia.vectorToArray(loudnessOut.shortTermLoudness)),
+        rms: {
+            left: rmsLeft,
+            right: rmsRight
+        }
     }
 }
 
