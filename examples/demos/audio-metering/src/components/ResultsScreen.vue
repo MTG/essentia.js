@@ -24,6 +24,7 @@
 								<loudness-card
 									:integrated="track.loudness.integrated"
 									:range="track.loudness.range"
+									:rms="track.loudness.rms"
 									:momentary="track.loudness.momentary"
 									:shortTerm="track.loudness.shortTerm"
 									:trackname="track.name"

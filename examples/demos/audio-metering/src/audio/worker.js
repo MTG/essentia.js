@@ -130,8 +130,8 @@ function getLoudness (left, right) {
         momentary: Array.from(self.essentia.vectorToArray(loudnessOut.momentaryLoudness)),
         shortTerm: Array.from(self.essentia.vectorToArray(loudnessOut.shortTermLoudness)),
         rms: {
-            left: rmsLeft,
-            right: rmsRight
+            left: 20*Math.log10(rmsLeft),
+            right: 20*Math.log10(rmsRight)
         }
     }
 }

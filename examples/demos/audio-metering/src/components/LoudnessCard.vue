@@ -1,23 +1,38 @@
 <template>
   <v-card elevation="0" color="secondary lighten-3">
-		<v-card-title>Loudness EBU</v-card-title>
-
-    <v-simple-table class="secondary lighten-3">
+		<v-card-title>Loudness</v-card-title>
+		<v-card-subtitle>EBU R128</v-card-subtitle>
+		<v-simple-table class="secondary lighten-3">
 			<template v-slot:default>
 				<tbody>
 					<tr>
-						<td><b>Integrated</b></td>
-						<td>{{integrated}}</td>
+						<td>Integrated</td>
+						<td>{{integrated.toFixed(3)}} dB</td>
 					</tr>
 					<tr>
-						<td><b>Range</b></td>
-						<td>{{range}}</td>
+						<td>Range</td>
+						<td>{{range.toFixed(3)}} dB</td>
 					</tr>
 				</tbody>
 			</template>
 		</v-simple-table>
 		<v-divider></v-divider>
 		<loudness-chart :data="chartData" :trackname="trackname"></loudness-chart>
+		<v-card-subtitle>RMS</v-card-subtitle>
+		<v-simple-table class="secondary lighten-3">
+			<template v-slot:default>
+				<tbody>
+					<tr>
+						<td>Left channel</td>
+						<td>{{rms.left.toFixed(3)}} dB</td>
+					</tr>
+					<tr>
+						<td>Right channel</td>
+						<td>{{rms.right.toFixed(3)}} dB</td>
+					</tr>
+				</tbody>
+			</template>
+		</v-simple-table>
 	</v-card>
 </template>
 
@@ -38,6 +53,7 @@ export default {
 	props: {
 		'integrated': Number,
 		'range': Number,
+		'rms': Object,
 		'momentary': Array,
 		'shortTerm': Array,
 		'trackname': String
