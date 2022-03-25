@@ -34,6 +34,7 @@
 								<phase-card 
 									:leftCh="track.phase.channelData[0]"
 									:rightCh="track.phase.channelData[1]"
+									:correlation="track.phase.correlation"
 								></phase-card>
 							</v-col>
 							<v-col cols="12">

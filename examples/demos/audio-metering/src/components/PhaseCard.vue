@@ -1,6 +1,7 @@
 <template>
 	<v-card elevation="0" color="secondary lighten-3">
 		<v-card-title>Phase Correlation</v-card-title>
+        <v-card-subtitle>{{correlation.toFixed(3)}}</v-card-subtitle>
 		<v-card-text>
             <div id="canvas-container">
                 <canvas 
