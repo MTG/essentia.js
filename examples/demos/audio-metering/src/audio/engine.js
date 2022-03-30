@@ -3,7 +3,7 @@ import analyser from "./analysis";
 class AudioEngine {
     constructor () {
         this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-        this.progress = 0;
+        this.progress = '';
         this.domObj = document.createElement('div');
     }
 
@@ -32,12 +32,14 @@ class AudioEngine {
         let analysis = [];
         console.time('tracks-analysis');
         const buffers = await this.#batchDecode(files);
+        this.progress = `0/${buffers.length}`;
+        this.dispatchEvent(new CustomEvent('progress', {detail: this.progress}));
         let idx = 0;
         for (const b of buffers) {
             const data = [b.getChannelData(0), b.getChannelData(1)];
             const analysisData = await analyser.analyseTrack(data);
             console.info(`analysed track #${idx}:`);
-            this.progress = 100 * (idx + 1) / buffers.length;
+            this.progress = `${idx + 1}/${buffers.length}`;
             const progressEvent = new CustomEvent('progress', {detail: this.progress});
             this.dispatchEvent(progressEvent);
             analysisData.name = files[idx].name;

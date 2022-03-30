@@ -62,7 +62,7 @@ export default {
     return {
       step: 1, // developing/testing TrackResults.vue
       analysis: null,
-      analysisProgress: 0
+      analysisProgress: ''
     };
   },
   methods: {
