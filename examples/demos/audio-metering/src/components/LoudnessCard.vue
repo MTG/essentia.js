@@ -7,11 +7,11 @@
 				<tbody>
 					<tr>
 						<td>Integrated</td>
-						<td>{{integrated.toFixed(3)}} dB</td>
+						<td>{{integrated.toFixed(3)}} LUFS</td>
 					</tr>
 					<tr>
 						<td>Range</td>
-						<td>{{range.toFixed(3)}} dB</td>
+						<td>{{range.toFixed(3)}} dB LU</td>
 					</tr>
 				</tbody>
 			</template>

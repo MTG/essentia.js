@@ -36,7 +36,8 @@ export default {
 			xType: d3.scaleTime,
 			xLabel: 'Time (min:sec)',
 			yLabel: 'dB',
-			yDomain: [d3.min(d3.map(this.data, d => d.dBs)) - 3, 0]
+			yDomain: [-70, 0],
+			height: 285
 		})
 	}
 }
