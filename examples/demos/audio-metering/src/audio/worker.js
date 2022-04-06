@@ -15,11 +15,11 @@ try {
     self.essentia = new Essentia(EssentiaWASM.EssentiaWASM);
 } catch (err) { error(err) }
 
-self.frameSize = 4096;
-self.hopSize = 2048;
+self.frameSize = 2048;
+self.hopSize = 16384*2;
 
 // COMMS
-onmessage = function leftSampstenToMainThread(msg) {
+onmessage = function listenToMainThread(msg) {
     if (msg.data.shutdown) {
         cleanup();
         self.postMessage({shutdownFinished: true});
@@ -47,55 +47,33 @@ function cleanup () {
 }
 
 // AUDIO FUNCS
+function getMonoMix(track) {
+    return track[0].map( (samp, idx) => (samp + track[1][idx]) * 0.5 );
+}
 
 function analyse (track) {
     const left = self.essentia.arrayToVector(track[0]);
     const right = self.essentia.arrayToVector(track[1]);
 
     // Cut frames
-    // console.time('frame-cutting');
-    // const monoMix = self.essentia.MonoMixer(left, right).audio;
-    const monoMix = track[0].map( (samp, idx) => (samp + track[1][idx]) * 0.5 );
-	const framesLeftVector = self.essentia.FrameGenerator(monoMix, self.frameSize, self.hopSize);
-	// const framesRightVector = self.essentia.FrameGenerator(track[1], self.frameSize, self.hopSize);
-    const leftLength = framesLeftVector.size();
-    // const rightLength = framesRightVector.size();
-    // console.timeEnd('frame-cutting');
-    // check in case FrameGenerator produced one vector shorter than the other
-    // const shortestVectorSize = leftLength > rightLength ? rightLength : leftLength;
-    let spectralProfileFrameWise = [];
-    // console.time('framewise-spectral');
-	for (let f=0; f < leftLength; f++) {
-        const leftFrame = framesLeftVector.get(f);
-        // const rightFrame = framesRightVector.get(f);
-        // another check in case the last frame exists for either L/R but not the other
-        // if (!rightFrame || !leftFrame) break;
-        spectralProfileFrameWise.push(spectralProfile(leftFrame));//, rightFrame));
-	}
-    // console.timeEnd('framewise-spectral');
-    // console.time('summary-spectral');
-    let spectralProfileSummary = [];
+    console.time('frame-cutting');
+    // const monoMixVector = self.essentia.MonoMixer(left, right).audio;
+    // const monoMix = vectorToArray(monoMixVector);
+    const monoMix = getMonoMix(track);
+	const framesVector = self.essentia.FrameGenerator(monoMix, self.frameSize, self.hopSize);
+    console.timeEnd('frame-cutting');
 
-    for (let b=0; b < spectralProfileFrameWise[0].length; b++) {
-        // const binSum = spectralProfileFrameWise.reduce(
-        //     (sum, currentFrame) => sum + currentFrame[b],
-        //     0
-        // )
-        // spectralProfileSummary.push(binSum / spectralProfileFrameWise.length);
-        const binEnergies = spectralProfileFrameWise.map( currentFrame => {
-            return currentFrame[b];
-        });
-        spectralProfileSummary.push(median(binEnergies));
-    }
-    // console.timeEnd('summary-spectral');
     // console.time('loudness');
-    const loudness = getLoudness(left, right);
+    const monoMixVector = self.essentia.arrayToVector(monoMix);
+    const loudness = getLoudness(left, right, monoMixVector);
     // console.timeEnd('loudness');
+
+    const spectralSummary = spectralProfile(framesVector);
+
     left.delete();
     right.delete();
-    framesLeftVector.delete();
-    spectralProfileFrameWise = null;
-    // framesRightVector.delete();
+    framesVector.delete();
+    monoMixVector.delete();
 
     return {
         loudness: loudness,
@@ -103,7 +81,7 @@ function analyse (track) {
             correlation: phaseCorrelation(track[0], track[1])
         },
         spectralProfile: {
-            integrated: spectralProfileSummary
+            integrated: spectralSummary
         }
     }
 }
@@ -120,18 +98,18 @@ function median(arr){
     return (arr[half - 1] + arr[half]) * 0.5;
 }
 
-function getLoudness (left, right) {
+function getLoudness (left, right, mono) {
     let loudnessOut = self.essentia.LoudnessEBUR128(left, right);
-    let rmsLeft = self.essentia.RMS(left).rms;
-    let rmsRight = self.essentia.RMS(right).rms;
+    let rmsMono = self.essentia.RMS(mono).rms;
+    // let rmsRight = self.essentia.RMS(right).rms;
     return {
         integrated: loudnessOut.integratedLoudness,
         range: loudnessOut.loudnessRange,
         momentary: Array.from(self.essentia.vectorToArray(loudnessOut.momentaryLoudness)),
         shortTerm: Array.from(self.essentia.vectorToArray(loudnessOut.shortTermLoudness)),
         rms: {
-            left: 20*Math.log10(rmsLeft),
-            right: 20*Math.log10(rmsRight)
+            mono: 20*Math.log10(rmsMono),
+            // right: 20*Math.log10(rmsRight)
         }
     }
 }
@@ -163,24 +141,40 @@ function phaseCorrelation (L, R) {
 	return (n * sumLR - sumL * sumR) / Math.sqrt((n * sumL2 - sumL * sumL) * (n * sumR2 - sumR * sumR));
 }
 
-function spectralProfile (monoFrame) {
+function spectralProfile (framesVector) {
+    const numFrames = framesVector.size();
+    
+    let spectralProfileFrameWise = [];
+    // console.time('framewise-spectral');
+	for (let f=0; f < numFrames; f++) {
+        const frame = framesVector.get(f);
+        spectralProfileFrameWise.push(getSpectrum(frame));
+	}
+    // console.timeEnd('framewise-spectral');
+    // console.time('summary-spectral');
+    let spectralProfileSummary = [];
+    const numBins = spectralProfileFrameWise[0].length;
+
+    for (let b=0; b < numBins; b++) {
+        const binEnergies = spectralProfileFrameWise.map( currentFrame => {
+            return currentFrame[b];
+        });
+        spectralProfileSummary.push(median(binEnergies));
+    }
+    // console.timeEnd('summary-spectral');
+   
+    spectralProfileFrameWise = null;
+    return spectralProfileSummary;
+}
+
+function getSpectrum (monoFrame) {
     let chunkSize = monoFrame.size();
-    // console.time('Windowing');
     const windowed = self.essentia.Windowing(monoFrame, true, chunkSize).frame;
-    // console.timeEnd('Windowing');
     monoFrame.delete();
-    // console.time('spectrum');
     const spectrum = self.essentia.Spectrum(windowed, chunkSize).spectrum;
-    // console.timeEnd('spectrum');
     windowed.delete();
-    // const barkbands = self.essentia.BarkBands(spectrum).bands;
-    // spectrum.delete();
-    // const bandsArray = self.essentia.vectorToArray(barkbands);
-    // barkbands.delete();
-    // console.time('spectral:vectorToArray');
-    const bandsArray = self.essentia.vectorToArray(spectrum);
-    // console.timeEnd('spectral:vectorToArray');
+    const spectrumArray = self.essentia.vectorToArray(spectrum);
     spectrum.delete();
     
-    return bandsArray;
+    return spectrumArray;
 }

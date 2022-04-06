@@ -23,13 +23,13 @@
 			<template v-slot:default>
 				<tbody>
 					<tr>
-						<td>Left channel</td>
-						<td>{{rms.left.toFixed(3)}} dB</td>
+						<td>Mono mix</td>
+						<td>{{rms.mono.toFixed(3)}} dB</td>
 					</tr>
-					<tr>
+					<!-- <tr>
 						<td>Right channel</td>
 						<td>{{rms.right.toFixed(3)}} dB</td>
-					</tr>
+					</tr> -->
 				</tbody>
 			</template>
 		</v-simple-table>
