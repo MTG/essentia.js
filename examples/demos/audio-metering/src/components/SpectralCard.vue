@@ -22,13 +22,12 @@ export default {
   props: ['data', 'trackname'],
   data () {
     return {
-      chart: null
+      dataCopy: this.data.slice()
     }
   },
   computed: {
     formattedData () {
-      const maxMag = Math.max(...this.data);
-      return this.data.map( (mag, bin) => {
+      return this.dataCopy.map( (mag, bin) => {
         return {
           freq: binToFreq(bin, this.data.length * 2),
           magnitude: 20 * Math.log10((mag+Number.EPSILON)/1.0), // bin magnitude in dBFS
@@ -42,6 +41,11 @@ export default {
 		}
   },
   mounted () {
+    const minMag = -130; // dB
+    const minMagLinear = Math.pow(10, minMag/20);
+    this.dataCopy.unshift(minMagLinear);
+    this.dataCopy.push(minMagLinear);
+
 		this.chart = new LineChart(this.formattedData.slice(1), {
 			svgSelector: `#${this.chartId}`,
 			x: d => d.freq,
@@ -49,11 +53,17 @@ export default {
       z: d => d.type,
       xType: d3.scaleLog,
       xLabel: "Hz",
-      // xDomain: [1, 27000],
+      xFormat: (tickLabel) => {
+        let strLabel = String(tickLabel);
+        if (strLabel.includes('3') || strLabel.includes('4')) return '';
+        if (strLabel.length > 3) strLabel = strLabel.replace(/\d{3}$/, 'k')
+        return strLabel;
+      },
 			color: '#E4454A',
 			yLabel: 'Energy',
-      yDomain: [d3.min(d3.map(this.formattedData, d => d.magnitude)) - 3, 0],
-      fillColor: '#e4454a44'
+      yDomain: [minMag, 0],
+      fillColor: '#e4454a44',
+      showGrid: true
 		})
   }
 }

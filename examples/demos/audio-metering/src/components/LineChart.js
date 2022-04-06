@@ -32,9 +32,10 @@ export default function LineChart(data, {
   strokeLinejoin, // stroke line join of line
   strokeWidth = 1.5, // stroke width of line
   strokeOpacity, // stroke opacity of line
+  tickLabelSize = '12px',
 	fillColor = "none",
   mixBlendMode = "multiply", // blend mode of lines
-  voronoi, // show a Voronoi overlay? (for debugging)
+  showGrid = false, // show a Voronoi overlay? (for debugging)
 	svgSelector
 } = {}) {
   // Compute values.
@@ -58,7 +59,7 @@ export default function LineChart(data, {
   const xScale = xType(xDomain, xRange);
   const yScale = yType(yDomain, yRange);
   const xAxis = d3.axisBottom(xScale)
-									.ticks(width / 80, xFormat)
+									.ticks(16, xFormat)
 									.tickSizeOuter(0);
   const yAxis = d3.axisLeft(yScale).ticks(height / 60, yFormat);
 
@@ -83,18 +84,13 @@ export default function LineChart(data, {
       .on("pointerleave", pointerleft)
       .on("touchstart", event => event.preventDefault());
 
-  // An optional Voronoi display (for fun).
-  if (voronoi) svg.append("path")
-      .attr("fill", "none")
-      .attr("stroke", "#ccc")
-      .attr("d", d3.Delaunay
-        .from(I, i => xScale(X[i]), i => yScale(Y[i]))
-        .voronoi([0, 0, width, height])
-        .render());
-
   svg.append("g")
       .attr("transform", `translate(0,${height - marginBottom})`)
+      .attr("style", `font-size: ${tickLabelSize};`)
       .call(xAxis)
+      .call(!showGrid ? () => {} : g => g.selectAll(".tick line").clone()
+          .attr("y2", -height + marginBottom + marginTop)
+          .attr("stroke-opacity", 0.1))
 			.call(g => g.append("text")
           .attr("x", width)
           .attr("y", marginBottom)
@@ -104,9 +100,10 @@ export default function LineChart(data, {
 
   svg.append("g")
       .attr("transform", `translate(${marginLeft},0)`)
+      .attr("style", `font-size: ${tickLabelSize};`)
       .call(yAxis)
       .call(g => g.select(".domain").remove())
-      .call(voronoi ? () => {} : g => g.selectAll(".tick line").clone()
+      .call(!showGrid ? () => {} : g => g.selectAll(".tick line").clone()
           .attr("x2", width - marginLeft - marginRight)
           .attr("stroke-opacity", 0.1))
       .call(g => g.append("text")
