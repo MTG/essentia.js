@@ -9,6 +9,7 @@
       integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
       crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.address/1.6/jquery.address.min.js" integrity="sha512-Fhm8fcAQhENO1HmU1JjbnNm6ReszFIiJvkHdnuGZBznaaM6vakH4YEPO7v8M3PbGR03R/dur0QP5vZ5s4YaN7w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
       body {
         display: flex;
@@ -214,7 +215,10 @@
 
   <script>
     $(document).ready(function () {
-      $('.menu .item').tab();
+      $('.ui.menu .item').tab({
+        history: true,
+        historyType: 'hash'
+      });
       $('p.code-example-name').popup({
         position: 'right center'
       });
