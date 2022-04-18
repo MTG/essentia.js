@@ -9,6 +9,7 @@
       integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
       crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.address/1.6/jquery.address.min.js" integrity="sha512-Fhm8fcAQhENO1HmU1JjbnNm6ReszFIiJvkHdnuGZBznaaM6vakH4YEPO7v8M3PbGR03R/dur0QP5vZ5s4YaN7w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
       body {
         display: flex;
@@ -16,15 +17,8 @@
         min-height: 100vh;
       }
 
-      #header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding-top: 2rem;
-      }
-
       #tabular-card-menu {
-        flex: 1
+        flex: 1;
       }
 
       h1 {
@@ -61,8 +55,7 @@
     <title>essentia.js examples</title>
   </head>
   <body>
-    <header id="header" class="ui centered aligned container">
-      <h1>Examples</h1>
+    <header id="header" class="ui icon header">
       <a href="https://github.com/MTG/essentia.js" target="_blank">
         <svg width="230" height="50" viewBox="0 0 310 50" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M25.8479 28.0014C25.8479 36.9629 31.4122 42.6443 41.135 42.6443C44.9422 42.6443 48.5736 42 51.5022 40.8286L50.3308 34.7371C47.8708 35.5571 45.4693 35.9671 42.4236 35.9671C38.265 35.9671 34.6336 34.21 34.3408 30.52H52.7908C52.9079 29.8757 53.1422 28.5871 53.1422 27.0057C53.1422 19.9186 49.5693 12.7143 40.315 12.7143C30.3579 12.7143 25.8479 20.7386 25.8479 28.0014ZM34.2822 24.4286C34.5165 22.0857 36.0393 18.63 39.7879 18.63C43.8293 18.63 44.825 22.32 44.825 24.4286H34.2822ZM56.7581 40.5943C58.8666 41.7657 62.2638 42.6443 66.0123 42.6443C74.2123 42.6443 78.4295 38.6614 78.4295 33.3314C78.3709 29.1143 76.0866 26.3614 70.6395 24.4871C67.1252 23.2571 66.0123 22.5543 66.0123 21.2071C66.0123 19.8014 67.2423 18.8643 69.4095 18.8643C71.8695 18.8643 74.3295 19.86 75.6181 20.5043L77.1995 14.3543C75.4423 13.4757 72.4552 12.7143 69.1166 12.7143C61.9709 12.7143 57.4609 16.6971 57.4609 22.0857C57.4609 25.4829 59.6866 28.7043 65.6609 30.6957C68.8823 31.8086 69.8195 32.5114 69.8195 33.9757C69.8195 35.4986 68.6481 36.3771 65.9538 36.3771C63.3766 36.3771 59.9795 35.2057 58.3395 34.21L56.7581 40.5943ZM82.2229 40.5943C84.3315 41.7657 87.7286 42.6443 91.4772 42.6443C99.6772 42.6443 103.894 38.6614 103.894 33.3314C103.836 29.1143 101.551 26.3614 96.1043 24.4871C92.59 23.2571 91.4772 22.5543 91.4772 21.2071C91.4772 19.8014 92.7072 18.8643 94.8743 18.8643C97.3343 18.8643 99.7943 19.86 101.083 20.5043L102.664 14.3543C100.907 13.4757 97.92 12.7143 94.5815 12.7143C87.4358 12.7143 82.9258 16.6971 82.9258 22.0857C82.9258 25.4829 85.1515 28.7043 91.1258 30.6957C94.3472 31.8086 95.2843 32.5114 95.2843 33.9757C95.2843 35.4986 94.1129 36.3771 91.4186 36.3771C88.8415 36.3771 85.4443 35.2057 83.8043 34.21L82.2229 40.5943ZM107.688 28.0014C107.688 36.9629 113.252 42.6443 122.975 42.6443C126.782 42.6443 130.413 42 133.342 40.8286L132.171 34.7371C129.711 35.5571 127.309 35.9671 124.263 35.9671C120.105 35.9671 116.473 34.21 116.181 30.52H134.631C134.748 29.8757 134.982 28.5871 134.982 27.0057C134.982 19.9186 131.409 12.7143 122.155 12.7143C112.198 12.7143 107.688 20.7386 107.688 28.0014ZM116.122 24.4286C116.356 22.0857 117.879 18.63 121.628 18.63C125.669 18.63 126.665 22.32 126.665 24.4286H116.122ZM140.179 42H149.141V25.4829C149.141 24.6629 149.258 23.7843 149.492 23.2571C150.078 21.6171 151.542 19.9186 154.002 19.9186C157.165 19.9186 158.512 22.4371 158.512 26.1271V42H167.415V25.0143C167.415 16.58 163.022 12.7143 157.165 12.7143C152.362 12.7143 149.492 15.4671 148.321 17.3414H148.145L147.735 13.3586H139.945C140.062 15.9357 140.179 18.9229 140.179 22.4957V42ZM177.903 40.1257C179.367 41.6486 181.768 42.6443 184.697 42.6443C187.157 42.6443 189.265 42.2343 190.437 41.8243L190.378 35.03C189.734 35.2057 188.855 35.3229 187.684 35.3229C185.048 35.3229 184.228 33.7414 184.228 30.2857V19.9186H190.613V13.3586H184.228V5.15857L175.501 7.20857V13.3586H171.635V19.9186H175.501V31.6329C175.501 35.7329 176.263 38.4271 177.903 40.1257ZM195.673 42H204.635V13.3586H195.673V42ZM200.066 9.84429C203.053 9.84429 204.928 7.85286 204.869 5.39286C204.869 2.81571 203.053 0.882859 200.183 0.882859C197.372 0.882859 195.498 2.81571 195.498 5.39286C195.498 7.85286 197.255 9.84429 200.066 9.84429ZM209.873 33.9171C209.873 38.4857 213.329 42.6443 219.128 42.6443C222.525 42.6443 225.453 41.4143 227.328 39.1886H227.503L228.031 42H236.055C235.762 40.36 235.586 37.7829 235.586 35.03V25.0729C235.586 18.3371 232.599 12.7143 223.052 12.7143C217.839 12.7143 213.915 14.12 211.923 15.2914L213.563 20.9729C215.496 19.86 218.483 18.8057 221.412 18.8057C225.863 18.8057 226.683 20.9729 226.683 22.4957V22.9057C216.551 22.9057 209.873 26.42 209.873 33.9171ZM218.659 32.98C218.659 29.5829 222.232 28.47 226.976 28.4114V31.6329C226.976 32.1014 226.976 32.6871 226.801 33.0971C226.215 34.9129 224.399 36.3771 222.232 36.3771C220.182 36.3771 218.659 35.2643 218.659 32.98Z" fill="black"/>
@@ -70,6 +63,9 @@
           <path d="M257.016 41.7071C258.831 42.2929 261.526 42.6443 263.576 42.6443C272.244 42.6443 277.633 38.6614 277.633 27.5329V2.52286H268.73V27.3571C268.73 33.5071 266.329 35.2057 262.639 35.2057C260.881 35.2057 259.241 34.9129 258.011 34.5029L257.016 41.7071ZM283.579 40.1843C285.805 41.4143 290.256 42.6443 294.766 42.6443C305.661 42.6443 310.639 36.9629 310.639 30.3443C310.639 24.78 307.418 21.1486 300.448 18.5714C295.352 16.6386 293.126 15.4671 293.126 13.0071C293.126 11.0157 295.001 9.2 298.866 9.2C302.732 9.2 305.543 10.3714 307.125 11.0743L309.058 3.87C306.773 2.81571 303.552 1.93714 298.983 1.93714C289.729 1.93714 284.048 7.03286 284.048 13.7686C284.048 19.5671 288.382 23.0814 295.001 25.4829C299.686 27.1229 301.561 28.5871 301.561 30.9886C301.561 33.5657 299.393 35.2643 295.293 35.2643C291.486 35.2643 287.738 34.0343 285.395 32.8043L283.579 40.1843Z" fill="#E4454A"/>
         </svg>
       </a>
+      <div class="content">
+        <h1>Examples</h1>
+      </div>
     </header>
     
     <div class="ui divider" style="height: 0.1rem; width: 1px"></div>
@@ -79,81 +75,91 @@
         <a class="item" data-tab="starter-code">Interactive code examples</a>
       </div>
       <div class="ui active bottom attached tab segment" data-tab="demos">
-        <div class="ui four column grid cards">
-          <div class="row">
-            <div class="ui fluid card column">
-              <div class="rounded image">
-                <img src='./demos/screenshots/melspectrogram-rt.png'></img>
-              </div>
-              <div class="content">
-                <a href="./demos/melspectrogram-rt/" class="header" target="_blank">
-                  Melspectrogram (Real-time)
+        <div class="ui four column doubling stackable grid link cards">
+            <div class="column">
+              <div class="ui fluid card">
+                <a href="./demos/melspectrogram-rt/" class="image" target="_blank">
+                  <img src='./demos/screenshots/melspectrogram-rt.png'></img>
                 </a>
+                <div class="content">
+                  <a href="./demos/melspectrogram-rt/" class="header" target="_blank">
+                    Melspectrogram (Real-time)
+                  </a>
+                </div>
               </div>
             </div>
-            <div class="ui fluid card column">
-              <div class="image">
-                <img src='./demos/screenshots/rms-rt.png'></img>
-              </div>
-              <div class="content">
-                <a href="./demos/rms-rt/" class="header" target="_blank">
-                  RMS (Real-time)
+            <div class="column">
+              <div class="ui fluid card">
+                <a href="./demos/rms-rt/" class="image" target="_blank">
+                  <img src='./demos/screenshots/rms-rt.png'></img>
                 </a>
+                <div class="content">
+                  <a href="./demos/rms-rt/" class="header" target="_blank">
+                    RMS (Real-time)
+                  </a>
+                </div>
               </div>
             </div>
-            <div class="ui fluid card column">
-              <div class="image">
-                <img src='./demos/screenshots/pitchmelodia-rt.png'></img>
-              </div>
-              <div class="content">
-                <a href="./demos/pitchmelodia-rt/" class="header" target="_blank">
-                  Pitch Melodia (Real-time)
+            <div class="column">
+              <div class="ui fluid card">
+                <a href="./demos/pitchmelodia-rt/" class="image" target="_blank">
+                  <img src='./demos/screenshots/pitchmelodia-rt.png'></img>
                 </a>
+                <div class="content">
+                  <a href="./demos/pitchmelodia-rt/" class="header" target="_blank">
+                    Pitch Melodia (Real-time)
+                  </a>
+                </div>
               </div>
             </div>
-            <div class="ui fluid card column">
-              <div class="image">
-                <img src='./demos/screenshots/onsets.png'></img>
-              </div>
-              <div class="content">
-                <a href="./demos/onsets/public/" class="header" target="_blank">
-                  Onset Detection
+            <div class="column">
+              <div class="ui fluid card">
+                <a href="./demos/onsets/public/" class="image" target="_blank">
+                  <img src='./demos/screenshots/onsets.png'></img>
                 </a>
+                <div class="content">
+                  <a href="./demos/onsets/public/" class="header" target="_blank">
+                    Onset Detection
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="row">
-            <div class="ui fluid card column">
-              <div class="image">
-                <img src='./demos/screenshots/autotagging-rt.png'></img>
-              </div>
-              <div class="content">
-                <a href="./demos/autotagging-rt/" class="header" target="_blank">
-                  Music Autotagging (Real-time)
+            <div class="column">
+              <div class="ui fluid card">
+                <a href="./demos/autotagging-rt/" class="image" target="_blank">
+                  <img src='./demos/screenshots/autotagging-rt.png'></img>
                 </a>
+                <div class="content">
+                  <a href="./demos/autotagging-rt/" class="header" target="_blank">
+                    Music Autotagging (Real-time)
+                  </a>
+                </div>
               </div>
             </div>
-            <div class="ui fluid card column">
-              <div class="image">
-                <img src='./demos/screenshots/mood-classifiers.png'></img>
-              </div>
-              <div class="content">
-                <a href="./demos/mood-classifiers/" class="header" target="_blank">
-                  Mood Classification plus Key & BPM
+            <div class="column">
+              <div class="ui fluid card">
+                <a href="./demos/mood-classifiers/" class="image" target="_blank">
+                  <img src='./demos/screenshots/mood-classifiers.png'></img>
                 </a>
+                <div class="content">
+                  <a href="./demos/mood-classifiers/" class="header" target="_blank">
+                    Mood Classification plus Key & BPM
+                  </a>
+                </div>
               </div>
             </div>
-            <div class="ui fluid card column">
-              <div class="image">
-                <img src='./demos/screenshots/hpcp-chroma-rt.png'></img>
-              </div>
-              <div class="content">
-                <a href="./demos/hpcp-chroma-rt/" class="header" target="_blank">
-                  HPCP Chroma (Real-time)
+            <div class="column">
+              <div class="ui fluid card">
+                <a href="./demos/hpcp-chroma-rt/" class="image" target="_blank">
+                  <img src='./demos/screenshots/hpcp-chroma-rt.png'></img>
                 </a>
+                <div class="content">
+                  <a href="./demos/hpcp-chroma-rt/" class="header" target="_blank">
+                    HPCP Chroma (Real-time)
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
         </div>
       </div>
       <div class="ui bottom attached tab segment" data-tab="starter-code">
@@ -200,7 +206,10 @@
 
   <script>
     $(document).ready(function () {
-      $('.menu .item').tab();
+      $('.ui.menu .item').tab({
+        history: true,
+        historyType: 'hash'
+      });
       $('p.code-example-name').popup({
         position: 'right center'
       });
