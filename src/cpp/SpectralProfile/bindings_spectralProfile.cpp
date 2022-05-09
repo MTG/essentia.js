@@ -23,7 +23,7 @@
 // expose the extractor class to js using embind templates
 EMSCRIPTEN_BINDINGS(Class_Extractor) { 
   class_<SpectralProfile>("SpectralProfile")
-    .constructor<int>()
+    .constructor<int, int, std::string>()
     .property("version", &SpectralProfile::essentiaVersion)
     .function("configure", &SpectralProfile::configure)
     .function("compute", &SpectralProfile::compute)

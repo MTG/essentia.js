@@ -52,14 +52,15 @@ void SpectralProfile::configure(const int frameSize, const int hopSize, const st
   _windowing = factory.create("Windowing");
   _spectrum = factory.create("Spectrum", "size", frameSize);
 
-  _aggregatorStats = {averageType.c_str()};
+  _averageType = averageType;
+  const char* aggregatorStats[] = {averageType.c_str()};
   _averaging = factory.create("PoolAggregator", 
-                              "defaultStats", arrayToVector<std::string>(_aggregatorStats));
+                              "defaultStats", arrayToVector<std::string>(aggregatorStats));
 };
 
 
 // compute method for your extractor
-val SpectralProfile::compute(std::vector<float>& audioSignal) {
+std::vector<float> SpectralProfile::compute(std::vector<float>& audioSignal) {
 
   _fc->input("signal").set(audioSignal);
   // FrameCutter -> Windowing -> Spectrum
@@ -73,7 +74,6 @@ val SpectralProfile::compute(std::vector<float>& audioSignal) {
   _spectrum->output("spectrum").set(spectrum);
   
   Pool spectralFramesPool, averageSpectrumPool;
-
   while (true) {
     // compute a frame
     _fc->compute();
@@ -82,7 +82,9 @@ val SpectralProfile::compute(std::vector<float>& audioSignal) {
       break;
     }
     // if the frame is silent, just drop it and go on processing
-    if (isSilent(frame)) continue;
+    if (isSilent(frame)) {
+      continue;
+    }
     _windowing->compute();
     _spectrum->compute();
     spectralFramesPool.add("frames", spectrum);
@@ -91,9 +93,9 @@ val SpectralProfile::compute(std::vector<float>& audioSignal) {
   _averaging->input("input").set(spectralFramesPool);
   _averaging->output("output").set(averageSpectrumPool);
   _averaging->compute();
-
-  // std::vector<std::string>> averageDescriptorNames = averageSpectrumPool.descriptorNames();
-  return averageSpectrumPool.value<std::vector<float>>();
+  // use descriptor <namespace> + <stat> to retrieve values from pool: 
+  // frames.mean || frames.median
+  return averageSpectrumPool.value<std::vector<float>>(_averageType.insert(0, "frames."));
 };
 
 

@@ -42,7 +42,7 @@ class SpectralProfile {
 
     void configure(const int frameSize=1024, const int hopSize=512, const std::string& averageType="median");
 
-    val compute(std::vector<float>& audioSignal);
+    std::vector<float> compute(std::vector<float>& audioSignal);
 
     void reset();
 
@@ -53,7 +53,7 @@ class SpectralProfile {
     Algorithm* _windowing;
     Algorithm* _spectrum;
     Algorithm* _averaging;
-    char* _aggregatorStats[];
+    std::string _averageType;
 };
 
 // convert a Float32 JS typed array into std::vector<float>

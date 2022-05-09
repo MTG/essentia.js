@@ -32,7 +32,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename)
+const __dirname = dirname(__filename);
 ```
 
 2. add a `package.json` with `"type": "module"` to the _/builds_ folder
