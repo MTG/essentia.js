@@ -6,17 +6,20 @@ self.error = function (msg) {
     throw Error(`audio-worker error: \n ${msg}`);
 };
 
+const useExtractor = true;
 // INIT
 import { Essentia, EssentiaWASM } from 'essentia.js';
+import { SpectralProfileWASM } from './spectralProfile.module.js';
 log("Imports went OK");
+
+self.frameSize = 2048;
+self.hopSize = 32768; // equivalent to downsampling for spectral profile
 
 self.essentia = null;
 try {
     self.essentia = new Essentia(EssentiaWASM.EssentiaWASM);
 } catch (err) { error(err) }
 
-self.frameSize = 2048;
-self.hopSize = 16384*2;
 
 // COMMS
 onmessage = function listenToMainThread(msg) {
@@ -55,24 +58,15 @@ function analyse (track) {
     const left = self.essentia.arrayToVector(track[0]);
     const right = self.essentia.arrayToVector(track[1]);
 
-    // Cut frames
-    console.time('frame-cutting');
-    // const monoMixVector = self.essentia.MonoMixer(left, right).audio;
-    // const monoMix = vectorToArray(monoMixVector);
     const monoMix = getMonoMix(track);
-	const framesVector = self.essentia.FrameGenerator(monoMix, self.frameSize, self.hopSize);
-    console.timeEnd('frame-cutting');
+    const monoMixVector = self.essentia.arrayToVector(monoMix);
 
     // console.time('loudness');
-    const monoMixVector = self.essentia.arrayToVector(monoMix);
     const loudness = getLoudness(left, right, monoMixVector);
     // console.timeEnd('loudness');
 
-    const spectralSummary = spectralProfile(framesVector);
-
     left.delete();
     right.delete();
-    framesVector.delete();
     monoMixVector.delete();
 
     return {
@@ -81,21 +75,9 @@ function analyse (track) {
             correlation: phaseCorrelation(track[0], track[1])
         },
         spectralProfile: {
-            integrated: spectralSummary
+            integrated: getSpectralProfile(monoMix)
         }
     }
-}
-
-function median(arr){
-    if(arr.length ===0) throw new Error("No inputs");
-  
-    arr.sort( (a,b) => a-b );
-
-    const half = Math.floor(arr.length * 0.5);
-    
-    if (arr.length % 2) return arr[half];
-    
-    return (arr[half - 1] + arr[half]) * 0.5;
 }
 
 function getLoudness (left, right, mono) {
@@ -141,40 +123,22 @@ function phaseCorrelation (L, R) {
 	return (n * sumLR - sumL * sumR) / Math.sqrt((n * sumL2 - sumL * sumL) * (n * sumR2 - sumR * sumR));
 }
 
-function spectralProfile (framesVector) {
-    const numFrames = framesVector.size();
-    
-    let spectralProfileFrameWise = [];
-    // console.time('framewise-spectral');
-	for (let f=0; f < numFrames; f++) {
-        const frame = framesVector.get(f);
-        spectralProfileFrameWise.push(getSpectrum(frame));
-	}
-    // console.timeEnd('framewise-spectral');
-    // console.time('summary-spectral');
-    let spectralProfileSummary = [];
-    const numBins = spectralProfileFrameWise[0].length;
+function getSpectralProfile (monoMix) {
+    const spectralExtractor = new SpectralProfileWASM.SpectralProfile(self.frameSize, self.hopSize, 'median');
+    // arrayToVector implementations differ between essentia.js and custom extractors
+    // spectralProfile only works with output from its own arrayToVector
+    const spectralInputVector = SpectralProfileWASM.arrayToVector(monoMix);
 
-    for (let b=0; b < numBins; b++) {
-        const binEnergies = spectralProfileFrameWise.map( currentFrame => {
-            return currentFrame[b];
-        });
-        spectralProfileSummary.push(median(binEnergies));
+    let spectralSummary = [];
+    // console.time('spectral profile');
+    // console.time('spectral compute');
+    const spectralVector = spectralExtractor.compute(spectralInputVector);
+    // console.timeEnd('spectral compute');
+    for (let b = 0; b < spectralVector.size(); b++) {
+        spectralSummary.push(spectralVector.get(b));
     }
-    // console.timeEnd('summary-spectral');
-   
-    spectralProfileFrameWise = null;
-    return spectralProfileSummary;
-}
-
-function getSpectrum (monoFrame) {
-    let chunkSize = monoFrame.size();
-    const windowed = self.essentia.Windowing(monoFrame, true, chunkSize).frame;
-    monoFrame.delete();
-    const spectrum = self.essentia.Spectrum(windowed, chunkSize).spectrum;
-    windowed.delete();
-    const spectrumArray = self.essentia.vectorToArray(spectrum);
-    spectrum.delete();
-    
-    return spectrumArray;
+    // console.timeEnd('spectral profile');
+    spectralInputVector.delete();
+    spectralExtractor.shutdown();
+    return spectralSummary;
 }
