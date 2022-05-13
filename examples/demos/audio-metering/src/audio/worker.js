@@ -9,7 +9,7 @@ self.error = function (msg) {
 const useExtractor = true;
 // INIT
 import { Essentia, EssentiaWASM } from 'essentia.js';
-import { SpectralProfileWASM } from './spectralProfile.module.js';
+import { SpectralProfileWASM } from './spectralProfile2.module.js';
 log("Imports went OK");
 
 self.frameSize = 2048;
@@ -129,15 +129,10 @@ function getSpectralProfile (monoMix) {
     // spectralProfile only works with output from its own arrayToVector
     const spectralInputVector = SpectralProfileWASM.arrayToVector(monoMix);
 
-    let spectralSummary = [];
-    // console.time('spectral profile');
-    // console.time('spectral compute');
     const spectralVector = spectralExtractor.compute(spectralInputVector);
-    // console.timeEnd('spectral compute');
-    for (let b = 0; b < spectralVector.size(); b++) {
-        spectralSummary.push(spectralVector.get(b));
-    }
-    // console.timeEnd('spectral profile');
+
+    let spectralSummary = Array.from(SpectralProfileWASM.vectorToArrayCpp(spectralVector));
+
     spectralInputVector.delete();
     spectralExtractor.shutdown();
     return spectralSummary;
