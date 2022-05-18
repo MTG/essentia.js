@@ -41,6 +41,12 @@ std::vector<float> float32ArrayToVector(const val &arr) {
   return vec;
 }
 
+emscripten::val vectorToFloat32Array(const std::vector<float>& vec) {
+  const int l = vec.size();
+  emscripten::val arr{emscripten::typed_memory_view(l, vec.data())};
+  return arr;
+}
+
 // instantiating the essentia algo registry with an optional argument to enable debug mode 
 EssentiaJS::EssentiaJS(bool debugger) {
   if (debugger) {

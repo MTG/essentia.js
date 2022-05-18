@@ -234,6 +234,7 @@ EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) {
     ;
   // utility function to convert a Float32 JS typed array into std::vector<float>
   function("arrayToVector", &float32ArrayToVector);
+  function("vectorToArrayCpp", &vectorToFloat32Array);
   // expose stl datatypes to js
   register_vector<int>("VectorInt");
   register_vector<float>("VectorFloat");

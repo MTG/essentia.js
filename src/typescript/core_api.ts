@@ -156,6 +156,17 @@ class Essentia {
   }
 
   /**
+   * C++ implementation of the conversion method above, testing if faster
+   * @method 
+   * @param {VectorFloat} inputVector input VectorFloat array
+   * @returns {Float32Array} returns converted JS typed array
+   * @memberof Essentia
+   */
+  vectorToArrayCpp(inputVector: any): Float32Array {
+    return this.module.vectorToArrayCpp(inputVector);
+  }
+
+  /**
    * Cuts an audio signal data into overlapping frames given frame size and hop size 
    * @method
    * @param {Float32Array} inputAudioData a single channel audio channel data
