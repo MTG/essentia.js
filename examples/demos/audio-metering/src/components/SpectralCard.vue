@@ -14,22 +14,18 @@ import LineChart from './LineChart.js';
 
 // const barkBandFrequencies = [1, 100, 200, 300, 400, 510, 630, 770, 920, 1080, 1270, 1480, 1720, 2000, 2320, 2700, 3150, 3700, 4400, 5300, 6400, 7700, 9500, 12000, 15500, 20500, 27000];
 
-const binToFreq = (bin, fftSize) => {
-  return bin * 44100 / fftSize;
-}
-
 export default {
-  props: ['data', 'trackname'],
+  props: ['spectralData', 'trackname', 'sampleRate'],
   data () {
     return {
-      dataCopy: this.data.slice()
+      dataCopy: this.spectralData.slice()
     }
   },
   computed: {
     formattedData () {
       return this.dataCopy.map( (mag, bin) => {
         return {
-          freq: binToFreq(bin, this.data.length * 2),
+          freq: this.binToFreq(bin),
           magnitude: 20 * Math.log10((mag+Number.EPSILON)/1.0), // bin magnitude in dBFS
           type: ''
         }
@@ -43,6 +39,7 @@ export default {
   mounted () {
     const minMag = -130; // dB
     const minMagLinear = Math.pow(10, minMag/20);
+    this.dataCopy[0] = minMagLinear;
     this.dataCopy.unshift(minMagLinear);
     this.dataCopy.push(minMagLinear);
 
@@ -65,6 +62,12 @@ export default {
       fillColor: '#e4454a44',
       showGrid: true
 		})
+  },
+  methods: {
+    binToFreq (bin) {
+      const fftSize = (this.spectralData.length-1) * 2;
+      return bin * this.sampleRate / fftSize;
+    }
   }
 }
 </script>

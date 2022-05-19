@@ -9,8 +9,8 @@
         v-for="track in AnalysisData"
         :key="track.name"
       >
-				<metering-card :track="track"></metering-card>
-			</v-slide-item>
+        <metering-card :track="track"></metering-card>
+      </v-slide-item>
     </v-slide-group>
   </v-row>
 </template>

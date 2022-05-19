@@ -43,6 +43,7 @@ class AudioEngine {
             const progressEvent = new CustomEvent('progress', {detail: this.progress});
             this.dispatchEvent(progressEvent);
             analysisData.name = files[idx].name;
+            analysisData.sampleRate = b.sampleRate;
             analysisData.phase.channelData = data;
             analysis.push(analysisData);
             idx++;

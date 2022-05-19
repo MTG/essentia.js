@@ -27,7 +27,9 @@
 					></phase-card>
 				</v-col>
 				<v-col cols="12">
-					<spectral-card :data="track.spectralProfile.integrated" :trackname="track.name"></spectral-card>
+					<spectral-card :spectral-data="track.spectralProfile.integrated" 
+						:trackname="track.name" :sample-rate="track.sampleRate">
+					</spectral-card>
 				</v-col>
 			</v-row>
 		</v-container>
