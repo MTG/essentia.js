@@ -14,22 +14,44 @@ import LineChart from './LineChart.js';
 
 // const barkBandFrequencies = [1, 100, 200, 300, 400, 510, 630, 770, 920, 1080, 1270, 1480, 1720, 2000, 2320, 2700, 3150, 3700, 4400, 5300, 6400, 7700, 9500, 12000, 15500, 20500, 27000];
 
+function db2lin (db) {
+  return Math.pow(10, db/20) - Number.EPSILON;
+}
+
+function linspace(x0, xN, n){
+  let dx = (xN - x0)/(n-1);
+  const x = [];
+  for(let i=0; i < n; ++i) {
+    x.push(x0 + i*dx);
+  }
+  return x;
+}
+
 export default {
   props: ['spectralData', 'trackname', 'sampleRate'],
   data () {
     return {
-      dataCopy: this.spectralData.slice()
+      dataCopy: this.spectralData.slice(),
+      minMag: -90, // dB
+      tiltSlope: 3
     }
   },
   computed: {
     formattedData () {
-      return this.dataCopy.map( (mag, bin) => {
+      const pinkCorrectionWeights = linspace(db2lin(-this.tiltSlope), db2lin(this.tiltSlope), this.dataCopy.length);
+      // console.info({pinkCorrectionWeights});
+      const formatted = this.dataCopy.map( (mag, bin) => {
+        let correctedMag = Math.sqrt(mag) * pinkCorrectionWeights[bin];
+        if (bin <= 1 || bin == this.dataCopy.length-1) {
+          correctedMag = mag;
+        }
         return {
           freq: this.binToFreq(bin),
-          magnitude: 20 * Math.log10((mag+Number.EPSILON)/1.0), // bin magnitude in dBFS
+          magnitude: 20 * Math.log10(correctedMag+Number.EPSILON), // bin magnitude in dBFS
           type: ''
         }
-      })
+      });
+      return formatted;
     },
     chartId () {
 			let whitespaceEscapedName = this.trackname.replace(/\s|\.|\d/g, '-');
@@ -37,8 +59,7 @@ export default {
 		}
   },
   mounted () {
-    const minMag = -130; // dB
-    const minMagLinear = Math.pow(10, minMag/20);
+    const minMagLinear = Math.pow(10, this.minMag/20);
     this.dataCopy[0] = minMagLinear;
     this.dataCopy.unshift(minMagLinear);
     this.dataCopy.push(minMagLinear);
@@ -58,7 +79,7 @@ export default {
       },
 			color: '#E4454A',
 			yLabel: 'Energy',
-      yDomain: [minMag, 0],
+      yDomain: [this.minMag, 0],
       fillColor: '#e4454a44',
       showGrid: true
 		})
