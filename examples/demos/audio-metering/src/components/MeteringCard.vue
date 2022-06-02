@@ -1,10 +1,28 @@
 <template>
-	<v-card max-width="500">
-		<v-toolbar elevation="0" dense>
+	<v-card :class="[`ma-${selectedAsRefCardElevation}`, selectedAsRef === 'selected' ? 'highlight-card' : '']" 
+          :elevation="selectedAsRefCardElevation" max-width="500">
+		<v-toolbar flat dense>
 			<v-btn icon color="primary" text>
 				<v-icon>mdi-tray-arrow-down</v-icon>
 			</v-btn>
 			<v-toolbar-title class="primary--text">{{ track.name }}</v-toolbar-title>
+			<v-spacer></v-spacer>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn-toggle
+            v-model="selectedAsRef"
+            color="primary"
+            rounded
+            group
+          >
+            <v-btn v-on="on"
+            v-bind="attrs" value="selected">
+              <v-icon :color="selectedAsRefBtnColor">mdi-compare-horizontal</v-icon>
+            </v-btn>
+          </v-btn-toggle>
+        </template>
+        <span>Use as reference track</span>
+      </v-tooltip>
 		</v-toolbar>
 		<v-divider></v-divider>
 		<v-container fluid>
@@ -45,6 +63,33 @@ export default {
 	props: {
 		track: Object
 	},
-	components: {LoudnessCard, PhaseCard, SpectralCard}
+	components: {LoudnessCard, PhaseCard, SpectralCard},
+	data () {
+		return {
+			selectedAsRef: undefined,
+      selectedAsRefBtnColor: 'secondary',
+      selectedAsRefCardElevation: "3"
+		}
+	},
+  watch: {
+    selectedAsRef (newVal) {
+      if (newVal === "selected") {
+        this.selectedAsRefBtnColor = 'primary';
+        this.selectedAsRefCardElevation = "0";
+      }
+      if (newVal === undefined) {
+        this.selectedAsRefBtnColor = 'secondary';
+        this.selectedAsRefCardElevation = "3";
+      }
+    }
+  }
 }
 </script>
+
+<style scoped>
+  .highlight-card {
+    border-width: 2px;
+    border-color: #E4454A88;
+    border-style: solid;
+  }
+</style>
