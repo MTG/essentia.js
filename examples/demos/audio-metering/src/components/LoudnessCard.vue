@@ -17,7 +17,7 @@
 			</template>
 		</v-simple-table>
 		<v-divider></v-divider>
-		<loudness-chart :data="chartData" :trackname="trackname"></loudness-chart>
+		<loudness-chart :data="chartData" :trackID="trackID"></loudness-chart>
 		<v-card-subtitle>RMS</v-card-subtitle>
 		<v-simple-table class="secondary lighten-3">
 			<template v-slot:default>
@@ -56,7 +56,7 @@ export default {
 		'rms': Object,
 		'momentary': Array,
 		'shortTerm': Array,
-		'trackname': String
+		'trackID': String
 	},
 	components: { LoudnessChart },
 	data () {

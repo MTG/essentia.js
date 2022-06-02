@@ -60,12 +60,12 @@ export default {
   },
   data() {
     return {
-      step: 1, // developing/testing purposes, should be init 1
-      // analysis: {
-      //   "ffc9d616-b4db-4a1e-af92-738c5096665c": exampleTrackAnalysis["ffc9d616-b4db-4a1e-af92-738c5096665c"],
-      //   "09a4c1d2-e71f-422a-b26b-1d2c41843d15": exampleTrackAnalysis["ffc9d616-b4db-4a1e-af92-738c5096665c"]
-      // },
-      analysis: undefined,
+      step: 3, // developing/testing purposes, should be init 1
+      analysis: {
+        "ffc9d616-b4db-4a1e-af92-738c5096665c": exampleTrackAnalysis["ffc9d616-b4db-4a1e-af92-738c5096665c"],
+        "09a4c1d2-e71f-422a-b26b-1d2c41843d15": {...exampleTrackAnalysis["ffc9d616-b4db-4a1e-af92-738c5096665c"], uuid: "09a4c1d2-e71f-422a-b26b-1d2c41843d15"}
+      },
+      // analysis: undefined,
       analysisProgress: ''
     };
   },

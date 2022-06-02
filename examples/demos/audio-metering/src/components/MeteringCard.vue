@@ -34,7 +34,7 @@
 						:rms="track.loudness.rms"
 						:momentary="track.loudness.momentary"
 						:shortTerm="track.loudness.shortTerm"
-						:trackname="track.name"
+						:trackID="track.uuid"
 					></loudness-card>
 				</v-col>
 				<v-col cols="12">
@@ -46,7 +46,7 @@
 				</v-col>
 				<v-col cols="12">
 					<spectral-card :spectral-data="track.spectralProfile.integrated" 
-						:trackname="track.name" :sample-rate="track.sampleRate">
+						:trackID="track.uuid" :sample-rate="track.sampleRate">
 					</spectral-card>
 				</v-col>
 			</v-row>
@@ -62,7 +62,6 @@ import SpectralCard from './SpectralCard.vue';
 export default {
 	props: {
 		track: Object,
-    uuid: String,
     refTrack: {
       default: undefined,
       required: true
@@ -82,7 +81,7 @@ export default {
       if (newVal === "selected") {
         this.selectedAsRefBtnColor = 'primary';
         this.selectedAsRefCardElevation = "0";
-        this.$emit('ref-selected', this.uuid);
+        this.$emit('ref-selected', this.track.uuid);
       }
       if (newVal === undefined) {
         this.selectedAsRefBtnColor = 'secondary';
@@ -91,7 +90,7 @@ export default {
     },
     refTrackID (newVal) {
       if (newVal === '' || newVal === undefined) return;
-      if (newVal !== this.uuid) {
+      if (newVal !== this.track.uuid) {
         this.selectedAsRef = undefined;
       }
     }

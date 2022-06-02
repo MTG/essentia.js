@@ -11,7 +11,7 @@ import * as d3 from 'd3';
 import LineChart from './LineChart.js';
 
 export default {
-	props: ['data', 'trackname'],
+	props: ['data', 'trackID'],
 	data () {
 		return {
 			chart: null
@@ -19,8 +19,8 @@ export default {
 	},
 	computed: {
 		chartId () {
-			let whitespaceEscapedName = this.trackname.replace(/\s|\.|\d/g, '-');
-			return `${whitespaceEscapedName}-loudness`;
+			// let whitespaceEscapedName = this.trackname.replace(/\s|\.|\d/g, '-');
+			return `loudness-${this.trackID}`;
 		} 
 	},
 	mounted () {

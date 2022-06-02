@@ -28,7 +28,7 @@ function linspace(x0, xN, n){
 }
 
 export default {
-  props: ['spectralData', 'trackname', 'sampleRate'],
+  props: ['spectralData', 'trackID', 'sampleRate'],
   data () {
     return {
       dataCopy: this.spectralData.slice(),
@@ -54,8 +54,8 @@ export default {
       return formatted;
     },
     chartId () {
-			let whitespaceEscapedName = this.trackname.replace(/\s|\.|\d/g, '-');
-			return `${whitespaceEscapedName}-spectral`;
+			// let whitespaceEscapedName = this.trackname.replace(/\s|\.|\d/g, '-');
+			return `spectral-${this.trackID}`;
 		}
   },
   mounted () {

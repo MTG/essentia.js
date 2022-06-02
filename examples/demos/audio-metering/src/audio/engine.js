@@ -47,6 +47,7 @@ class AudioEngine {
             analysisData.sampleRate = b.sampleRate;
             analysisData.phase.channelData = data;
             const trackID = uuidv4();
+            analysisData.uuid = trackID;
             analysis[trackID] = analysisData;
             idx++;
         }
