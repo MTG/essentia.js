@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "d3": "^7.3.0",
-    "essentia.js": "^0.1.3"
+    "essentia.js": "^0.1.3",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@mdi/font": "^6.5.95",

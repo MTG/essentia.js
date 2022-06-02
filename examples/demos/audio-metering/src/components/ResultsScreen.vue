@@ -6,10 +6,16 @@
       show-arrows
     >
       <v-slide-item
-        v-for="track in AnalysisData"
-        :key="track.name"
+        v-for="(track, trackID) in AnalysisData"
+        :key="trackID"
       >
-        <metering-card :track="track"></metering-card>
+        <metering-card 
+          :track="track" 
+          :uuid="trackID" 
+          @ref-selected="handleSelectedAsRef"
+          :refTrack="selectedAsRefID !== undefined ? AnalysisData[selectedAsRefID] : undefined"
+          :refTrackID="selectedAsRefID"
+        ></metering-card>
       </v-slide-item>
     </v-slide-group>
   </v-row>
@@ -21,11 +27,12 @@ import MeteringCard from './MeteringCard.vue';
 export default {
 	components: { MeteringCard },
 	props: {
-		AnalysisData: Array[Object]
+		AnalysisData: Object[Object],
 	},
 	data () {
 		return {
-			currentSlide: 0
+			currentSlide: 0,
+			selectedAsRefID: undefined
 		}
 	},
 	methods: {
@@ -37,6 +44,10 @@ export default {
 		// handlePanelClick (name) {
 			
 		// }
+		handleSelectedAsRef (trackID) {
+			this.selectedAsRefID = trackID;
+			// pass this track's data to other MeteringCard instances
+		}
 	}
 }
 </script>

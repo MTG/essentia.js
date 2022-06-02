@@ -1,4 +1,5 @@
 import analyser from "./analysis";
+import { v4 as uuidv4 } from 'uuid';
 
 class AudioEngine {
     constructor () {
@@ -29,7 +30,7 @@ class AudioEngine {
     }
 
     async batchProcess (files) {
-        let analysis = [];
+        let analysis = {};
         console.time('tracks-analysis');
         const buffers = await this.#batchDecode(files);
         this.progress = `0/${buffers.length}`;
@@ -45,7 +46,8 @@ class AudioEngine {
             analysisData.name = files[idx].name;
             analysisData.sampleRate = b.sampleRate;
             analysisData.phase.channelData = data;
-            analysis.push(analysisData);
+            const trackID = uuidv4();
+            analysis[trackID] = analysisData;
             idx++;
         }
 

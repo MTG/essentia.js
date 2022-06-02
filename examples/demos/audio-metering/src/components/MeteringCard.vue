@@ -61,7 +61,13 @@ import SpectralCard from './SpectralCard.vue';
 
 export default {
 	props: {
-		track: Object
+		track: Object,
+    uuid: String,
+    refTrack: {
+      default: undefined,
+      required: true
+    },
+    refTrackID: String
 	},
 	components: {LoudnessCard, PhaseCard, SpectralCard},
 	data () {
@@ -76,10 +82,17 @@ export default {
       if (newVal === "selected") {
         this.selectedAsRefBtnColor = 'primary';
         this.selectedAsRefCardElevation = "0";
+        this.$emit('ref-selected', this.uuid);
       }
       if (newVal === undefined) {
         this.selectedAsRefBtnColor = 'secondary';
         this.selectedAsRefCardElevation = "3";
+      }
+    },
+    refTrackID (newVal) {
+      if (newVal === '' || newVal === undefined) return;
+      if (newVal !== this.uuid) {
+        this.selectedAsRef = undefined;
       }
     }
   }
