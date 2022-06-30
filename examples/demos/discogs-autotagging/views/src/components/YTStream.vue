@@ -45,6 +45,8 @@
 import EventBus from '../event-bus.js';
 import CustomToggle from './CustomToggle.vue';
 
+console.log(import.meta.env.BASE_URL);
+
 export default {
     components: {CustomToggle},
     data () {
@@ -131,7 +133,7 @@ export default {
             let regex = this.youtubeURL.includes('youtu.be') ? /\/(?<id>\w{11})/ : /watch\?v=(?<id>(\w|\d|-|_){11})/;
             let matches = regex.exec(this.youtubeURL);
             let ytid = matches ? matches.groups.id : null;
-            if (ytid) this.streamingURL = `http://localhost:8000/stream/${ytid}`;
+            if (ytid) this.streamingURL = `${import.meta.env.BASE_URL}stream/${ytid}`;
         },
         fileURL (val, _) {
             this.streamingURL = val;
