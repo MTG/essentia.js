@@ -49,6 +49,7 @@ declare module 'vue' {
     VListItemContent: typeof import('vuetify/lib')['VListItemContent']
     VListItemTitle: typeof import('vuetify/lib')['VListItemTitle']
     VMain: typeof import('vuetify/lib')['VMain']
+    VOverlay: typeof import('vuetify/lib')['VOverlay']
     VProgressLinear: typeof import('vuetify/lib')['VProgressLinear']
     VRow: typeof import('vuetify/lib')['VRow']
     VSheet: typeof import('vuetify/lib')['VSheet']

@@ -25,7 +25,13 @@
       </v-tooltip>
 		</v-toolbar>
 		<v-divider></v-divider>
-		<v-container fluid>
+		<v-container fluid id="relative-container">
+      <v-overlay
+        :value="showOverlay"
+        absolute
+        color="#ffffff"
+        opacity="0.6"
+      ></v-overlay>
 			<v-row dense>
 				<v-col cols="12">
 					<loudness-card
@@ -94,11 +100,21 @@ export default {
         this.selectedAsRef = undefined;
       }
     }
+  },
+  computed: {
+    showOverlay () {
+      if (this.selectedAsRef === "selected") return true;
+      return false;
+    }
   }
 }
 </script>
 
 <style scoped>
+  #relative-container {
+    position: relative;
+  }
+
   .highlight-card {
     border-width: 2px;
     border-color: #E4454A88;
