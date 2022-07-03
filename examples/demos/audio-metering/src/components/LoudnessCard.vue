@@ -8,10 +8,12 @@
 					<tr>
 						<td>Integrated</td>
 						<td>{{integrated.toFixed(3)}} LUFS</td>
+						<td v-if="refTrack !== undefined"  class="primary--text">{{refTrack.loudness.integrated.toFixed(3)}} LUFS</td>
 					</tr>
 					<tr>
 						<td>Range</td>
 						<td>{{range.toFixed(3)}} dB LU</td>
+						<td v-if="refTrack !== undefined"  class="primary--text">{{refTrack.loudness.range.toFixed(3)}} dB LU</td>
 					</tr>
 				</tbody>
 			</template>
@@ -25,6 +27,7 @@
 					<tr>
 						<td>Mono mix</td>
 						<td>{{rms.mono.toFixed(3)}} dB</td>
+						<td v-if="refTrack !== undefined" class="primary--text">{{refTrack.loudness.rms.mono.toFixed(3)}} dB</td>
 					</tr>
 					<!-- <tr>
 						<td>Right channel</td>
@@ -56,7 +59,11 @@ export default {
 		'rms': Object,
 		'momentary': Array,
 		'shortTerm': Array,
-		'trackID': String
+		'trackID': String,
+		refTrack: {
+			default: undefined,
+			required: true
+		}
 	},
 	components: { LoudnessChart },
 	data () {
@@ -83,5 +90,7 @@ export default {
 </script>
 
 <style>
-
+/* .ref-track-text {
+	color: var(--primary);
+} */
 </style>

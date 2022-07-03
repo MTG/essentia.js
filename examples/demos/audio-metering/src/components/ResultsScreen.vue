@@ -12,7 +12,7 @@
         <metering-card 
           :track="track" 
           :uuid="trackID" 
-          @ref-selected="handleSelectedAsRef"
+          @ref-selected="handleRefSelected" @ref-unselected="handleRefUnselected"
           :refTrack="selectedAsRefID !== undefined ? AnalysisData[selectedAsRefID] : undefined"
           :refTrackID="selectedAsRefID"
         ></metering-card>
@@ -44,9 +44,12 @@ export default {
 		// handlePanelClick (name) {
 			
 		// }
-		handleSelectedAsRef (trackID) {
+		handleRefSelected (trackID) {
 			this.selectedAsRefID = trackID;
 			// pass this track's data to other MeteringCard instances
+		},
+		handleRefUnselected () {
+			this.selectedAsRefID = undefined;
 		}
 	}
 }

@@ -33,7 +33,11 @@ export default {
     return {
       dataCopy: this.spectralData.slice(),
       minMag: -90, // dB
-      tiltSlope: 3
+      tiltSlope: 3,
+      refTrack: {
+        default: undefined,
+        required: true
+      }
     }
   },
   computed: {

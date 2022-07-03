@@ -11,6 +11,7 @@
         <template v-slot:activator="{ on, attrs }">
           <v-btn-toggle
             v-model="selectedAsRef"
+            @change="handleRefToggleChange"
             color="primary"
             rounded
             group
@@ -41,6 +42,7 @@
 						:momentary="track.loudness.momentary"
 						:shortTerm="track.loudness.shortTerm"
 						:trackID="track.uuid"
+            :refTrack="showRef ? refTrack : undefined"
 					></loudness-card>
 				</v-col>
 				<v-col cols="12">
@@ -48,11 +50,16 @@
 						:leftCh="track.phase.channelData[0]"
 						:rightCh="track.phase.channelData[1]"
 						:correlation="track.phase.correlation"
+            :refTrack="showRef ? refTrack : undefined"
 					></phase-card>
 				</v-col>
 				<v-col cols="12">
-					<spectral-card :spectral-data="track.spectralProfile.integrated" 
-						:trackID="track.uuid" :sample-rate="track.sampleRate">
+					<spectral-card 
+            :spectral-data="track.spectralProfile.integrated" 
+						:trackID="track.uuid" 
+            :sample-rate="track.sampleRate"
+            :refTrack="showRef ? refTrack : undefined"
+          >
 					</spectral-card>
 				</v-col>
 			</v-row>
@@ -87,7 +94,6 @@ export default {
       if (newVal === "selected") {
         this.selectedAsRefBtnColor = 'primary';
         this.selectedAsRefCardElevation = "0";
-        this.$emit('ref-selected', this.track.uuid);
       }
       if (newVal === undefined) {
         this.selectedAsRefBtnColor = 'secondary';
@@ -105,6 +111,23 @@ export default {
     showOverlay () {
       if (this.selectedAsRef === "selected") return true;
       return false;
+    },
+    showRef () {
+      if (this.refTrack !== undefined && this.refTrackID !== this.track.uuid) {
+        return true;
+      }
+      return false;
+    }
+  },
+  methods: {
+    handleRefToggleChange (val) {
+      console.log('toggle change', val);
+      if (val === "selected") {
+        this.$emit('ref-selected', this.track.uuid);
+      }
+      if (val === undefined) {
+        this.$emit('ref-unselected', this.track.uuid);
+      }
     }
   }
 }

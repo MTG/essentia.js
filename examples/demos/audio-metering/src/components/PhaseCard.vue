@@ -32,7 +32,11 @@ export default {
 	props: {
 		'leftCh': Float32Array,
 		'rightCh': Float32Array,
-		'correlation': Number
+		'correlation': Number,
+        refTrack: {
+            default: undefined,
+            required: true
+        }
 	},
 	data () {
 		return {
