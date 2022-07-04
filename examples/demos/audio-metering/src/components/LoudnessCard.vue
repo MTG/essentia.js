@@ -20,6 +20,7 @@
 		</v-simple-table>
 		<v-divider></v-divider>
 		<loudness-chart :data="chartData" :trackID="trackID"></loudness-chart>
+		<v-divider></v-divider>
 		<v-card-subtitle>RMS</v-card-subtitle>
 		<v-simple-table class="secondary lighten-3">
 			<template v-slot:default>
@@ -90,7 +91,4 @@ export default {
 </script>
 
 <style>
-/* .ref-track-text {
-	color: var(--primary);
-} */
 </style>

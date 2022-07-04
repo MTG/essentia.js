@@ -1,9 +1,16 @@
 <template>
-	<v-card-text>
-  <!-- <div class="pa-1"> -->
-		<svg :id="chartId"></svg>
-  <!-- </div> -->
-	</v-card-text>
+	<v-expansion-panels flat hover>
+		<v-expansion-panel class="secondary lighten-3">
+			<v-expansion-panel-header class="px-4">
+				Momentary & short-term
+			</v-expansion-panel-header>
+			<v-expansion-panel-content eager>
+				<div>
+					<svg :id="chartId"></svg>
+				</div>
+			</v-expansion-panel-content>
+		</v-expansion-panel>
+	</v-expansion-panels>
 </template>
 
 <script>
