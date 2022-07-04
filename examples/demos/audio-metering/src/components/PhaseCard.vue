@@ -1,29 +1,43 @@
 <template>
-	<v-card elevation="0" color="secondary lighten-3">
-		<v-card-title>Phase Correlation</v-card-title>
+  <v-card elevation="0" color="secondary lighten-3">
+    <v-card-title>Phase Correlation</v-card-title>
         <v-card-subtitle>{{correlation.toFixed(3)}}</v-card-subtitle>
-		<v-card-text>
-            <div id="canvas-container">
-                <canvas 
-                    ref="axes"
-                    id="axes"
-                    height="200" 
-                    width="200"
-                ></canvas>
-                <canvas 
-                    ref="lissajous"
-                    id="lissajous"
-                    height="200" 
-                    width="200"
-                ></canvas>
-            </div>
-		</v-card-text>
-	</v-card>
+    <v-card-text class="d-flex justify-space-between">
+		<div class="canvas-container">
+			<canvas
+				ref="axes"
+				class="axes"
+				height="200"
+				width="200"
+			></canvas>
+			<canvas
+				ref="lissajous"
+				class="lissajous"
+				height="200"
+				width="200"
+			></canvas>
+		</div>
+		<div class="canvas-container" v-if="refTrack !== undefined">
+			<canvas
+				ref="refAxes"
+				class="axes"
+				height="200"
+				width="200"
+			></canvas>
+			<canvas
+				ref="refLissajous"
+				class="lissajous"
+				height="200"
+				width="200"
+			></canvas>
+		</div>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>
 function deg2rad (degrees) {
-	return degrees * Math.PI / 180;
+  return degrees * Math.PI / 180;
 }
 const ALPHAS = ['10', '07', '05', '03', '01'];
 const sampleSkip = 256;
@@ -33,34 +47,37 @@ export default {
 		'leftCh': Float32Array,
 		'rightCh': Float32Array,
 		'correlation': Number,
-        refTrack: {
-            default: undefined,
-            required: true
-        }
+		refTrack: {
+			default: undefined,
+			required: true
+		},
+		strokeColor: String
 	},
 	data () {
 		return {
-			lissajousCtx: null,
-            axesCtx: null,
-            animationFrame: 0,
-            variation: 0,
-            variationMemo: Array(5).fill(0)
+			animationFrame: 0,
+			variation: 0,
+			variationMemo: Array(5).fill(0)
 		}
 	},
+    watch: {
+        refTrack(newVal) {
+            if (newVal !== undefined) {
+                this.$nextTick(() => {
+                    this.drawRef(this.$root.$vuetify.theme.themes.light.primary);
+					// this.drawMain(this.$root.$vuetify.theme.themes.light.accent);
+                })
+            }
+        }
+    },
 	mounted () {
-        console.info('drawing phase native');
-        console.time('draw-phase');
-        this.axesCtx = this.$refs.axes.getContext('2d');
-		this.lissajousCtx = this.$refs.lissajous.getContext('2d');
-
-		this.drawAxes();
-        // this.animationFrame = requestAnimationFrame(this.drawPhase.bind(this));
-        this.drawPhase();
-        console.timeEnd('draw-phase');
+		// console.info('drawing phase native');
+		// console.time('draw-phase'); '#F50E00'
+		this.drawMain(this.$root.$vuetify.theme.themes.light.error);
+		// console.timeEnd('draw-phase');
 	},
     methods: {
-        drawPhase () {
-            const ctx = this.lissajousCtx;
+        drawPhase (ctx, color) {
             ctx.clearRect(0, 0, 200, 200);
             ctx.save();
 
@@ -71,7 +88,7 @@ export default {
             // this.variationMemo.map( (v, i) => {
             //     this.drawVariation(v, ALPHAS[i])
             // });
-            this.drawVariation(0, '13');
+            this.drawVariation(0, color, '10', ctx);
 
             this.variationMemo.pop();
             this.variationMemo.unshift(this.variation);
@@ -80,8 +97,7 @@ export default {
             ctx.restore();
             // requestAnimationFrame(this.drawPhase.bind(this));
         },
-        drawAxes () {
-            const ctx = this.axesCtx;
+        drawAxes (ctx, signsColor) {
             const axesColor = '#BBBBBB';
 
             ctx.strokeStyle = axesColor;
@@ -95,19 +111,19 @@ export default {
             ctx.lineTo(200, 200);
             ctx.textAlign = "left";
             ctx.fillText("L", 0, 27);
-            
+
             ctx.moveTo(0, 200); // right axis
             ctx.lineTo(200, 0);
             ctx.textAlign = "right";
             ctx.fillText("R", 200, 27);
-            
+
             ctx.moveTo(100, 200); // middle axis
             ctx.lineTo(100, 20);
             ctx.textAlign = "center";
             ctx.fillText("M", 100, 10);
 
             ctx.font = 'bold 20px sans-serif';
-            ctx.fillStyle = '#F50E0040';
+            ctx.fillStyle = `${signsColor}80`;
             ctx.textAlign = "left";
             ctx.fillText("+", 20, 12);
             ctx.textAlign = "right";
@@ -119,9 +135,8 @@ export default {
 
             ctx.stroke();
         },
-        drawVariation (variation, alpha) {
-            const ctx = this.lissajousCtx;
-            ctx.strokeStyle = `#F50E00${alpha}`;
+        drawVariation (variation, phaseColor, alpha, ctx) {
+            ctx.strokeStyle = `${phaseColor}${alpha}`;
             let pastPoint = null;
             for (let s = 0; s < this.leftCh.length; s+=sampleSkip) {
                 ctx.beginPath();
@@ -130,8 +145,8 @@ export default {
                 if (leftSample == undefined || rightSample == undefined) {
                     break;
                 };
-                
-                // + 100 offset is redundant: ctx.translate 
+
+                // + 100 offset is redundant: ctx.translate
                 // applies to all subsequent objects in ctx
                 const ls = (leftSample * 60);
                 const rs = (rightSample * 60);
@@ -146,23 +161,39 @@ export default {
                 pastPoint = sampPoint.slice();
                 ctx.stroke();
             }
-        }
+        },
+		drawMain(color) {
+			const axesCtx = this.$refs.axes.getContext('2d');
+			const lissajousCtx = this.$refs.lissajous.getContext('2d');
+
+			this.drawAxes(axesCtx, color);
+			// this.animationFrame = requestAnimationFrame(this.drawPhase.bind(this));
+			this.drawPhase(lissajousCtx, color);
+		},
+		drawRef(color) {
+			const refAxesCtx = this.$refs.refAxes.getContext('2d');
+			const refLissajousCtx = this.$refs.refLissajous.getContext('2d');
+
+			this.drawAxes(refAxesCtx, color);
+			// this.animationFrame = requestAnimationFrame(this.drawPhase.bind(this));
+			this.drawPhase(refLissajousCtx, color);
+		}
     }
 }
 
 </script>
 
-<style>
-    #canvas-container {
+<style scoped>
+    .canvas-container {
         position: relative;
         padding: 0;
         margin: 0;
     }
 
-    #axes {
+    .axes {
         z-index: 1;
     }
-    #lissajous {
+    .lissajous {
         position: absolute;
         top: 0;
         left: 0;
