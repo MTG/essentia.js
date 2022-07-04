@@ -36,7 +36,8 @@ export default function LineChart(data, {
 	fillColor = "none",
   mixBlendMode = "multiply", // blend mode of lines
   showGrid = false, // show a Voronoi overlay? (for debugging)
-	svgSelector
+	svgSelector,
+  showLegend = false
 } = {}) {
   // Compute values.
   const X = d3.map(data, x);
@@ -79,11 +80,7 @@ export default function LineChart(data, {
       .attr("viewBox", [0, 0, width, height])
       .attr("style", "max-width: 100%; height: auto; height: intrinsic;")
       .style("-webkit-tap-highlight-color", "transparent")
-      .on("pointerenter", pointerentered)
-      .on("pointermove", pointermoved)
-      .on("pointerleave", pointerleft)
       .on("touchstart", event => event.preventDefault());
-
   svg.append("g")
       .attr("transform", `translate(0,${height - marginBottom})`)
       .attr("style", `font-size: ${tickLabelSize};`)
@@ -127,6 +124,10 @@ export default function LineChart(data, {
 			.attr("stroke", typeof color === "function" ? ([z]) => color(z) : null)
 			.attr("d", ([,I]) => line(I));
 
+  if (showLegend) {
+    drawLegend();
+  }
+
   const dot = svg.append("g")
       .attr("display", "none");
 
@@ -139,25 +140,30 @@ export default function LineChart(data, {
       .attr("text-anchor", "middle")
       .attr("y", -8);
 
-  function pointermoved(event) {
-    const [xm, ym] = d3.pointer(event);
-    const i = d3.least(I, i => Math.hypot(xScale(X[i]) - xm, yScale(Y[i]) - ym)); // closest point
-    path.style("stroke", ([z]) => Z[i] === z ? null : "#ddd").filter(([z]) => Z[i] === z).raise();
-    dot.attr("transform", `translate(${xScale(X[i])},${yScale(Y[i])})`);
-    if (T) dot.select("text").text(T[i]);
-    svg.property("value", O[i]).dispatch("input", {bubbles: true});
-  }
 
-  function pointerentered() {
-    path.style("mix-blend-mode", null).style("stroke", "#ddd");
-    dot.attr("display", null);
-  }
+  function drawLegend() {
+    const circleRadius = 7;
 
-  function pointerleft() {
-    path.style("mix-blend-mode", "multiply").style("stroke", null);
-    dot.attr("display", "none");
-    svg.node().value = null;
-    svg.dispatch("input", {bubbles: true});
+    svg.selectAll("legend-dots")
+    .data(d3.group(I, i => Z[i]))
+    .enter()
+    .append("circle")
+      .attr("cx", (d, i) => { return width*0.25*(i+2)})
+      .attr("cy", marginTop*0.5) // 100 is where the first dot appears. 25 is the distance between dots
+      .attr("r", circleRadius)
+      .style("fill", typeof color === "function" ? ([z]) => color(z) : null)
+    
+    // Add one dot in the legend for each name.
+    svg.selectAll("legend-labels")
+      .data(d3.group(I, i => Z[i]))
+      .enter()
+      .append("text")
+        .attr("x", (d, i) => { return circleRadius*2 + width*0.25*(i+2)})
+        .attr("y", marginTop*0.5) // 100 is where the first dot appears. 25 is the distance between dots
+        .style("fill", 'grey')
+        .text(([z]) => z)
+        .attr("text-anchor", "left")
+        .style("alignment-baseline", "middle")
   }
 
   return Object.assign(svg.node(), {value: null});

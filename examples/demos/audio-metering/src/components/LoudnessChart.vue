@@ -44,7 +44,8 @@ export default {
 			xLabel: 'Time (min:sec)',
 			yLabel: 'dB',
 			yDomain: [-70, 0],
-			height: 285
+			height: 285,
+			showLegend: true
 		})
 	}
 }
