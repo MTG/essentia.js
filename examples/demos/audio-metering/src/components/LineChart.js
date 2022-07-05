@@ -166,5 +166,6 @@ export default function LineChart(data, {
         .style("alignment-baseline", "middle")
   }
 
-  return Object.assign(svg.node(), {value: null});
+  // return Object.assign(svg.node(), {value: null});
+  return svg;
 }
