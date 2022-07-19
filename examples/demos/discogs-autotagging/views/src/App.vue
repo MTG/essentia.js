@@ -1,16 +1,20 @@
 <template>
-	<main>
-		<YTStream></YTStream>
-		<PredictionsDisplay></PredictionsDisplay>
-	</main>
+	<div>
+		<main>
+			<YTStream></YTStream>
+			<PredictionsDisplay></PredictionsDisplay>
+		</main>
+		<DemosFooter></DemosFooter>
+	</div>
 </template>
 
 <script>
 import YTStream from './components/YTStream.vue';
 import PredictionsDisplay from './components/PredictionsDisplay.vue';
+import DemosFooter from './components/DemosFooter.vue';
 
 export default {
-    components: { YTStream, PredictionsDisplay }
+    components: { YTStream, PredictionsDisplay, DemosFooter }
 }
 </script>
 
@@ -45,5 +49,6 @@ main {
 body {
 	background-color: rgb(var(--color-bg));
 	color: white;
+	margin: 0;
 }
 </style>
