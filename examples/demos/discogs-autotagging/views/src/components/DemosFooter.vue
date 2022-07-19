@@ -13,7 +13,7 @@
         <div id="essentia-models" class="d-flex flex-column justify-content-center align-items-center footer-block" 
             @mouseover="essentiaModelsHovered = true" @mouseleave="essentiaModelsHovered = false">
             <p>Made with</p> 
-            <a href="https://essentia.upf.edu/models.html#discogs-effnet" target="_blank">
+            <a href="https://essentia.upf.edu/models.html" target="_blank">
                 <essentia-logo :isHovered="essentiaModelsHovered"></essentia-logo>
             </a>
             <p :style="essentiaModelsHovered ? {fontWeight: 'bold', color: '#afafaf'} : {}">Models</p>
