@@ -1,10 +1,18 @@
 <template>
-    <section id="audio-controls">
-        <header class="full-width">
+    <section id="side-column">
+        <header class="side-column-item">
             <h1>Music Genre Autotagging</h1>
-            <h3>with DiscogsResNet</h3>
+            <h3>with <a id="discogsresnet" href="https://essentia.upf.edu/models.html#discogs-effnet" target="_blank">DiscogsResNet</a></h3>
         </header>
-        <section class="control full-width">
+        <div class="side-column-item">
+            <p>
+                Enter a Youtube video URL or upload your own file to get real-time music genre predictions based on the analysed audio stream.
+            </p>
+            <p class="note">
+                Note: Works only in Chromium-based browsers.
+            </p>
+        </div>
+        <div class="control side-column-item">
             <custom-toggle @change="(method) => selectedMethod = method"></custom-toggle>
             <input 
                 type="search" 
@@ -32,12 +40,12 @@
                 :class="{'control-is-active': !streamButtonDisabled, 'btn-blinker': btnShouldBlink }"
                 id="start-streaming-btn"
             >{{ buttonPrompt }} streaming</button>
-        </section>
-        <section class="control full-width">
+        </div>
+        <div class="control side-column-item">
             <audio :src="streamingURL" controls ref="audioElem" crossorigin="anonymous"
             @ended="handleStreamEnded" @pause="handlePause" @play="handlePlay" 
             @loadeddata="handleLoadedData"></audio>
-        </section>
+        </div>
     </section>
 </template>
 
@@ -156,8 +164,8 @@ export default {
 }
 </script>
 
-<style>
-    section.control {
+<style lang="scss">
+    div.control {
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -165,11 +173,20 @@ export default {
         font-size: 0.9rem;
     }
 
-    section#audio-controls {
-        display: flex;
+    #side-column {
+        /* display: flex;
         flex-direction: column;
-        justify-content: space-evenly;
+        justify-content: start; */
         flex: 1;
+        margin: 3em 0;
+    }
+
+    #discogsresnet {
+        text-decoration: none;
+        color: inherit;
+        &:hover {
+            color: var(--action-color);
+        }
     }
 
     .search-control {
@@ -178,9 +195,10 @@ export default {
         padding: .5em;
     }
 
-    .full-width {
+    .side-column-item {
         width: 100%;
         padding: 0 2em;
+        margin: 3em 0;
     }
 
     audio {
@@ -254,6 +272,13 @@ export default {
 
     .btn-blinker {
         animation: blinking 750ms ease infinite alternate
+    }
+
+    p {
+        text-align: left;
+        &.note {
+            color: rgb(var(--color-grey));
+        }
     }
 
     @keyframes blinking {
