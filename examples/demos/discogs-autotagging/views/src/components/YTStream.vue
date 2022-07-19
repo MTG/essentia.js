@@ -47,6 +47,15 @@ import CustomToggle from './CustomToggle.vue';
 
 console.log(import.meta.env.BASE_URL);
 
+function getStreamingURL (youtubeID) {
+    if (import.meta.env.DEV) {
+        return `http://localhost:8000/stream/${youtubeID}`
+    }
+    if (import.meta.env.PROD) {
+        return `${import.meta.env.BASE_URL}stream/${youtubeID}`
+    }
+}
+
 export default {
     components: {CustomToggle},
     data () {
@@ -133,7 +142,7 @@ export default {
             let regex = this.youtubeURL.includes('youtu.be') ? /\/(?<id>\w{11})/ : /watch\?v=(?<id>(\w|\d|-|_){11})/;
             let matches = regex.exec(this.youtubeURL);
             let ytid = matches ? matches.groups.id : null;
-            if (ytid) this.streamingURL = `${import.meta.env.BASE_URL}stream/${ytid}`;
+            if (ytid) this.streamingURL = getStreamingURL(ytid);
         },
         fileURL (val, _) {
             this.streamingURL = val;
