@@ -2,7 +2,7 @@
 	<v-expansion-panels flat hover>
 		<v-expansion-panel class="secondary lighten-3" key="0">
 			<v-expansion-panel-header class="px-4" :class="headerColor">
-				Momentary & short-term
+				Momentary & short-term {{isRefText}}
 			</v-expansion-panel-header>
 			<v-expansion-panel-content eager>
 				<div>
@@ -45,6 +45,9 @@ export default {
 		},
 		headerColor () {
 			return `${this.colors.header}--text`;
+		},
+		isRefText () {
+			if (this.isRef) return ' (ref)';
 		}
 	},
 	methods: {
@@ -57,7 +60,7 @@ export default {
 				y: d => d.dBs,
 				z: d => d.measurement,
 				color: (z) => {
-					return z == 'short-term' ? '#E4454A' : '#E3E05B';
+					return z == 'short-term' ? this.colors['short-term'] : this.colors['momentary'];
 				},
 				xFormat: '%M:%S',
 				xType: d3.scaleTime,

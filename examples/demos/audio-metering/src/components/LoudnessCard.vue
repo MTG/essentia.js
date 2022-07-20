@@ -87,8 +87,8 @@ export default {
 	data () {
 		return {
 			chartData: getChartData(this.momentary, this.shortTerm),
-			stdColors: {'momentary': '#E4454A', 'short-term': '#E3E05B', 'header': 'black'},
-			refColors: {'momentary': '#000', 'short-term': '#9E9E9E', 'header': 'primary'}
+			refColors: {'momentary': '#E3E05B', 'short-term': '#E4454A', 'header': 'primary'},
+			stdColors: {'momentary': '#C4C24F', 'short-term': '#961E22', 'header': 'error'}
 		}
 	},
 	computed: {
