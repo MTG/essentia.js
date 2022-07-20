@@ -1,36 +1,41 @@
 <template>
   <v-card elevation="0" color="secondary lighten-3">
     <v-card-title>Phase Correlation</v-card-title>
-        <v-card-subtitle>{{correlation.toFixed(3)}}</v-card-subtitle>
     <v-card-text class="d-flex justify-space-between">
-		<div class="canvas-container">
-			<canvas
-				ref="axes"
-				class="axes"
-				height="200"
-				width="200"
-			></canvas>
-			<canvas
-				ref="lissajous"
-				class="lissajous"
-				height="200"
-				width="200"
-			></canvas>
-		</div>
-		<div class="canvas-container" v-if="refTrack !== undefined">
-			<canvas
-				ref="refAxes"
-				class="axes"
-				height="200"
-				width="200"
-			></canvas>
-			<canvas
-				ref="refLissajous"
-				class="lissajous"
-				height="200"
-				width="200"
-			></canvas>
-		</div>
+		<div class="d-flex flex-column justify-center">
+            <p class="text-center">{{correlation.toFixed(3)}}</p>
+            <div class="canvas-container">
+                <canvas
+                    ref="axes"
+                    class="axes"
+                    height="200"
+                    width="200"
+                ></canvas>
+                <canvas
+                    ref="lissajous"
+                    class="lissajous"
+                    height="200"
+                    width="200"
+                ></canvas>
+            </div>
+        </div>
+        <div class="d-flex flex-column justify-center" v-if="refTrack !== undefined">
+            <p class="text-center">{{refTrack.phase.correlation.toFixed(3)}}</p>
+            <div class="canvas-container">
+                <canvas
+                    ref="refAxes"
+                    class="axes"
+                    height="200"
+                    width="200"
+                ></canvas>
+                <canvas
+                    ref="refLissajous"
+                    class="lissajous"
+                    height="200"
+                    width="200"
+                ></canvas>
+            </div>
+        </div>
     </v-card-text>
   </v-card>
 </template>
