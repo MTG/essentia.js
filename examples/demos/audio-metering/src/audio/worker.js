@@ -10,7 +10,6 @@ const useExtractor = true;
 // INIT
 import { Essentia, EssentiaWASM } from 'essentia.js';
 import { SpectralProfileWASM } from './spectralProfile2.module.js';
-log("Imports went OK");
 
 self.frameSize = 2048;
 self.hopSize = 32768; // equivalent to downsampling for spectral profile

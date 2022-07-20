@@ -44,7 +44,6 @@ export default {
     mounted () {
         const dropzone = this.$el;
         const fileupload = this.$el.firstElementChild;
-        console.log('fileupload', fileupload);
 
         if(dropzone) {
             // register all drag & drop event listeners

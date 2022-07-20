@@ -121,7 +121,6 @@ export default {
   },
   methods: {
     handleRefToggleChange (val) {
-      console.log('toggle change', val);
       if (val === "selected") {
         this.$emit('ref-selected', this.track.uuid);
       }

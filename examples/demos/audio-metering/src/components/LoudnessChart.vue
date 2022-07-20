@@ -32,8 +32,6 @@ export default {
 	},
 	watch: {
 		data () {
-			console.log('loudnesschart data change');
-			console.log('chartId', this.chartId);
 			this.$nextTick(() => {
 				this.createChart();
 			})
