@@ -19,7 +19,9 @@
 			</template>
 		</v-simple-table>
 		<v-divider></v-divider>
-		<loudness-chart :data="chartData" :trackID="trackID"></loudness-chart>
+		<loudness-chart :data="chartData" :trackID="trackID" :colors="stdColors" :isRef="false"></loudness-chart>
+		<v-divider v-if="refTrack !== undefined"></v-divider>
+		<loudness-chart v-show="refTrack !== undefined" :data="refChartData" :trackID="refTrackID" :colors="refColors" :isRef="true"></loudness-chart>
 		<v-divider></v-divider>
 		<v-card-subtitle>RMS</v-card-subtitle>
 		<v-simple-table class="secondary lighten-3">
@@ -30,10 +32,6 @@
 						<td>{{rms.mono.toFixed(3)}} dB</td>
 						<td v-if="refTrack !== undefined" class="primary--text">{{refTrack.loudness.rms.mono.toFixed(3)}} dB</td>
 					</tr>
-					<!-- <tr>
-						<td>Right channel</td>
-						<td>{{rms.right.toFixed(3)}} dB</td>
-					</tr> -->
 				</tbody>
 			</template>
 		</v-simple-table>
@@ -53,6 +51,25 @@ const timestampFromFramePosition = (framePos, frameSize) => {
 	return `${minutes}:${seconds.length > 1 ? seconds : '0'+seconds}:${milliseconds}`;
 }
 
+const getChartData = (momentary, shortTerm) => {
+	let chartData = [];
+	momentary.map( (val, i) => {
+		chartData.push({
+			time: timestampFromFramePosition(i, 0.4),
+			dBs: val,
+			measurement: 'momentary'
+		});
+	})
+	shortTerm.map( (val, i) => {
+		chartData.push({
+			time: timestampFromFramePosition(i, 3),
+			dBs: val,
+			measurement: 'short-term'
+		});
+	})
+	return chartData;
+};
+
 export default {
 	props: {
 		'integrated': Number,
@@ -68,23 +85,22 @@ export default {
 	},
 	components: { LoudnessChart },
 	data () {
-		let chartData = [];
-		this.momentary.map( (val, i) => {
-			chartData.push({
-				time: timestampFromFramePosition(i, 0.4),
-				dBs: val,
-				measurement: 'momentary'
-			});
-		})
-		this.shortTerm.map( (val, i) => {
-			chartData.push({
-				time: timestampFromFramePosition(i, 3),
-				dBs: val,
-				measurement: 'short-term'
-			});
-		})
 		return {
-			chartData: chartData,		
+			chartData: getChartData(this.momentary, this.shortTerm),
+			stdColors: {'momentary': '#E4454A', 'short-term': '#E3E05B', 'header': 'black'},
+			refColors: {'momentary': '#000', 'short-term': '#9E9E9E', 'header': 'primary'}
+		}
+	},
+	computed: {
+		refChartData () {
+			if (this.refTrack) {
+				return getChartData(this.refTrack.loudness.momentary, this.refTrack.loudness.shortTerm);
+			}
+			return [];
+		},
+		refTrackID () {
+			if (this.refTrack) return this.refTrack.uuid;
+			return '';
 		}
 	}
 }
