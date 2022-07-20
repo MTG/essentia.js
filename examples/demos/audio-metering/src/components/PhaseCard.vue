@@ -44,9 +44,9 @@ const sampleSkip = 256;
 
 export default {
 	props: {
-		'leftCh': Float32Array,
-		'rightCh': Float32Array,
-		'correlation': Number,
+		leftCh: Float32Array,
+		rightCh: Float32Array,
+		correlation: Number,
 		refTrack: {
 			default: undefined,
 			required: true
@@ -77,7 +77,7 @@ export default {
 		// console.timeEnd('draw-phase');
 	},
     methods: {
-        drawPhase (ctx, color) {
+        drawPhase (data, ctx, color) {
             ctx.clearRect(0, 0, 200, 200);
             ctx.save();
 
@@ -88,7 +88,7 @@ export default {
             // this.variationMemo.map( (v, i) => {
             //     this.drawVariation(v, ALPHAS[i])
             // });
-            this.drawVariation(0, color, '10', ctx);
+            this.drawVariation(data, 0, color, '10', ctx);
 
             this.variationMemo.pop();
             this.variationMemo.unshift(this.variation);
@@ -135,13 +135,15 @@ export default {
 
             ctx.stroke();
         },
-        drawVariation (variation, phaseColor, alpha, ctx) {
+        drawVariation (data, variation, phaseColor, alpha, ctx) {
+            const leftCh = data[0];
+            const rightCh = data[1];
             ctx.strokeStyle = `${phaseColor}${alpha}`;
             let pastPoint = null;
-            for (let s = 0; s < this.leftCh.length; s+=sampleSkip) {
+            for (let s = 0; s < leftCh.length; s+=sampleSkip) {
                 ctx.beginPath();
-                const leftSample = this.leftCh[s+variation];
-                const rightSample = this.rightCh[s+variation];
+                const leftSample = leftCh[s+variation];
+                const rightSample = rightCh[s+variation];
                 if (leftSample == undefined || rightSample == undefined) {
                     break;
                 };
@@ -168,7 +170,7 @@ export default {
 
 			this.drawAxes(axesCtx, color);
 			// this.animationFrame = requestAnimationFrame(this.drawPhase.bind(this));
-			this.drawPhase(lissajousCtx, color);
+			this.drawPhase([this.leftCh, this.rightCh],lissajousCtx, color);
 		},
 		drawRef(color) {
 			const refAxesCtx = this.$refs.refAxes.getContext('2d');
@@ -176,7 +178,7 @@ export default {
 
 			this.drawAxes(refAxesCtx, color);
 			// this.animationFrame = requestAnimationFrame(this.drawPhase.bind(this));
-			this.drawPhase(refLissajousCtx, color);
+			this.drawPhase(this.refTrack.phase.channelData, refLissajousCtx, color);
 		}
     }
 }
