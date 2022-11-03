@@ -1,11 +1,11 @@
-ARG EMSCRIPTEN_VERSION=1.39.19
+ARG EMSCRIPTEN_VERSION=3.1.24
 FROM emscripten/emsdk:${EMSCRIPTEN_VERSION}
 
 ENV LANG C.UTF-8
 
 # compile essentia with emscripten and selected third-party dependencies
 RUN apt-get update \
-    && apt-get install -y cmake curl nano python-dev python-numpy-dev libpython2.7 python-pip libeigen3-dev \
+    && apt-get install -y cmake curl nano python-dev python-numpy-dev libpython2.7 python3-pip libeigen3-dev \
     && mkdir /essentia && cd /essentia && git clone https://github.com/MTG/essentia.git \
     && cd /essentia/essentia/packaging/debian_3rdparty \
     && bash -C "./build_eigen3.sh" && cd ../../  && chmod +x waf \
@@ -19,8 +19,8 @@ RUN apt-get update \
 
 # copy and install python dependencies
 COPY src/python/requirements.txt /tmp/requirements.txt
-RUN pip install --upgrade setuptools \
-    && pip install --no-cache-dir -r /tmp/requirements.txt \
+RUN pip3 install --upgrade setuptools \
+    && pip3 install --no-cache-dir -r /tmp/requirements.txt \
     && rm /tmp/requirements.txt
 
 # add latest eigen3 header files for linking the essentia.js binding builds

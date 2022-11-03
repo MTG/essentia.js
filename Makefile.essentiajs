@@ -22,7 +22,7 @@ POST_JS_UMD_WASM=src/js/wasm.umd.post.js
 
 codegen:
 	@echo "Generating cpp source code from essentia python bindings ..."
-	@cd src/python && python configure_bindings.py
+	@cd src/python && python3 configure_bindings.py
 
 build:
 	@mkdir -p $(BUILD_DIR_ES)
