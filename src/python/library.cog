@@ -161,7 +161,7 @@ val EssentiaJS::LoudnessEBUR128(std::vector<float>& left_channel, std::vector<fl
 // NOTE: The following code snippets are machine generated. Do not edit.
 /*[[[cog
 import cog
-from .code_generator import generate_algorithms
+from code_generator import generate_algorithms
 algos = generate_algorithms()
 for algo in algos:
   for ln in algo:
