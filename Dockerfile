@@ -22,6 +22,9 @@ COPY src/python/requirements.txt /tmp/requirements.txt
 RUN pip3 install --upgrade setuptools \
     && pip3 install --no-cache-dir -r /tmp/requirements.txt \
     && rm /tmp/requirements.txt
+# install essentia python bindings from pre-compiled wheels
+COPY src/python/essentia-2.1b6.dev861-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl /tmp/essentia-2.1b6.dev861-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+RUN pip3 install /tmp/essentia-2.1b6.dev861-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
 
 # add latest eigen3 header files for linking the essentia.js binding builds
 ARG EIGEN_VERSION=3.3.7
@@ -30,6 +33,6 @@ RUN wget  -P /usr/local/include/ "https://gitlab.com/libeigen/eigen/-/archive/3.
     && rm -f eigen-${EIGEN_VERSION}.tar.gz && mv eigen-${EIGEN_VERSION} eigen3
 
 ENV EIGEN_PATH /usr/local/include/eigen3
-ENV EMSCRIPTEN /emsdk/upstream/emscripten
+ENV EMSCRIPTEN /emsdk/upstream/emscripten 
 
 WORKDIR /essentia/
