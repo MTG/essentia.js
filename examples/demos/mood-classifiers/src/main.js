@@ -68,8 +68,6 @@ function decodeFile(arrayBuffer) {
             let audioData = shortenAudio(prepocessedAudio, KEEP_PERCENTAGE, true); // <-- TRIMMED start/end
 
             // send for feature extraction
-            createFeatureExtractionWorker();
-
             featureExtractionWorker.postMessage({
                 audio: audioData.buffer
             }, [audioData.buffer]);
@@ -94,19 +92,24 @@ function computeKeyBPM (audioSignal) {
 
 function createFeatureExtractionWorker() {
     featureExtractionWorker = new Worker('./src/featureExtraction.js');
+    featureExtractionWorker.postMessage({
+        init: true
+    });
     featureExtractionWorker.onmessage = function listenToFeatureExtractionWorker(msg) {
         // feed to models
-        if (msg.data.features) {
-            modelNames.forEach((n) => {
-                // send features off to each of the models
-                inferenceWorkers[n].postMessage({
-                    features: msg.data.features
-                });
-            });
-            msg.data.features = null;
+        if (msg.data.embeddings) {
+            console.log("main received embeddings");
+            console.log(msg.data.embeddings);
+            // modelNames.forEach((n) => {
+            //     // send features off to each of the models
+            //     inferenceWorkers[n].postMessage({
+            //         features: msg.data.features
+            //     });
+            // });
+            // msg.data.embeddings = null;
         }
         // free worker resource until next audio is uploaded
-        featureExtractionWorker.terminate();
+        // featureExtractionWorker.terminate();
     };
 }
 
@@ -155,6 +158,7 @@ function toggleLoader() {
 
 window.onload = () => {
     createInferenceWorkers();
+    createFeatureExtractionWorker();
     EssentiaWASM().then((wasmModule) => {
         essentia = new wasmModule.EssentiaJS(false);
         essentia.arrayToVector = wasmModule.arrayToVector;
