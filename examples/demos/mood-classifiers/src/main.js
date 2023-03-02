@@ -100,12 +100,12 @@ function createFeatureExtractionWorker() {
         if (msg.data.embeddings) {
             console.log("main received embeddings");
             console.log(msg.data.embeddings);
-            // modelNames.forEach((n) => {
-            //     // send features off to each of the models
-            //     inferenceWorkers[n].postMessage({
-            //         features: msg.data.features
-            //     });
-            // });
+            modelNames.forEach((n) => {
+                // send features off to each of the models
+                inferenceWorkers[n].postMessage({
+                    embeddings: msg.data.embeddings
+                });
+            });
             // msg.data.embeddings = null;
         }
         // free worker resource until next audio is uploaded
