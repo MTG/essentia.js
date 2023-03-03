@@ -32,10 +32,11 @@ async function initTensorflowWASM() {
     tf.ready().then( () => {
         defaultBackend = tf.getBackend();
         console.log('default tfjs backend is: ', defaultBackend);
+        initModel();
     });
     
     if (defaultBackend != 'wasm') {
-        // return;
+        return;
         importScripts('./lib/tf-backend-wasm-3.5.0.js');
         // importScripts('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm/dist/tf-backend-wasm.js');
         tf.setBackend('wasm');

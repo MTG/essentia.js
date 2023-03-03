@@ -11,6 +11,7 @@ let featureExtractionWorker = null;
 let inferenceWorkers = {};
 const modelNames = ['mood_happy' , 'mood_sad', 'mood_relaxed', 'mood_aggressive', 'danceability'];
 let inferenceResultPromises = [];
+let inferenceStartTime = 0;
 
 const resultsViz = new AnalysisResults(modelNames);
 let wavesurfer;
@@ -100,6 +101,7 @@ function createFeatureExtractionWorker() {
         if (msg.data.embeddings) {
             console.log("main received embeddings");
             console.log(msg.data.embeddings);
+            inferenceStartTime = Date.now();
             modelNames.forEach((n) => {
                 // send features off to each of the models
                 inferenceWorkers[n].postMessage({
@@ -137,6 +139,7 @@ function createInferenceWorkers() {
 function collectPredictions() {
     if (inferenceResultPromises.length == modelNames.length) {
         Promise.all(inferenceResultPromises).then((predictions) => {
+            console.log(`inference took ${Date.now() - inferenceStartTime}ms in total`);
             const allPredictions = {};
             Object.assign(allPredictions, ...predictions);
             resultsViz.updateMeters(allPredictions);
