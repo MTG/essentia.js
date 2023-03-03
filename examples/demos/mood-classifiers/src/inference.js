@@ -1,24 +1,40 @@
 importScripts('./lib/tf.min.3.5.0.js');
 
-let model;
-let modelName = "";
-let modelLoaded = false;
-
-const modelTagOrder = {
-    'mood_happy': [true, false],
-    'mood_sad': [false, true],
-    'mood_relaxed': [false, true],
-    'mood_aggressive': [true, false],
-    'danceability': [true, false]
+let classifiers = {
+    'mood_happy': {
+        isLoaded: false,
+        tagOrder: [true, false],
+        model: null
+    }, 
+    'mood_sad': {
+        isLoaded: false,
+        tagOrder: [false, true],
+        model: null
+    }, 
+    'mood_relaxed': {
+        isLoaded: false,
+        tagOrder: [false, true],
+        model: null
+    }, 
+    'mood_aggressive': {
+        isLoaded: false,
+        tagOrder: [true, false],
+        model: null
+    }, 
+    'danceability': {
+        isLoaded: false,
+        tagOrder: [true, false],
+        model: null
+    }
 };
 
-async function initModel() {
-    model = await tf.loadGraphModel(getModelURL(modelName));
-    modelLoaded = true;
-    console.info(`Model ${modelName} has been loaded!`);
+async function initModel(name) {
+    classifiers[name].model = await tf.loadGraphModel(getModelURL(name));
+    console.info(`Model ${name} has been loaded!`);
+    classifiers[name].isLoaded = true;
 }
 
-function getModelURL() {
+function getModelURL(modelName) {
     return `../models/${modelName}-msd-musicnn-1/tfjs/model.json`;
 }
 
@@ -32,7 +48,9 @@ async function initTensorflowWASM() {
     tf.ready().then( () => {
         defaultBackend = tf.getBackend();
         console.log('default tfjs backend is: ', defaultBackend);
-        initModel();
+        for (let n of Object.keys(classifiers)) {
+            initModel(n);
+        }
     });
     
     if (defaultBackend != 'wasm') {
@@ -71,34 +89,37 @@ function outputPredictions(p) {
     });
 }
 
-function modelPredict(embeddings) {
-    if (modelLoaded) {
-        const inferenceStart = Date.now();
-        let inputTensor = arrayToTensorAsBatches(embeddings, 200);
-        let predictions = model.execute(inputTensor);
-        inputTensor.dispose();
-        let predictionsArray = predictions.arraySync();
-        predictions.dispose();
+function modelsPredict(embeddings) {
+    const inferenceStart = Date.now();
+    let inputTensor = arrayToTensorAsBatches(embeddings, 200);
+    
+    let predictions = {};
 
-        const summarizedPredictions = twoValuesAverage(predictionsArray);
-        // format predictions, grab only positive one
-        const results = summarizedPredictions.filter((_, i) => modelTagOrder[modelName][i])[0];
-        
-        console.info(`${modelName}: Inference took: ${Date.now() - inferenceStart}ms`);
-
-        outputPredictions(results);
+    for (let name of Object.keys(classifiers)) {
+        if (classifiers[name].isLoaded) {
+            let output = classifiers[name].model.execute(inputTensor);
+            let outputArray = output.arraySync();
+            
+            const summarizedPredictions = twoValuesAverage(outputArray);
+            // format predictions, grab only positive one
+            const results = summarizedPredictions.filter((_, i) => classifiers[name].tagOrder[i])[0];
+            predictions[name] = results;
+            
+            console.info(`${name}: Inference took: ${Date.now() - inferenceStart}ms`);
+            
+        }
     }
+    outputPredictions(predictions);
+    inputTensor.dispose();
 }
 
+initTensorflowWASM();
 
 onmessage = function listenToMainThread(msg) {
     // listen for audio embeddings
-    if (msg.data.name) {
-        modelName = msg.data.name;
-        initTensorflowWASM();
-    } else if (msg.data.embeddings) {
+    if (msg.data.embeddings) {
         console.log("From inference worker: I've got embeddings!");
         // should/can this eventhandler run async functions
-        modelPredict(msg.data.embeddings);
+        modelsPredict(msg.data.embeddings);
     }
 };
