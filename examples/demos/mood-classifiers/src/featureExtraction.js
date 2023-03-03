@@ -6,6 +6,8 @@ importScripts('./lib/essentia-wasm.module.js');
 const EssentiaWASM = Module;
 const extractor = new EssentiaModel.EssentiaTFInputExtractor(EssentiaWASM, 'musicnn', false);
 
+let modelStart = 0;
+
 let model;
 let modelURL = "../models/msd-musicnn-1/model.json";
 let modelLoaded = false;
@@ -70,11 +72,13 @@ async function initTensorflowWASM() {
     }
 }
 
-function computeEmbeddings(audioData) {    
+function computeEmbeddings(audioData) {
+    const spectrogramStart = Date.now();
     const features = extractor.computeFrameWise(audioData, 256);
-
+    console.log(`melspectrogram took: ${Date.now() - spectrogramStart}ms`);
     // console.log('computeEmbeddings: ', features.melSpectrum);
 
+    modelStart = Date.now();
     return model.predict(features, true, true);
 }
 
@@ -88,7 +92,9 @@ onmessage = function listenToMainThread(msg) {
         const audio = new Float32Array(msg.data.audio);
         const embeddingStart = Date.now();
         computeEmbeddings(audio).then( embeddings => {
+            console.info(`embedding model took ${Date.now() - modelStart}ms`);
             console.info(`Embedding extraction took: ${Date.now() - embeddingStart}`);
+            console.log('embeddings look like this: ', embeddings)
             postMessage({
                 embeddings: embeddings
             });
