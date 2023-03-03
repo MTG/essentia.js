@@ -8,9 +8,8 @@ const KEEP_PERCENTAGE = 0.15; // keep only 15% of audio file
 let essentia = null;
 let essentiaAnalysis;
 let featureExtractionWorker = null;
-let inferenceWorkers = {};
 const modelNames = ['mood_happy' , 'mood_sad', 'mood_relaxed', 'mood_aggressive', 'danceability'];
-let inferenceResultPromises = [];
+let inferenceWorker;
 let inferenceStartTime = 0;
 
 const resultsViz = new AnalysisResults(modelNames);
@@ -102,11 +101,9 @@ function createFeatureExtractionWorker() {
             console.log("main received embeddings");
             console.log(msg.data.embeddings);
             inferenceStartTime = Date.now();
-            modelNames.forEach((n) => {
-                // send features off to each of the models
-                inferenceWorkers[n].postMessage({
-                    embeddings: msg.data.embeddings
-                });
+            // send features off to each of the models
+            inferenceWorker.postMessage({
+                embeddings: msg.data.embeddings
             });
             // msg.data.embeddings = null;
         }
@@ -115,41 +112,26 @@ function createFeatureExtractionWorker() {
     };
 }
 
-function createInferenceWorkers() {
-    modelNames.forEach((n) => { 
-        inferenceWorkers[n] = new Worker('./src/inference.js');
-        inferenceWorkers[n].postMessage({
-            name: n
-        });
-        inferenceWorkers[n].onmessage = function listenToWorker(msg) {
-            // listen out for model output
-            if (msg.data.predictions) {
-                const preds = msg.data.predictions;
-                // emmit event to PredictionCollector object
-                inferenceResultPromises.push(new Promise((res) => {
-                    res({ [n]: preds });
-                }));
-                collectPredictions();
-                console.log(`${n} predictions: `, preds);
-            }
-        };
-    });
+function createInferenceWorker() {
+    inferenceWorker = new Worker('./src/inference.js');
+    inferenceWorker.onmessage = function listenToWorker(msg) {
+        // listen out for model output
+        if (msg.data.predictions) {
+            const preds = msg.data.predictions;
+            displayPredictions(preds);
+            console.log(`received predictions: `, preds);
+        }
+    };
 }
 
-function collectPredictions() {
-    if (inferenceResultPromises.length == modelNames.length) {
-        Promise.all(inferenceResultPromises).then((predictions) => {
-            console.log(`inference took ${Date.now() - inferenceStartTime}ms in total`);
-            const allPredictions = {};
-            Object.assign(allPredictions, ...predictions);
-            resultsViz.updateMeters(allPredictions);
-            resultsViz.updateValueBoxes(essentiaAnalysis);
-            toggleLoader();
-            controls.toggleEnabled(true)
-
-            inferenceResultPromises = [] // clear array
-        })
-    }
+function displayPredictions(predictions) {
+    console.log(`inference took ${Date.now() - inferenceStartTime}ms in total`);
+    const allPredictions = {};
+    Object.assign(allPredictions, ...predictions);
+    resultsViz.updateMeters(allPredictions);
+    resultsViz.updateValueBoxes(essentiaAnalysis);
+    toggleLoader();
+    controls.toggleEnabled(true)
 }
 
 function toggleLoader() {
@@ -160,7 +142,7 @@ function toggleLoader() {
 
 
 window.onload = () => {
-    createInferenceWorkers();
+    createInferenceWorker();
     createFeatureExtractionWorker();
     EssentiaWASM().then((wasmModule) => {
         essentia = new wasmModule.EssentiaJS(false);
