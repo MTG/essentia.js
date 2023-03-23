@@ -1,73 +1,56 @@
 // avoid ES Module imports: not available on workers in Firefox nor Safari
 let essentiaExtractor = new EssentiaExtractor(exports.EssentiaWASM);
 
-function Float32Concat(first, second)
-{
-    var firstLength = first.length,
-        result = new Float32Array(firstLength + second.length);
-
-    result.set(first);
-    result.set(second, firstLength);
-
-    return result;
-}
-
 class MelspectrogramProcessor extends AudioWorkletProcessor {
     constructor(options) {
         super();
-        this._bufferSize = options.processorOptions.bufferSize;
-        this._hopSize = options.processorOptions.hopSize;
-        this._melNumBands = options.processorOptions.melNumBands;
-        this._sampleRate = options.processorOptions.sampleRate;
-        this._channelCount = 1;
-        this._extractor = essentiaExtractor;
+        this.bufferSize = options.processorOptions.bufferSize;
+        this.hopSize = options.processorOptions.hopSize;
+        this.melNumBands = options.processorOptions.melNumBands;
+        this.sampleRate = options.processorOptions.sampleRate;
+        this.channelCount = 1;
+        this.extractor = essentiaExtractor;
         // modifying default extractor settings
-        this._extractor.frameSize = this._bufferSize;
-        this._extractor.hopSize = this._hopSize;
+        this.extractor.frameSize = this.bufferSize;
+        this.extractor.hopSize = this.hopSize;
         // settings specific to an algorithm
-        this._extractor.profile.MelBands.numberBands = this._melNumBands;
-        this._extractor.profile.MelBands.type = 'power';
+        this.extractor.profile.MelBands.numberBands = this.melNumBands;
+        this.extractor.profile.MelBands.type = 'power';
 
         // buffersize mismatch helpers
-        this._inputRingBuffer = new ChromeLabsRingBuffer(this._bufferSize, this._channelCount);
-        this._outputRingBuffer = new ChromeLabsRingBuffer(this._bufferSize, this._channelCount); // changed from 1024 to match block size
+        this.inputRingBuffer = new ChromeLabsRingBuffer(this.bufferSize, this.channelCount);
 
-        this._accumData = [new Float32Array(this._bufferSize)];
-        this._spectrum;
+        this.accumData = [new Float32Array(this.bufferSize)];
 
-        // SAB config
-        this.port.onmessage = e => {
-          this._audio_writer = new AudioWriter(new RingBuffer(e.data.sab, Float32Array));
+        // Shared memory config
+        this.port.onmessage = msg => {
+          this.descriptor_pool = new EssentiaPool(msg.data.memoryInfo);
         };
     }
 
-    process(inputList, outputList, params) {
+    process(inputList, outputList) {
         let input = inputList[0];
         let output = outputList[0];
 
-        this._inputRingBuffer.push(input);
+        this.inputRingBuffer.push(input);
 
-        if (this._inputRingBuffer.framesAvailable >= this._bufferSize) {
+        if (this.inputRingBuffer.framesAvailable >= this.bufferSize) {
 
-            this._inputRingBuffer.pull(this._accumData);
+            this.inputRingBuffer.pull(this.accumData);
 
-            this._spectrum = this._extractor.melSpectrumExtractor(this._accumData[0], this._sampleRate);
-            if (this._audio_writer.available_write() >= this._melNumBands) {
-              this._audio_writer.enqueue(this._spectrum);
-            }
+            const spectrum = this.extractor.melSpectrumExtractor(this.accumData[0], this.sampleRate);
+            const spectrumVector = this.extractor.arrayToVector(spectrum);
+            const centroid = Math.round(this.extractor.Centroid(spectrumVector, this.melNumBands).centroid);
 
-            let zeros = new Float32Array(128-this._spectrum.length);
-            let zeroPaddedSpectrum = Float32Concat(this._spectrum, zeros);
-
-            this._outputRingBuffer.push([zeroPaddedSpectrum]);
+            const centroidContainer = Float32Array.from([centroid]);
+            
+            this.descriptor_pool.set('melbands', spectrum);
+            this.descriptor_pool.set('melbands.centroid', centroidContainer);
             
             // reset variables
-            this._accumData = [new Float32Array(this._bufferSize)];
-            this._spectrum = null;
+            this.accumData = [new Float32Array(this.bufferSize)];
         }
 
-        this._outputRingBuffer.pull(output); // if ringbuffer does not have enough frames, output will be silent
-        // console.log(output[0]);
         return true;
     }
 }
@@ -157,9 +140,9 @@ class ChromeLabsRingBuffer {
     // match with this buffer obejct.
 
     // Transfer data from the |arraySequence| storage to the internal buffer.
-    let sourceLength = arraySequence[0].length;
+    const sourceLength = arraySequence[0].length;
     for (let i = 0; i < sourceLength; ++i) {
-      let writeIndex = (this._writeIndex + i) % this._length;
+      const writeIndex = (this._writeIndex + i) % this._length;
       for (let channel = 0; channel < this._channelCount; ++channel) {
         this._channelData[channel][writeIndex] = arraySequence[channel][i];
       }
@@ -191,11 +174,11 @@ class ChromeLabsRingBuffer {
       return;
     }
 
-    let destinationLength = arraySequence[0].length;
+    const destinationLength = arraySequence[0].length;
 
     // Transfer data from the internal buffer to the |arraySequence| storage.
     for (let i = 0; i < destinationLength; ++i) {
-      let readIndex = (this._readIndex + i) % this._length;
+      const readIndex = (this._readIndex + i) % this._length;
       for (let channel = 0; channel < this._channelCount; ++channel) {
         arraySequence[channel][i] = this._channelData[channel][readIndex];
       }
@@ -211,5 +194,4 @@ class ChromeLabsRingBuffer {
       this._framesAvailable = 0;
     }
   }
-} // class ChromeLabsRingBuffer
-
+} // class RingBuffer

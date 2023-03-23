@@ -1,0 +1,22 @@
+{
+  "name": "shared-array-buffer-tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vitejs/plugin-basic-ssl": "^1.0.1",
+    "jquery": "^3.6.3",
+    "pixi.js": "^7.2.1",
+    "ringbuf.js": "^0.3.3"
+  },
+  "devDependencies": {
+    "vite": "^4.1.4"
+  }
+}
