@@ -1,6 +1,7 @@
 ESSENTIAJS_VERSION=0.1.3
 ## Path to libs for Emscripten
 LIB_DIR_ESSENTIA=$(EMSCRIPTEN)/system/local/lib
+INCLUDE_DIR_ESSENTIA=$(EMSCRIPTEN)/system/local/include
 EIGEN_PATH=/usr/local/include/eigen3
 ## Pass custom build and dist directories using system environment variables
 BUILD_DIR_ES := $(or $(ESSENTIAJS_WASM_BUILDS_DIR),builds)
@@ -29,7 +30,7 @@ build:
 
 	@echo "Compiling the emscripten embind cpp bindings to bitcode ..."
 
-	@emcc -I $(EIGEN_PATH) \
+	@emcc -v -I $(EIGEN_PATH) -I $(INCLUDE_DIR_ESSENTIA)\
 	   --bind -Oz $(BINDING_ESSENTIAJS) $(INCLUDE_ESSENTIAJS) \
 	   -o $(BUILD_DIR_ES)/essentiajs.bc \
 	   -s EXCEPTION_DEBUG \
