@@ -31,6 +31,7 @@ build:
 	@echo "Compiling the emscripten embind cpp bindings to bitcode ..."
 
 	@emcc -v -I $(EIGEN_PATH) -I $(INCLUDE_DIR_ESSENTIA)\
+		 -lessentia -L ${LIB_DIR_ESSENTIA} \
 	   --bind -Oz $(BINDING_ESSENTIAJS) $(INCLUDE_ESSENTIAJS) \
 	   -o $(BUILD_DIR_ES)/essentiajs.bc \
 	   -s EXCEPTION_DEBUG \
