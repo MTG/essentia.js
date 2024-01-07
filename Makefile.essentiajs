@@ -43,8 +43,8 @@ build:
 
 	@echo "Linking and compiling the bindings with essentia to js, wasm files ..."
 	@echo "compiling async builds..."
-	@emcc -lembind -Oz $(BUILD_DIR_ES)/bindings_essentiajs.o $(BUILD_DIR_ES)/essentiajs.o ${LIB_DIR_ESSENTIA}/libessentia.a \
-	   -L $(LIB_DIR_ESSENTIA) \
+	@emcc -Oz $(BUILD_DIR_ES)/bindings_essentiajs.o $(BUILD_DIR_ES)/essentiajs.o \
+	   -lembind -lessentia -L $(LIB_DIR_ESSENTIA) \
 		 -s WASM=1 \
 	   -o $(ESSENTIA_JS_WEB) \
 	   -s EXCEPTION_DEBUG \
@@ -57,8 +57,8 @@ build:
 	@echo "Done ..."
 
 	@echo "compiling sync builds..."
-	@emcc --bind -Oz $(BUILD_DIR_ES)/bindings_essentiajs.o $(BUILD_DIR_ES)/essentiajs.o ${LIB_DIR_ESSENTIA}/libessentia.a \
-		 -L $(LIB_DIR_ESSENTIA) \
+	@emcc -Oz $(BUILD_DIR_ES)/bindings_essentiajs.o $(BUILD_DIR_ES)/essentiajs.o \
+		 -lembind -lessentia -L $(LIB_DIR_ESSENTIA) \
 	   -s WASM=1 \
 	   -o $(ESSENTIA_JS_MODULE) \
 	   -s BINARYEN_ASYNC_COMPILATION=0 \
