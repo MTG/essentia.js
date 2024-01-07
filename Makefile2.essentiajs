@@ -28,23 +28,12 @@ codegen:
 build:
 	@mkdir -p $(BUILD_DIR_ES)
 
-	@echo "Compiling the emscripten embind cpp bindings to bitcode ..."
+	@echo "Compiling + linking emscripten embind cpp bindings directly to js, wasm files ..."
 
-	@emcc -v -I $(EIGEN_PATH) -I $(INCLUDE_DIR_ESSENTIA)\
-	   -s DISABLE_EXCEPTION_CATCHING=2 \
-		 -o $(BUILD_DIR_ES)/bindings_essentiajs.o \
-		 -c $(BINDING_ESSENTIAJS) || exit 1
-
-	@emcc -v -I $(EIGEN_PATH) -I $(INCLUDE_DIR_ESSENTIA)\
-	   -s DISABLE_EXCEPTION_CATCHING=2 \
-		 -o $(BUILD_DIR_ES)/essentiajs.o \
-		 -c $(INCLUDE_ESSENTIAJS) || exit 1
-	@echo "Done ..."
-
-	@echo "Linking and compiling the bindings with essentia to js, wasm files ..."
-	@echo "compiling async builds..."
-	@emcc -lembind -Oz $(BUILD_DIR_ES)/bindings_essentiajs.o $(BUILD_DIR_ES)/essentiajs.o ${LIB_DIR_ESSENTIA}/libessentia.a \
+	@echo "... compiling async builds..."
+	@emcc -lembind -Oz $(BINDING_ESSENTIAJS) $(INCLUDE_ESSENTIAJS) ${LIB_DIR_ESSENTIA}/libessentia.a \
 	   -L $(LIB_DIR_ESSENTIA) \
+		 -I $(EIGEN_PATH) -I $(INCLUDE_DIR_ESSENTIA)\
 		 -s WASM=1 \
 	   -o $(ESSENTIA_JS_WEB) \
 	   -s EXCEPTION_DEBUG \
@@ -56,9 +45,10 @@ build:
 	   -s ALLOW_MEMORY_GROWTH=1 || exit 1
 	@echo "Done ..."
 
-	@echo "compiling sync builds..."
-	@emcc --bind -Oz $(BUILD_DIR_ES)/bindings_essentiajs.o $(BUILD_DIR_ES)/essentiajs.o ${LIB_DIR_ESSENTIA}/libessentia.a \
+	@echo "... compiling sync builds..."
+	@emcc --bind -Oz $(BINDING_ESSENTIAJS) $(INCLUDE_ESSENTIAJS) ${LIB_DIR_ESSENTIA}/libessentia.a \
 		 -L $(LIB_DIR_ESSENTIA) \
+		 -I $(EIGEN_PATH) -I $(INCLUDE_DIR_ESSENTIA)\
 	   -s WASM=1 \
 	   -o $(ESSENTIA_JS_MODULE) \
 	   -s BINARYEN_ASYNC_COMPILATION=0 \
@@ -83,9 +73,6 @@ build:
 	@cp -f $(ESSENTIA_WASM_ES6_MODULE) $(DIST_DIR_ES)/
 
 	@echo "Done ..."
-
-	@echo "Removing unnecessary files ..."
-	@rm $(BUILD_DIR_ES)/essentiajs.o $(BUILD_DIR_ES)/bindings_essentiajs.o
 
 	@echo "Builds ..."
 	@ls $(BUILD_DIR_ES)
