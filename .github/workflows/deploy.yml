@@ -10,7 +10,7 @@ on:
       # - 'test/**'
       - 'build-libs.sh'
       - 'Dockerfile'
-      - 'Makefile.essentiajs'
+      - 'Makefile'
       - 'rollup*.js'
       - 'tsconfig.json'
       - '!docs/**'
