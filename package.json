@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@tensorflow/tfjs-node": "^3.7.0",
+    "benchmark": "^2.1.4",
     "chai": "^4.2.0",
     "esm": "^3.2.25",
     "foodoc": "0.0.9",
