@@ -13,7 +13,7 @@ fs.readdir(directoryPath, function (err, files) {
   //listing all files using forEach
   files.forEach(function (file) {
     // Do whatever you want to do with the file
-    if (file === 'index.js') return;
+    if (file === 'index.js' || file === 'mfcc.js') return;
     childProcess.fork(path.join(__dirname, file), args);
   });
 });
