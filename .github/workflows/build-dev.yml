@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Build new Docker image
         working-directory: ${{ github.workspace }}
-        run: docker build -t mtgupf/essentia-emscripten:dev < ./Dockerfile
+        run: docker build -t mtgupf/essentia-emscripten:dev .
       - name: Build library
         working-directory: ${{ github.workspace }}
         run: |
