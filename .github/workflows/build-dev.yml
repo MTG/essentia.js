@@ -1,0 +1,45 @@
+name: build-dev
+
+on: 
+  push:
+    branches:
+      - dev
+      - master
+    paths:
+      - 'src/python/requirements.txt'
+      - 'build-libs.sh'
+      - 'Dockerfile'
+      - 'Makefile'
+  pull_request:
+    branches:
+      - dev
+      - master
+    paths:
+      - 'src/python/requirements.txt'
+      - 'build-libs.sh'
+      - 'Dockerfile'
+      - 'Makefile'
+    types:
+      - opened
+      - edited
+      - reopened
+
+jobs: 
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: mtgupf/essentia-emscripten:latest
+      options: --rm
+    steps:
+      - name: Checkout close
+        uses: actions/checkout@v2
+      - name: Build new Docker image
+        working-directory: ${{ github.workspace }}
+        run: docker build -t mtgupf/essentia-emscripten:dev < ./Dockerfile
+      - name: Build library
+        working-directory: ${{ github.workspace }}
+        run: |
+          docker run --rm -v `pwd`:/essentia/ mtgupf/essentia-emscripten:dev /essentia/build-libs.sh
+        shell: bash
+
+  # unit-test:
