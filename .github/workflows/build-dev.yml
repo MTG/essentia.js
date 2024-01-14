@@ -28,9 +28,6 @@ on:
 jobs: 
   build:
     runs-on: ubuntu-latest
-    container:
-      image: mtgupf/essentia-emscripten:latest
-      options: --rm
     steps:
       - name: Checkout close
         uses: actions/checkout@v2
