@@ -35,7 +35,7 @@ EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) {
     /*[[[cog
     import logging
     import cog
-    from .code_generator import TO_INCLUDE_ALGOS
+    from code_generator import TO_INCLUDE_ALGOS
     logging.basicConfig(level='INFO')
     logging.info("Generating emscripten bindings for the essentia...")
     for algo_name in TO_INCLUDE_ALGOS:

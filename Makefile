@@ -1,6 +1,7 @@
 ESSENTIAJS_VERSION=0.1.3
 ## Path to libs for Emscripten
 LIB_DIR_ESSENTIA=$(EMSCRIPTEN)/system/local/lib
+INCLUDE_DIR_ESSENTIA=$(EMSCRIPTEN)/system/local/include
 EIGEN_PATH=/usr/local/include/eigen3
 ## Pass custom build and dist directories using system environment variables
 BUILD_DIR_ES := $(or $(ESSENTIAJS_WASM_BUILDS_DIR),builds)
@@ -22,25 +23,18 @@ POST_JS_UMD_WASM=src/js/wasm.umd.post.js
 
 codegen:
 	@echo "Generating cpp source code from essentia python bindings ..."
-	@cd src/python && python configure_bindings.py
+	@cd src/python && python3 configure_bindings.py
 
 build:
 	@mkdir -p $(BUILD_DIR_ES)
 
-	@echo "Compiling the emscripten embind cpp bindings to bitcode ..."
+	@echo "Compiling + linking emscripten embind cpp bindings directly to js, wasm files ..."
 
-	@emcc -I $(EIGEN_PATH) \
-	   --bind -Oz $(BINDING_ESSENTIAJS) $(INCLUDE_ESSENTIAJS) \
-	   -o $(BUILD_DIR_ES)/essentiajs.bc \
-	   -s EXCEPTION_DEBUG \
-	   -s ASSERTIONS=2 \
-	   -s DISABLE_EXCEPTION_CATCHING=2 || exit 1
-	@echo "Done ..."
-
-	@echo "Linking and compiling the bindings with essentia to js, wasm files ..."
-	@echo "compiling async builds..."
-	@emcc --bind -Oz $(BUILD_DIR_ES)/essentiajs.bc ${LIB_DIR_ESSENTIA}/essentia.a \
-	   -s WASM=1 \
+	@echo "... compiling async builds..."
+	@emcc -lembind -Oz $(BINDING_ESSENTIAJS) $(INCLUDE_ESSENTIAJS) \
+	   -lembind -lessentia -L $(LIB_DIR_ESSENTIA) \
+		 -I $(EIGEN_PATH) -I $(INCLUDE_DIR_ESSENTIA)\
+		 -s WASM=1 \
 	   -o $(ESSENTIA_JS_WEB) \
 	   -s EXCEPTION_DEBUG \
 	   -s ASSERTIONS=2 \
@@ -51,8 +45,10 @@ build:
 	   -s ALLOW_MEMORY_GROWTH=1 || exit 1
 	@echo "Done ..."
 
-	@echo "compiling sync builds..."
-	@emcc --bind -Oz $(BUILD_DIR_ES)/essentiajs.bc ${LIB_DIR_ESSENTIA}/essentia.a \
+	@echo "... compiling sync builds..."
+	@emcc --bind -Oz $(BINDING_ESSENTIAJS) $(INCLUDE_ESSENTIAJS) \
+		 -lembind -lessentia -L $(LIB_DIR_ESSENTIA) \
+		 -I $(EIGEN_PATH) -I $(INCLUDE_DIR_ESSENTIA)\
 	   -s WASM=1 \
 	   -o $(ESSENTIA_JS_MODULE) \
 	   -s BINARYEN_ASYNC_COMPILATION=0 \
@@ -77,9 +73,6 @@ build:
 	@cp -f $(ESSENTIA_WASM_ES6_MODULE) $(DIST_DIR_ES)/
 
 	@echo "Done ..."
-
-	@echo "Removing unnecessary files ..."
-	@rm $(BUILD_DIR_ES)/essentiajs.bc
 
 	@echo "Builds ..."
 	@ls $(BUILD_DIR_ES)

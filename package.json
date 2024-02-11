@@ -15,8 +15,8 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "gen-code": "make -f Makefile.essentiajs codegen",
-    "build-wasm": "make -f Makefile.essentiajs build",
+    "gen-code": "make -f Makefile codegen",
+    "build-wasm": "make -f Makefile build",
     "build-js-api": "rollup --config",
     "build-api-docs": "./build-docs.sh",
     "test": "mocha"

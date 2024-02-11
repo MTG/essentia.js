@@ -1,4 +1,4 @@
-name: CI
+name: build-dev
 
 on: 
   push:
@@ -6,47 +6,38 @@ on:
       - dev
       - master
     paths:
-      - 'src/**'
-      # - 'test/**'
+      - 'src/python/requirements.txt'
       - 'build-libs.sh'
       - 'Dockerfile'
       - 'Makefile'
-      - 'rollup*.js'
-      - 'tsconfig.json'
-      - '!docs/**'
-      - '!examples/**'
   pull_request:
     branches:
       - dev
       - master
     paths:
-      - 'src/**'
-      # - 'test/**'
+      - 'src/python/requirements.txt'
       - 'build-libs.sh'
       - 'Dockerfile'
       - 'Makefile'
-      - 'rollup*.js'
-      - 'tsconfig.json'
-      - '!docs/**'
-      - '!examples/**'
     types:
       - opened
       - edited
+      - synchronize
       - reopened
 
 jobs: 
   build:
     runs-on: ubuntu-latest
-    container:
-      image: mtgupf/essentia-emscripten:latest
-      options: --rm
     steps:
-      - uses: actions/checkout@v2
-      - name: Build library
-        run: |
-          chmod +x ./build-libs.sh
-          ./build-libs.sh
+      - name: Checkout close
+        uses: actions/checkout@v2
+      - name: Build new Docker image
         working-directory: ${{ github.workspace }}
+        run: docker build -t mtgupf/essentia-emscripten:dev .
+      - name: Build library
+        working-directory: ${{ github.workspace }}
+        run: |
+          docker run --rm -v `pwd`:/essentia/ mtgupf/essentia-emscripten:dev /essentia/build-libs.sh
         shell: bash
 
   # unit-test:

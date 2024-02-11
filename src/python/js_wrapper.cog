@@ -198,7 +198,7 @@ class Essentia {
   // NOTE: The following code snippets are machine generated. Do not edit.
   /*[[[cog
   import cog
-  from .code_generator import generate_typescript_wrapper
+  from code_generator import generate_typescript_wrapper
   algos = generate_typescript_wrapper()
   for algo in algos:
     for ln in algo:

@@ -42,7 +42,7 @@ class EssentiaJS {
     // NOTE: The following code snippets are machine generated. Do not edit.    
     /*[[[cog
     import cog
-    from .code_generator import generate_headers, TO_INCLUDE_ALGOS
+    from code_generator import generate_headers, TO_INCLUDE_ALGOS
     cog.outl(" ")
     cog.outl("// class property which stores all the list of essentia algorithm names available in essentia.js")
     c_algo_list = str(TO_INCLUDE_ALGOS)
