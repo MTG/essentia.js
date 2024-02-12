@@ -82,10 +82,11 @@ def parse_algorithm_info(algorithm_name, target="header"):
 	output_dict['outputs'] = []
 	param_dict['params'] = []
 	output_var_names = list()
+	param_var_names = list()
 	# create the algorithm object
 	algo = getattr(estd, algorithm_name)()
 	doc_dict = algo.getStruct()
-	algo_obj = "algo%s" % algorithm_name
+	algo_obj = f"_{algorithm_name.lower()}"
 
 	# parse inputs
 	for inp in doc_dict['inputs']:
@@ -114,33 +115,20 @@ def parse_algorithm_info(algorithm_name, target="header"):
 												params['name']))
 
 		param_dict['params'].append('"%s", %s' % (params['name'], params['name']))
+		param_var_names.append(params['name'])
 
 	# parse outputs
 	# if the algorithm has multiple outputs we construct a void function, otherwise return it's return type
-	if (len(doc_dict['outputs']) != 1):
-		func_return_type = "void"
-		if len(doc_dict['outputs']) > 0:
-			for out in doc_dict['outputs']:
-				output_var = "%s %s%s" % (map_types_to_cpp(out['type']), 
-										OUTPUT_PREFIX_ES, 
-										out['name'])
-				
-				outputs.append(output_var)
-				output_var_names.append("%s%s" % (OUTPUT_PREFIX_ES, out['name']))
-				output_dict['outputs'].append('  %s->output("%s").set(%s%s);' % (algo_obj, 
-																			out['name'], 
-																			OUTPUT_PREFIX_ES, 
-																			out['name']))
-	else:
-		func_return_type = map_types_to_cpp(doc_dict['outputs'][0]['type']).replace('&', '')
+
+	if len(doc_dict['outputs']) > 0:
 		for out in doc_dict['outputs']:
-			output_var = "%s %s%s" % (map_types_to_cpp(out['type']), OUTPUT_PREFIX_ES, out['name'])
-			outputs.append(output_var)
-			output_var_names.append("%s%s" % (OUTPUT_PREFIX_ES, out['name']))
-			output_dict['outputs'].append('  %s->output("%s").set(%s%s);' % (algo_obj, 
-																			out['name'], 
-																			OUTPUT_PREFIX_ES, 
-																			out['name']))
+			output_name = out['name']
+			output_var_name = f"{OUTPUT_PREFIX_ES}{output_name}"
+			output_var_type_declaration = f"{map_types_to_cpp(out['type'])} {output_var_name}"
+			outputs.append(output_var_type_declaration)
+			output_var_names.append(output_var_name)
+			output_set_str = f'\t{algo_obj}->output("{output_name}").set({OUTPUT_PREFIX_ES}{output_name});'
+			output_dict['outputs'].append(output_set_str)
 		
 	# Default class declaration string
 	class_str = f"""
@@ -152,7 +140,7 @@ class {algorithm_name} {{
 		{FUNC_RETURN_TYPE} compute({', '.join(inputs)});
 		void reset();
 	private:
-		Algorithm* _{algorithm_name.lower()};
+		Algorithm* {algo_obj};
 }};"""
 
 	# Update the class_str if either inputs or parameters 
@@ -168,64 +156,72 @@ class {algorithm_name} {{
 	# otherwise construct the algorithm method 
 	elif target == "algorithm":		
 		algorithm = list()
-		class_name = "EssentiaJS"
-		# add empty line
-		algorithm.append(" ")
+
 		# add comment to the links of documentation
-		algorithm.append("// check https://essentia.upf.edu/reference/std_%s.html" % algorithm_name)
-
-		arg_parse_str = " %s" % algorithm_name
+		algorithm.append(f"\n// START {algorithm_name} definitions")
+		algorithm.append(f"// check https://essentia.upf.edu/reference/std_{algorithm_name}.html")
 		
+		def close_def_body():
+			algorithm.append("}")
 
-		algorithm.append("%s %s::%s%s {" % (FUNC_RETURN_TYPE, 
-											class_name, 
-											algorithm_name, 
-											class_str.split(arg_parse_str)[1]))
+		# append algo constructor
+		algorithm.append(f"{algorithm_name}::{algorithm_name}({', '.join(parameters)}) {{")
+		algorithm.append(f"\tconfigure({', '.join(param_var_names)});")
+		close_def_body()
 
-			
-		algorithm.append("  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();")
+		# append algo destructor
+		algorithm.append(f"{algorithm_name}::~{algorithm_name}() {{")
+		algorithm.append(f"\tdelete {algo_obj};")
+		close_def_body()
 
+		# append algo configure: factory instance, algo create
+		algorithm.append(f"void {algorithm_name}::configure({', '.join(parameters)}) {{")
+		algorithm.append("\tAlgorithmFactory& factory = standard::AlgorithmFactory::instance();")
 		if param_dict['params']:
-			algorithm.append('  Algorithm* %s = factory.create("%s", %s);' % (algo_obj, 
-																	algorithm_name, 
-																	', '.join(param_dict['params'])))
+			algorithm.append(f'\t{algo_obj} = factory.create("{algorithm_name}", {", ".join(param_dict["params"])});')
 		else:
-			algorithm.append('  Algorithm* %s = factory.create("%s");' % (algo_obj, algorithm_name))
+			algorithm.append(f'\t{algo_obj} = factory.create("{algorithm_name}");')
+		close_def_body()
 
+		# append algo compute:
+		algorithm.append(f"{FUNC_RETURN_TYPE} {algorithm_name}::compute({', '.join(inputs)}) {{")
 		# set inputs to the algorithm
-		for inp in doc_dict['inputs']:
-			inp_str = '  %s->input("%s").set(%s%s);' % (algo_obj, inp['name'], 
-													INPUT_PREFIX_ES, 
-													inp['name'])
-			algorithm.append(inp_str)
+		for input in doc_dict['inputs']:
+			input_name = input['name']
+			input_str = f'\t{algo_obj}->input("{input_name}").set({INPUT_PREFIX_ES}{input_name});'
+			algorithm.append(input_str)
 
+		# declare output containers
 		for out in outputs:
-			algorithm.append("  %s;" % out.replace('&', ''))
-
+			algorithm.append(f"\t{out.replace('&', '')};")
 		# set outputs to the algorithm
 		if output_dict['outputs']:
 			for out in output_dict['outputs']:
 				algorithm.append(out)
 		else:
-			raise IOError("No output variable found in the algo '%s'" % algorithm_name)
-
-		algorithm.append("  %s->compute();" % algo_obj)
-
-		algorithm.append("  val output%s(val::object());" % algorithm_name)
-
+			raise IOError(f"No output variable found in the algo '{algorithm_name}'")
+		# call compute
+		algorithm.append(f"\t{algo_obj}->compute();")
+		# declare output val object
+		algorithm.append(f"\t{FUNC_RETURN_TYPE} output{algorithm_name}(val::object());")
+		# set its values
 		for out_var in output_var_names:
-			algorithm.append('  output%s.set("%s", %s);' % (algorithm_name,
-														out_var.replace(OUTPUT_PREFIX_ES, ''),
-														out_var))
+			output_name = out_var.replace(OUTPUT_PREFIX_ES, '')
+			algorithm.append(f'\toutput{algorithm_name}.set("{output_name}", {out_var});')
+		# return
+		algorithm.append(f"\treturn output{algorithm_name};")	
+		close_def_body()
 
-		algorithm.append("  delete %s;" % algo_obj)	
-		algorithm.append("  return output%s;" % algorithm_name)	
-		algorithm.append("}")
+		# append algo reset:
+		algorithm.append(f"void {algorithm_name}::reset() {{")
+		algorithm.append(f"{algo_obj}->reset();")
+		close_def_body()
+		algorithm.append(f"// END {algorithm_name} definitions")
+
 		return algorithm
 
 	else:
-		raise IOError("Given target=%s is not valid. 'target' should be either 'header' or 'algorithm'." 
-																							% target)
+		raise IOError(f"Given target={target} is not valid. 'target' should be either 'header' or 'algorithm'.")
 
 
 def generate_headers(algorithms=TO_INCLUDE_ALGOS):
