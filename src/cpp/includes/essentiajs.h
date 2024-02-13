@@ -22,7 +22,6 @@
 #ifndef ESSENTIAJS_H
 #define ESSENTIAJS_H
 
-#include <emscripten/bind.h>
 #include <vector>
 #include <essentia/algorithmfactory.h>
 #include <essentia/essentiamath.h>

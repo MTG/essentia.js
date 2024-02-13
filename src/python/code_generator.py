@@ -83,6 +83,7 @@ def parse_algorithm_info(algorithm_name, target="header"):
 	param_dict['params'] = []
 	output_var_names = list()
 	param_var_names = list()
+	param_type_list = list()
 	# create the algorithm object
 	algo = getattr(estd, algorithm_name)()
 	doc_dict = algo.getStruct()
@@ -94,28 +95,32 @@ def parse_algorithm_info(algorithm_name, target="header"):
 		inputs.append(input_var)
 
 	# parse parameters
-	for params in doc_dict['parameters']:
-		if params['type'] == 'string':
+	for param in doc_dict['parameters']:
+		param_type = map_types_to_cpp(param['type'])
+		param_type_list.append(param_type)
+		if target == "binding": 
+			continue
+		if param['type'] == 'string':
 			if target == 'header':
-				parameters.append('const %s& %s="%s"' % (map_types_to_cpp(params['type']), 
-														params['name'], 
-														params['default']))
+				parameters.append('const %s& %s="%s"' % (param_type, 
+														param['name'], 
+														param['default']))
 			elif target == "algorithm":
-				parameters.append('const %s& %s' % (map_types_to_cpp(params['type']), 
-													params['name']))
-		elif params['type'] == 'vector_real':		
-			parameters.append(map_vector_params_to_cpp(params, target=target))
+				parameters.append('const %s& %s' % (param_type, 
+													param['name']))
+		elif param['type'] == 'vector_real':		
+			parameters.append(map_vector_params_to_cpp(param, target=target))
 		else:
 			if target == 'header':
-				parameters.append("const %s %s=%s" % (map_types_to_cpp(params['type']), 
-													params['name'], 
-													params['default']))
+				parameters.append("const %s %s=%s" % (param_type, 
+													param['name'], 
+													param['default']))
 			elif target == 'algorithm':
-				parameters.append("const %s %s" % (map_types_to_cpp(params['type']), 
-												params['name']))
+				parameters.append("const %s %s" % (param_type, 
+												param['name']))
 
-		param_dict['params'].append('"%s", %s' % (params['name'], params['name']))
-		param_var_names.append(params['name'])
+		param_dict['params'].append('"%s", %s' % (param['name'], param['name']))
+		param_var_names.append(param['name'])
 
 	# parse outputs
 	# if the algorithm has multiple outputs we construct a void function, otherwise return it's return type
@@ -220,6 +225,16 @@ class {algorithm_name} {{
 
 		return algorithm
 
+	elif target == "binding":
+		binding_str = f"""
+class_<{algorithm_name}>("{algorithm_name}")
+	.constructor<{', '.join(param_type_list)}>()
+	.function("configure", &{algorithm_name}::configure)
+	.function("compute", &{algorithm_name}::compute)
+	.function("reset", &{algorithm_name}::reset)
+	;"""
+		return binding_str
+	
 	else:
 		raise IOError(f"Given target={target} is not valid. 'target' should be either 'header' or 'algorithm'.")
 
@@ -249,6 +264,12 @@ def generate_algorithms(algorithms=TO_INCLUDE_ALGOS):
 	logging.info("Finished generating cpp source code for %s essentia algorithms" % (len(algorithms) + 3))
 	return algos
 
+def generate_bindings(algorithms=TO_INCLUDE_ALGOS):
+	logging.info("Generating emscripten bindings for the essentia...")
+	bindings = list()
+	for algo_name in algorithms:
+		bindings.append(parse_algorithm_info(algo_name, target="binding"))
+	return bindings
 
 def map_types_to_js(es_type):
 	if es_type in ['vector_real', 
