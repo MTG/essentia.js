@@ -23,13 +23,13 @@
 
 // expose essentiajs class to js using embind wrappers
 EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) {
-  function("bootEssentia", &bootEssentia);
+  function("init", &_initEssentia);
+  constant("algorithmNames", ALGORITHM_NAMES);
   class_<FrameGenerator>("FrameGenerator")
     .constructor<int, int>()
     .function("configure", &FrameGenerator::configure)
     .function("compute", &FrameGenerator::compute)
     .function("reset", &FrameGenerator::reset)
-    .function("shutdown", &FrameGenerator::shutdown)
     ;
   // NOTE: The following code snippets are machine generated. Do not edit.
 

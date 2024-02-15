@@ -25,12 +25,13 @@
 #include <vector>
 #include <essentia/algorithmfactory.h>
 #include <essentia/essentiamath.h>
+#include <emscripten/bind.h>
 
 using namespace essentia;
 using namespace essentia::standard;
 using namespace emscripten;
 
-void init();
+void _initEssentia();
 
 // method for generating frames from a given audio signal
 class FrameGenerator {
@@ -53,7 +54,7 @@ from code_generator import generate_headers, TO_INCLUDE_ALGOS
 cog.outl(" ")
 cog.outl("// class property which stores all the list of essentia algorithm names available in essentia.js")
 c_algo_list = str(TO_INCLUDE_ALGOS)
-cog.outl(f'std::string algorithmNames = "{c_algo_list}";')
+cog.outl(f'const std::string ALGORITHM_NAMES = "{c_algo_list}";')
 cog.outl("// class methods to call various essentia algorithms")
 headers = generate_headers()
 for ln in headers:

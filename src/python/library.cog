@@ -37,6 +37,9 @@ std::vector<float> float32ArrayToVector(const val &arr) {
   return vec;
 }
 
+void _initEssentia() {
+  essentia::init();
+}
 
 // START FrameGenerator definitions
 FrameGenerator::FrameGenerator(int frameSize, int hopSize) {
