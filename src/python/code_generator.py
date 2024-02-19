@@ -323,111 +323,81 @@ def parse_to_typescript(algorithm_name):
 						'vector_vector_complex', 
 						'vector_stereosample']:
 
-			inputs.append("%s: any" % inp['name'])	
+			inputs.append(f"{inp['name']}: any")	
 
 			if inp['type'] in ['vector_real', 'vector_complex', 'matrix_real']:
-				comments.append("%s {VectorFloat} %s %s" % (param_prefix,
-												inp['name'],
-												inp['description']))
+				comment_input_type = "{VectorFloat}"
 			
 			elif inp['type'] == "vector_string":
-				comments.append("%s {VectorString} %s %s" % (param_prefix,
-															inp['name'],
-															inp['description']))
-
+				comment_input_type = "{VectorString}"
 			else:
-				comments.append("%s {VectorVectorFloat} %s %s" % (param_prefix,
-																inp['name'],
-																inp['description']))		
+				comment_input_type = "{VectorVectorFloat}"
+
 		else:
-			inputs.append("%s: %s" % (inp['name'], map_types_to_js(inp['type'])))
+			inputs.append(f"{inp['name']}: {map_types_to_js(inp['type'])}")
+			comment_input_type = f"{{{map_types_to_js(inp['type'])}}}"
 
-			comments.append("%s {%s} %s %s" % (param_prefix,
-												map_types_to_js(inp['type']),
-												inp['name'],
-												inp['description']))
-
+		comments.append(f"{param_prefix} {comment_input_type} {inp['name']} {inp['description']}")
 		return_inputs.append(inp['name'])
 		
 	# parse parameter variables
 	for param in doc_dict['parameters']:
 
-		comments.append("%s {%s} [%s=%s] %s" % (param_prefix, 
-												map_types_to_js(param['type']), 
-												param['name'], 
-												param['default'],
-												param['description']))
-
+		comments.append(f"{param_prefix} {{{map_types_to_js(param['type'])}}} [{param['name']}={param['default']}] {param['description']}")
+		vec_param_var = f"vec{param['name']}"
+		param_default_val = param['default']
+		param_var_name = param['name']
 		if param['type'] in ['vector_real', 'vector_complex', 'matrix_real']:
-			param_converted.append("  let vec%s = new this.module.VectorFloat();" % param['name'])
-			param_converted.append("  for (var i=0; i<vec%s.size(); i++) {" %  param['name'])
-			param_converted.append("    vec%s.push_back(%s[i]);" % (param['name'], param['name']))
+			param_converted.append(f"  let {vec_param_var} = new this.module.VectorFloat();")
+			param_converted.append(f"  for (var i=0; i<{vec_param_var}.size(); i++) {{")
+			param_converted.append(f"    {vec_param_var}.push_back({param['name']}[i]);")
 			param_converted.append("  }")
 
-			parameters.append("%s: %s=%s" % (param['name'],
-											map_types_to_js(param['type']),
-											param['default']))
-
-			return_parameters.append("vec%s" % param['name'])
+			param_var_name = vec_param_var
 
 		elif param['type'] in ['vector_string']:
-			param_converted.append("  let vec%s = new this.module.VectorString();" % param['name'])
-			param_converted.append("  for (var i=0; i<vec%s.size(); i++) {" % param['name'])
-			param_converted.append("    vec%s.push_back(%s[i]);" % param['name'])
+			param_converted.append(f"  let {vec_param_var} = new this.module.VectorString();")
+			param_converted.append(f"  for (var i=0; i<{vec_param_var}.size(); i++) {{")
+			param_converted.append(f"    {vec_param_var}.push_back({param['name']}[i]);")
 			param_converted.append("  }")
 
-			parameters.append("%s: %s=%s" % (param['name'],
-											map_types_to_js(param['type']),
-											param['default']))
-
-			return_parameters.append("vec%s" % param['name'])
+			param_var_name = vec_param_var
 
 		elif param['type'] == 'string':
-			parameters.append("%s: %s='%s'" % (param['name'],
-											map_types_to_js(param['type']),
-											param['default']))
-
-			return_parameters.append(param['name'])
-		else:
-			parameters.append("%s: %s=%s" % (param['name'],
-											map_types_to_js(param['type']),
-											param['default']))
-
-			return_parameters.append(param['name'])
+			param_default_val = f"'{param['default']}'"
+		
+		parameters.append(f"{param['name']}: {map_types_to_js(param['type'])}={param_default_val}")
+		return_parameters.append(param_var_name)
 	
 	# parse output variables
 	outs = list()
 	for out in doc_dict['outputs']:
-		outs.append("%s: '%s'" % (out['name'], out['description']))
-	comments.append("%s {object} {%s}" % (return_prefix, ', '.join(outs)))
+		outs.append(f"{out['name']}: '{out['description']}'")
+	comments.append(f"{return_prefix} {{object}} {{{', '.join(outs)}}}")
 
 	comments.append("* @memberof Essentia")
 	comments.append("*/")
 
 	if inputs and parameters:
-		func_definition = "%s(%s, %s)" % (algorithm_name, ', '.join(inputs), ', '.join(parameters))
-		return_definition = "return %s.%s(%s, %s);" % (JS_ALGORITHMS_RETURN_NAMESPACE, 
-													algorithm_name, 
-													', '.join(return_inputs), 
-													', '.join(return_parameters))
+		in_arg_str = f"{', '.join(inputs)}, {', '.join(parameters)}"
+		return_arg_str = f"{', '.join(return_inputs)}, {', '.join(return_parameters)}"
 	elif inputs:
-		func_definition = "%s(%s)" % (algorithm_name, ', '.join(inputs))
-		return_definition = "return %s.%s(%s);" % (JS_ALGORITHMS_RETURN_NAMESPACE, 
-												algorithm_name, 
-												', '.join(return_inputs))
+		in_arg_str = ', '.join(inputs)
+		return_arg_str = ', '.join(return_inputs)
 	else:
-		func_definition = "%s(%s)" % (algorithm_name, ', '.join(parameters))
-		return_definition = "return %s.%s(%s);" % (JS_ALGORITHMS_RETURN_NAMESPACE, 
-												algorithm_name, 
-												', '.join(return_parameters))
+		in_arg_str = ', '.join(parameters)
+		return_arg_str = ', '.join(return_parameters)
+
+	func_definition = f"{algorithm_name}({in_arg_str})"
+	return_definition = f"return {JS_ALGORITHMS_RETURN_NAMESPACE}.{algorithm_name}({return_arg_str});"
 
 	algorithm.extend(comments)
-	algorithm.append("%s {" % func_definition)
+	algorithm.append(f"{func_definition} {{")
 
 	if param_converted:
 		algorithm.extend(param_converted)
 
-	algorithm.append("  %s" % return_definition)  
+	algorithm.append(f"  {return_definition}")  
 	algorithm.append("}")
 	return algorithm
 

@@ -415,7 +415,7 @@ class Essentia {
   * This algorithm performs basic arithmetical operations element by element given two arrays.
   Note:
     - using this algorithm in streaming mode can cause diamond shape graphs which have not been tested with the current scheduler. There is NO GUARANTEE of its correct work for diamond shape graphs.
-    - for y<0, x/y is invalid Check https://essentia.upf.edu/reference/std_BinaryOperator.html for more details.
+    - for y=0, x/y is invalid Check https://essentia.upf.edu/reference/std_BinaryOperator.html for more details.
   * @method
   * @param {VectorFloat} array1 the first operand input array
   * @param {VectorFloat} array2 the second operand input array
@@ -431,7 +431,7 @@ class Essentia {
   * This algorithm performs basic arithmetical operations element by element given two arrays.
   Note:
     - using this algorithm in streaming mode can cause diamond shape graphs which have not been tested with the current scheduler. There is NO GUARANTEE of its correct work for diamond shape graphs.
-    - for y<0, x/y is invalid Check https://essentia.upf.edu/reference/std_BinaryOperatorStream.html for more details.
+    - for y=0, x/y is invalid Check https://essentia.upf.edu/reference/std_BinaryOperatorStream.html for more details.
   * @method
   * @param {VectorFloat} array1 the first operand input array
   * @param {VectorFloat} array2 the second operand input array
@@ -512,7 +512,11 @@ class Essentia {
   }
    
   /**
-  * This algorithm estimates chords given an input sequence of harmonic pitch class profiles (HPCPs). It finds the best matching major or minor triad and outputs the result as a string (e.g. A#, Bm, G#m, C). This algorithm uses the Sharp versions of each Flatted note (i.e. Bb -> A#). Check https://essentia.upf.edu/reference/std_ChordsDetection.html for more details.
+  * This algorithm estimates chords given an input sequence of harmonic pitch class profiles (HPCPs). It finds the best matching major or minor triad and outputs the result as a string (e.g. A#, Bm, G#m, C). The following note names are used in the output:
+  "A", "Bb", "B", "C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab".
+  Note:
+    - The algorithm assumes that the sequence of the input HPCP frames has been computed with framesize = 2*hopsize
+    - The algorithm estimates a sequence of chord values corresponding to the input HPCP frames (one chord value for each frame, estimated using a temporal window of HPCPs centered at that frame). Check https://essentia.upf.edu/reference/std_ChordsDetection.html for more details.
   * @method
   * @param {VectorVectorFloat} pcp the pitch class profile from which to detect the chord
   * @param {number} [hopSize=2048] the hop size with which the input PCPs were computed
@@ -531,7 +535,7 @@ class Essentia {
     - 'starting_beat', chroma vector is sampled from the start of the segment (that is, its starting beat position) using its first frame. It makes sense if chroma is preliminary smoothed. Check https://essentia.upf.edu/reference/std_ChordsDetectionBeats.html for more details.
   * @method
   * @param {VectorVectorFloat} pcp the pitch class profile from which to detect the chord
-  * @param {VectorFloat} ticks the list of beat positions (in seconds)
+  * @param {VectorFloat} ticks the list of beat positions (in seconds). One chord will be outputted for each segment between two adjacent ticks. If number of ticks is smaller than 2, exception will be thrown. Those ticks that exceeded the pcp time length will be ignored.
   * @param {string} [chromaPick=interbeat_median] method of calculating singleton chroma for interbeat interval
   * @param {number} [hopSize=2048] the hop size with which the input PCPs were computed
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
@@ -574,7 +578,7 @@ class Essentia {
   * @param {number} [sampleRate=44100] FFT sampling rate [Hz]
   * @param {number} [scale=1] filters scale. Larger values use longer windows
   * @param {number} [threshold=0.01] bins whose magnitude is below this quantile are discarded
-  * @param {string} [windowType=hann] the window type, which can be 'hamming', 'hann', 'triangular', 'square' or 'blackmanharrisXX'
+  * @param {string} [windowType=hann] the window type
   * @param {boolean} [zeroPhase=true] a boolean value that enables zero-phase windowing. Input audio frames should be windowed with the same phase mode
   * @returns {object} {chromagram: 'the magnitude constant-Q chromagram'}
   * @memberof Essentia
@@ -621,7 +625,7 @@ class Essentia {
   * @param {string} [alignmentType=serra09] choose either one of the given local-alignment constraints for smith-waterman algorithm as described in [2] or [3] respectively.
   * @param {number} [disExtension=0.5] penalty for disruption extension
   * @param {number} [disOnset=0.5] penalty for disruption onset
-  * @param {string} [distanceType=asymmetric] choose the type of distance. By default the algorithm outputs a asymmetric disctance which is obtained by normalising the maximum score in the alignment score matrix with length of reference song
+  * @param {string} [distanceType=asymmetric] choose the type of distance. By default the algorithm outputs a asymmetric distance which is obtained by normalising the maximum score in the alignment score matrix with length of reference song
   * @returns {object} {scoreMatrix: 'a 2D smith-waterman alignment score matrix from the input binary cross-similarity matrix', distance: 'cover song similarity distance between the query and reference song from the input similarity matrix. Either 'asymmetric' (as described in [2]) or 'symmetric' (maximum score in the alignment score matrix).'}
   * @memberof Essentia
   */
@@ -1086,7 +1090,7 @@ class Essentia {
   }
    
   /**
-  * This algorithm uses energy and time thresholds to detect gaps in the waveform. A median filter is used to remove spurious silent samples. The power of a small audio region before the detected gaps (prepower) is thresholded to detect intentional pauses as described in [1]. This technique isextended to the region after the gap.
+  * This algorithm uses energy and time thresholds to detect gaps in the waveform. A median filter is used to remove spurious silent samples. The power of a small audio region before the detected gaps (prepower) is thresholded to detect intentional pauses as described in [1]. This technique is extended to the region after the gap.
   The algorithm was designed for a framewise use and returns the start and end timestamps related to the first frame processed. Call configure() or reset() in order to restart the count. Check https://essentia.upf.edu/reference/std_GapsDetector.html for more details.
   * @method
   * @param {VectorFloat} frame the input frame (must be non-empty)
@@ -1398,7 +1402,7 @@ class Essentia {
   * @param {number} [spectralPeaksThreshold=0.0001] the threshold for the spectral peaks
   * @param {number} [tuningFrequency=440] the tuning frequency of the input signal
   * @param {string} [weightType=cosine] type of weighting function for determining frequency contribution
-  * @param {string} [windowType=hann] the window type, which can be 'hamming', 'hann', 'triangular', 'square' or 'blackmanharrisXX'
+  * @param {string} [windowType=hann] the window type
   * @returns {object} {key: 'See Key algorithm documentation', scale: 'See Key algorithm documentation', strength: 'See Key algorithm documentation'}
   * @memberof Essentia
   */
@@ -1480,20 +1484,21 @@ class Essentia {
   * @param {VectorFloat} spectrum spectrum frame
   * @param {number} [binsPerSemitone=3]  bins per semitone
   * @param {number} [frameSize=1025] the input frame size of the spectrum vector
+  * @param {number} [nOctave=7] the number of octave of the output vector
   * @param {number} [rollOn=0] this removes low-frequency noise - useful in quiet recordings
   * @param {number} [sampleRate=44100] the input sample rate
   * @returns {object} {logFreqSpectrum: 'log frequency spectrum frame', meanTuning: 'normalized mean tuning frequency', localTuning: 'normalized local tuning frequency'}
   * @memberof Essentia
   */
-  LogSpectrum(spectrum: any, binsPerSemitone: number=3, frameSize: number=1025, rollOn: number=0, sampleRate: number=44100) {
-    return this.algorithms.LogSpectrum(spectrum, binsPerSemitone, frameSize, rollOn, sampleRate);
+  LogSpectrum(spectrum: any, binsPerSemitone: number=3, frameSize: number=1025, nOctave: number=7, rollOn: number=0, sampleRate: number=44100) {
+    return this.algorithms.LogSpectrum(spectrum, binsPerSemitone, frameSize, nOctave, rollOn, sampleRate);
   }
    
   /**
   * This algorithm takes an audio signal and a BPM estimate for that signal and predicts the reliability of the BPM estimate in a value from 0 to 1. The audio signal is assumed to be a musical loop with constant tempo. The confidence returned is based on comparing the duration of the signal with multiples of the BPM estimate (see [1] for more details). Check https://essentia.upf.edu/reference/std_LoopBpmConfidence.html for more details.
   * @method
   * @param {VectorFloat} signal loop audio signal
-  * @param {number} bpmEstimate estimated BPM for the audio signal
+  * @param {number} bpmEstimate estimated BPM for the audio signal (will be rounded to nearest integer)
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @returns {object} {confidence: 'confidence value for the BPM estimation'}
   * @memberof Essentia
@@ -1615,7 +1620,7 @@ class Essentia {
   * @method
   * @param {VectorFloat} signal signal to be filtered
   * @param {boolean} [causal=true] use casual filter (window is behind current element otherwise it is centered around)
-  * @param {number} [width=3] the window size, has to be odd if the window is centered
+  * @param {number} [width=3] the window size, even size is auto-resized to the next odd value in the non-casual case
   * @returns {object} {signal: 'filtered output'}
   * @memberof Essentia
   */
@@ -1687,7 +1692,7 @@ class Essentia {
   * @param {VectorFloat} spectrum the audio spectrum
   * @param {number} [highFrequencyBound=22050] an upper-bound limit for the frequencies to be included in the bands
   * @param {number} [inputSize=1025] the size of the spectrum
-  * @param {boolean} [log=false] compute log-energies (log10 (1 + energy))
+  * @param {boolean} [log=false] compute log-energies (log2 (1 + energy))
   * @param {number} [lowFrequencyBound=0] a lower-bound limit for the frequencies to be included in the bands
   * @param {string} [normalize=unit_sum] spectrum bin weights to use for each mel band: 'unit_max' to make each mel band vertex equal to 1, 'unit_sum' to make each mel band area equal to 1 summing the actual weights of spectrum bins, 'unit_area' to make each triangle mel band area equal to 1 normalizing the weights of each triangle by its bandwidth
   * @param {number} [numberBands=24] the number of output bands
@@ -1784,7 +1789,7 @@ class Essentia {
   * @param {number} [hopSize=128] the hop size with which the pitch salience function was computed
   * @param {number} [magnitudeCompression=1] magnitude compression parameter for the salience function (=0 for maximum compression, =1 for no compression)
   * @param {number} [magnitudeThreshold=40] spectral peak magnitude threshold (maximum allowed difference from the highest peak in dBs)
-  * @param {number} [maxFrequency=20000] the minimum allowed frequency for salience function peaks (ignore contours with peaks above) [Hz]
+  * @param {number} [maxFrequency=20000] the maximum allowed frequency for salience function peaks (ignore contours with peaks above) [Hz]
   * @param {number} [minDuration=100] the minimum allowed contour duration [ms]
   * @param {number} [minFrequency=40] the minimum allowed frequency for salience function peaks (ignore contours with peaks below) [Hz]
   * @param {number} [numberHarmonics=20] number of considered harmonics
@@ -2024,8 +2029,7 @@ class Essentia {
   }
    
   /**
-  * This algorithm implements the 'Enhance Harmonics' step as described in [1].Given an input autocorrelation signal, two time-stretched versions of it (by factors of 2 and 4) are added to the original.In this way, peaks with an harmonic relation are boosted.
-  For more details check the referenced paper. Check https://essentia.upf.edu/reference/std_PercivalEnhanceHarmonics.html for more details.
+  * This algorithm implements the 'Enhance Harmonics' step as described in [1].Given an input autocorrelation signal, two time-stretched versions of it scaled by factors of 2 and 4 are added to the original.For more details check the referenced paper. Check https://essentia.upf.edu/reference/std_PercivalEnhanceHarmonics.html for more details.
   * @method
   * @param {VectorFloat} array the input signal
   * @returns {object} {array: 'the input signal with enhanced harmonics'}
@@ -2036,8 +2040,8 @@ class Essentia {
   }
    
   /**
-  * This algorithm implements the 'Evaluate Pulse Trains' step as described in [1].Given an input onset strength signal (OSS) and a number of candidate tempo lag positions, the OSS is correlated with ideal expected pulse trains (for each candidate tempo lag) shifted in time by different amounts. The candidate tempo lag which generates the pulse train that better correlates with the OSS is returned as the preferred tempo candidate.
-  For more details check the referenced paper. Check https://essentia.upf.edu/reference/std_PercivalEvaluatePulseTrains.html for more details.
+  * This algorithm implements the 'Evaluate Pulse Trains' step as described in [1].Given an input onset detection function (ODF, called "onset strength signal", OSS, in the original paper) and a number of candidate BPM peak positions, the ODF is correlated with ideal expected pulse trains (for each candidate tempo lag) shifted in time by different amounts.The candidate tempo lag that generates a periodic pulse train with the best correlation to the ODF is returned as the best tempo estimate.
+  For more details check the referenced paper.Please note that in the original paper, the term OSS (Onset Strength Signal) is used instead of ODF. Check https://essentia.upf.edu/reference/std_PercivalEvaluatePulseTrains.html for more details.
   * @method
   * @param {VectorFloat} oss onset strength signal (or other novelty curve)
   * @param {VectorFloat} positions peak positions of BPM candidates
@@ -2098,7 +2102,7 @@ class Essentia {
   * @param {number} [filterIterations=3] number of interations for the octave errors / pitch outlier filtering process
   * @param {boolean} [guessUnvoiced=false] Estimate pitch for non-voiced segments by using non-salient contours when no salient ones are present in a frame
   * @param {number} [hopSize=128] the hop size with which the pitch salience function was computed
-  * @param {number} [maxFrequency=20000] the minimum allowed frequency for salience function peaks (ignore contours with peaks above) [Hz]
+  * @param {number} [maxFrequency=20000] the maximum allowed frequency for salience function peaks (ignore contours with peaks above) [Hz]
   * @param {number} [minFrequency=80] the minimum allowed frequency for salience function peaks (ignore contours with peaks below) [Hz]
   * @param {number} [referenceFrequency=55] the reference frequency for Hertz to cent convertion [Hz], corresponding to the 0th cent bin
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal (Hz)
@@ -2124,7 +2128,7 @@ class Essentia {
   * @param {number} [filterIterations=3] number of interations for the octave errors / pitch outlier filtering process
   * @param {boolean} [guessUnvoiced=false] Estimate pitch for non-voiced segments by using non-salient contours when no salient ones are present in a frame
   * @param {number} [hopSize=128] the hop size with which the pitch salience function was computed
-  * @param {number} [maxFrequency=20000] the minimum allowed frequency for salience function peaks (ignore contours with peaks above) [Hz]
+  * @param {number} [maxFrequency=20000] the maximum allowed frequency for salience function peaks (ignore contours with peaks above) [Hz]
   * @param {number} [minFrequency=80] the minimum allowed frequency for salience function peaks (ignore contours with peaks below) [Hz]
   * @param {number} [referenceFrequency=55] the reference frequency for Hertz to cent convertion [Hz], corresponding to the 0th cent bin
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal (Hz)
@@ -2147,7 +2151,7 @@ class Essentia {
   * @param {number} [filterIterations=3] number of interations for the octave errors / pitch outlier filtering process
   * @param {boolean} [guessUnvoiced=false] Estimate pitch for non-voiced segments by using non-salient contours when no salient ones are present in a frame
   * @param {number} [hopSize=128] the hop size with which the pitch salience function was computed
-  * @param {number} [maxFrequency=20000] the minimum allowed frequency for salience function peaks (ignore contours with peaks above) [Hz]
+  * @param {number} [maxFrequency=20000] the maximum allowed frequency for salience function peaks (ignore contours with peaks above) [Hz]
   * @param {number} [minFrequency=80] the minimum allowed frequency for salience function peaks (ignore contours with peaks below) [Hz]
   * @param {number} [referenceFrequency=55] the reference frequency for Hertz to cent convertion [Hz], corresponding to the 0th cent bin
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal (Hz)
@@ -2185,7 +2189,7 @@ class Essentia {
   * @param {number} [hopSize=128] the hop size with which the pitch salience function was computed
   * @param {number} [magnitudeCompression=1] magnitude compression parameter for the salience function (=0 for maximum compression, =1 for no compression)
   * @param {number} [magnitudeThreshold=40] spectral peak magnitude threshold (maximum allowed difference from the highest peak in dBs)
-  * @param {number} [maxFrequency=20000] the minimum allowed frequency for salience function peaks (ignore contours with peaks above) [Hz]
+  * @param {number} [maxFrequency=20000] the maximum allowed frequency for salience function peaks (ignore contours with peaks above) [Hz]
   * @param {number} [minDuration=100] the minimum allowed contour duration [ms]
   * @param {number} [minFrequency=40] the minimum allowed frequency for salience function peaks (ignore contours with peaks below) [Hz]
   * @param {number} [numberHarmonics=20] number of considered harmonics
@@ -2367,7 +2371,7 @@ class Essentia {
   * @param {number} [hopSize=128] the hop size with which the pitch salience function was computed
   * @param {number} [magnitudeCompression=1] magnitude compression parameter for the salience function (=0 for maximum compression, =1 for no compression)
   * @param {number} [magnitudeThreshold=40] spectral peak magnitude threshold (maximum allowed difference from the highest peak in dBs)
-  * @param {number} [maxFrequency=20000] the minimum allowed frequency for salience function peaks (ignore contours with peaks above) [Hz]
+  * @param {number} [maxFrequency=20000] the maximum allowed frequency for salience function peaks (ignore contours with peaks above) [Hz]
   * @param {number} [minDuration=100] the minimum allowed contour duration [ms]
   * @param {number} [minFrequency=80] the minimum allowed frequency for salience function peaks (ignore contours with peaks below) [Hz]
   * @param {number} [numberHarmonics=20] number of considered harmonics
@@ -2432,7 +2436,7 @@ class Essentia {
   * @param {VectorFloat} signal the input signal
   * @param {number} [inputSampleRate=44100] the sampling rate of the input signal [Hz]
   * @param {number} [outputSampleRate=44100] the sampling rate of the output signal [Hz]
-  * @param {number} [quality=1] the quality of the conversion, 0 for best quality
+  * @param {number} [quality=1] the quality of the conversion, 0 for best quality, 4 for fast linear approximation
   * @returns {object} {signal: 'the resampled signal'}
   * @memberof Essentia
   */
@@ -2441,11 +2445,11 @@ class Essentia {
   }
    
   /**
-  * This algorithm resamples a sequence using FFT / IFFT. The input and output sizes must be an even number. (It is meant to be eqivalent to the resample function in Numpy). Check https://essentia.upf.edu/reference/std_ResampleFFT.html for more details.
+  * This algorithm resamples a sequence using FFT/IFFT. The input and output sizes must be an even number. The algorithm is a counterpart of the resample function in SciPy. Check https://essentia.upf.edu/reference/std_ResampleFFT.html for more details.
   * @method
   * @param {VectorFloat} input input array
-  * @param {number} [inSize=128] the size of the input sequence. It needss to be even-sized.
-  * @param {number} [outSize=128] the size of the output sequence. It needss to be even-sized.
+  * @param {number} [inSize=128] the size of the input sequence. It needs to be even-sized.
+  * @param {number} [outSize=128] the size of the output sequence. It needs to be even-sized.
   * @returns {object} {output: 'output resample array'}
   * @memberof Essentia
   */
@@ -2537,12 +2541,7 @@ class Essentia {
   }
    
   /**
-  * This algorithm computes the SNR of the input audio in a frame-wise manner. The algorithm assumes that:
-    1. The noise is gaussian.
-    2. There is a region of noise (without signal) at the beginning of the stream in order to estimate the PSD of the noise.[1]
-  Once the noise PSD is estimated, the algorithm relies on the Ephraim-Malah [2] recursion to estimate the SNR for each frequency bin.
-  The algorithm also returns an overall (a single value for the whole spectrum) SNR estimation and an averaged overall SNR estimation using Exponential Moving Average filtering.
-  This algorithm throws a Warning if less than 15 frames are used to estimte the noise PSD. Check https://essentia.upf.edu/reference/std_SNR.html for more details.
+  * This algorithm computes the SNR of the input audio in a frame-wise manner. Check https://essentia.upf.edu/reference/std_SNR.html for more details.
   * @method
   * @param {VectorFloat} frame the input audio frame
   * @param {number} [MAAlpha=0.95] Alpha coefficient for the EMA SNR estimation [2]
@@ -2755,7 +2754,7 @@ class Essentia {
   * @param {number} [sampleRate=44100] FFT sampling rate [Hz]
   * @param {number} [scale=1] filters scale. Larger values use longer windows
   * @param {number} [threshold=0.01] bins whose magnitude is below this quantile are discarded
-  * @param {string} [windowType=hann] the window type, which can be 'hamming', 'hann', 'triangular', 'square' or 'blackmanharrisXX'
+  * @param {string} [windowType=hann] the window type
   * @param {boolean} [zeroPhase=true] a boolean value that enables zero-phase windowing. Input audio frames should be windowed with the same phase mode
   * @returns {object} {spectrumCQ: 'the magnitude constant-Q spectrum'}
   * @memberof Essentia
@@ -2771,7 +2770,7 @@ class Essentia {
   * @param {number} [bands=720] number of bins to compute. Default is 720 (6 octaves with the default 'centBinResolution')
   * @param {number} [centBinResolution=10] Width of each band in cents. Default is 10 cents
   * @param {number} [inputSize=32768] the size of the spectrum
-  * @param {boolean} [log=true] compute log-energies (log10 (1 + energy))
+  * @param {boolean} [log=true] compute log-energies (log2 (1 + energy))
   * @param {number} [minimumFrequency=164] central frequency of the first band of the bank [Hz]
   * @param {string} [normalize=unit_sum] use unit area or vertex equal to 1 triangles.
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
@@ -3116,7 +3115,18 @@ class Essentia {
   }
    
   /**
-  * This algorithm computes mel-bands with a particular parametrization specific to MusiCNN based models. Check https://essentia.upf.edu/reference/std_TensorflowInputMusiCNN.html for more details.
+  * This algorithm computes mel bands from an audio frame with the specific parametrization required by the FSD-SINet models. Check https://essentia.upf.edu/reference/std_TensorflowInputFSDSINet.html for more details.
+  * @method
+  * @param {VectorFloat} frame the audio frame
+  * @returns {object} {bands: 'the log-compressed mel bands'}
+  * @memberof Essentia
+  */
+  TensorflowInputFSDSINet(frame: any) {
+    return this.algorithms.TensorflowInputFSDSINet(frame);
+  }
+   
+  /**
+  * This algorithm computes mel-bands specific to the input of MusiCNN-based models. Check https://essentia.upf.edu/reference/std_TensorflowInputMusiCNN.html for more details.
   * @method
   * @param {VectorFloat} frame the audio frame
   * @returns {object} {bands: 'the log compressed mel bands'}
@@ -3127,7 +3137,18 @@ class Essentia {
   }
    
   /**
-  * This algorithm computes mel-bands with a particular parametrization specific to VGGish based models. Check https://essentia.upf.edu/reference/std_TensorflowInputVGGish.html for more details.
+  * This algorithm computes mel-bands specific to the input of TempoCNN-based models. Check https://essentia.upf.edu/reference/std_TensorflowInputTempoCNN.html for more details.
+  * @method
+  * @param {VectorFloat} frame the audio frame
+  * @returns {object} {bands: 'the mel bands'}
+  * @memberof Essentia
+  */
+  TensorflowInputTempoCNN(frame: any) {
+    return this.algorithms.TensorflowInputTempoCNN(frame);
+  }
+   
+  /**
+  * This algorithm computes mel-bands specific to the input of VGGish-based models. Check https://essentia.upf.edu/reference/std_TensorflowInputVGGish.html for more details.
   * @method
   * @param {VectorFloat} frame the audio frame
   * @returns {object} {bands: 'the log compressed mel bands'}
@@ -3152,7 +3173,7 @@ class Essentia {
   }
    
   /**
-  * This algorithm estimates the tonic frequency of the lead artist in Indian art music. It uses multipitch representation of the audio signal (pitch salience) to compute a histogram using which the tonic is identified as one of its peak. The decision is made based on the distance between the prominent peaks, the classification is done using a decision tree. Check https://essentia.upf.edu/reference/std_TonicIndianArtMusic.html for more details.
+  * This algorithm estimates the tonic frequency of the lead artist in Indian art music. It uses multipitch representation of the audio signal (pitch salience) to compute a histogram using which the tonic is identified as one of its peak. The decision is made based on the distance between the prominent peaks, the classification is done using a decision tree. An empty input signal will throw an exception. An exception will also be thrown if no predominant pitch salience peaks are detected within the maxTonicFrequency to minTonicFrequency range.  Check https://essentia.upf.edu/reference/std_TonicIndianArtMusic.html for more details.
   * @method
   * @param {VectorFloat} signal the input signal
   * @param {number} [binResolution=10] salience function bin resolution [cents]
@@ -3164,7 +3185,7 @@ class Essentia {
   * @param {number} [maxTonicFrequency=375] the maximum allowed tonic frequency [Hz]
   * @param {number} [minTonicFrequency=100] the minimum allowed tonic frequency [Hz]
   * @param {number} [numberHarmonics=20] number of considered hamonics
-  * @param {number} [numberSaliencePeaks=5]  number of top peaks of the salience function which should be considered for constructing histogram
+  * @param {number} [numberSaliencePeaks=5] number of top peaks of the salience function which should be considered for constructing histogram
   * @param {number} [referenceFrequency=55] the reference frequency for Hertz to cent convertion [Hz], corresponding to the 0th cent bin
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @returns {object} {tonic: 'the estimated tonic frequency [Hz]'}
@@ -3180,7 +3201,7 @@ class Essentia {
   * @param {VectorFloat} spectrum the input spectrum (must be greater than size one)
   * @param {any[]} [frequencyBands=[21.533203125, 43.06640625, 64.599609375, 86.1328125, 107.666015625, 129.19921875, 150.732421875, 172.265625, 193.798828125, 215.33203125, 236.865234375, 258.3984375, 279.931640625, 301.46484375, 322.998046875, 344.53125, 366.064453125, 387.59765625, 409.130859375, 430.6640625, 452.197265625, 473.73046875, 495.263671875, 516.796875, 538.330078125, 559.86328125, 581.396484375, 602.9296875, 624.462890625, 645.99609375, 667.529296875, 689.0625, 710.595703125, 732.12890625, 753.662109375, 775.1953125, 796.728515625, 839.794921875, 861.328125, 882.861328125, 904.39453125, 925.927734375, 968.994140625, 990.52734375, 1012.06054688, 1055.12695312, 1076.66015625, 1098.19335938, 1141.25976562, 1184.32617188, 1205.859375, 1248.92578125, 1270.45898438, 1313.52539062, 1356.59179688, 1399.65820312, 1442.72460938, 1485.79101562, 1528.85742188, 1571.92382812, 1614.99023438, 1658.05664062, 1701.12304688, 1765.72265625, 1808.7890625, 1873.38867188, 1916.45507812, 1981.0546875, 2024.12109375, 2088.72070312, 2153.3203125, 2217.91992188, 2282.51953125, 2347.11914062, 2411.71875, 2497.8515625, 2562.45117188, 2627.05078125, 2713.18359375, 2799.31640625, 2885.44921875, 2950.04882812, 3036.18164062, 3143.84765625, 3229.98046875, 3316.11328125, 3423.77929688, 3509.91210938, 3617.578125, 3725.24414062, 3832.91015625, 3940.57617188, 4069.77539062, 4177.44140625, 4306.640625, 4435.83984375, 4565.0390625, 4694.23828125, 4844.97070312, 4974.16992188, 5124.90234375, 5275.63476562, 5426.3671875, 5577.09960938, 5749.36523438, 5921.63085938, 6093.89648438, 6266.16210938, 6459.9609375, 6653.75976562, 6847.55859375, 7041.35742188, 7256.68945312, 7450.48828125, 7687.35351562, 7902.68554688, 8139.55078125, 8376.41601562, 8613.28125, 8871.6796875, 9130.078125, 9388.4765625, 9668.40820312, 9948.33984375, 10249.8046875, 10551.2695312, 10852.734375, 11175.7324219, 11498.7304688, 11843.2617188, 12187.7929688, 12553.8574219, 12919.921875, 13285.9863281, 13673.5839844, 14082.7148438, 14491.8457031, 14922.5097656, 15353.1738281, 15805.3710938, 16257.5683594]] list of frequency ranges into which the spectrum is divided (these must be in ascending order and connot contain duplicates),each triangle is build as x(i-1)=0, x(i)=1, x(i+1)=0 over i, the resulting number of bands is size of input array - 2
   * @param {number} [inputSize=1025] the size of the spectrum
-  * @param {boolean} [log=true] compute log-energies (log10 (1 + energy))
+  * @param {boolean} [log=true] compute log-energies (log2 (1 + energy))
   * @param {string} [normalize=unit_sum] spectrum bin weights to use for each triangular band: 'unit_max' to make each triangle vertex equal to 1, 'unit_sum' to make each triangle area equal to 1 summing the actual weights of spectrum bins, 'unit_area' to make each triangle area equal to 1 normalizing the weights of each triangle by its bandwidth
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @param {string} [type=power] use magnitude or power spectrum
@@ -3204,7 +3225,7 @@ class Essentia {
   * @param {VectorFloat} spectrum the audio spectrum
   * @param {number} [highFrequencyBound=22050] an upper-bound limit for the frequencies to be included in the bands
   * @param {number} [inputSize=1025] the size of the spectrum
-  * @param {boolean} [log=false] compute log-energies (log10 (1 + energy))
+  * @param {boolean} [log=false] compute log-energies (log2 (1 + energy))
   * @param {number} [lowFrequencyBound=0] a lower-bound limit for the frequencies to be included in the bands
   * @param {string} [normalize=unit_sum] 'unit_max' makes the vertex of all the triangles equal to 1, 'unit_sum' makes the area of all the triangles equal to 1
   * @param {number} [numberBands=24] the number of output bands
@@ -3389,7 +3410,7 @@ class Essentia {
   * @param {number} [frameSize=512] the expected size of the input audio signal (this is an optional parameter to optimize memory allocation)
   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
   * @param {string} [scaling=density] 'density' normalizes the result to the bandwidth while 'power' outputs the unnormalized power spectrum
-  * @param {string} [windowType=hann] the window type, which can be 'hamming', 'hann', 'triangular', 'square' or 'blackmanharrisXX'
+  * @param {string} [windowType=hann] the window type
   * @returns {object} {psd: 'Power Spectral Density [dB] or [dB/Hz]'}
   * @memberof Essentia
   */
@@ -3401,16 +3422,19 @@ class Essentia {
   * This algorithm applies windowing to an audio signal. It optionally applies zero-phase windowing and optionally adds zero-padding. The resulting windowed frame size is equal to the incoming frame size plus the number of padded zeros. By default, the available windows are normalized (to have an area of 1) and then scaled by a factor of 2. Check https://essentia.upf.edu/reference/std_Windowing.html for more details.
   * @method
   * @param {VectorFloat} frame the input audio frame
+  * @param {number} [constantsDecimals=5] number of decimals considered in the constants for the formulation of the hamming and blackmanharris* windows 
   * @param {boolean} [normalized=true] a boolean value to specify whether to normalize windows (to have an area of 1) and then scale by a factor of 2
   * @param {number} [size=1024] the window size
-  * @param {string} [type=hann] the window type, which can be 'hamming', 'hann', 'triangular', 'square' or 'blackmanharrisXX'
+  * @param {boolean} [splitPadding=false] whether to split the padding to the edges of the signal (_/\_) or to add it to the right (/\__). This option is ignored when zeroPhase (\__/) is true
+  * @param {boolean} [symmetric=true] whether to create a symmetric or asymmetric window as implemented in SciPy
+  * @param {string} [type=hann] the window type
   * @param {number} [zeroPadding=0] the size of the zero-padding
   * @param {boolean} [zeroPhase=true] a boolean value that enables zero-phase windowing
   * @returns {object} {frame: 'the windowed audio frame'}
   * @memberof Essentia
   */
-  Windowing(frame: any, normalized: boolean=true, size: number=1024, type: string='hann', zeroPadding: number=0, zeroPhase: boolean=true) {
-    return this.algorithms.Windowing(frame, normalized, size, type, zeroPadding, zeroPhase);
+  Windowing(frame: any, constantsDecimals: number=5, normalized: boolean=true, size: number=1024, splitPadding: boolean=false, symmetric: boolean=true, type: string='hann', zeroPadding: number=0, zeroPhase: boolean=true) {
+    return this.algorithms.Windowing(frame, constantsDecimals, normalized, size, splitPadding, symmetric, type, zeroPadding, zeroPhase);
   }
    
   /**
