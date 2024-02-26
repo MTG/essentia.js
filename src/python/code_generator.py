@@ -293,21 +293,22 @@ def parse_to_typescript(algorithm_name):
 	inputs = list()
 	parameters = list()
 	param_converted = list()
-	return_inputs = list()
-	return_parameters = list()	
+	untyped_inputs = list()
+	untyped_parameters = list()	
 	comments = list()
 	algorithm = list()
 	# create the algorithm object
 	algo = getattr(estd, algorithm_name)()
 	doc_dict = algo.getStruct()
 
-	doc_link = " Check https://essentia.upf.edu/reference/std_%s.html for more details." % algorithm_name
+	wasmBackendVar = "wasmBackend"
+	doc_link = f" Check https://essentia.upf.edu/reference/std_{algorithm_name}.html for more details."
 	# We do a shim of algorithm description for prettifying the doc
 	algo_description = doc_dict['description'].split('\n\n')[0] + doc_link
 	# add jsdoc string
 	comments.append("/**")
 	comments.append("* %s" % algo_description)
-	comments.append("* @method")
+	comments.append("* @class")
 
 	param_prefix = "* @param"
 	return_prefix = "* @returns"
@@ -338,7 +339,7 @@ def parse_to_typescript(algorithm_name):
 			comment_input_type = f"{{{map_types_to_js(inp['type'])}}}"
 
 		comments.append(f"{param_prefix} {comment_input_type} {inp['name']} {inp['description']}")
-		return_inputs.append(inp['name'])
+		untyped_inputs.append(inp['name'])
 		
 	# parse parameter variables
 	for param in doc_dict['parameters']:
@@ -348,18 +349,18 @@ def parse_to_typescript(algorithm_name):
 		param_default_val = param['default']
 		param_var_name = param['name']
 		if param['type'] in ['vector_real', 'vector_complex', 'matrix_real']:
-			param_converted.append(f"  let {vec_param_var} = new this.module.VectorFloat();")
-			param_converted.append(f"  for (var i=0; i<{vec_param_var}.size(); i++) {{")
-			param_converted.append(f"    {vec_param_var}.push_back({param['name']}[i]);")
-			param_converted.append("  }")
+			param_converted.append(f"    let {vec_param_var} = new {wasmBackendVar}.VectorFloat();")
+			param_converted.append(f"    for (var i=0; i<{vec_param_var}.size(); i++) {{")
+			param_converted.append(f"      {vec_param_var}.push_back({param['name']}[i]);")
+			param_converted.append("    }")
 
 			param_var_name = vec_param_var
 
 		elif param['type'] in ['vector_string']:
-			param_converted.append(f"  let {vec_param_var} = new this.module.VectorString();")
-			param_converted.append(f"  for (var i=0; i<{vec_param_var}.size(); i++) {{")
-			param_converted.append(f"    {vec_param_var}.push_back({param['name']}[i]);")
-			param_converted.append("  }")
+			param_converted.append(f"    let {vec_param_var} = new {wasmBackendVar}.VectorString();")
+			param_converted.append(f"    for (var i=0; i<{vec_param_var}.size(); i++) {{")
+			param_converted.append(f"      {vec_param_var}.push_back({param['name']}[i]);")
+			param_converted.append("    }")
 
 			param_var_name = vec_param_var
 
@@ -367,7 +368,7 @@ def parse_to_typescript(algorithm_name):
 			param_default_val = f"'{param['default']}'"
 		
 		parameters.append(f"{param['name']}: {map_types_to_js(param['type'])}={param_default_val}")
-		return_parameters.append(param_var_name)
+		untyped_parameters.append(param_var_name)
 	
 	# parse output variables
 	outs = list()
@@ -378,27 +379,40 @@ def parse_to_typescript(algorithm_name):
 	comments.append("* @memberof Essentia")
 	comments.append("*/")
 
-	if inputs and parameters:
-		in_arg_str = f"{', '.join(inputs)}, {', '.join(parameters)}"
-		return_arg_str = f"{', '.join(return_inputs)}, {', '.join(return_parameters)}"
-	elif inputs:
-		in_arg_str = ', '.join(inputs)
-		return_arg_str = ', '.join(return_inputs)
-	else:
-		in_arg_str = ', '.join(parameters)
-		return_arg_str = ', '.join(return_parameters)
-
-	func_definition = f"{algorithm_name}({in_arg_str})"
-	return_definition = f"return {JS_ALGORITHMS_RETURN_NAMESPACE}.{algorithm_name}({return_arg_str});"
-
+	# Add the comments to the algorithm list
 	algorithm.extend(comments)
-	algorithm.append(f"{func_definition} {{")
 
+	# Generate the class definition
+	class_definition = f"class {algorithm_name} {{"
+	algorithm.append(class_definition)
+	algorithm.append("  private algoInstance: any;")
+
+	config_param_list = ', '.join(untyped_parameters)
+	# Add the constructor
+	constructor_args = ', '.join(parameters)
+	algorithm.append(f"  constructor({constructor_args}) {{")
 	if param_converted:
 		algorithm.extend(param_converted)
+	algorithm.append(f"    this.algoInstance = new wasmBackend.{algorithm_name}({config_param_list});")
+	algorithm.append("  }")
 
-	algorithm.append(f"  {return_definition}")  
+	# Add configure method
+	algorithm.append(f"  configure({constructor_args}) {{")		
+	if param_converted:
+		algorithm.extend(param_converted)
+	algorithm.append(f"    this.algoInstance.configure({config_param_list});")
+	algorithm.append("  }")
+
+	# Add the compute method
+	compute_args = ', '.join(inputs)
+	algorithm.append(f"  compute({compute_args}) {{")
+	algorithm.append(f"    return this.algoInstance.compute({', '.join(untyped_inputs)});")
+	algorithm.append("  }")
+
+	# Close the class definition
 	algorithm.append("}")
+
+
 	return algorithm
 
 

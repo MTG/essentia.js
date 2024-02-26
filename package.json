@@ -17,7 +17,7 @@
   "scripts": {
     "gen-code": "make -f Makefile codegen",
     "build-wasm": "make -f Makefile build",
-    "build-js-api": "rollup --config",
+    "build-js-api": "ESSENTIAJS_ADDON=0 rollup --config",
     "build-api-docs": "./build-docs.sh",
     "test": "mocha"
   },
