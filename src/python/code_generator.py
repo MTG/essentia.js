@@ -402,7 +402,7 @@ def parse_to_typescript(algorithm_name):
 
 	# Add delete method
 	algorithm.append("  delete() {")
-	algorithm.append("    return this.algoInstance.delete();")
+	algorithm.append("    this.algoInstance.delete();")
 	algorithm.append("  }")
 
 	# Close the class definition

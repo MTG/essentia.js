@@ -144,6 +144,10 @@ class FrameGenerator {
   compute(inputAudioData: Float32Array) {
     return this.algoInstance.compute(inputAudioData);
   }
+
+  delete() {
+    this.algoInstance.delete();
+  }
 }
 
 /**

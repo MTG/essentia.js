@@ -144,6 +144,10 @@ class FrameGenerator {
   compute(inputAudioData: Float32Array) {
     return this.algoInstance.compute(inputAudioData);
   }
+
+  delete() {
+    this.algoInstance.delete();
+  }
 }
 
 /**
@@ -193,7 +197,7 @@ class AfterMaxToBeforeMaxEnergyRatio {
     return this.algoInstance.compute(pitch);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -220,7 +224,7 @@ class AllPass {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -248,7 +252,7 @@ class AudioOnsetsMarker {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -276,7 +280,7 @@ class AutoCorrelation {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -312,7 +316,7 @@ class BFCC {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -341,7 +345,7 @@ class BPF {
     return this.algoInstance.compute(x);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -367,7 +371,7 @@ class BandPass {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -393,7 +397,7 @@ class BandReject {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -418,7 +422,7 @@ class BarkBands {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -443,7 +447,7 @@ class BeatTrackerDegara {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -473,7 +477,7 @@ class BeatTrackerMultiFeature {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -499,7 +503,7 @@ class Beatogram {
     return this.algoInstance.compute(loudness, loudnessBandRatio);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -531,7 +535,7 @@ class BeatsLoudness {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -559,7 +563,7 @@ class BinaryOperator {
     return this.algoInstance.compute(array1, array2);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -587,7 +591,7 @@ class BinaryOperatorStream {
     return this.algoInstance.compute(array1, array2);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -611,7 +615,7 @@ class BpmHistogramDescriptors {
     return this.algoInstance.compute(bpmIntervals);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -637,7 +641,7 @@ class BpmRubato {
     return this.algoInstance.compute(beats);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -662,7 +666,7 @@ class CentralMoments {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -686,7 +690,7 @@ class Centroid {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -715,7 +719,7 @@ class ChordsDescriptors {
     return this.algoInstance.compute(chords, key, scale);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -745,7 +749,7 @@ class ChordsDetection {
     return this.algoInstance.compute(pcp);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -774,7 +778,7 @@ class ChordsDetectionBeats {
     return this.algoInstance.compute(pcp, ticks);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -805,7 +809,7 @@ class ChromaCrossSimilarity {
     return this.algoInstance.compute(queryFeature, referenceFeature);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -839,7 +843,7 @@ class Chromagram {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -869,7 +873,7 @@ class ClickDetector {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -894,7 +898,7 @@ class Clipper {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -921,7 +925,7 @@ class CoverSongSimilarity {
     return this.algoInstance.compute(inputArray);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -944,7 +948,7 @@ class Crest {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -970,7 +974,7 @@ class CrossCorrelation {
     return this.algoInstance.compute(arrayX, arrayY);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -998,7 +1002,7 @@ class CrossSimilarityMatrix {
     return this.algoInstance.compute(queryFeature, referenceFeature);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1039,7 +1043,7 @@ class CubicSpline {
     return this.algoInstance.compute(x);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1064,7 +1068,7 @@ class DCRemoval {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1092,7 +1096,7 @@ class DCT {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1119,7 +1123,7 @@ class Danceability {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1147,7 +1151,7 @@ class Decrease {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1170,7 +1174,7 @@ class Derivative {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1193,7 +1197,7 @@ class DerivativeSFX {
     return this.algoInstance.compute(envelope);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1224,7 +1228,7 @@ class DiscontinuityDetector {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1253,7 +1257,7 @@ class Dissonance {
     return this.algoInstance.compute(frequencies, magnitudes);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1277,7 +1281,7 @@ class DistributionShape {
     return this.algoInstance.compute(centralMoments);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1301,7 +1305,7 @@ class Duration {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1326,7 +1330,7 @@ class DynamicComplexity {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1356,7 +1360,7 @@ class ERBBands {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1386,7 +1390,7 @@ class EffectiveDuration {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1409,7 +1413,7 @@ class Energy {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1436,7 +1440,7 @@ class EnergyBand {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1462,7 +1466,7 @@ class EnergyBandRatio {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1485,7 +1489,7 @@ class Entropy {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1512,7 +1516,7 @@ class Envelope {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1536,7 +1540,7 @@ class EqualLoudness {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1559,7 +1563,7 @@ class Flatness {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1582,7 +1586,7 @@ class FlatnessDB {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1605,7 +1609,7 @@ class FlatnessSFX {
     return this.algoInstance.compute(envelope);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1630,7 +1634,7 @@ class Flux {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1658,7 +1662,7 @@ class FrameCutter {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1683,7 +1687,7 @@ class FrameToReal {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1710,7 +1714,7 @@ class FrequencyBands {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1743,7 +1747,7 @@ class GFCC {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1779,7 +1783,7 @@ class GapsDetector {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1802,7 +1806,7 @@ class GeometricMean {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1830,7 +1834,7 @@ class HFC {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1867,7 +1871,7 @@ class HPCP {
     return this.algoInstance.compute(frequencies, magnitudes);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1895,7 +1899,7 @@ class HarmonicBpm {
     return this.algoInstance.compute(bpms);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1928,7 +1932,7 @@ class HarmonicPeaks {
     return this.algoInstance.compute(frequencies, magnitudes, pitch);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1953,7 +1957,7 @@ class HighPass {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -1978,7 +1982,7 @@ class HighResolutionFeatures {
     return this.algoInstance.compute(hpcp);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2005,7 +2009,7 @@ class Histogram {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2043,7 +2047,7 @@ class HprModelAnal {
     return this.algoInstance.compute(frame, pitch);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2081,7 +2085,7 @@ class HpsModelAnal {
     return this.algoInstance.compute(frame, pitch);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2109,7 +2113,7 @@ class IDCT {
     return this.algoInstance.compute(dct);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2138,7 +2142,7 @@ class IIR {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2162,7 +2166,7 @@ class Inharmonicity {
     return this.algoInstance.compute(frequencies, magnitudes);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2185,7 +2189,7 @@ class InstantPower {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2209,7 +2213,7 @@ class Intensity {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2239,7 +2243,7 @@ class Key {
     return this.algoInstance.compute(pcp);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2276,7 +2280,7 @@ class KeyExtractor {
     return this.algoInstance.compute(audio);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2302,7 +2306,7 @@ class LPC {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2329,7 +2333,7 @@ class Larm {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2353,7 +2357,7 @@ class Leq {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2378,7 +2382,7 @@ class LevelExtractor {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2404,7 +2408,7 @@ class LogAttackTime {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2432,7 +2436,7 @@ class LogSpectrum {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2457,7 +2461,7 @@ class LoopBpmConfidence {
     return this.algoInstance.compute(signal, bpmEstimate);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2481,7 +2485,7 @@ class LoopBpmEstimator {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2504,7 +2508,7 @@ class Loudness {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2528,7 +2532,7 @@ class LoudnessVickers {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2554,7 +2558,7 @@ class LowLevelSpectralEqloudExtractor {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2580,7 +2584,7 @@ class LowLevelSpectralExtractor {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2608,7 +2612,7 @@ class LowPass {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2649,7 +2653,7 @@ class MFCC {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2674,7 +2678,7 @@ class MaxFilter {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2699,7 +2703,7 @@ class MaxMagFreq {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2722,7 +2726,7 @@ class MaxToTotal {
     return this.algoInstance.compute(envelope);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2745,7 +2749,7 @@ class Mean {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2768,7 +2772,7 @@ class Median {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2792,7 +2796,7 @@ class MedianFilter {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2825,7 +2829,7 @@ class MelBands {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2848,7 +2852,7 @@ class Meter {
     return this.algoInstance.compute(beatogram);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2873,7 +2877,7 @@ class MinMax {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2896,7 +2900,7 @@ class MinToTotal {
     return this.algoInstance.compute(envelope);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2920,7 +2924,7 @@ class MovingAverage {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2955,7 +2959,7 @@ class MultiPitchKlapuri {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -2996,7 +3000,7 @@ class MultiPitchMelodia {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3020,7 +3024,7 @@ class Multiplexer {
     return this.algoInstance.compute();
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3057,7 +3061,7 @@ class NNLSChroma {
     return this.algoInstance.compute(logSpectrogram, meanTuning, localTuning);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3082,7 +3086,7 @@ class NoiseAdder {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3108,7 +3112,7 @@ class NoiseBurstDetector {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3137,7 +3141,7 @@ class NoveltyCurve {
     return this.algoInstance.compute(frequencyBands);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3165,7 +3169,7 @@ class NoveltyCurveFixedBpmEstimator {
     return this.algoInstance.compute(novelty);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3191,7 +3195,7 @@ class OddToEvenHarmonicEnergyRatio {
     return this.algoInstance.compute(frequencies, magnitudes);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3224,7 +3228,7 @@ class OnsetDetection {
     return this.algoInstance.compute(spectrum, phase);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3258,7 +3262,7 @@ class OnsetDetectionGlobal {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3283,7 +3287,7 @@ class OnsetRate {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3309,7 +3313,7 @@ class OverlapAdd {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3342,7 +3346,7 @@ class PeakDetection {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3372,7 +3376,7 @@ class PercivalBpmEstimator {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3395,7 +3399,7 @@ class PercivalEnhanceHarmonics {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3420,7 +3424,7 @@ class PercivalEvaluatePulseTrains {
     return this.algoInstance.compute(oss, positions);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3450,7 +3454,7 @@ class PitchContourSegmentation {
     return this.algoInstance.compute(pitch, signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3482,7 +3486,7 @@ class PitchContours {
     return this.algoInstance.compute(peakBins, peakSaliences);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3519,7 +3523,7 @@ class PitchContoursMelody {
     return this.algoInstance.compute(contoursBins, contoursSaliences, contoursStartTimes, duration);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3555,7 +3559,7 @@ class PitchContoursMonoMelody {
     return this.algoInstance.compute(contoursBins, contoursSaliences, contoursStartTimes, duration);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3590,7 +3594,7 @@ class PitchContoursMultiMelody {
     return this.algoInstance.compute(contoursBins, contoursSaliences, contoursStartTimes, duration);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3617,7 +3621,7 @@ class PitchFilter {
     return this.algoInstance.compute(pitch, pitchConfidence);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3658,7 +3662,7 @@ class PitchMelodia {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3684,7 +3688,7 @@ class PitchSalience {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3714,7 +3718,7 @@ class PitchSalienceFunction {
     return this.algoInstance.compute(frequencies, magnitudes);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3741,7 +3745,7 @@ class PitchSalienceFunctionPeaks {
     return this.algoInstance.compute(salienceFunction);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3770,7 +3774,7 @@ class PitchYin {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3799,7 +3803,7 @@ class PitchYinFFT {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3828,7 +3832,7 @@ class PitchYinProbabilistic {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3855,7 +3859,7 @@ class PitchYinProbabilities {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3883,7 +3887,7 @@ class PitchYinProbabilitiesHMM {
     return this.algoInstance.compute(pitchCandidates, probabilities);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3907,7 +3911,7 @@ class PowerMean {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3931,7 +3935,7 @@ class PowerSpectrum {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -3974,7 +3978,7 @@ class PredominantPitchMelodia {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4002,7 +4006,7 @@ class RMS {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4026,7 +4030,7 @@ class RawMoments {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4050,7 +4054,7 @@ class ReplayGain {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4076,7 +4080,7 @@ class Resample {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4101,7 +4105,7 @@ class ResampleFFT {
     return this.algoInstance.compute(input);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4124,7 +4128,7 @@ class RhythmDescriptors {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4164,7 +4168,7 @@ class RhythmExtractor {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4192,7 +4196,7 @@ class RhythmExtractor2013 {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4217,7 +4221,7 @@ class RhythmTransform {
     return this.algoInstance.compute(melBands);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4242,7 +4246,7 @@ class RollOff {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4272,7 +4276,7 @@ class SNR {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4304,7 +4308,7 @@ class SaturationDetector {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4330,7 +4334,7 @@ class Scale {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4359,7 +4363,7 @@ class SineSubtraction {
     return this.algoInstance.compute(frame, magnitudes, frequencies, phases);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4389,7 +4393,7 @@ class SingleBeatLoudness {
     return this.algoInstance.compute(beat);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4420,7 +4424,7 @@ class Slicer {
     return this.algoInstance.compute(audio);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4447,7 +4451,7 @@ class SpectralCentroidTime {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4472,7 +4476,7 @@ class SpectralComplexity {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4502,7 +4506,7 @@ class SpectralContrast {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4531,7 +4535,7 @@ class SpectralPeaks {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4558,7 +4562,7 @@ class SpectralWhitening {
     return this.algoInstance.compute(spectrum, frequencies, magnitudes);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4582,7 +4586,7 @@ class Spectrum {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4615,7 +4619,7 @@ class SpectrumCQ {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4646,7 +4650,7 @@ class SpectrumToCent {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4683,7 +4687,7 @@ class Spline {
     return this.algoInstance.compute(x);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4717,7 +4721,7 @@ class SprModelAnal {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4746,7 +4750,7 @@ class SprModelSynth {
     return this.algoInstance.compute(magnitudes, frequencies, phases, res);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4781,7 +4785,7 @@ class SpsModelAnal {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4811,7 +4815,7 @@ class SpsModelSynth {
     return this.algoInstance.compute(magnitudes, frequencies, phases, stocenv);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4840,7 +4844,7 @@ class StartStopCut {
     return this.algoInstance.compute(audio);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4864,7 +4868,7 @@ class StartStopSilence {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4891,7 +4895,7 @@ class StochasticModelAnal {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4918,7 +4922,7 @@ class StochasticModelSynth {
     return this.algoInstance.compute(stocenv);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4942,7 +4946,7 @@ class StrongDecay {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4965,7 +4969,7 @@ class StrongPeak {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -4994,7 +4998,7 @@ class SuperFluxExtractor {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5019,7 +5023,7 @@ class SuperFluxNovelty {
     return this.algoInstance.compute(bands);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5048,7 +5052,7 @@ class SuperFluxPeaks {
     return this.algoInstance.compute(novelty);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5071,7 +5075,7 @@ class TCToTotal {
     return this.algoInstance.compute(envelope);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5098,7 +5102,7 @@ class TempoScaleBands {
     return this.algoInstance.compute(bands);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5133,7 +5137,7 @@ class TempoTap {
     return this.algoInstance.compute(featuresFrame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5160,7 +5164,7 @@ class TempoTapDegara {
     return this.algoInstance.compute(onsetDetections);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5183,7 +5187,7 @@ class TempoTapMaxAgreement {
     return this.algoInstance.compute(tickCandidates);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5210,7 +5214,7 @@ class TempoTapTicks {
     return this.algoInstance.compute(periods, phases);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5233,7 +5237,7 @@ class TensorflowInputFSDSINet {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5256,7 +5260,7 @@ class TensorflowInputMusiCNN {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5279,7 +5283,7 @@ class TensorflowInputTempoCNN {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5302,7 +5306,7 @@ class TensorflowInputVGGish {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5328,7 +5332,7 @@ class TonalExtractor {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5363,7 +5367,7 @@ class TonicIndianArtMusic {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5395,7 +5399,7 @@ class TriangularBands {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5429,7 +5433,7 @@ class TriangularBarkBands {
     return this.algoInstance.compute(spectrum);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5457,7 +5461,7 @@ class Trimmer {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5481,7 +5485,7 @@ class Tristimulus {
     return this.algoInstance.compute(frequencies, magnitudes);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5520,7 +5524,7 @@ class TruePeakDetector {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5545,7 +5549,7 @@ class TuningFrequency {
     return this.algoInstance.compute(frequencies, magnitudes);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5570,7 +5574,7 @@ class TuningFrequencyExtractor {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5601,7 +5605,7 @@ class UnaryOperator {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5632,7 +5636,7 @@ class UnaryOperatorStream {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5655,7 +5659,7 @@ class Variance {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5683,7 +5687,7 @@ class Vibrato {
     return this.algoInstance.compute(pitch);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5710,7 +5714,7 @@ class WarpedAutoCorrelation {
     return this.algoInstance.compute(array);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5740,7 +5744,7 @@ class Welch {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5771,7 +5775,7 @@ class Windowing {
     return this.algoInstance.compute(frame);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
@@ -5796,7 +5800,7 @@ class ZeroCrossingRate {
     return this.algoInstance.compute(signal);
   }
   delete() {
-    return this.algoInstance.delete();
+    this.algoInstance.delete();
   }
 }
  
