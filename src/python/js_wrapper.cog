@@ -87,22 +87,20 @@ function audioBufferToMonoSignal(buffer: AudioBuffer): Float32Array {
 
 /**
  * Convert an input JS array into VectorFloat type
- * @method
+ * @function
  * @param {Float32Array} inputArray input JS typed array
  * @returns {VectorFloat} returns vector float
- * @memberof Essentia
- */
+*/
 function arrayToVector(inputArray: any) {
   return wasmBackend.arrayToVector(inputArray);
 }
 
 /**
  * Convert an input VectorFloat array into typed JS Float32Array 
- * @method 
+ * @function 
  * @param {VectorFloat} inputVector input VectorFloat array
  * @returns {Float32Array} returns converted JS typed array
- * @memberof Essentia
- */
+*/
 function vectorToArray(inputVector: any): Float32Array {
   return wasmBackend.vectorToArray(inputVector);
 }
@@ -124,27 +122,32 @@ class FrameGenerator {
   }
 
   /**
-   * Configure algorithm
+   * Configure algorithm with default or given params
    * @method
    * @param {number} [frameSize=2048] frame size for cutting the audio signal
    * @param {number} [hopSize=1024] size of overlapping frame 
    * @memberof FrameGenerator
-   */
+  */
   configure(frameSize: number=2048, hopSize: number=1024) {
     this.algoInstance.configure(frameSize, hopSize);
   }
 
   /**
-   * Execute algorithm
+   * Execute algorithm with given inputs
    * @method
    * @param {Float32Array} inputAudioData a single channel audio channel data
    * @returns {VectorVectorFloat} Returns a 2D vector float of sliced audio frames
    * @memberof FrameGenerator 
-   */
+  */
   compute(inputAudioData: Float32Array) {
     return this.algoInstance.compute(inputAudioData);
   }
 
+  /**
+   * Delete algorithm instance
+   * @method
+   * @memberof FrameGenerator 
+  */
   delete() {
     this.algoInstance.delete();
   }

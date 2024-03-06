@@ -287,7 +287,6 @@ def parse_to_typescript(algorithm_name):
 	param_converted = list()
 	untyped_inputs = list()
 	untyped_parameters = list()	
-	comments = list()
 	algorithm = list()
 	# create the algorithm object
 	algo = getattr(estd, algorithm_name)()
@@ -298,13 +297,19 @@ def parse_to_typescript(algorithm_name):
 	# We do a shim of algorithm description for prettifying the doc
 	algo_description = doc_dict['description'].split('\n\n')[0] + doc_link
 	# add jsdoc string
-	comments.append("/**")
-	comments.append(f"* {algo_description}")
-	comments.append("* @class")
+	class_comment = [
+		"/**",
+		f"* {algo_description}",
+		"* @class",
+		"*/"
+	]
+
+	algorithm.extend(class_comment)
 
 	param_prefix = "* @param"
 	return_prefix = "* @returns"
 
+	inputs_comments = list()
 	# parse input variables
 	for inp in doc_dict['inputs']:
 
@@ -330,13 +335,14 @@ def parse_to_typescript(algorithm_name):
 			inputs.append(f"{inp['name']}: {map_types_to_js(inp['type'])}")
 			comment_input_type = f"{{{map_types_to_js(inp['type'])}}}"
 
-		comments.append(f"{param_prefix} {comment_input_type} {inp['name']} {inp['description']}")
+		inputs_comments.append(f"   {param_prefix} {comment_input_type} {inp['name']} {inp['description']}")
 		untyped_inputs.append(inp['name'])
-		
+	
+	param_comments = list()
 	# parse parameter variables
 	for param in doc_dict['parameters']:
 
-		comments.append(f"{param_prefix} {{{map_types_to_js(param['type'])}}} [{param['name']}={param['default']}] {param['description']}")
+		param_comments.append(f"   {param_prefix} {{{map_types_to_js(param['type'])}}} [{param['name']}={param['default']}] {param['description']}")
 		vec_param_var = f"vec{param['name']}"
 		param_default_val = param['default']
 		param_var_name = param['name']
@@ -365,21 +371,25 @@ def parse_to_typescript(algorithm_name):
 	outs = list()
 	for out in doc_dict['outputs']:
 		outs.append(f"{out['name']}: '{out['description']}'")
-	comments.append(f"{return_prefix} {{object}} {{{', '.join(outs)}}}")
-
-	comments.append("* @memberof Essentia")
-	comments.append("*/")
-
-	# Add the comments to the algorithm list
-	algorithm.extend(comments)
+	return_comment = f"   {return_prefix} {{object}} {{{', '.join(outs)}}}"
 
 	# Generate the class definition
 	class_definition = f"class {algorithm_name} {{"
 	algorithm.append(class_definition)
+	# TODO: add public `params` member, perhaps read-only with defaults/current values
 	algorithm.append("  private algoInstance: any;")
 
 	config_param_list = ', '.join(untyped_parameters)
+	
 	# Add the constructor
+	constructor_comment = [
+		"  /**",
+		"   * Creates an instance of the algorithm and initializes it by configuring with default or given params",
+		"   * @constructor",
+		*param_comments,
+		"  */"
+	]
+	algorithm.extend(constructor_comment)
 	constructor_args = ', '.join(parameters)
 	algorithm.append(f"  constructor({constructor_args}) {{")
 	if param_converted:
@@ -388,6 +398,15 @@ def parse_to_typescript(algorithm_name):
 	algorithm.append("  }")
 
 	# Add configure method
+	configure_comment = [
+		"  /**",
+		"   * Configure algorithm with default or given params",
+		"   * @method",
+		*param_comments,
+		f"   * @memberof {algorithm_name}",
+		"  */"
+	]
+	algorithm.extend(configure_comment)
 	algorithm.append(f"  configure({constructor_args}) {{")		
 	if param_converted:
 		algorithm.extend(param_converted)
@@ -395,12 +414,30 @@ def parse_to_typescript(algorithm_name):
 	algorithm.append("  }")
 
 	# Add the compute method
+	compute_comment = [
+		"  /**",
+		"   * Execute algorithm with given inputs",
+		"   * @method",
+		*inputs_comments,
+		return_comment,
+		f"   * @memberof {algorithm_name}",
+		"  */"
+	]
+	algorithm.extend(compute_comment)
 	compute_args = ', '.join(inputs)
 	algorithm.append(f"  compute({compute_args}) {{")
 	algorithm.append(f"    return this.algoInstance.compute({', '.join(untyped_inputs)});")
 	algorithm.append("  }")
 
 	# Add delete method
+	delete_comment = [
+		"  /**",
+		"   * Delete algorithm instance",
+		"   * @method",
+		f"   * @memberof {algorithm_name}",
+		"  */"
+	]
+	algorithm.extend(delete_comment)
 	algorithm.append("  delete() {")
 	algorithm.append("    this.algoInstance.delete();")
 	algorithm.append("  }")
