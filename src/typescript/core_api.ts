@@ -192,6 +192,9 @@ class AfterMaxToBeforeMaxEnergyRatio {
   compute(pitch: any) {
     return this.algoInstance.compute(pitch);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -216,6 +219,9 @@ class AllPass {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -231,21 +237,18 @@ class AllPass {
 class AudioOnsetsMarker {
   private algoInstance: any;
   constructor(onsets: any[]=[], sampleRate: number=44100, type: string='beep') {
-    let veconsets = new wasmBackend.VectorFloat();
-    for (var i=0; i<veconsets.size(); i++) {
-      veconsets.push_back(onsets[i]);
-    }
+    let veconsets = arrayToVector(onsets);
     this.algoInstance = new wasmBackend.AudioOnsetsMarker(veconsets, sampleRate, type);
   }
   configure(onsets: any[]=[], sampleRate: number=44100, type: string='beep') {
-    let veconsets = new wasmBackend.VectorFloat();
-    for (var i=0; i<veconsets.size(); i++) {
-      veconsets.push_back(onsets[i]);
-    }
+    let veconsets = arrayToVector(onsets);
     this.algoInstance.configure(veconsets, sampleRate, type);
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -271,6 +274,9 @@ class AutoCorrelation {
   }
   compute(array: any) {
     return this.algoInstance.compute(array);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -305,6 +311,9 @@ class BFCC {
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -319,29 +328,20 @@ class BFCC {
 class BPF {
   private algoInstance: any;
   constructor(xPoints: any[]=[0, 1], yPoints: any[]=[0, 1]) {
-    let vecxPoints = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecxPoints.size(); i++) {
-      vecxPoints.push_back(xPoints[i]);
-    }
-    let vecyPoints = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecyPoints.size(); i++) {
-      vecyPoints.push_back(yPoints[i]);
-    }
+    let vecxPoints = arrayToVector(xPoints);
+    let vecyPoints = arrayToVector(yPoints);
     this.algoInstance = new wasmBackend.BPF(vecxPoints, vecyPoints);
   }
   configure(xPoints: any[]=[0, 1], yPoints: any[]=[0, 1]) {
-    let vecxPoints = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecxPoints.size(); i++) {
-      vecxPoints.push_back(xPoints[i]);
-    }
-    let vecyPoints = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecyPoints.size(); i++) {
-      vecyPoints.push_back(yPoints[i]);
-    }
+    let vecxPoints = arrayToVector(xPoints);
+    let vecyPoints = arrayToVector(yPoints);
     this.algoInstance.configure(vecxPoints, vecyPoints);
   }
   compute(x: number) {
     return this.algoInstance.compute(x);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -366,6 +366,9 @@ class BandPass {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -389,6 +392,9 @@ class BandReject {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -411,6 +417,9 @@ class BarkBands {
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -432,6 +441,9 @@ class BeatTrackerDegara {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -460,6 +472,9 @@ class BeatTrackerMultiFeature {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -483,6 +498,9 @@ class Beatogram {
   compute(loudness: any, loudnessBandRatio: any) {
     return this.algoInstance.compute(loudness, loudnessBandRatio);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -500,29 +518,20 @@ class Beatogram {
 class BeatsLoudness {
   private algoInstance: any;
   constructor(beatDuration: number=0.05, beatWindowDuration: number=0.1, beats: any[]=[], frequencyBands: any[]=[20, 150, 400, 3200, 7000, 22000], sampleRate: number=44100) {
-    let vecbeats = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecbeats.size(); i++) {
-      vecbeats.push_back(beats[i]);
-    }
-    let vecfrequencyBands = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecfrequencyBands.size(); i++) {
-      vecfrequencyBands.push_back(frequencyBands[i]);
-    }
+    let vecbeats = arrayToVector(beats);
+    let vecfrequencyBands = arrayToVector(frequencyBands);
     this.algoInstance = new wasmBackend.BeatsLoudness(beatDuration, beatWindowDuration, vecbeats, vecfrequencyBands, sampleRate);
   }
   configure(beatDuration: number=0.05, beatWindowDuration: number=0.1, beats: any[]=[], frequencyBands: any[]=[20, 150, 400, 3200, 7000, 22000], sampleRate: number=44100) {
-    let vecbeats = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecbeats.size(); i++) {
-      vecbeats.push_back(beats[i]);
-    }
-    let vecfrequencyBands = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecfrequencyBands.size(); i++) {
-      vecfrequencyBands.push_back(frequencyBands[i]);
-    }
+    let vecbeats = arrayToVector(beats);
+    let vecfrequencyBands = arrayToVector(frequencyBands);
     this.algoInstance.configure(beatDuration, beatWindowDuration, vecbeats, vecfrequencyBands, sampleRate);
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -549,6 +558,9 @@ class BinaryOperator {
   compute(array1: any, array2: any) {
     return this.algoInstance.compute(array1, array2);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -574,6 +586,9 @@ class BinaryOperatorStream {
   compute(array1: any, array2: any) {
     return this.algoInstance.compute(array1, array2);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -594,6 +609,9 @@ class BpmHistogramDescriptors {
   }
   compute(bpmIntervals: any) {
     return this.algoInstance.compute(bpmIntervals);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -618,6 +636,9 @@ class BpmRubato {
   compute(beats: any) {
     return this.algoInstance.compute(beats);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -640,6 +661,9 @@ class CentralMoments {
   compute(array: any) {
     return this.algoInstance.compute(array);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -660,6 +684,9 @@ class Centroid {
   }
   compute(array: any) {
     return this.algoInstance.compute(array);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -686,6 +713,9 @@ class ChordsDescriptors {
   }
   compute(chords: any, key: string, scale: string) {
     return this.algoInstance.compute(chords, key, scale);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -714,6 +744,9 @@ class ChordsDetection {
   compute(pcp: any) {
     return this.algoInstance.compute(pcp);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -739,6 +772,9 @@ class ChordsDetectionBeats {
   }
   compute(pcp: any, ticks: any) {
     return this.algoInstance.compute(pcp, ticks);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -767,6 +803,9 @@ class ChromaCrossSimilarity {
   }
   compute(queryFeature: any, referenceFeature: any) {
     return this.algoInstance.compute(queryFeature, referenceFeature);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -799,6 +838,9 @@ class Chromagram {
   compute(frame: any) {
     return this.algoInstance.compute(frame);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -826,6 +868,9 @@ class ClickDetector {
   compute(frame: any) {
     return this.algoInstance.compute(frame);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -847,6 +892,9 @@ class Clipper {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -872,6 +920,9 @@ class CoverSongSimilarity {
   compute(inputArray: any) {
     return this.algoInstance.compute(inputArray);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -891,6 +942,9 @@ class Crest {
   }
   compute(array: any) {
     return this.algoInstance.compute(array);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -914,6 +968,9 @@ class CrossCorrelation {
   }
   compute(arrayX: any, arrayY: any) {
     return this.algoInstance.compute(arrayX, arrayY);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -939,6 +996,9 @@ class CrossSimilarityMatrix {
   }
   compute(queryFeature: any, referenceFeature: any) {
     return this.algoInstance.compute(queryFeature, referenceFeature);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -966,29 +1026,20 @@ References:
 class CubicSpline {
   private algoInstance: any;
   constructor(leftBoundaryFlag: number=0, leftBoundaryValue: number=0, rightBoundaryFlag: number=0, rightBoundaryValue: number=0, xPoints: any[]=[0, 1], yPoints: any[]=[0, 1]) {
-    let vecxPoints = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecxPoints.size(); i++) {
-      vecxPoints.push_back(xPoints[i]);
-    }
-    let vecyPoints = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecyPoints.size(); i++) {
-      vecyPoints.push_back(yPoints[i]);
-    }
+    let vecxPoints = arrayToVector(xPoints);
+    let vecyPoints = arrayToVector(yPoints);
     this.algoInstance = new wasmBackend.CubicSpline(leftBoundaryFlag, leftBoundaryValue, rightBoundaryFlag, rightBoundaryValue, vecxPoints, vecyPoints);
   }
   configure(leftBoundaryFlag: number=0, leftBoundaryValue: number=0, rightBoundaryFlag: number=0, rightBoundaryValue: number=0, xPoints: any[]=[0, 1], yPoints: any[]=[0, 1]) {
-    let vecxPoints = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecxPoints.size(); i++) {
-      vecxPoints.push_back(xPoints[i]);
-    }
-    let vecyPoints = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecyPoints.size(); i++) {
-      vecyPoints.push_back(yPoints[i]);
-    }
+    let vecxPoints = arrayToVector(xPoints);
+    let vecyPoints = arrayToVector(yPoints);
     this.algoInstance.configure(leftBoundaryFlag, leftBoundaryValue, rightBoundaryFlag, rightBoundaryValue, vecxPoints, vecyPoints);
   }
   compute(x: number) {
     return this.algoInstance.compute(x);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -1011,6 +1062,9 @@ class DCRemoval {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -1037,6 +1091,9 @@ class DCT {
   compute(array: any) {
     return this.algoInstance.compute(array);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1060,6 +1117,9 @@ class Danceability {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -1086,6 +1146,9 @@ class Decrease {
   compute(array: any) {
     return this.algoInstance.compute(array);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1106,6 +1169,9 @@ class Derivative {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1125,6 +1191,9 @@ class DerivativeSFX {
   }
   compute(envelope: any) {
     return this.algoInstance.compute(envelope);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -1154,6 +1223,9 @@ class DiscontinuityDetector {
   compute(frame: any) {
     return this.algoInstance.compute(frame);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1180,6 +1252,9 @@ class Dissonance {
   compute(frequencies: any, magnitudes: any) {
     return this.algoInstance.compute(frequencies, magnitudes);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1200,6 +1275,9 @@ class DistributionShape {
   }
   compute(centralMoments: any) {
     return this.algoInstance.compute(centralMoments);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -1222,6 +1300,9 @@ class Duration {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1243,6 +1324,9 @@ class DynamicComplexity {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -1271,6 +1355,9 @@ class ERBBands {
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1298,6 +1385,9 @@ class EffectiveDuration {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1317,6 +1407,9 @@ class Energy {
   }
   compute(array: any) {
     return this.algoInstance.compute(array);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -1342,6 +1435,9 @@ class EnergyBand {
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1365,6 +1461,9 @@ class EnergyBandRatio {
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1384,6 +1483,9 @@ class Entropy {
   }
   compute(array: any) {
     return this.algoInstance.compute(array);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -1409,6 +1511,9 @@ class Envelope {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1430,6 +1535,9 @@ class EqualLoudness {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1449,6 +1557,9 @@ class Flatness {
   }
   compute(array: any) {
     return this.algoInstance.compute(array);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -1470,6 +1581,9 @@ class FlatnessDB {
   compute(array: any) {
     return this.algoInstance.compute(array);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1489,6 +1603,9 @@ class FlatnessSFX {
   }
   compute(envelope: any) {
     return this.algoInstance.compute(envelope);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -1511,6 +1628,9 @@ class Flux {
   }
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -1537,6 +1657,9 @@ class FrameCutter {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1559,6 +1682,9 @@ class FrameToReal {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1573,21 +1699,18 @@ class FrameToReal {
 class FrequencyBands {
   private algoInstance: any;
   constructor(frequencyBands: any[]=[0, 50, 100, 150, 200, 300, 400, 510, 630, 770, 920, 1080, 1270, 1480, 1720, 2000, 2320, 2700, 3150, 3700, 4400, 5300, 6400, 7700, 9500, 12000, 15500, 20500, 27000], sampleRate: number=44100) {
-    let vecfrequencyBands = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecfrequencyBands.size(); i++) {
-      vecfrequencyBands.push_back(frequencyBands[i]);
-    }
+    let vecfrequencyBands = arrayToVector(frequencyBands);
     this.algoInstance = new wasmBackend.FrequencyBands(vecfrequencyBands, sampleRate);
   }
   configure(frequencyBands: any[]=[0, 50, 100, 150, 200, 300, 400, 510, 630, 770, 920, 1080, 1270, 1480, 1720, 2000, 2320, 2700, 3150, 3700, 4400, 5300, 6400, 7700, 9500, 12000, 15500, 20500, 27000], sampleRate: number=44100) {
-    let vecfrequencyBands = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecfrequencyBands.size(); i++) {
-      vecfrequencyBands.push_back(frequencyBands[i]);
-    }
+    let vecfrequencyBands = arrayToVector(frequencyBands);
     this.algoInstance.configure(vecfrequencyBands, sampleRate);
   }
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -1618,6 +1741,9 @@ class GFCC {
   }
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -1652,6 +1778,9 @@ class GapsDetector {
   compute(frame: any) {
     return this.algoInstance.compute(frame);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1671,6 +1800,9 @@ class GeometricMean {
   }
   compute(array: any) {
     return this.algoInstance.compute(array);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -1696,6 +1828,9 @@ class HFC {
   }
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -1731,6 +1866,9 @@ class HPCP {
   compute(frequencies: any, magnitudes: any) {
     return this.algoInstance.compute(frequencies, magnitudes);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1755,6 +1893,9 @@ class HarmonicBpm {
   }
   compute(bpms: any) {
     return this.algoInstance.compute(bpms);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -1786,6 +1927,9 @@ class HarmonicPeaks {
   compute(frequencies: any, magnitudes: any, pitch: number) {
     return this.algoInstance.compute(frequencies, magnitudes, pitch);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1808,6 +1952,9 @@ class HighPass {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1829,6 +1976,9 @@ class HighResolutionFeatures {
   }
   compute(hpcp: any) {
     return this.algoInstance.compute(hpcp);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -1853,6 +2003,9 @@ class Histogram {
   }
   compute(array: any) {
     return this.algoInstance.compute(array);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -1889,6 +2042,9 @@ class HprModelAnal {
   compute(frame: any, pitch: number) {
     return this.algoInstance.compute(frame, pitch);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1924,6 +2080,9 @@ class HpsModelAnal {
   compute(frame: any, pitch: number) {
     return this.algoInstance.compute(frame, pitch);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1949,6 +2108,9 @@ class IDCT {
   compute(dct: any) {
     return this.algoInstance.compute(dct);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -1963,29 +2125,20 @@ class IDCT {
 class IIR {
   private algoInstance: any;
   constructor(denominator: any[]=[1], numerator: any[]=[1]) {
-    let vecdenominator = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecdenominator.size(); i++) {
-      vecdenominator.push_back(denominator[i]);
-    }
-    let vecnumerator = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecnumerator.size(); i++) {
-      vecnumerator.push_back(numerator[i]);
-    }
+    let vecdenominator = arrayToVector(denominator);
+    let vecnumerator = arrayToVector(numerator);
     this.algoInstance = new wasmBackend.IIR(vecdenominator, vecnumerator);
   }
   configure(denominator: any[]=[1], numerator: any[]=[1]) {
-    let vecdenominator = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecdenominator.size(); i++) {
-      vecdenominator.push_back(denominator[i]);
-    }
-    let vecnumerator = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecnumerator.size(); i++) {
-      vecnumerator.push_back(numerator[i]);
-    }
+    let vecdenominator = arrayToVector(denominator);
+    let vecnumerator = arrayToVector(numerator);
     this.algoInstance.configure(vecdenominator, vecnumerator);
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2008,6 +2161,9 @@ class Inharmonicity {
   compute(frequencies: any, magnitudes: any) {
     return this.algoInstance.compute(frequencies, magnitudes);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -2027,6 +2183,9 @@ class InstantPower {
   }
   compute(array: any) {
     return this.algoInstance.compute(array);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2048,6 +2207,9 @@ class Intensity {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2075,6 +2237,9 @@ class Key {
   }
   compute(pcp: any) {
     return this.algoInstance.compute(pcp);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2110,6 +2275,9 @@ class KeyExtractor {
   compute(audio: any) {
     return this.algoInstance.compute(audio);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -2132,6 +2300,9 @@ class LPC {
   }
   compute(frame: any) {
     return this.algoInstance.compute(frame);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2157,6 +2328,9 @@ class Larm {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -2177,6 +2351,9 @@ class Leq {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2200,6 +2377,9 @@ class LevelExtractor {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -2222,6 +2402,9 @@ class LogAttackTime {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2248,6 +2431,9 @@ class LogSpectrum {
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -2270,6 +2456,9 @@ class LoopBpmConfidence {
   compute(signal: any, bpmEstimate: number) {
     return this.algoInstance.compute(signal, bpmEstimate);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -2291,6 +2480,9 @@ class LoopBpmEstimator {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -2310,6 +2502,9 @@ class Loudness {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2331,6 +2526,9 @@ class LoudnessVickers {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2355,6 +2553,9 @@ class LowLevelSpectralEqloudExtractor {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -2377,6 +2578,9 @@ class LowLevelSpectralExtractor {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2402,6 +2606,9 @@ class LowPass {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2441,6 +2648,9 @@ class MFCC {
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -2462,6 +2672,9 @@ class MaxFilter {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2485,6 +2698,9 @@ class MaxMagFreq {
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -2504,6 +2720,9 @@ class MaxToTotal {
   }
   compute(envelope: any) {
     return this.algoInstance.compute(envelope);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2525,6 +2744,9 @@ class Mean {
   compute(array: any) {
     return this.algoInstance.compute(array);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -2544,6 +2766,9 @@ class Median {
   }
   compute(array: any) {
     return this.algoInstance.compute(array);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2565,6 +2790,9 @@ class MedianFilter {
   }
   compute(array: any) {
     return this.algoInstance.compute(array);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2596,6 +2824,9 @@ class MelBands {
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -2615,6 +2846,9 @@ class Meter {
   }
   compute(beatogram: any) {
     return this.algoInstance.compute(beatogram);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2638,6 +2872,9 @@ class MinMax {
   compute(array: any) {
     return this.algoInstance.compute(array);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -2657,6 +2894,9 @@ class MinToTotal {
   }
   compute(envelope: any) {
     return this.algoInstance.compute(envelope);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2678,6 +2918,9 @@ class MovingAverage {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2710,6 +2953,9 @@ class MultiPitchKlapuri {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2749,6 +2995,9 @@ class MultiPitchMelodia {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -2769,6 +3018,9 @@ class Multiplexer {
   }
   compute() {
     return this.algoInstance.compute();
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2804,6 +3056,9 @@ class NNLSChroma {
   compute(logSpectrogram: any, meanTuning: any, localTuning: any) {
     return this.algoInstance.compute(logSpectrogram, meanTuning, localTuning);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -2825,6 +3080,9 @@ class NoiseAdder {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2849,6 +3107,9 @@ class NoiseBurstDetector {
   compute(frame: any) {
     return this.algoInstance.compute(frame);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -2865,21 +3126,18 @@ class NoiseBurstDetector {
 class NoveltyCurve {
   private algoInstance: any;
   constructor(frameRate: number=344.531, normalize: boolean=false, weightCurve: any[]=[], weightCurveType: string='hybrid') {
-    let vecweightCurve = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecweightCurve.size(); i++) {
-      vecweightCurve.push_back(weightCurve[i]);
-    }
+    let vecweightCurve = arrayToVector(weightCurve);
     this.algoInstance = new wasmBackend.NoveltyCurve(frameRate, normalize, vecweightCurve, weightCurveType);
   }
   configure(frameRate: number=344.531, normalize: boolean=false, weightCurve: any[]=[], weightCurveType: string='hybrid') {
-    let vecweightCurve = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecweightCurve.size(); i++) {
-      vecweightCurve.push_back(weightCurve[i]);
-    }
+    let vecweightCurve = arrayToVector(weightCurve);
     this.algoInstance.configure(frameRate, normalize, vecweightCurve, weightCurveType);
   }
   compute(frequencyBands: any) {
     return this.algoInstance.compute(frequencyBands);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2906,6 +3164,9 @@ class NoveltyCurveFixedBpmEstimator {
   compute(novelty: any) {
     return this.algoInstance.compute(novelty);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -2928,6 +3189,9 @@ class OddToEvenHarmonicEnergyRatio {
   }
   compute(frequencies: any, magnitudes: any) {
     return this.algoInstance.compute(frequencies, magnitudes);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2958,6 +3222,9 @@ class OnsetDetection {
   }
   compute(spectrum: any, phase: any) {
     return this.algoInstance.compute(spectrum, phase);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -2990,6 +3257,9 @@ class OnsetDetectionGlobal {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3011,6 +3281,9 @@ class OnsetRate {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -3034,6 +3307,9 @@ class OverlapAdd {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -3065,6 +3341,9 @@ class PeakDetection {
   compute(array: any) {
     return this.algoInstance.compute(array);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3092,6 +3371,9 @@ class PercivalBpmEstimator {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3111,6 +3393,9 @@ class PercivalEnhanceHarmonics {
   }
   compute(array: any) {
     return this.algoInstance.compute(array);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -3133,6 +3418,9 @@ class PercivalEvaluatePulseTrains {
   }
   compute(oss: any, positions: any) {
     return this.algoInstance.compute(oss, positions);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -3160,6 +3448,9 @@ class PitchContourSegmentation {
   }
   compute(pitch: any, signal: any) {
     return this.algoInstance.compute(pitch, signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -3189,6 +3480,9 @@ class PitchContours {
   }
   compute(peakBins: any, peakSaliences: any) {
     return this.algoInstance.compute(peakBins, peakSaliences);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -3224,6 +3518,9 @@ class PitchContoursMelody {
   compute(contoursBins: any, contoursSaliences: any, contoursStartTimes: any, duration: number) {
     return this.algoInstance.compute(contoursBins, contoursSaliences, contoursStartTimes, duration);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3257,6 +3554,9 @@ class PitchContoursMonoMelody {
   compute(contoursBins: any, contoursSaliences: any, contoursStartTimes: any, duration: number) {
     return this.algoInstance.compute(contoursBins, contoursSaliences, contoursStartTimes, duration);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3289,6 +3589,9 @@ class PitchContoursMultiMelody {
   compute(contoursBins: any, contoursSaliences: any, contoursStartTimes: any, duration: number) {
     return this.algoInstance.compute(contoursBins, contoursSaliences, contoursStartTimes, duration);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3312,6 +3615,9 @@ class PitchFilter {
   }
   compute(pitch: any, pitchConfidence: any) {
     return this.algoInstance.compute(pitch, pitchConfidence);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -3351,6 +3657,9 @@ class PitchMelodia {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3373,6 +3682,9 @@ class PitchSalience {
   }
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -3401,6 +3713,9 @@ class PitchSalienceFunction {
   compute(frequencies: any, magnitudes: any) {
     return this.algoInstance.compute(frequencies, magnitudes);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3424,6 +3739,9 @@ class PitchSalienceFunctionPeaks {
   }
   compute(salienceFunction: any) {
     return this.algoInstance.compute(salienceFunction);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -3451,6 +3769,9 @@ class PitchYin {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3476,6 +3797,9 @@ class PitchYinFFT {
   }
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -3503,6 +3827,9 @@ class PitchYinProbabilistic {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3526,6 +3853,9 @@ class PitchYinProbabilities {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -3552,6 +3882,9 @@ class PitchYinProbabilitiesHMM {
   compute(pitchCandidates: any, probabilities: any) {
     return this.algoInstance.compute(pitchCandidates, probabilities);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3573,6 +3906,9 @@ class PowerMean {
   compute(array: any) {
     return this.algoInstance.compute(array);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3593,6 +3929,9 @@ class PowerSpectrum {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -3634,6 +3973,9 @@ class PredominantPitchMelodia {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3659,6 +4001,9 @@ class RMS {
   compute(array: any) {
     return this.algoInstance.compute(array);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3680,6 +4025,9 @@ class RawMoments {
   compute(array: any) {
     return this.algoInstance.compute(array);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3700,6 +4048,9 @@ class ReplayGain {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -3724,6 +4075,9 @@ class Resample {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3746,6 +4100,9 @@ class ResampleFFT {
   compute(input: any) {
     return this.algoInstance.compute(input);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3765,6 +4122,9 @@ class RhythmDescriptors {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -3793,21 +4153,18 @@ class RhythmDescriptors {
 class RhythmExtractor {
   private algoInstance: any;
   constructor(frameHop: number=1024, frameSize: number=1024, hopSize: number=256, lastBeatInterval: number=0.1, maxTempo: number=208, minTempo: number=40, numberFrames: number=1024, sampleRate: number=44100, tempoHints: any[]=[], tolerance: number=0.24, useBands: boolean=true, useOnset: boolean=true) {
-    let vectempoHints = new wasmBackend.VectorFloat();
-    for (var i=0; i<vectempoHints.size(); i++) {
-      vectempoHints.push_back(tempoHints[i]);
-    }
+    let vectempoHints = arrayToVector(tempoHints);
     this.algoInstance = new wasmBackend.RhythmExtractor(frameHop, frameSize, hopSize, lastBeatInterval, maxTempo, minTempo, numberFrames, sampleRate, vectempoHints, tolerance, useBands, useOnset);
   }
   configure(frameHop: number=1024, frameSize: number=1024, hopSize: number=256, lastBeatInterval: number=0.1, maxTempo: number=208, minTempo: number=40, numberFrames: number=1024, sampleRate: number=44100, tempoHints: any[]=[], tolerance: number=0.24, useBands: boolean=true, useOnset: boolean=true) {
-    let vectempoHints = new wasmBackend.VectorFloat();
-    for (var i=0; i<vectempoHints.size(); i++) {
-      vectempoHints.push_back(tempoHints[i]);
-    }
+    let vectempoHints = arrayToVector(tempoHints);
     this.algoInstance.configure(frameHop, frameSize, hopSize, lastBeatInterval, maxTempo, minTempo, numberFrames, sampleRate, vectempoHints, tolerance, useBands, useOnset);
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -3834,6 +4191,9 @@ class RhythmExtractor2013 {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3856,6 +4216,9 @@ class RhythmTransform {
   compute(melBands: any) {
     return this.algoInstance.compute(melBands);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3877,6 +4240,9 @@ class RollOff {
   }
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -3904,6 +4270,9 @@ class SNR {
   }
   compute(frame: any) {
     return this.algoInstance.compute(frame);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -3934,6 +4303,9 @@ class SaturationDetector {
   compute(frame: any) {
     return this.algoInstance.compute(frame);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -3956,6 +4328,9 @@ class Scale {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -3983,6 +4358,9 @@ class SineSubtraction {
   compute(frame: any, magnitudes: any, frequencies: any, phases: any) {
     return this.algoInstance.compute(frame, magnitudes, frequencies, phases);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4000,21 +4378,18 @@ class SineSubtraction {
 class SingleBeatLoudness {
   private algoInstance: any;
   constructor(beatDuration: number=0.05, beatWindowDuration: number=0.1, frequencyBands: any[]=[0, 200, 400, 800, 1600, 3200, 22000], onsetStart: string='sumEnergy', sampleRate: number=44100) {
-    let vecfrequencyBands = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecfrequencyBands.size(); i++) {
-      vecfrequencyBands.push_back(frequencyBands[i]);
-    }
+    let vecfrequencyBands = arrayToVector(frequencyBands);
     this.algoInstance = new wasmBackend.SingleBeatLoudness(beatDuration, beatWindowDuration, vecfrequencyBands, onsetStart, sampleRate);
   }
   configure(beatDuration: number=0.05, beatWindowDuration: number=0.1, frequencyBands: any[]=[0, 200, 400, 800, 1600, 3200, 22000], onsetStart: string='sumEnergy', sampleRate: number=44100) {
-    let vecfrequencyBands = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecfrequencyBands.size(); i++) {
-      vecfrequencyBands.push_back(frequencyBands[i]);
-    }
+    let vecfrequencyBands = arrayToVector(frequencyBands);
     this.algoInstance.configure(beatDuration, beatWindowDuration, vecfrequencyBands, onsetStart, sampleRate);
   }
   compute(beat: any) {
     return this.algoInstance.compute(beat);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -4032,29 +4407,20 @@ class SingleBeatLoudness {
 class Slicer {
   private algoInstance: any;
   constructor(endTimes: any[]=[], sampleRate: number=44100, startTimes: any[]=[], timeUnits: string='seconds') {
-    let vecendTimes = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecendTimes.size(); i++) {
-      vecendTimes.push_back(endTimes[i]);
-    }
-    let vecstartTimes = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecstartTimes.size(); i++) {
-      vecstartTimes.push_back(startTimes[i]);
-    }
+    let vecendTimes = arrayToVector(endTimes);
+    let vecstartTimes = arrayToVector(startTimes);
     this.algoInstance = new wasmBackend.Slicer(vecendTimes, sampleRate, vecstartTimes, timeUnits);
   }
   configure(endTimes: any[]=[], sampleRate: number=44100, startTimes: any[]=[], timeUnits: string='seconds') {
-    let vecendTimes = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecendTimes.size(); i++) {
-      vecendTimes.push_back(endTimes[i]);
-    }
-    let vecstartTimes = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecstartTimes.size(); i++) {
-      vecstartTimes.push_back(startTimes[i]);
-    }
+    let vecendTimes = arrayToVector(endTimes);
+    let vecstartTimes = arrayToVector(startTimes);
     this.algoInstance.configure(vecendTimes, sampleRate, vecstartTimes, timeUnits);
   }
   compute(audio: any) {
     return this.algoInstance.compute(audio);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -4080,6 +4446,9 @@ class SpectralCentroidTime {
   compute(array: any) {
     return this.algoInstance.compute(array);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4101,6 +4470,9 @@ class SpectralComplexity {
   }
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -4129,6 +4501,9 @@ class SpectralContrast {
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4155,6 +4530,9 @@ class SpectralPeaks {
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4179,6 +4557,9 @@ class SpectralWhitening {
   compute(spectrum: any, frequencies: any, magnitudes: any) {
     return this.algoInstance.compute(spectrum, frequencies, magnitudes);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4199,6 +4580,9 @@ class Spectrum {
   }
   compute(frame: any) {
     return this.algoInstance.compute(frame);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -4230,6 +4614,9 @@ class SpectrumCQ {
   compute(frame: any) {
     return this.algoInstance.compute(frame);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4258,6 +4645,9 @@ class SpectrumToCent {
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4280,29 +4670,20 @@ Regarding spline types:
 class Spline {
   private algoInstance: any;
   constructor(beta1: number=1, beta2: number=0, type: string='b', xPoints: any[]=[0, 1], yPoints: any[]=[0, 1]) {
-    let vecxPoints = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecxPoints.size(); i++) {
-      vecxPoints.push_back(xPoints[i]);
-    }
-    let vecyPoints = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecyPoints.size(); i++) {
-      vecyPoints.push_back(yPoints[i]);
-    }
+    let vecxPoints = arrayToVector(xPoints);
+    let vecyPoints = arrayToVector(yPoints);
     this.algoInstance = new wasmBackend.Spline(beta1, beta2, type, vecxPoints, vecyPoints);
   }
   configure(beta1: number=1, beta2: number=0, type: string='b', xPoints: any[]=[0, 1], yPoints: any[]=[0, 1]) {
-    let vecxPoints = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecxPoints.size(); i++) {
-      vecxPoints.push_back(xPoints[i]);
-    }
-    let vecyPoints = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecyPoints.size(); i++) {
-      vecyPoints.push_back(yPoints[i]);
-    }
+    let vecxPoints = arrayToVector(xPoints);
+    let vecyPoints = arrayToVector(yPoints);
     this.algoInstance.configure(beta1, beta2, type, vecxPoints, vecyPoints);
   }
   compute(x: number) {
     return this.algoInstance.compute(x);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -4335,6 +4716,9 @@ class SprModelAnal {
   compute(frame: any) {
     return this.algoInstance.compute(frame);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4360,6 +4744,9 @@ class SprModelSynth {
   }
   compute(magnitudes: any, frequencies: any, phases: any, res: any) {
     return this.algoInstance.compute(magnitudes, frequencies, phases, res);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -4393,6 +4780,9 @@ class SpsModelAnal {
   compute(frame: any) {
     return this.algoInstance.compute(frame);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4420,6 +4810,9 @@ class SpsModelSynth {
   compute(magnitudes: any, frequencies: any, phases: any, stocenv: any) {
     return this.algoInstance.compute(magnitudes, frequencies, phases, stocenv);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4446,6 +4839,9 @@ class StartStopCut {
   compute(audio: any) {
     return this.algoInstance.compute(audio);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4466,6 +4862,9 @@ class StartStopSilence {
   }
   compute(frame: any) {
     return this.algoInstance.compute(frame);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -4491,6 +4890,9 @@ class StochasticModelAnal {
   compute(frame: any) {
     return this.algoInstance.compute(frame);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4515,6 +4917,9 @@ class StochasticModelSynth {
   compute(stocenv: any) {
     return this.algoInstance.compute(stocenv);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4536,6 +4941,9 @@ class StrongDecay {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4555,6 +4963,9 @@ class StrongPeak {
   }
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -4582,6 +4993,9 @@ class SuperFluxExtractor {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4603,6 +5017,9 @@ class SuperFluxNovelty {
   }
   compute(bands: any) {
     return this.algoInstance.compute(bands);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -4630,6 +5047,9 @@ class SuperFluxPeaks {
   compute(novelty: any) {
     return this.algoInstance.compute(novelty);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4650,6 +5070,9 @@ class TCToTotal {
   compute(envelope: any) {
     return this.algoInstance.compute(envelope);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4664,21 +5087,18 @@ class TCToTotal {
 class TempoScaleBands {
   private algoInstance: any;
   constructor(bandsGain: any[]=[2, 3, 2, 1, 1.20000004768, 2, 3, 2.5], frameTime: number=512) {
-    let vecbandsGain = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecbandsGain.size(); i++) {
-      vecbandsGain.push_back(bandsGain[i]);
-    }
+    let vecbandsGain = arrayToVector(bandsGain);
     this.algoInstance = new wasmBackend.TempoScaleBands(vecbandsGain, frameTime);
   }
   configure(bandsGain: any[]=[2, 3, 2, 1, 1.20000004768, 2, 3, 2.5], frameTime: number=512) {
-    let vecbandsGain = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecbandsGain.size(); i++) {
-      vecbandsGain.push_back(bandsGain[i]);
-    }
+    let vecbandsGain = arrayToVector(bandsGain);
     this.algoInstance.configure(vecbandsGain, frameTime);
   }
   compute(bands: any) {
     return this.algoInstance.compute(bands);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -4702,21 +5122,18 @@ The algorithm uses elements of the following beat-tracking methods:
 class TempoTap {
   private algoInstance: any;
   constructor(frameHop: number=1024, frameSize: number=256, maxTempo: number=208, minTempo: number=40, numberFrames: number=1024, sampleRate: number=44100, tempoHints: any[]=[]) {
-    let vectempoHints = new wasmBackend.VectorFloat();
-    for (var i=0; i<vectempoHints.size(); i++) {
-      vectempoHints.push_back(tempoHints[i]);
-    }
+    let vectempoHints = arrayToVector(tempoHints);
     this.algoInstance = new wasmBackend.TempoTap(frameHop, frameSize, maxTempo, minTempo, numberFrames, sampleRate, vectempoHints);
   }
   configure(frameHop: number=1024, frameSize: number=256, maxTempo: number=208, minTempo: number=40, numberFrames: number=1024, sampleRate: number=44100, tempoHints: any[]=[]) {
-    let vectempoHints = new wasmBackend.VectorFloat();
-    for (var i=0; i<vectempoHints.size(); i++) {
-      vectempoHints.push_back(tempoHints[i]);
-    }
+    let vectempoHints = arrayToVector(tempoHints);
     this.algoInstance.configure(frameHop, frameSize, maxTempo, minTempo, numberFrames, sampleRate, vectempoHints);
   }
   compute(featuresFrame: any) {
     return this.algoInstance.compute(featuresFrame);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -4742,6 +5159,9 @@ class TempoTapDegara {
   compute(onsetDetections: any) {
     return this.algoInstance.compute(onsetDetections);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4761,6 +5181,9 @@ class TempoTapMaxAgreement {
   }
   compute(tickCandidates: any) {
     return this.algoInstance.compute(tickCandidates);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -4786,6 +5209,9 @@ class TempoTapTicks {
   compute(periods: any, phases: any) {
     return this.algoInstance.compute(periods, phases);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4805,6 +5231,9 @@ class TensorflowInputFSDSINet {
   }
   compute(frame: any) {
     return this.algoInstance.compute(frame);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -4826,6 +5255,9 @@ class TensorflowInputMusiCNN {
   compute(frame: any) {
     return this.algoInstance.compute(frame);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4846,6 +5278,9 @@ class TensorflowInputTempoCNN {
   compute(frame: any) {
     return this.algoInstance.compute(frame);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4865,6 +5300,9 @@ class TensorflowInputVGGish {
   }
   compute(frame: any) {
     return this.algoInstance.compute(frame);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -4888,6 +5326,9 @@ class TonalExtractor {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -4921,6 +5362,9 @@ class TonicIndianArtMusic {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -4940,21 +5384,18 @@ class TonicIndianArtMusic {
 class TriangularBands {
   private algoInstance: any;
   constructor(frequencyBands: any[]=[21.533203125, 43.06640625, 64.599609375, 86.1328125, 107.666015625, 129.19921875, 150.732421875, 172.265625, 193.798828125, 215.33203125, 236.865234375, 258.3984375, 279.931640625, 301.46484375, 322.998046875, 344.53125, 366.064453125, 387.59765625, 409.130859375, 430.6640625, 452.197265625, 473.73046875, 495.263671875, 516.796875, 538.330078125, 559.86328125, 581.396484375, 602.9296875, 624.462890625, 645.99609375, 667.529296875, 689.0625, 710.595703125, 732.12890625, 753.662109375, 775.1953125, 796.728515625, 839.794921875, 861.328125, 882.861328125, 904.39453125, 925.927734375, 968.994140625, 990.52734375, 1012.06054688, 1055.12695312, 1076.66015625, 1098.19335938, 1141.25976562, 1184.32617188, 1205.859375, 1248.92578125, 1270.45898438, 1313.52539062, 1356.59179688, 1399.65820312, 1442.72460938, 1485.79101562, 1528.85742188, 1571.92382812, 1614.99023438, 1658.05664062, 1701.12304688, 1765.72265625, 1808.7890625, 1873.38867188, 1916.45507812, 1981.0546875, 2024.12109375, 2088.72070312, 2153.3203125, 2217.91992188, 2282.51953125, 2347.11914062, 2411.71875, 2497.8515625, 2562.45117188, 2627.05078125, 2713.18359375, 2799.31640625, 2885.44921875, 2950.04882812, 3036.18164062, 3143.84765625, 3229.98046875, 3316.11328125, 3423.77929688, 3509.91210938, 3617.578125, 3725.24414062, 3832.91015625, 3940.57617188, 4069.77539062, 4177.44140625, 4306.640625, 4435.83984375, 4565.0390625, 4694.23828125, 4844.97070312, 4974.16992188, 5124.90234375, 5275.63476562, 5426.3671875, 5577.09960938, 5749.36523438, 5921.63085938, 6093.89648438, 6266.16210938, 6459.9609375, 6653.75976562, 6847.55859375, 7041.35742188, 7256.68945312, 7450.48828125, 7687.35351562, 7902.68554688, 8139.55078125, 8376.41601562, 8613.28125, 8871.6796875, 9130.078125, 9388.4765625, 9668.40820312, 9948.33984375, 10249.8046875, 10551.2695312, 10852.734375, 11175.7324219, 11498.7304688, 11843.2617188, 12187.7929688, 12553.8574219, 12919.921875, 13285.9863281, 13673.5839844, 14082.7148438, 14491.8457031, 14922.5097656, 15353.1738281, 15805.3710938, 16257.5683594], inputSize: number=1025, log: boolean=true, normalize: string='unit_sum', sampleRate: number=44100, type: string='power', weighting: string='linear') {
-    let vecfrequencyBands = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecfrequencyBands.size(); i++) {
-      vecfrequencyBands.push_back(frequencyBands[i]);
-    }
+    let vecfrequencyBands = arrayToVector(frequencyBands);
     this.algoInstance = new wasmBackend.TriangularBands(vecfrequencyBands, inputSize, log, normalize, sampleRate, type, weighting);
   }
   configure(frequencyBands: any[]=[21.533203125, 43.06640625, 64.599609375, 86.1328125, 107.666015625, 129.19921875, 150.732421875, 172.265625, 193.798828125, 215.33203125, 236.865234375, 258.3984375, 279.931640625, 301.46484375, 322.998046875, 344.53125, 366.064453125, 387.59765625, 409.130859375, 430.6640625, 452.197265625, 473.73046875, 495.263671875, 516.796875, 538.330078125, 559.86328125, 581.396484375, 602.9296875, 624.462890625, 645.99609375, 667.529296875, 689.0625, 710.595703125, 732.12890625, 753.662109375, 775.1953125, 796.728515625, 839.794921875, 861.328125, 882.861328125, 904.39453125, 925.927734375, 968.994140625, 990.52734375, 1012.06054688, 1055.12695312, 1076.66015625, 1098.19335938, 1141.25976562, 1184.32617188, 1205.859375, 1248.92578125, 1270.45898438, 1313.52539062, 1356.59179688, 1399.65820312, 1442.72460938, 1485.79101562, 1528.85742188, 1571.92382812, 1614.99023438, 1658.05664062, 1701.12304688, 1765.72265625, 1808.7890625, 1873.38867188, 1916.45507812, 1981.0546875, 2024.12109375, 2088.72070312, 2153.3203125, 2217.91992188, 2282.51953125, 2347.11914062, 2411.71875, 2497.8515625, 2562.45117188, 2627.05078125, 2713.18359375, 2799.31640625, 2885.44921875, 2950.04882812, 3036.18164062, 3143.84765625, 3229.98046875, 3316.11328125, 3423.77929688, 3509.91210938, 3617.578125, 3725.24414062, 3832.91015625, 3940.57617188, 4069.77539062, 4177.44140625, 4306.640625, 4435.83984375, 4565.0390625, 4694.23828125, 4844.97070312, 4974.16992188, 5124.90234375, 5275.63476562, 5426.3671875, 5577.09960938, 5749.36523438, 5921.63085938, 6093.89648438, 6266.16210938, 6459.9609375, 6653.75976562, 6847.55859375, 7041.35742188, 7256.68945312, 7450.48828125, 7687.35351562, 7902.68554688, 8139.55078125, 8376.41601562, 8613.28125, 8871.6796875, 9130.078125, 9388.4765625, 9668.40820312, 9948.33984375, 10249.8046875, 10551.2695312, 10852.734375, 11175.7324219, 11498.7304688, 11843.2617188, 12187.7929688, 12553.8574219, 12919.921875, 13285.9863281, 13673.5839844, 14082.7148438, 14491.8457031, 14922.5097656, 15353.1738281, 15805.3710938, 16257.5683594], inputSize: number=1025, log: boolean=true, normalize: string='unit_sum', sampleRate: number=44100, type: string='power', weighting: string='linear') {
-    let vecfrequencyBands = new wasmBackend.VectorFloat();
-    for (var i=0; i<vecfrequencyBands.size(); i++) {
-      vecfrequencyBands.push_back(frequencyBands[i]);
-    }
+    let vecfrequencyBands = arrayToVector(frequencyBands);
     this.algoInstance.configure(vecfrequencyBands, inputSize, log, normalize, sampleRate, type, weighting);
   }
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -4987,6 +5428,9 @@ class TriangularBarkBands {
   compute(spectrum: any) {
     return this.algoInstance.compute(spectrum);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -5012,6 +5456,9 @@ class Trimmer {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -5032,6 +5479,9 @@ class Tristimulus {
   }
   compute(frequencies: any, magnitudes: any) {
     return this.algoInstance.compute(frequencies, magnitudes);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -5069,6 +5519,9 @@ class TruePeakDetector {
   compute(signal: any) {
     return this.algoInstance.compute(signal);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -5091,6 +5544,9 @@ class TuningFrequency {
   compute(frequencies: any, magnitudes: any) {
     return this.algoInstance.compute(frequencies, magnitudes);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -5112,6 +5568,9 @@ class TuningFrequencyExtractor {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -5141,6 +5600,9 @@ class UnaryOperator {
   compute(array: any) {
     return this.algoInstance.compute(array);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -5169,6 +5631,9 @@ class UnaryOperatorStream {
   compute(array: any) {
     return this.algoInstance.compute(array);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -5188,6 +5653,9 @@ class Variance {
   }
   compute(array: any) {
     return this.algoInstance.compute(array);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -5214,6 +5682,9 @@ class Vibrato {
   compute(pitch: any) {
     return this.algoInstance.compute(pitch);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -5237,6 +5708,9 @@ class WarpedAutoCorrelation {
   }
   compute(array: any) {
     return this.algoInstance.compute(array);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -5264,6 +5738,9 @@ class Welch {
   }
   compute(frame: any) {
     return this.algoInstance.compute(frame);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  
@@ -5293,6 +5770,9 @@ class Windowing {
   compute(frame: any) {
     return this.algoInstance.compute(frame);
   }
+  delete() {
+    return this.algoInstance.delete();
+  }
 }
  
 /**
@@ -5314,6 +5794,9 @@ class ZeroCrossingRate {
   }
   compute(signal: any) {
     return this.algoInstance.compute(signal);
+  }
+  delete() {
+    return this.algoInstance.delete();
   }
 }
  

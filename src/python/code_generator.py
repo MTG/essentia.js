@@ -341,10 +341,8 @@ def parse_to_typescript(algorithm_name):
 		param_default_val = param['default']
 		param_var_name = param['name']
 		if param['type'] in ['vector_real', 'vector_complex', 'matrix_real']:
-			param_converted.append(f"    let {vec_param_var} = new {wasmBackendVar}.VectorFloat();")
-			param_converted.append(f"    for (var i=0; i<{vec_param_var}.size(); i++) {{")
-			param_converted.append(f"      {vec_param_var}.push_back({param['name']}[i]);")
-			param_converted.append("    }")
+			# arrayToVector now sits at the same module level as all algorithm classes
+			param_converted.append(f"    let {vec_param_var} = arrayToVector({param['name']});")
 
 			param_var_name = vec_param_var
 
@@ -402,6 +400,11 @@ def parse_to_typescript(algorithm_name):
 	algorithm.append(f"    return this.algoInstance.compute({', '.join(untyped_inputs)});")
 	algorithm.append("  }")
 
+	# Add delete method
+	algorithm.append("  delete() {")
+	algorithm.append("    return this.algoInstance.delete();")
+	algorithm.append("  }")
+
 	# Close the class definition
 	algorithm.append("}")
 
@@ -427,3 +430,22 @@ def check_type_param_algos(check_type):
 		vector_string_params = [p['name'] for p in doc_dict['parameters'] if p['type'] in [check_type]]
 		if len(vector_string_params) > 0:
 			print(f'{algo_name} has {check_type} params: {vector_string_params}')
+
+def get_types_summary():
+	param_types = []
+	input_types = []
+	output_types = []
+	for algo_name in TO_INCLUDE_ALGOS:
+		algo = getattr(estd, algo_name)()
+		doc_dict = algo.getStruct()
+		algo_param_types = [p['type'] for p in doc_dict['parameters'] if p['type'] not in param_types]
+		param_types.extend(set(algo_param_types))
+		algo_input_types = [i['type'] for i in doc_dict['inputs'] if i['type'] not in input_types]
+		input_types.extend(set(algo_input_types))
+		algo_output_types = [o['type'] for o in doc_dict['outputs'] if o['type'] not in output_types]
+		output_types.extend(set(algo_output_types))
+
+	print(f'param types in INCLUDED_ALGOS: {param_types}')
+	print(f'input types in INCLUDED_ALGOS: {input_types}')
+	print(f'output types in INCLUDED_ALGOS: {output_types}')
+		
