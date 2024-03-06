@@ -22,7 +22,12 @@
 
 let wasmBackend: any;
 
-function ready(EssentiaWASM: any) {
+/**
+ * Set module-wide WASM instance and initialise Essentia
+ * @function
+ * @param {EssentiaEmscriptenModule} EssentiaWASM Essentia WebAssembly backend (emcripten global module object) which is loaded from 'essentia-wasm.*.js file'
+*/
+function ready(EssentiaWASM: EssentiaEmscriptenModule) {
   wasmBackend = EssentiaWASM;
   wasmBackend.init();
 }
@@ -90,7 +95,7 @@ function audioBufferToMonoSignal(buffer: AudioBuffer): Float32Array {
  * @function
  * @param {Float32Array} inputArray input JS typed array
  * @returns {VectorFloat} returns vector float
- */
+*/
 function arrayToVector(inputArray: any) {
   return wasmBackend.arrayToVector(inputArray);
 }
@@ -100,7 +105,7 @@ function arrayToVector(inputArray: any) {
  * @function 
  * @param {VectorFloat} inputVector input VectorFloat array
  * @returns {Float32Array} returns converted JS typed array
- */
+*/
 function vectorToArray(inputVector: any): Float32Array {
   return wasmBackend.vectorToArray(inputVector);
 }
@@ -113,7 +118,8 @@ class FrameGenerator {
   private algoInstance: any;
 
   /**
-   * @constructs
+   * Creates an instance of the algorithm and initializes it by configuring with default or given params
+   * @constructor
    * @param {number} [frameSize=2048] frame size for cutting the audio signal
    * @param {number} [hopSize=1024] size of overlapping frame 
   */
@@ -154,31 +160,94 @@ class FrameGenerator {
 }
 
 /**
-* This algorithm downmixes the signal into a single channel given a stereo signal. It is a wrapper around https://essentia.upf.edu/reference/std_MonoMixer.html.
-* @method
-* @param {VectorFloat} leftChannel the left channel of the stereo audio signal
-* @param {VectorFloat} rightChannel the right channel of the stereo audio signal
-* @returns {object} {audio: 'the downmixed mono signal'}
-* @memberof Essentia
+ * This algorithm downmixes the signal into a single channel given a stereo signal. It is a wrapper around https://essentia.upf.edu/reference/std_MonoMixer.html.
+ * @class
 */
-// MonoMixer(leftSignal: any, rightSignal: any) {
-//   return this.algorithms.MonoMixer(leftSignal, rightSignal);
-// }
+class MonoMixer {
+  private algoInstance: any;
+  /**
+   * Creates an instance of the algorithm and initializes it by configuring with default or given params
+   * @constructor
+  */
+  constructor() {
+    this.algoInstance = new wasmBackend.MonoMixer();
+  }
+  /**
+   * Configure algorithm with default or given params
+   * @method
+   * @memberof MonoMixer
+  */
+  configure() {
+    this.algoInstance.configure();
+  }
+  /**
+   * Execute algorithm with given inputs
+   * @method
+   * @param {VectorFloat} leftChannel the left channel of the stereo audio signal
+   * @param {VectorFloat} rightChannel the right channel of the stereo audio signal
+   * @returns {object} {audio: 'the downmixed mono signal'}
+   * @memberof MonoMixer 
+  */
+  compute(leftSignal: any, rightSignal: any) {
+    return this.algoInstance.compute(leftSignal, rightSignal);
+  }
+  /**
+   * Delete algorithm instance
+   * @method
+   * @memberof MonoMixer 
+  */
+  delete() {
+    this.algoInstance.delete();
+  }
+}
 
 /**
-* This algorithm computes the EBUR128 loudness descriptors of an audio signal. It is a wrapper around https://essentia.upf.edu/reference/std_LoudnessEBUR128.html.
-* @method
-* @param {VectorFloat} leftChannel the left channel of the stereo audio signal
-* @param {VectorFloat} rightChannel the right channel of the stereo audio signal
-* @param {number} [hopSize=0.1] the hop size with which the loudness is computed [s]
-* @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
-* @param {boolean} [startAtZero=false] start momentary/short-term loudness estimation at time 0 (zero-centered loudness estimation windows) if true; otherwise start both windows at time 0 (time positions for momentary and short-term values will not be syncronized)
-* @returns {object} {momentaryLoudness: 'momentary loudness (over 400ms) (LUFS)', shortTermLoudness: 'short-term loudness (over 3 seconds) (LUFS)', integratedLoudness: 'integrated loudness (overall) (LUFS)', loudnessRange: 'loudness range over an arbitrary long time interval [3] (dB, LU)'}
-* @memberof Essentia
+ * This algorithm computes the EBUR128 loudness descriptors of an audio signal. It is a wrapper around https://essentia.upf.edu/reference/std_LoudnessEBUR128.html.
+ * @class
 */
-// LoudnessEBUR128(leftSignal: any, rightSignal: any, hopSize: number=0.1, sampleRate: number=44100, startAtZero: boolean=false) {
-//   return this.algorithms.LoudnessEBUR128(leftSignal, rightSignal, hopSize, sampleRate, startAtZero);
-// }
+class LoudnessEBUR128 {
+  private algoInstance: any;
+  /**
+   * Creates an instance of the algorithm and initializes it by configuring with default or given params
+   * @constructor
+   * @param {number} [hopSize=0.1] the hop size with which the loudness is computed [s]
+   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
+   * @param {boolean} [startAtZero=false] start momentary/short-term loudness estimation at time 0 (zero-centered loudness estimation windows) if true; otherwise start both windows at time 0 (time positions for momentary and short-term values will not be syncronized)
+  */
+  constructor(hopSize: number=0.1, sampleRate: number=44100, startAtZero: boolean=false) {
+    this.algoInstance = new wasmBackend.LoudnessEBUR128();
+  }
+  /**
+   * Configure algorithm with default or given params
+   * @method
+   * @param {number} [hopSize=0.1] the hop size with which the loudness is computed [s]
+   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
+   * @param {boolean} [startAtZero=false] start momentary/short-term loudness estimation at time 0 (zero-centered loudness estimation windows) if true; otherwise start both windows at time 0 (time positions for momentary and short-term values will not be syncronized)
+   * @memberof LoudnessEBUR128
+  */
+  configure(hopSize: number=0.1, sampleRate: number=44100, startAtZero: boolean=false) {
+    this.algoInstance.configure();
+  }
+  /**
+   * Execute algorithm with given inputs
+   * @method
+   * @param {VectorFloat} leftChannel the left channel of the stereo audio signal
+   * @param {VectorFloat} rightChannel the right channel of the stereo audio signal
+   * @returns {object} {momentaryLoudness: 'momentary loudness (over 400ms) (LUFS)', shortTermLoudness: 'short-term loudness (over 3 seconds) (LUFS)', integratedLoudness: 'integrated loudness (overall) (LUFS)', loudnessRange: 'loudness range over an arbitrary long time interval [3] (dB, LU)'}
+   * @memberof LoudnessEBUR128 
+  */
+  compute(leftSignal: any, rightSignal: any) {
+    return this.algoInstance.compute(leftSignal, rightSignal);
+  }
+  /**
+   * Delete algorithm instance
+   * @method
+   * @memberof LoudnessEBUR128 
+  */
+  delete() {
+    this.algoInstance.delete();
+  }
+}
 
 // NOTE: The following code snippets are machine generated. Do not edit.
 /**
@@ -10194,6 +10263,8 @@ export {
   arrayToVector,
   vectorToArray,
   FrameGenerator,
+  MonoMixer,
+  LoudnessEBUR128,
   AfterMaxToBeforeMaxEnergyRatio,
   AllPass,
   AudioOnsetsMarker,
