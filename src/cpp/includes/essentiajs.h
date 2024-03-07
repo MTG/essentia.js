@@ -31,7 +31,7 @@ using namespace essentia;
 using namespace essentia::standard;
 using namespace emscripten;
 
-void _initEssentia();
+void _initEssentia(bool debugger=false);
 
 // method for generating frames from a given audio signal
 class FrameGenerator {

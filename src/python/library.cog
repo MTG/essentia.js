@@ -37,7 +37,22 @@ std::vector<float> float32ArrayToVector(const val &arr) {
   return vec;
 }
 
-void _initEssentia() {
+void _initEssentia(bool debugger) {
+  if (debugger) {
+    // if true sets essentia debugger active
+    // EAll is a special value in essentia that contains all modules
+    setDebugLevel(EAll); 
+    unsetDebugLevel(EMemory | EConnectors);
+    // activate warnings
+    essentia::warningLevelActive = true; 
+    // activate info
+    essentia::infoLevelActive = true;
+    // activate error level    
+    essentia::errorLevelActive = true;    
+  } else {
+    essentia::infoLevelActive = false;
+    essentia::warningLevelActive = false;
+  }
   essentia::init();
 }
 

@@ -27,9 +27,9 @@ let wasmBackend: any;
  * @function
  * @param {EssentiaEmscriptenModule} EssentiaWASM Essentia WebAssembly backend (emcripten global module object) which is loaded from 'essentia-wasm.*.js file'
 */
-function ready(EssentiaWASM: EssentiaEmscriptenModule) {
+function ready(EssentiaWASM: any, isDebug: boolean = false) {
   wasmBackend = EssentiaWASM;
-  wasmBackend.init();
+  wasmBackend.init(isDebug);
 }
 
 
