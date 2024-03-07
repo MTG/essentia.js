@@ -1,10 +1,8 @@
 const { expect } = require('chai');
 const EssentiaWASM = require('../dist/essentia-wasm.umd.js');
-const { ready, FrequencyBands, arrayToVector } = require('../dist/essentia.js-core.umd.js');
+const { ready, FrequencyBands, arrayToVector, vectorToArray } = require('../dist/essentia.js-core.umd.js');
 
 ready(EssentiaWASM);
-
-console.log('frequencybands', FrequencyBands);
 
 describe('FrequencyBands:instantiation', () => {
   let frequencyBandsInstance;
@@ -60,8 +58,8 @@ describe('FrequencyBands:functionality', () => {
     // Add assertions to check the result of the computation
     expect(result).to.be.an('object')
                 .and.to.have.property('bands');
-    console.log('result bands', result['bands']);
-    expect(result['bands']).to.be.a('VectorFloat');
+    // Chai cannot check for type VectorFloat, so quick conversion to bypass that
+    expect(vectorToArray(result['bands'])).to.be.a('Float32Array');
   });
 
 });
