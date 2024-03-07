@@ -36,9 +36,9 @@ void _initEssentia();
 // method for generating frames from a given audio signal
 class FrameGenerator {
   public:
-    FrameGenerator(int frameSize, int hopSize);
+    FrameGenerator(int frameSize=1024, int hopSize=512);
     ~FrameGenerator();
-    void configure(int frameSize, int hopSize);
+    void configure(int frameSize=1024, int hopSize=512);
     std::vector< std::vector<float> > compute(const val& signalArray);
     void reset();
   private:
