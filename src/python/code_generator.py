@@ -163,21 +163,28 @@ class {algorithm_name} {{
 
 		# append algo constructor
 		algorithm.append(f"{algorithm_name}::{algorithm_name}({', '.join(parameters)}) {{")
-		algorithm.append(f"\tconfigure({', '.join(param_var_names)});")
+		if param_dict['params']:
+			algorithm.append(f'\t{algo_obj} = AlgorithmFactory::create("{algorithm_name}", {", ".join(param_dict["params"])});')
+		else:
+			algorithm.append(f'\t{algo_obj} = AlgorithmFactory::create("{algorithm_name}");')
 		close_def_body()
 
 		# append algo destructor
 		algorithm.append(f"{algorithm_name}::~{algorithm_name}() {{")
-		algorithm.append(f"\tdelete {algo_obj};")
+		algorithm.append(f"\tif ({algo_obj}) delete {algo_obj};")
 		close_def_body()
 
 		# append algo configure: factory instance, algo create
 		algorithm.append(f"void {algorithm_name}::configure({', '.join(parameters)}) {{")
-		algorithm.append("\tAlgorithmFactory& factory = standard::AlgorithmFactory::instance();")
-		if param_dict['params']:
-			algorithm.append(f'\t{algo_obj} = factory.create("{algorithm_name}", {", ".join(param_dict["params"])});')
+		problem_config_algos = ["PitchMelodia", "PredominantPitchMelodia", "MultiPitchMelodia"]
+		# TODO: remove this dirty fix for these 3 algorithms which fail on compile on their many-parameter `configure` method calls
+		if param_dict['params'] and algorithm_name in problem_config_algos:
+			algorithm.append(f'\tif ({algo_obj}) delete {algo_obj};')
+			algorithm.append(f'\t{algo_obj} = AlgorithmFactory::create("{algorithm_name}", {", ".join(param_dict["params"])});')
+		elif param_dict['params']:
+			algorithm.append(f'\t{algo_obj}->configure({", ".join(param_dict["params"])});')
 		else:
-			algorithm.append(f'\t{algo_obj} = factory.create("{algorithm_name}");')
+			algorithm.append(f"\t{algo_obj}->configure();")
 		close_def_body()
 
 		# append algo compute:

@@ -43,17 +43,15 @@ void _initEssentia() {
 
 // START FrameGenerator definitions
 FrameGenerator::FrameGenerator(int frameSize, int hopSize) {
-  configure(frameSize, hopSize);
+  _framecutter = AlgorithmFactory::create("FrameCutter",
+                "frameSize", frameSize,
+                "hopSize", hopSize);
 }
 FrameGenerator::~FrameGenerator() {
   delete _framecutter;
 }
 void FrameGenerator::configure(int frameSize, int hopSize) {
-    // create algorithm instances
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  _framecutter = factory.create("FrameCutter",
-                  "frameSize", frameSize,
-                  "hopSize", hopSize);
+  _framecutter->configure("frameSize", frameSize, "hopSize", hopSize);
 }
 std::vector<std::vector<float> > FrameGenerator::compute(const val& signalArray) {
   // convert JS typed typed float 32 array to std::vector<float>
@@ -151,14 +149,13 @@ void FrameGenerator::reset() {
 // START AfterMaxToBeforeMaxEnergyRatio definitions
 // check https://essentia.upf.edu/reference/std_AfterMaxToBeforeMaxEnergyRatio.html
 AfterMaxToBeforeMaxEnergyRatio::AfterMaxToBeforeMaxEnergyRatio() {
-	configure();
+	_aftermaxtobeforemaxenergyratio = AlgorithmFactory::create("AfterMaxToBeforeMaxEnergyRatio");
 }
 AfterMaxToBeforeMaxEnergyRatio::~AfterMaxToBeforeMaxEnergyRatio() {
-	delete _aftermaxtobeforemaxenergyratio;
+	if (_aftermaxtobeforemaxenergyratio) delete _aftermaxtobeforemaxenergyratio;
 }
 void AfterMaxToBeforeMaxEnergyRatio::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_aftermaxtobeforemaxenergyratio = factory.create("AfterMaxToBeforeMaxEnergyRatio");
+	_aftermaxtobeforemaxenergyratio->configure();
 }
 val AfterMaxToBeforeMaxEnergyRatio::compute(std::vector<float>& input_pitch) {
 	_aftermaxtobeforemaxenergyratio->input("pitch").set(input_pitch);
@@ -177,14 +174,13 @@ _aftermaxtobeforemaxenergyratio->reset();
 // START AllPass definitions
 // check https://essentia.upf.edu/reference/std_AllPass.html
 AllPass::AllPass(const float bandwidth, const float cutoffFrequency, const int order, const float sampleRate) {
-	configure(bandwidth, cutoffFrequency, order, sampleRate);
+	_allpass = AlgorithmFactory::create("AllPass", "bandwidth", bandwidth, "cutoffFrequency", cutoffFrequency, "order", order, "sampleRate", sampleRate);
 }
 AllPass::~AllPass() {
-	delete _allpass;
+	if (_allpass) delete _allpass;
 }
 void AllPass::configure(const float bandwidth, const float cutoffFrequency, const int order, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_allpass = factory.create("AllPass", "bandwidth", bandwidth, "cutoffFrequency", cutoffFrequency, "order", order, "sampleRate", sampleRate);
+	_allpass->configure("bandwidth", bandwidth, "cutoffFrequency", cutoffFrequency, "order", order, "sampleRate", sampleRate);
 }
 val AllPass::compute(std::vector<float>& input_signal) {
 	_allpass->input("signal").set(input_signal);
@@ -203,14 +199,13 @@ _allpass->reset();
 // START AudioOnsetsMarker definitions
 // check https://essentia.upf.edu/reference/std_AudioOnsetsMarker.html
 AudioOnsetsMarker::AudioOnsetsMarker(const std::vector<float>& onsets, const float sampleRate, const std::string& type) {
-	configure(onsets, sampleRate, type);
+	_audioonsetsmarker = AlgorithmFactory::create("AudioOnsetsMarker", "onsets", onsets, "sampleRate", sampleRate, "type", type);
 }
 AudioOnsetsMarker::~AudioOnsetsMarker() {
-	delete _audioonsetsmarker;
+	if (_audioonsetsmarker) delete _audioonsetsmarker;
 }
 void AudioOnsetsMarker::configure(const std::vector<float>& onsets, const float sampleRate, const std::string& type) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_audioonsetsmarker = factory.create("AudioOnsetsMarker", "onsets", onsets, "sampleRate", sampleRate, "type", type);
+	_audioonsetsmarker->configure("onsets", onsets, "sampleRate", sampleRate, "type", type);
 }
 val AudioOnsetsMarker::compute(std::vector<float>& input_signal) {
 	_audioonsetsmarker->input("signal").set(input_signal);
@@ -229,14 +224,13 @@ _audioonsetsmarker->reset();
 // START AutoCorrelation definitions
 // check https://essentia.upf.edu/reference/std_AutoCorrelation.html
 AutoCorrelation::AutoCorrelation(const float frequencyDomainCompression, const bool generalized, const std::string& normalization) {
-	configure(frequencyDomainCompression, generalized, normalization);
+	_autocorrelation = AlgorithmFactory::create("AutoCorrelation", "frequencyDomainCompression", frequencyDomainCompression, "generalized", generalized, "normalization", normalization);
 }
 AutoCorrelation::~AutoCorrelation() {
-	delete _autocorrelation;
+	if (_autocorrelation) delete _autocorrelation;
 }
 void AutoCorrelation::configure(const float frequencyDomainCompression, const bool generalized, const std::string& normalization) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_autocorrelation = factory.create("AutoCorrelation", "frequencyDomainCompression", frequencyDomainCompression, "generalized", generalized, "normalization", normalization);
+	_autocorrelation->configure("frequencyDomainCompression", frequencyDomainCompression, "generalized", generalized, "normalization", normalization);
 }
 val AutoCorrelation::compute(std::vector<float>& input_array) {
 	_autocorrelation->input("array").set(input_array);
@@ -255,14 +249,13 @@ _autocorrelation->reset();
 // START BFCC definitions
 // check https://essentia.upf.edu/reference/std_BFCC.html
 BFCC::BFCC(const int dctType, const float highFrequencyBound, const int inputSize, const int liftering, const std::string& logType, const float lowFrequencyBound, const std::string& normalize, const int numberBands, const int numberCoefficients, const float sampleRate, const std::string& type, const std::string& weighting) {
-	configure(dctType, highFrequencyBound, inputSize, liftering, logType, lowFrequencyBound, normalize, numberBands, numberCoefficients, sampleRate, type, weighting);
+	_bfcc = AlgorithmFactory::create("BFCC", "dctType", dctType, "highFrequencyBound", highFrequencyBound, "inputSize", inputSize, "liftering", liftering, "logType", logType, "lowFrequencyBound", lowFrequencyBound, "normalize", normalize, "numberBands", numberBands, "numberCoefficients", numberCoefficients, "sampleRate", sampleRate, "type", type, "weighting", weighting);
 }
 BFCC::~BFCC() {
-	delete _bfcc;
+	if (_bfcc) delete _bfcc;
 }
 void BFCC::configure(const int dctType, const float highFrequencyBound, const int inputSize, const int liftering, const std::string& logType, const float lowFrequencyBound, const std::string& normalize, const int numberBands, const int numberCoefficients, const float sampleRate, const std::string& type, const std::string& weighting) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_bfcc = factory.create("BFCC", "dctType", dctType, "highFrequencyBound", highFrequencyBound, "inputSize", inputSize, "liftering", liftering, "logType", logType, "lowFrequencyBound", lowFrequencyBound, "normalize", normalize, "numberBands", numberBands, "numberCoefficients", numberCoefficients, "sampleRate", sampleRate, "type", type, "weighting", weighting);
+	_bfcc->configure("dctType", dctType, "highFrequencyBound", highFrequencyBound, "inputSize", inputSize, "liftering", liftering, "logType", logType, "lowFrequencyBound", lowFrequencyBound, "normalize", normalize, "numberBands", numberBands, "numberCoefficients", numberCoefficients, "sampleRate", sampleRate, "type", type, "weighting", weighting);
 }
 val BFCC::compute(std::vector<float>& input_spectrum) {
 	_bfcc->input("spectrum").set(input_spectrum);
@@ -284,14 +277,13 @@ _bfcc->reset();
 // START BPF definitions
 // check https://essentia.upf.edu/reference/std_BPF.html
 BPF::BPF(const std::vector<float>& xPoints, const std::vector<float>& yPoints) {
-	configure(xPoints, yPoints);
+	_bpf = AlgorithmFactory::create("BPF", "xPoints", xPoints, "yPoints", yPoints);
 }
 BPF::~BPF() {
-	delete _bpf;
+	if (_bpf) delete _bpf;
 }
 void BPF::configure(const std::vector<float>& xPoints, const std::vector<float>& yPoints) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_bpf = factory.create("BPF", "xPoints", xPoints, "yPoints", yPoints);
+	_bpf->configure("xPoints", xPoints, "yPoints", yPoints);
 }
 val BPF::compute(float input_x) {
 	_bpf->input("x").set(input_x);
@@ -310,14 +302,13 @@ _bpf->reset();
 // START BandPass definitions
 // check https://essentia.upf.edu/reference/std_BandPass.html
 BandPass::BandPass(const float bandwidth, const float cutoffFrequency, const float sampleRate) {
-	configure(bandwidth, cutoffFrequency, sampleRate);
+	_bandpass = AlgorithmFactory::create("BandPass", "bandwidth", bandwidth, "cutoffFrequency", cutoffFrequency, "sampleRate", sampleRate);
 }
 BandPass::~BandPass() {
-	delete _bandpass;
+	if (_bandpass) delete _bandpass;
 }
 void BandPass::configure(const float bandwidth, const float cutoffFrequency, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_bandpass = factory.create("BandPass", "bandwidth", bandwidth, "cutoffFrequency", cutoffFrequency, "sampleRate", sampleRate);
+	_bandpass->configure("bandwidth", bandwidth, "cutoffFrequency", cutoffFrequency, "sampleRate", sampleRate);
 }
 val BandPass::compute(std::vector<float>& input_signal) {
 	_bandpass->input("signal").set(input_signal);
@@ -336,14 +327,13 @@ _bandpass->reset();
 // START BandReject definitions
 // check https://essentia.upf.edu/reference/std_BandReject.html
 BandReject::BandReject(const float bandwidth, const float cutoffFrequency, const float sampleRate) {
-	configure(bandwidth, cutoffFrequency, sampleRate);
+	_bandreject = AlgorithmFactory::create("BandReject", "bandwidth", bandwidth, "cutoffFrequency", cutoffFrequency, "sampleRate", sampleRate);
 }
 BandReject::~BandReject() {
-	delete _bandreject;
+	if (_bandreject) delete _bandreject;
 }
 void BandReject::configure(const float bandwidth, const float cutoffFrequency, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_bandreject = factory.create("BandReject", "bandwidth", bandwidth, "cutoffFrequency", cutoffFrequency, "sampleRate", sampleRate);
+	_bandreject->configure("bandwidth", bandwidth, "cutoffFrequency", cutoffFrequency, "sampleRate", sampleRate);
 }
 val BandReject::compute(std::vector<float>& input_signal) {
 	_bandreject->input("signal").set(input_signal);
@@ -362,14 +352,13 @@ _bandreject->reset();
 // START BarkBands definitions
 // check https://essentia.upf.edu/reference/std_BarkBands.html
 BarkBands::BarkBands(const int numberBands, const float sampleRate) {
-	configure(numberBands, sampleRate);
+	_barkbands = AlgorithmFactory::create("BarkBands", "numberBands", numberBands, "sampleRate", sampleRate);
 }
 BarkBands::~BarkBands() {
-	delete _barkbands;
+	if (_barkbands) delete _barkbands;
 }
 void BarkBands::configure(const int numberBands, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_barkbands = factory.create("BarkBands", "numberBands", numberBands, "sampleRate", sampleRate);
+	_barkbands->configure("numberBands", numberBands, "sampleRate", sampleRate);
 }
 val BarkBands::compute(std::vector<float>& input_spectrum) {
 	_barkbands->input("spectrum").set(input_spectrum);
@@ -388,14 +377,13 @@ _barkbands->reset();
 // START BeatTrackerDegara definitions
 // check https://essentia.upf.edu/reference/std_BeatTrackerDegara.html
 BeatTrackerDegara::BeatTrackerDegara(const int maxTempo, const int minTempo) {
-	configure(maxTempo, minTempo);
+	_beattrackerdegara = AlgorithmFactory::create("BeatTrackerDegara", "maxTempo", maxTempo, "minTempo", minTempo);
 }
 BeatTrackerDegara::~BeatTrackerDegara() {
-	delete _beattrackerdegara;
+	if (_beattrackerdegara) delete _beattrackerdegara;
 }
 void BeatTrackerDegara::configure(const int maxTempo, const int minTempo) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_beattrackerdegara = factory.create("BeatTrackerDegara", "maxTempo", maxTempo, "minTempo", minTempo);
+	_beattrackerdegara->configure("maxTempo", maxTempo, "minTempo", minTempo);
 }
 val BeatTrackerDegara::compute(std::vector<float>& input_signal) {
 	_beattrackerdegara->input("signal").set(input_signal);
@@ -414,14 +402,13 @@ _beattrackerdegara->reset();
 // START BeatTrackerMultiFeature definitions
 // check https://essentia.upf.edu/reference/std_BeatTrackerMultiFeature.html
 BeatTrackerMultiFeature::BeatTrackerMultiFeature(const int maxTempo, const int minTempo) {
-	configure(maxTempo, minTempo);
+	_beattrackermultifeature = AlgorithmFactory::create("BeatTrackerMultiFeature", "maxTempo", maxTempo, "minTempo", minTempo);
 }
 BeatTrackerMultiFeature::~BeatTrackerMultiFeature() {
-	delete _beattrackermultifeature;
+	if (_beattrackermultifeature) delete _beattrackermultifeature;
 }
 void BeatTrackerMultiFeature::configure(const int maxTempo, const int minTempo) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_beattrackermultifeature = factory.create("BeatTrackerMultiFeature", "maxTempo", maxTempo, "minTempo", minTempo);
+	_beattrackermultifeature->configure("maxTempo", maxTempo, "minTempo", minTempo);
 }
 val BeatTrackerMultiFeature::compute(std::vector<float>& input_signal) {
 	_beattrackermultifeature->input("signal").set(input_signal);
@@ -443,14 +430,13 @@ _beattrackermultifeature->reset();
 // START Beatogram definitions
 // check https://essentia.upf.edu/reference/std_Beatogram.html
 Beatogram::Beatogram(const int size) {
-	configure(size);
+	_beatogram = AlgorithmFactory::create("Beatogram", "size", size);
 }
 Beatogram::~Beatogram() {
-	delete _beatogram;
+	if (_beatogram) delete _beatogram;
 }
 void Beatogram::configure(const int size) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_beatogram = factory.create("Beatogram", "size", size);
+	_beatogram->configure("size", size);
 }
 val Beatogram::compute(std::vector<float>& input_loudness, std::vector<std::vector<float> >& input_loudnessBandRatio) {
 	_beatogram->input("loudness").set(input_loudness);
@@ -470,14 +456,13 @@ _beatogram->reset();
 // START BeatsLoudness definitions
 // check https://essentia.upf.edu/reference/std_BeatsLoudness.html
 BeatsLoudness::BeatsLoudness(const float beatDuration, const float beatWindowDuration, const std::vector<float>& beats, const std::vector<float>& frequencyBands, const float sampleRate) {
-	configure(beatDuration, beatWindowDuration, beats, frequencyBands, sampleRate);
+	_beatsloudness = AlgorithmFactory::create("BeatsLoudness", "beatDuration", beatDuration, "beatWindowDuration", beatWindowDuration, "beats", beats, "frequencyBands", frequencyBands, "sampleRate", sampleRate);
 }
 BeatsLoudness::~BeatsLoudness() {
-	delete _beatsloudness;
+	if (_beatsloudness) delete _beatsloudness;
 }
 void BeatsLoudness::configure(const float beatDuration, const float beatWindowDuration, const std::vector<float>& beats, const std::vector<float>& frequencyBands, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_beatsloudness = factory.create("BeatsLoudness", "beatDuration", beatDuration, "beatWindowDuration", beatWindowDuration, "beats", beats, "frequencyBands", frequencyBands, "sampleRate", sampleRate);
+	_beatsloudness->configure("beatDuration", beatDuration, "beatWindowDuration", beatWindowDuration, "beats", beats, "frequencyBands", frequencyBands, "sampleRate", sampleRate);
 }
 val BeatsLoudness::compute(std::vector<float>& input_signal) {
 	_beatsloudness->input("signal").set(input_signal);
@@ -499,14 +484,13 @@ _beatsloudness->reset();
 // START BinaryOperator definitions
 // check https://essentia.upf.edu/reference/std_BinaryOperator.html
 BinaryOperator::BinaryOperator(const std::string& type) {
-	configure(type);
+	_binaryoperator = AlgorithmFactory::create("BinaryOperator", "type", type);
 }
 BinaryOperator::~BinaryOperator() {
-	delete _binaryoperator;
+	if (_binaryoperator) delete _binaryoperator;
 }
 void BinaryOperator::configure(const std::string& type) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_binaryoperator = factory.create("BinaryOperator", "type", type);
+	_binaryoperator->configure("type", type);
 }
 val BinaryOperator::compute(std::vector<float>& input_array1, std::vector<float>& input_array2) {
 	_binaryoperator->input("array1").set(input_array1);
@@ -526,14 +510,13 @@ _binaryoperator->reset();
 // START BinaryOperatorStream definitions
 // check https://essentia.upf.edu/reference/std_BinaryOperatorStream.html
 BinaryOperatorStream::BinaryOperatorStream(const std::string& type) {
-	configure(type);
+	_binaryoperatorstream = AlgorithmFactory::create("BinaryOperatorStream", "type", type);
 }
 BinaryOperatorStream::~BinaryOperatorStream() {
-	delete _binaryoperatorstream;
+	if (_binaryoperatorstream) delete _binaryoperatorstream;
 }
 void BinaryOperatorStream::configure(const std::string& type) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_binaryoperatorstream = factory.create("BinaryOperatorStream", "type", type);
+	_binaryoperatorstream->configure("type", type);
 }
 val BinaryOperatorStream::compute(std::vector<float>& input_array1, std::vector<float>& input_array2) {
 	_binaryoperatorstream->input("array1").set(input_array1);
@@ -553,14 +536,13 @@ _binaryoperatorstream->reset();
 // START BpmHistogramDescriptors definitions
 // check https://essentia.upf.edu/reference/std_BpmHistogramDescriptors.html
 BpmHistogramDescriptors::BpmHistogramDescriptors() {
-	configure();
+	_bpmhistogramdescriptors = AlgorithmFactory::create("BpmHistogramDescriptors");
 }
 BpmHistogramDescriptors::~BpmHistogramDescriptors() {
-	delete _bpmhistogramdescriptors;
+	if (_bpmhistogramdescriptors) delete _bpmhistogramdescriptors;
 }
 void BpmHistogramDescriptors::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_bpmhistogramdescriptors = factory.create("BpmHistogramDescriptors");
+	_bpmhistogramdescriptors->configure();
 }
 val BpmHistogramDescriptors::compute(std::vector<float>& input_bpmIntervals) {
 	_bpmhistogramdescriptors->input("bpmIntervals").set(input_bpmIntervals);
@@ -597,14 +579,13 @@ _bpmhistogramdescriptors->reset();
 // START BpmRubato definitions
 // check https://essentia.upf.edu/reference/std_BpmRubato.html
 BpmRubato::BpmRubato(const float longRegionsPruningTime, const float shortRegionsMergingTime, const float tolerance) {
-	configure(longRegionsPruningTime, shortRegionsMergingTime, tolerance);
+	_bpmrubato = AlgorithmFactory::create("BpmRubato", "longRegionsPruningTime", longRegionsPruningTime, "shortRegionsMergingTime", shortRegionsMergingTime, "tolerance", tolerance);
 }
 BpmRubato::~BpmRubato() {
-	delete _bpmrubato;
+	if (_bpmrubato) delete _bpmrubato;
 }
 void BpmRubato::configure(const float longRegionsPruningTime, const float shortRegionsMergingTime, const float tolerance) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_bpmrubato = factory.create("BpmRubato", "longRegionsPruningTime", longRegionsPruningTime, "shortRegionsMergingTime", shortRegionsMergingTime, "tolerance", tolerance);
+	_bpmrubato->configure("longRegionsPruningTime", longRegionsPruningTime, "shortRegionsMergingTime", shortRegionsMergingTime, "tolerance", tolerance);
 }
 val BpmRubato::compute(std::vector<float>& input_beats) {
 	_bpmrubato->input("beats").set(input_beats);
@@ -629,14 +610,13 @@ _bpmrubato->reset();
 // START CentralMoments definitions
 // check https://essentia.upf.edu/reference/std_CentralMoments.html
 CentralMoments::CentralMoments(const std::string& mode, const float range) {
-	configure(mode, range);
+	_centralmoments = AlgorithmFactory::create("CentralMoments", "mode", mode, "range", range);
 }
 CentralMoments::~CentralMoments() {
-	delete _centralmoments;
+	if (_centralmoments) delete _centralmoments;
 }
 void CentralMoments::configure(const std::string& mode, const float range) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_centralmoments = factory.create("CentralMoments", "mode", mode, "range", range);
+	_centralmoments->configure("mode", mode, "range", range);
 }
 val CentralMoments::compute(std::vector<float>& input_array) {
 	_centralmoments->input("array").set(input_array);
@@ -655,14 +635,13 @@ _centralmoments->reset();
 // START Centroid definitions
 // check https://essentia.upf.edu/reference/std_Centroid.html
 Centroid::Centroid(const float range) {
-	configure(range);
+	_centroid = AlgorithmFactory::create("Centroid", "range", range);
 }
 Centroid::~Centroid() {
-	delete _centroid;
+	if (_centroid) delete _centroid;
 }
 void Centroid::configure(const float range) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_centroid = factory.create("Centroid", "range", range);
+	_centroid->configure("range", range);
 }
 val Centroid::compute(std::vector<float>& input_array) {
 	_centroid->input("array").set(input_array);
@@ -681,14 +660,13 @@ _centroid->reset();
 // START ChordsDescriptors definitions
 // check https://essentia.upf.edu/reference/std_ChordsDescriptors.html
 ChordsDescriptors::ChordsDescriptors() {
-	configure();
+	_chordsdescriptors = AlgorithmFactory::create("ChordsDescriptors");
 }
 ChordsDescriptors::~ChordsDescriptors() {
-	delete _chordsdescriptors;
+	if (_chordsdescriptors) delete _chordsdescriptors;
 }
 void ChordsDescriptors::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_chordsdescriptors = factory.create("ChordsDescriptors");
+	_chordsdescriptors->configure();
 }
 val ChordsDescriptors::compute(std::vector<std::string> input_chords, std::string input_key, std::string input_scale) {
 	_chordsdescriptors->input("chords").set(input_chords);
@@ -721,14 +699,13 @@ _chordsdescriptors->reset();
 // START ChordsDetection definitions
 // check https://essentia.upf.edu/reference/std_ChordsDetection.html
 ChordsDetection::ChordsDetection(const int hopSize, const float sampleRate, const float windowSize) {
-	configure(hopSize, sampleRate, windowSize);
+	_chordsdetection = AlgorithmFactory::create("ChordsDetection", "hopSize", hopSize, "sampleRate", sampleRate, "windowSize", windowSize);
 }
 ChordsDetection::~ChordsDetection() {
-	delete _chordsdetection;
+	if (_chordsdetection) delete _chordsdetection;
 }
 void ChordsDetection::configure(const int hopSize, const float sampleRate, const float windowSize) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_chordsdetection = factory.create("ChordsDetection", "hopSize", hopSize, "sampleRate", sampleRate, "windowSize", windowSize);
+	_chordsdetection->configure("hopSize", hopSize, "sampleRate", sampleRate, "windowSize", windowSize);
 }
 val ChordsDetection::compute(std::vector<std::vector<float> >& input_pcp) {
 	_chordsdetection->input("pcp").set(input_pcp);
@@ -750,14 +727,13 @@ _chordsdetection->reset();
 // START ChordsDetectionBeats definitions
 // check https://essentia.upf.edu/reference/std_ChordsDetectionBeats.html
 ChordsDetectionBeats::ChordsDetectionBeats(const std::string& chromaPick, const int hopSize, const float sampleRate) {
-	configure(chromaPick, hopSize, sampleRate);
+	_chordsdetectionbeats = AlgorithmFactory::create("ChordsDetectionBeats", "chromaPick", chromaPick, "hopSize", hopSize, "sampleRate", sampleRate);
 }
 ChordsDetectionBeats::~ChordsDetectionBeats() {
-	delete _chordsdetectionbeats;
+	if (_chordsdetectionbeats) delete _chordsdetectionbeats;
 }
 void ChordsDetectionBeats::configure(const std::string& chromaPick, const int hopSize, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_chordsdetectionbeats = factory.create("ChordsDetectionBeats", "chromaPick", chromaPick, "hopSize", hopSize, "sampleRate", sampleRate);
+	_chordsdetectionbeats->configure("chromaPick", chromaPick, "hopSize", hopSize, "sampleRate", sampleRate);
 }
 val ChordsDetectionBeats::compute(std::vector<std::vector<float> >& input_pcp, std::vector<float>& input_ticks) {
 	_chordsdetectionbeats->input("pcp").set(input_pcp);
@@ -780,14 +756,13 @@ _chordsdetectionbeats->reset();
 // START ChromaCrossSimilarity definitions
 // check https://essentia.upf.edu/reference/std_ChromaCrossSimilarity.html
 ChromaCrossSimilarity::ChromaCrossSimilarity(const float binarizePercentile, const int frameStackSize, const int frameStackStride, const int noti, const bool oti, const bool otiBinary, const bool streaming) {
-	configure(binarizePercentile, frameStackSize, frameStackStride, noti, oti, otiBinary, streaming);
+	_chromacrosssimilarity = AlgorithmFactory::create("ChromaCrossSimilarity", "binarizePercentile", binarizePercentile, "frameStackSize", frameStackSize, "frameStackStride", frameStackStride, "noti", noti, "oti", oti, "otiBinary", otiBinary, "streaming", streaming);
 }
 ChromaCrossSimilarity::~ChromaCrossSimilarity() {
-	delete _chromacrosssimilarity;
+	if (_chromacrosssimilarity) delete _chromacrosssimilarity;
 }
 void ChromaCrossSimilarity::configure(const float binarizePercentile, const int frameStackSize, const int frameStackStride, const int noti, const bool oti, const bool otiBinary, const bool streaming) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_chromacrosssimilarity = factory.create("ChromaCrossSimilarity", "binarizePercentile", binarizePercentile, "frameStackSize", frameStackSize, "frameStackStride", frameStackStride, "noti", noti, "oti", oti, "otiBinary", otiBinary, "streaming", streaming);
+	_chromacrosssimilarity->configure("binarizePercentile", binarizePercentile, "frameStackSize", frameStackSize, "frameStackStride", frameStackStride, "noti", noti, "oti", oti, "otiBinary", otiBinary, "streaming", streaming);
 }
 val ChromaCrossSimilarity::compute(std::vector<std::vector<float> >& input_queryFeature, std::vector<std::vector<float> >& input_referenceFeature) {
 	_chromacrosssimilarity->input("queryFeature").set(input_queryFeature);
@@ -807,14 +782,13 @@ _chromacrosssimilarity->reset();
 // START Chromagram definitions
 // check https://essentia.upf.edu/reference/std_Chromagram.html
 Chromagram::Chromagram(const int binsPerOctave, const float minFrequency, const int minimumKernelSize, const std::string& normalizeType, const int numberBins, const float sampleRate, const float scale, const float threshold, const std::string& windowType, const bool zeroPhase) {
-	configure(binsPerOctave, minFrequency, minimumKernelSize, normalizeType, numberBins, sampleRate, scale, threshold, windowType, zeroPhase);
+	_chromagram = AlgorithmFactory::create("Chromagram", "binsPerOctave", binsPerOctave, "minFrequency", minFrequency, "minimumKernelSize", minimumKernelSize, "normalizeType", normalizeType, "numberBins", numberBins, "sampleRate", sampleRate, "scale", scale, "threshold", threshold, "windowType", windowType, "zeroPhase", zeroPhase);
 }
 Chromagram::~Chromagram() {
-	delete _chromagram;
+	if (_chromagram) delete _chromagram;
 }
 void Chromagram::configure(const int binsPerOctave, const float minFrequency, const int minimumKernelSize, const std::string& normalizeType, const int numberBins, const float sampleRate, const float scale, const float threshold, const std::string& windowType, const bool zeroPhase) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_chromagram = factory.create("Chromagram", "binsPerOctave", binsPerOctave, "minFrequency", minFrequency, "minimumKernelSize", minimumKernelSize, "normalizeType", normalizeType, "numberBins", numberBins, "sampleRate", sampleRate, "scale", scale, "threshold", threshold, "windowType", windowType, "zeroPhase", zeroPhase);
+	_chromagram->configure("binsPerOctave", binsPerOctave, "minFrequency", minFrequency, "minimumKernelSize", minimumKernelSize, "normalizeType", normalizeType, "numberBins", numberBins, "sampleRate", sampleRate, "scale", scale, "threshold", threshold, "windowType", windowType, "zeroPhase", zeroPhase);
 }
 val Chromagram::compute(std::vector<float>& input_frame) {
 	_chromagram->input("frame").set(input_frame);
@@ -833,14 +807,13 @@ _chromagram->reset();
 // START ClickDetector definitions
 // check https://essentia.upf.edu/reference/std_ClickDetector.html
 ClickDetector::ClickDetector(const float detectionThreshold, const int frameSize, const int hopSize, const int order, const int powerEstimationThreshold, const float sampleRate, const int silenceThreshold) {
-	configure(detectionThreshold, frameSize, hopSize, order, powerEstimationThreshold, sampleRate, silenceThreshold);
+	_clickdetector = AlgorithmFactory::create("ClickDetector", "detectionThreshold", detectionThreshold, "frameSize", frameSize, "hopSize", hopSize, "order", order, "powerEstimationThreshold", powerEstimationThreshold, "sampleRate", sampleRate, "silenceThreshold", silenceThreshold);
 }
 ClickDetector::~ClickDetector() {
-	delete _clickdetector;
+	if (_clickdetector) delete _clickdetector;
 }
 void ClickDetector::configure(const float detectionThreshold, const int frameSize, const int hopSize, const int order, const int powerEstimationThreshold, const float sampleRate, const int silenceThreshold) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_clickdetector = factory.create("ClickDetector", "detectionThreshold", detectionThreshold, "frameSize", frameSize, "hopSize", hopSize, "order", order, "powerEstimationThreshold", powerEstimationThreshold, "sampleRate", sampleRate, "silenceThreshold", silenceThreshold);
+	_clickdetector->configure("detectionThreshold", detectionThreshold, "frameSize", frameSize, "hopSize", hopSize, "order", order, "powerEstimationThreshold", powerEstimationThreshold, "sampleRate", sampleRate, "silenceThreshold", silenceThreshold);
 }
 val ClickDetector::compute(std::vector<float>& input_frame) {
 	_clickdetector->input("frame").set(input_frame);
@@ -862,14 +835,13 @@ _clickdetector->reset();
 // START Clipper definitions
 // check https://essentia.upf.edu/reference/std_Clipper.html
 Clipper::Clipper(const float max, const float min) {
-	configure(max, min);
+	_clipper = AlgorithmFactory::create("Clipper", "max", max, "min", min);
 }
 Clipper::~Clipper() {
-	delete _clipper;
+	if (_clipper) delete _clipper;
 }
 void Clipper::configure(const float max, const float min) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_clipper = factory.create("Clipper", "max", max, "min", min);
+	_clipper->configure("max", max, "min", min);
 }
 val Clipper::compute(std::vector<float>& input_signal) {
 	_clipper->input("signal").set(input_signal);
@@ -888,14 +860,13 @@ _clipper->reset();
 // START CoverSongSimilarity definitions
 // check https://essentia.upf.edu/reference/std_CoverSongSimilarity.html
 CoverSongSimilarity::CoverSongSimilarity(const std::string& alignmentType, const float disExtension, const float disOnset, const std::string& distanceType) {
-	configure(alignmentType, disExtension, disOnset, distanceType);
+	_coversongsimilarity = AlgorithmFactory::create("CoverSongSimilarity", "alignmentType", alignmentType, "disExtension", disExtension, "disOnset", disOnset, "distanceType", distanceType);
 }
 CoverSongSimilarity::~CoverSongSimilarity() {
-	delete _coversongsimilarity;
+	if (_coversongsimilarity) delete _coversongsimilarity;
 }
 void CoverSongSimilarity::configure(const std::string& alignmentType, const float disExtension, const float disOnset, const std::string& distanceType) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_coversongsimilarity = factory.create("CoverSongSimilarity", "alignmentType", alignmentType, "disExtension", disExtension, "disOnset", disOnset, "distanceType", distanceType);
+	_coversongsimilarity->configure("alignmentType", alignmentType, "disExtension", disExtension, "disOnset", disOnset, "distanceType", distanceType);
 }
 val CoverSongSimilarity::compute(std::vector<std::vector<float> >& input_inputArray) {
 	_coversongsimilarity->input("inputArray").set(input_inputArray);
@@ -917,14 +888,13 @@ _coversongsimilarity->reset();
 // START Crest definitions
 // check https://essentia.upf.edu/reference/std_Crest.html
 Crest::Crest() {
-	configure();
+	_crest = AlgorithmFactory::create("Crest");
 }
 Crest::~Crest() {
-	delete _crest;
+	if (_crest) delete _crest;
 }
 void Crest::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_crest = factory.create("Crest");
+	_crest->configure();
 }
 val Crest::compute(std::vector<float>& input_array) {
 	_crest->input("array").set(input_array);
@@ -943,14 +913,13 @@ _crest->reset();
 // START CrossCorrelation definitions
 // check https://essentia.upf.edu/reference/std_CrossCorrelation.html
 CrossCorrelation::CrossCorrelation(const int maxLag, const int minLag) {
-	configure(maxLag, minLag);
+	_crosscorrelation = AlgorithmFactory::create("CrossCorrelation", "maxLag", maxLag, "minLag", minLag);
 }
 CrossCorrelation::~CrossCorrelation() {
-	delete _crosscorrelation;
+	if (_crosscorrelation) delete _crosscorrelation;
 }
 void CrossCorrelation::configure(const int maxLag, const int minLag) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_crosscorrelation = factory.create("CrossCorrelation", "maxLag", maxLag, "minLag", minLag);
+	_crosscorrelation->configure("maxLag", maxLag, "minLag", minLag);
 }
 val CrossCorrelation::compute(std::vector<float>& input_arrayX, std::vector<float>& input_arrayY) {
 	_crosscorrelation->input("arrayX").set(input_arrayX);
@@ -970,14 +939,13 @@ _crosscorrelation->reset();
 // START CrossSimilarityMatrix definitions
 // check https://essentia.upf.edu/reference/std_CrossSimilarityMatrix.html
 CrossSimilarityMatrix::CrossSimilarityMatrix(const bool binarize, const float binarizePercentile, const int frameStackSize, const int frameStackStride) {
-	configure(binarize, binarizePercentile, frameStackSize, frameStackStride);
+	_crosssimilaritymatrix = AlgorithmFactory::create("CrossSimilarityMatrix", "binarize", binarize, "binarizePercentile", binarizePercentile, "frameStackSize", frameStackSize, "frameStackStride", frameStackStride);
 }
 CrossSimilarityMatrix::~CrossSimilarityMatrix() {
-	delete _crosssimilaritymatrix;
+	if (_crosssimilaritymatrix) delete _crosssimilaritymatrix;
 }
 void CrossSimilarityMatrix::configure(const bool binarize, const float binarizePercentile, const int frameStackSize, const int frameStackStride) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_crosssimilaritymatrix = factory.create("CrossSimilarityMatrix", "binarize", binarize, "binarizePercentile", binarizePercentile, "frameStackSize", frameStackSize, "frameStackStride", frameStackStride);
+	_crosssimilaritymatrix->configure("binarize", binarize, "binarizePercentile", binarizePercentile, "frameStackSize", frameStackSize, "frameStackStride", frameStackStride);
 }
 val CrossSimilarityMatrix::compute(std::vector<std::vector<float> >& input_queryFeature, std::vector<std::vector<float> >& input_referenceFeature) {
 	_crosssimilaritymatrix->input("queryFeature").set(input_queryFeature);
@@ -997,14 +965,13 @@ _crosssimilaritymatrix->reset();
 // START CubicSpline definitions
 // check https://essentia.upf.edu/reference/std_CubicSpline.html
 CubicSpline::CubicSpline(const int leftBoundaryFlag, const float leftBoundaryValue, const int rightBoundaryFlag, const float rightBoundaryValue, const std::vector<float>& xPoints, const std::vector<float>& yPoints) {
-	configure(leftBoundaryFlag, leftBoundaryValue, rightBoundaryFlag, rightBoundaryValue, xPoints, yPoints);
+	_cubicspline = AlgorithmFactory::create("CubicSpline", "leftBoundaryFlag", leftBoundaryFlag, "leftBoundaryValue", leftBoundaryValue, "rightBoundaryFlag", rightBoundaryFlag, "rightBoundaryValue", rightBoundaryValue, "xPoints", xPoints, "yPoints", yPoints);
 }
 CubicSpline::~CubicSpline() {
-	delete _cubicspline;
+	if (_cubicspline) delete _cubicspline;
 }
 void CubicSpline::configure(const int leftBoundaryFlag, const float leftBoundaryValue, const int rightBoundaryFlag, const float rightBoundaryValue, const std::vector<float>& xPoints, const std::vector<float>& yPoints) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_cubicspline = factory.create("CubicSpline", "leftBoundaryFlag", leftBoundaryFlag, "leftBoundaryValue", leftBoundaryValue, "rightBoundaryFlag", rightBoundaryFlag, "rightBoundaryValue", rightBoundaryValue, "xPoints", xPoints, "yPoints", yPoints);
+	_cubicspline->configure("leftBoundaryFlag", leftBoundaryFlag, "leftBoundaryValue", leftBoundaryValue, "rightBoundaryFlag", rightBoundaryFlag, "rightBoundaryValue", rightBoundaryValue, "xPoints", xPoints, "yPoints", yPoints);
 }
 val CubicSpline::compute(float input_x) {
 	_cubicspline->input("x").set(input_x);
@@ -1029,14 +996,13 @@ _cubicspline->reset();
 // START DCRemoval definitions
 // check https://essentia.upf.edu/reference/std_DCRemoval.html
 DCRemoval::DCRemoval(const float cutoffFrequency, const float sampleRate) {
-	configure(cutoffFrequency, sampleRate);
+	_dcremoval = AlgorithmFactory::create("DCRemoval", "cutoffFrequency", cutoffFrequency, "sampleRate", sampleRate);
 }
 DCRemoval::~DCRemoval() {
-	delete _dcremoval;
+	if (_dcremoval) delete _dcremoval;
 }
 void DCRemoval::configure(const float cutoffFrequency, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_dcremoval = factory.create("DCRemoval", "cutoffFrequency", cutoffFrequency, "sampleRate", sampleRate);
+	_dcremoval->configure("cutoffFrequency", cutoffFrequency, "sampleRate", sampleRate);
 }
 val DCRemoval::compute(std::vector<float>& input_signal) {
 	_dcremoval->input("signal").set(input_signal);
@@ -1055,14 +1021,13 @@ _dcremoval->reset();
 // START DCT definitions
 // check https://essentia.upf.edu/reference/std_DCT.html
 DCT::DCT(const int dctType, const int inputSize, const int liftering, const int outputSize) {
-	configure(dctType, inputSize, liftering, outputSize);
+	_dct = AlgorithmFactory::create("DCT", "dctType", dctType, "inputSize", inputSize, "liftering", liftering, "outputSize", outputSize);
 }
 DCT::~DCT() {
-	delete _dct;
+	if (_dct) delete _dct;
 }
 void DCT::configure(const int dctType, const int inputSize, const int liftering, const int outputSize) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_dct = factory.create("DCT", "dctType", dctType, "inputSize", inputSize, "liftering", liftering, "outputSize", outputSize);
+	_dct->configure("dctType", dctType, "inputSize", inputSize, "liftering", liftering, "outputSize", outputSize);
 }
 val DCT::compute(std::vector<float>& input_array) {
 	_dct->input("array").set(input_array);
@@ -1081,14 +1046,13 @@ _dct->reset();
 // START Danceability definitions
 // check https://essentia.upf.edu/reference/std_Danceability.html
 Danceability::Danceability(const float maxTau, const float minTau, const float sampleRate, const float tauMultiplier) {
-	configure(maxTau, minTau, sampleRate, tauMultiplier);
+	_danceability = AlgorithmFactory::create("Danceability", "maxTau", maxTau, "minTau", minTau, "sampleRate", sampleRate, "tauMultiplier", tauMultiplier);
 }
 Danceability::~Danceability() {
-	delete _danceability;
+	if (_danceability) delete _danceability;
 }
 void Danceability::configure(const float maxTau, const float minTau, const float sampleRate, const float tauMultiplier) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_danceability = factory.create("Danceability", "maxTau", maxTau, "minTau", minTau, "sampleRate", sampleRate, "tauMultiplier", tauMultiplier);
+	_danceability->configure("maxTau", maxTau, "minTau", minTau, "sampleRate", sampleRate, "tauMultiplier", tauMultiplier);
 }
 val Danceability::compute(std::vector<float>& input_signal) {
 	_danceability->input("signal").set(input_signal);
@@ -1110,14 +1074,13 @@ _danceability->reset();
 // START Decrease definitions
 // check https://essentia.upf.edu/reference/std_Decrease.html
 Decrease::Decrease(const float range) {
-	configure(range);
+	_decrease = AlgorithmFactory::create("Decrease", "range", range);
 }
 Decrease::~Decrease() {
-	delete _decrease;
+	if (_decrease) delete _decrease;
 }
 void Decrease::configure(const float range) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_decrease = factory.create("Decrease", "range", range);
+	_decrease->configure("range", range);
 }
 val Decrease::compute(std::vector<float>& input_array) {
 	_decrease->input("array").set(input_array);
@@ -1136,14 +1099,13 @@ _decrease->reset();
 // START Derivative definitions
 // check https://essentia.upf.edu/reference/std_Derivative.html
 Derivative::Derivative() {
-	configure();
+	_derivative = AlgorithmFactory::create("Derivative");
 }
 Derivative::~Derivative() {
-	delete _derivative;
+	if (_derivative) delete _derivative;
 }
 void Derivative::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_derivative = factory.create("Derivative");
+	_derivative->configure();
 }
 val Derivative::compute(std::vector<float>& input_signal) {
 	_derivative->input("signal").set(input_signal);
@@ -1162,14 +1124,13 @@ _derivative->reset();
 // START DerivativeSFX definitions
 // check https://essentia.upf.edu/reference/std_DerivativeSFX.html
 DerivativeSFX::DerivativeSFX() {
-	configure();
+	_derivativesfx = AlgorithmFactory::create("DerivativeSFX");
 }
 DerivativeSFX::~DerivativeSFX() {
-	delete _derivativesfx;
+	if (_derivativesfx) delete _derivativesfx;
 }
 void DerivativeSFX::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_derivativesfx = factory.create("DerivativeSFX");
+	_derivativesfx->configure();
 }
 val DerivativeSFX::compute(std::vector<float>& input_envelope) {
 	_derivativesfx->input("envelope").set(input_envelope);
@@ -1191,14 +1152,13 @@ _derivativesfx->reset();
 // START DiscontinuityDetector definitions
 // check https://essentia.upf.edu/reference/std_DiscontinuityDetector.html
 DiscontinuityDetector::DiscontinuityDetector(const float detectionThreshold, const float energyThreshold, const int frameSize, const int hopSize, const int kernelSize, const int order, const int silenceThreshold, const int subFrameSize) {
-	configure(detectionThreshold, energyThreshold, frameSize, hopSize, kernelSize, order, silenceThreshold, subFrameSize);
+	_discontinuitydetector = AlgorithmFactory::create("DiscontinuityDetector", "detectionThreshold", detectionThreshold, "energyThreshold", energyThreshold, "frameSize", frameSize, "hopSize", hopSize, "kernelSize", kernelSize, "order", order, "silenceThreshold", silenceThreshold, "subFrameSize", subFrameSize);
 }
 DiscontinuityDetector::~DiscontinuityDetector() {
-	delete _discontinuitydetector;
+	if (_discontinuitydetector) delete _discontinuitydetector;
 }
 void DiscontinuityDetector::configure(const float detectionThreshold, const float energyThreshold, const int frameSize, const int hopSize, const int kernelSize, const int order, const int silenceThreshold, const int subFrameSize) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_discontinuitydetector = factory.create("DiscontinuityDetector", "detectionThreshold", detectionThreshold, "energyThreshold", energyThreshold, "frameSize", frameSize, "hopSize", hopSize, "kernelSize", kernelSize, "order", order, "silenceThreshold", silenceThreshold, "subFrameSize", subFrameSize);
+	_discontinuitydetector->configure("detectionThreshold", detectionThreshold, "energyThreshold", energyThreshold, "frameSize", frameSize, "hopSize", hopSize, "kernelSize", kernelSize, "order", order, "silenceThreshold", silenceThreshold, "subFrameSize", subFrameSize);
 }
 val DiscontinuityDetector::compute(std::vector<float>& input_frame) {
 	_discontinuitydetector->input("frame").set(input_frame);
@@ -1220,14 +1180,13 @@ _discontinuitydetector->reset();
 // START Dissonance definitions
 // check https://essentia.upf.edu/reference/std_Dissonance.html
 Dissonance::Dissonance() {
-	configure();
+	_dissonance = AlgorithmFactory::create("Dissonance");
 }
 Dissonance::~Dissonance() {
-	delete _dissonance;
+	if (_dissonance) delete _dissonance;
 }
 void Dissonance::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_dissonance = factory.create("Dissonance");
+	_dissonance->configure();
 }
 val Dissonance::compute(std::vector<float>& input_frequencies, std::vector<float>& input_magnitudes) {
 	_dissonance->input("frequencies").set(input_frequencies);
@@ -1247,14 +1206,13 @@ _dissonance->reset();
 // START DistributionShape definitions
 // check https://essentia.upf.edu/reference/std_DistributionShape.html
 DistributionShape::DistributionShape() {
-	configure();
+	_distributionshape = AlgorithmFactory::create("DistributionShape");
 }
 DistributionShape::~DistributionShape() {
-	delete _distributionshape;
+	if (_distributionshape) delete _distributionshape;
 }
 void DistributionShape::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_distributionshape = factory.create("DistributionShape");
+	_distributionshape->configure();
 }
 val DistributionShape::compute(std::vector<float>& input_centralMoments) {
 	_distributionshape->input("centralMoments").set(input_centralMoments);
@@ -1279,14 +1237,13 @@ _distributionshape->reset();
 // START Duration definitions
 // check https://essentia.upf.edu/reference/std_Duration.html
 Duration::Duration(const float sampleRate) {
-	configure(sampleRate);
+	_duration = AlgorithmFactory::create("Duration", "sampleRate", sampleRate);
 }
 Duration::~Duration() {
-	delete _duration;
+	if (_duration) delete _duration;
 }
 void Duration::configure(const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_duration = factory.create("Duration", "sampleRate", sampleRate);
+	_duration->configure("sampleRate", sampleRate);
 }
 val Duration::compute(std::vector<float>& input_signal) {
 	_duration->input("signal").set(input_signal);
@@ -1305,14 +1262,13 @@ _duration->reset();
 // START DynamicComplexity definitions
 // check https://essentia.upf.edu/reference/std_DynamicComplexity.html
 DynamicComplexity::DynamicComplexity(const float frameSize, const float sampleRate) {
-	configure(frameSize, sampleRate);
+	_dynamiccomplexity = AlgorithmFactory::create("DynamicComplexity", "frameSize", frameSize, "sampleRate", sampleRate);
 }
 DynamicComplexity::~DynamicComplexity() {
-	delete _dynamiccomplexity;
+	if (_dynamiccomplexity) delete _dynamiccomplexity;
 }
 void DynamicComplexity::configure(const float frameSize, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_dynamiccomplexity = factory.create("DynamicComplexity", "frameSize", frameSize, "sampleRate", sampleRate);
+	_dynamiccomplexity->configure("frameSize", frameSize, "sampleRate", sampleRate);
 }
 val DynamicComplexity::compute(std::vector<float>& input_signal) {
 	_dynamiccomplexity->input("signal").set(input_signal);
@@ -1334,14 +1290,13 @@ _dynamiccomplexity->reset();
 // START ERBBands definitions
 // check https://essentia.upf.edu/reference/std_ERBBands.html
 ERBBands::ERBBands(const float highFrequencyBound, const int inputSize, const float lowFrequencyBound, const int numberBands, const float sampleRate, const std::string& type, const float width) {
-	configure(highFrequencyBound, inputSize, lowFrequencyBound, numberBands, sampleRate, type, width);
+	_erbbands = AlgorithmFactory::create("ERBBands", "highFrequencyBound", highFrequencyBound, "inputSize", inputSize, "lowFrequencyBound", lowFrequencyBound, "numberBands", numberBands, "sampleRate", sampleRate, "type", type, "width", width);
 }
 ERBBands::~ERBBands() {
-	delete _erbbands;
+	if (_erbbands) delete _erbbands;
 }
 void ERBBands::configure(const float highFrequencyBound, const int inputSize, const float lowFrequencyBound, const int numberBands, const float sampleRate, const std::string& type, const float width) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_erbbands = factory.create("ERBBands", "highFrequencyBound", highFrequencyBound, "inputSize", inputSize, "lowFrequencyBound", lowFrequencyBound, "numberBands", numberBands, "sampleRate", sampleRate, "type", type, "width", width);
+	_erbbands->configure("highFrequencyBound", highFrequencyBound, "inputSize", inputSize, "lowFrequencyBound", lowFrequencyBound, "numberBands", numberBands, "sampleRate", sampleRate, "type", type, "width", width);
 }
 val ERBBands::compute(std::vector<float>& input_spectrum) {
 	_erbbands->input("spectrum").set(input_spectrum);
@@ -1360,14 +1315,13 @@ _erbbands->reset();
 // START EffectiveDuration definitions
 // check https://essentia.upf.edu/reference/std_EffectiveDuration.html
 EffectiveDuration::EffectiveDuration(const float sampleRate, const float thresholdRatio) {
-	configure(sampleRate, thresholdRatio);
+	_effectiveduration = AlgorithmFactory::create("EffectiveDuration", "sampleRate", sampleRate, "thresholdRatio", thresholdRatio);
 }
 EffectiveDuration::~EffectiveDuration() {
-	delete _effectiveduration;
+	if (_effectiveduration) delete _effectiveduration;
 }
 void EffectiveDuration::configure(const float sampleRate, const float thresholdRatio) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_effectiveduration = factory.create("EffectiveDuration", "sampleRate", sampleRate, "thresholdRatio", thresholdRatio);
+	_effectiveduration->configure("sampleRate", sampleRate, "thresholdRatio", thresholdRatio);
 }
 val EffectiveDuration::compute(std::vector<float>& input_signal) {
 	_effectiveduration->input("signal").set(input_signal);
@@ -1386,14 +1340,13 @@ _effectiveduration->reset();
 // START Energy definitions
 // check https://essentia.upf.edu/reference/std_Energy.html
 Energy::Energy() {
-	configure();
+	_energy = AlgorithmFactory::create("Energy");
 }
 Energy::~Energy() {
-	delete _energy;
+	if (_energy) delete _energy;
 }
 void Energy::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_energy = factory.create("Energy");
+	_energy->configure();
 }
 val Energy::compute(std::vector<float>& input_array) {
 	_energy->input("array").set(input_array);
@@ -1412,14 +1365,13 @@ _energy->reset();
 // START EnergyBand definitions
 // check https://essentia.upf.edu/reference/std_EnergyBand.html
 EnergyBand::EnergyBand(const float sampleRate, const float startCutoffFrequency, const float stopCutoffFrequency) {
-	configure(sampleRate, startCutoffFrequency, stopCutoffFrequency);
+	_energyband = AlgorithmFactory::create("EnergyBand", "sampleRate", sampleRate, "startCutoffFrequency", startCutoffFrequency, "stopCutoffFrequency", stopCutoffFrequency);
 }
 EnergyBand::~EnergyBand() {
-	delete _energyband;
+	if (_energyband) delete _energyband;
 }
 void EnergyBand::configure(const float sampleRate, const float startCutoffFrequency, const float stopCutoffFrequency) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_energyband = factory.create("EnergyBand", "sampleRate", sampleRate, "startCutoffFrequency", startCutoffFrequency, "stopCutoffFrequency", stopCutoffFrequency);
+	_energyband->configure("sampleRate", sampleRate, "startCutoffFrequency", startCutoffFrequency, "stopCutoffFrequency", stopCutoffFrequency);
 }
 val EnergyBand::compute(std::vector<float>& input_spectrum) {
 	_energyband->input("spectrum").set(input_spectrum);
@@ -1438,14 +1390,13 @@ _energyband->reset();
 // START EnergyBandRatio definitions
 // check https://essentia.upf.edu/reference/std_EnergyBandRatio.html
 EnergyBandRatio::EnergyBandRatio(const float sampleRate, const float startFrequency, const float stopFrequency) {
-	configure(sampleRate, startFrequency, stopFrequency);
+	_energybandratio = AlgorithmFactory::create("EnergyBandRatio", "sampleRate", sampleRate, "startFrequency", startFrequency, "stopFrequency", stopFrequency);
 }
 EnergyBandRatio::~EnergyBandRatio() {
-	delete _energybandratio;
+	if (_energybandratio) delete _energybandratio;
 }
 void EnergyBandRatio::configure(const float sampleRate, const float startFrequency, const float stopFrequency) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_energybandratio = factory.create("EnergyBandRatio", "sampleRate", sampleRate, "startFrequency", startFrequency, "stopFrequency", stopFrequency);
+	_energybandratio->configure("sampleRate", sampleRate, "startFrequency", startFrequency, "stopFrequency", stopFrequency);
 }
 val EnergyBandRatio::compute(std::vector<float>& input_spectrum) {
 	_energybandratio->input("spectrum").set(input_spectrum);
@@ -1464,14 +1415,13 @@ _energybandratio->reset();
 // START Entropy definitions
 // check https://essentia.upf.edu/reference/std_Entropy.html
 Entropy::Entropy() {
-	configure();
+	_entropy = AlgorithmFactory::create("Entropy");
 }
 Entropy::~Entropy() {
-	delete _entropy;
+	if (_entropy) delete _entropy;
 }
 void Entropy::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_entropy = factory.create("Entropy");
+	_entropy->configure();
 }
 val Entropy::compute(std::vector<float>& input_array) {
 	_entropy->input("array").set(input_array);
@@ -1490,14 +1440,13 @@ _entropy->reset();
 // START Envelope definitions
 // check https://essentia.upf.edu/reference/std_Envelope.html
 Envelope::Envelope(const bool applyRectification, const float attackTime, const float releaseTime, const float sampleRate) {
-	configure(applyRectification, attackTime, releaseTime, sampleRate);
+	_envelope = AlgorithmFactory::create("Envelope", "applyRectification", applyRectification, "attackTime", attackTime, "releaseTime", releaseTime, "sampleRate", sampleRate);
 }
 Envelope::~Envelope() {
-	delete _envelope;
+	if (_envelope) delete _envelope;
 }
 void Envelope::configure(const bool applyRectification, const float attackTime, const float releaseTime, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_envelope = factory.create("Envelope", "applyRectification", applyRectification, "attackTime", attackTime, "releaseTime", releaseTime, "sampleRate", sampleRate);
+	_envelope->configure("applyRectification", applyRectification, "attackTime", attackTime, "releaseTime", releaseTime, "sampleRate", sampleRate);
 }
 val Envelope::compute(std::vector<float>& input_signal) {
 	_envelope->input("signal").set(input_signal);
@@ -1516,14 +1465,13 @@ _envelope->reset();
 // START EqualLoudness definitions
 // check https://essentia.upf.edu/reference/std_EqualLoudness.html
 EqualLoudness::EqualLoudness(const float sampleRate) {
-	configure(sampleRate);
+	_equalloudness = AlgorithmFactory::create("EqualLoudness", "sampleRate", sampleRate);
 }
 EqualLoudness::~EqualLoudness() {
-	delete _equalloudness;
+	if (_equalloudness) delete _equalloudness;
 }
 void EqualLoudness::configure(const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_equalloudness = factory.create("EqualLoudness", "sampleRate", sampleRate);
+	_equalloudness->configure("sampleRate", sampleRate);
 }
 val EqualLoudness::compute(std::vector<float>& input_signal) {
 	_equalloudness->input("signal").set(input_signal);
@@ -1542,14 +1490,13 @@ _equalloudness->reset();
 // START Flatness definitions
 // check https://essentia.upf.edu/reference/std_Flatness.html
 Flatness::Flatness() {
-	configure();
+	_flatness = AlgorithmFactory::create("Flatness");
 }
 Flatness::~Flatness() {
-	delete _flatness;
+	if (_flatness) delete _flatness;
 }
 void Flatness::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_flatness = factory.create("Flatness");
+	_flatness->configure();
 }
 val Flatness::compute(std::vector<float>& input_array) {
 	_flatness->input("array").set(input_array);
@@ -1568,14 +1515,13 @@ _flatness->reset();
 // START FlatnessDB definitions
 // check https://essentia.upf.edu/reference/std_FlatnessDB.html
 FlatnessDB::FlatnessDB() {
-	configure();
+	_flatnessdb = AlgorithmFactory::create("FlatnessDB");
 }
 FlatnessDB::~FlatnessDB() {
-	delete _flatnessdb;
+	if (_flatnessdb) delete _flatnessdb;
 }
 void FlatnessDB::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_flatnessdb = factory.create("FlatnessDB");
+	_flatnessdb->configure();
 }
 val FlatnessDB::compute(std::vector<float>& input_array) {
 	_flatnessdb->input("array").set(input_array);
@@ -1594,14 +1540,13 @@ _flatnessdb->reset();
 // START FlatnessSFX definitions
 // check https://essentia.upf.edu/reference/std_FlatnessSFX.html
 FlatnessSFX::FlatnessSFX() {
-	configure();
+	_flatnesssfx = AlgorithmFactory::create("FlatnessSFX");
 }
 FlatnessSFX::~FlatnessSFX() {
-	delete _flatnesssfx;
+	if (_flatnesssfx) delete _flatnesssfx;
 }
 void FlatnessSFX::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_flatnesssfx = factory.create("FlatnessSFX");
+	_flatnesssfx->configure();
 }
 val FlatnessSFX::compute(std::vector<float>& input_envelope) {
 	_flatnesssfx->input("envelope").set(input_envelope);
@@ -1620,14 +1565,13 @@ _flatnesssfx->reset();
 // START Flux definitions
 // check https://essentia.upf.edu/reference/std_Flux.html
 Flux::Flux(const bool halfRectify, const std::string& norm) {
-	configure(halfRectify, norm);
+	_flux = AlgorithmFactory::create("Flux", "halfRectify", halfRectify, "norm", norm);
 }
 Flux::~Flux() {
-	delete _flux;
+	if (_flux) delete _flux;
 }
 void Flux::configure(const bool halfRectify, const std::string& norm) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_flux = factory.create("Flux", "halfRectify", halfRectify, "norm", norm);
+	_flux->configure("halfRectify", halfRectify, "norm", norm);
 }
 val Flux::compute(std::vector<float>& input_spectrum) {
 	_flux->input("spectrum").set(input_spectrum);
@@ -1646,14 +1590,13 @@ _flux->reset();
 // START FrameCutter definitions
 // check https://essentia.upf.edu/reference/std_FrameCutter.html
 FrameCutter::FrameCutter(const int frameSize, const int hopSize, const bool lastFrameToEndOfFile, const bool startFromZero, const float validFrameThresholdRatio) {
-	configure(frameSize, hopSize, lastFrameToEndOfFile, startFromZero, validFrameThresholdRatio);
+	_framecutter = AlgorithmFactory::create("FrameCutter", "frameSize", frameSize, "hopSize", hopSize, "lastFrameToEndOfFile", lastFrameToEndOfFile, "startFromZero", startFromZero, "validFrameThresholdRatio", validFrameThresholdRatio);
 }
 FrameCutter::~FrameCutter() {
-	delete _framecutter;
+	if (_framecutter) delete _framecutter;
 }
 void FrameCutter::configure(const int frameSize, const int hopSize, const bool lastFrameToEndOfFile, const bool startFromZero, const float validFrameThresholdRatio) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_framecutter = factory.create("FrameCutter", "frameSize", frameSize, "hopSize", hopSize, "lastFrameToEndOfFile", lastFrameToEndOfFile, "startFromZero", startFromZero, "validFrameThresholdRatio", validFrameThresholdRatio);
+	_framecutter->configure("frameSize", frameSize, "hopSize", hopSize, "lastFrameToEndOfFile", lastFrameToEndOfFile, "startFromZero", startFromZero, "validFrameThresholdRatio", validFrameThresholdRatio);
 }
 val FrameCutter::compute(std::vector<float>& input_signal) {
 	_framecutter->input("signal").set(input_signal);
@@ -1672,14 +1615,13 @@ _framecutter->reset();
 // START FrameToReal definitions
 // check https://essentia.upf.edu/reference/std_FrameToReal.html
 FrameToReal::FrameToReal(const int frameSize, const int hopSize) {
-	configure(frameSize, hopSize);
+	_frametoreal = AlgorithmFactory::create("FrameToReal", "frameSize", frameSize, "hopSize", hopSize);
 }
 FrameToReal::~FrameToReal() {
-	delete _frametoreal;
+	if (_frametoreal) delete _frametoreal;
 }
 void FrameToReal::configure(const int frameSize, const int hopSize) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_frametoreal = factory.create("FrameToReal", "frameSize", frameSize, "hopSize", hopSize);
+	_frametoreal->configure("frameSize", frameSize, "hopSize", hopSize);
 }
 val FrameToReal::compute(std::vector<float>& input_signal) {
 	_frametoreal->input("signal").set(input_signal);
@@ -1698,14 +1640,13 @@ _frametoreal->reset();
 // START FrequencyBands definitions
 // check https://essentia.upf.edu/reference/std_FrequencyBands.html
 FrequencyBands::FrequencyBands(const std::vector<float>& frequencyBands, const float sampleRate) {
-	configure(frequencyBands, sampleRate);
+	_frequencybands = AlgorithmFactory::create("FrequencyBands", "frequencyBands", frequencyBands, "sampleRate", sampleRate);
 }
 FrequencyBands::~FrequencyBands() {
-	delete _frequencybands;
+	if (_frequencybands) delete _frequencybands;
 }
 void FrequencyBands::configure(const std::vector<float>& frequencyBands, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_frequencybands = factory.create("FrequencyBands", "frequencyBands", frequencyBands, "sampleRate", sampleRate);
+	_frequencybands->configure("frequencyBands", frequencyBands, "sampleRate", sampleRate);
 }
 val FrequencyBands::compute(std::vector<float>& input_spectrum) {
 	_frequencybands->input("spectrum").set(input_spectrum);
@@ -1724,14 +1665,13 @@ _frequencybands->reset();
 // START GFCC definitions
 // check https://essentia.upf.edu/reference/std_GFCC.html
 GFCC::GFCC(const int dctType, const float highFrequencyBound, const int inputSize, const std::string& logType, const float lowFrequencyBound, const int numberBands, const int numberCoefficients, const float sampleRate, const float silenceThreshold, const std::string& type) {
-	configure(dctType, highFrequencyBound, inputSize, logType, lowFrequencyBound, numberBands, numberCoefficients, sampleRate, silenceThreshold, type);
+	_gfcc = AlgorithmFactory::create("GFCC", "dctType", dctType, "highFrequencyBound", highFrequencyBound, "inputSize", inputSize, "logType", logType, "lowFrequencyBound", lowFrequencyBound, "numberBands", numberBands, "numberCoefficients", numberCoefficients, "sampleRate", sampleRate, "silenceThreshold", silenceThreshold, "type", type);
 }
 GFCC::~GFCC() {
-	delete _gfcc;
+	if (_gfcc) delete _gfcc;
 }
 void GFCC::configure(const int dctType, const float highFrequencyBound, const int inputSize, const std::string& logType, const float lowFrequencyBound, const int numberBands, const int numberCoefficients, const float sampleRate, const float silenceThreshold, const std::string& type) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_gfcc = factory.create("GFCC", "dctType", dctType, "highFrequencyBound", highFrequencyBound, "inputSize", inputSize, "logType", logType, "lowFrequencyBound", lowFrequencyBound, "numberBands", numberBands, "numberCoefficients", numberCoefficients, "sampleRate", sampleRate, "silenceThreshold", silenceThreshold, "type", type);
+	_gfcc->configure("dctType", dctType, "highFrequencyBound", highFrequencyBound, "inputSize", inputSize, "logType", logType, "lowFrequencyBound", lowFrequencyBound, "numberBands", numberBands, "numberCoefficients", numberCoefficients, "sampleRate", sampleRate, "silenceThreshold", silenceThreshold, "type", type);
 }
 val GFCC::compute(std::vector<float>& input_spectrum) {
 	_gfcc->input("spectrum").set(input_spectrum);
@@ -1753,14 +1693,13 @@ _gfcc->reset();
 // START GapsDetector definitions
 // check https://essentia.upf.edu/reference/std_GapsDetector.html
 GapsDetector::GapsDetector(const float attackTime, const int frameSize, const int hopSize, const int kernelSize, const float maximumTime, const float minimumTime, const float postpowerTime, const float prepowerThreshold, const float prepowerTime, const float releaseTime, const float sampleRate, const float silenceThreshold) {
-	configure(attackTime, frameSize, hopSize, kernelSize, maximumTime, minimumTime, postpowerTime, prepowerThreshold, prepowerTime, releaseTime, sampleRate, silenceThreshold);
+	_gapsdetector = AlgorithmFactory::create("GapsDetector", "attackTime", attackTime, "frameSize", frameSize, "hopSize", hopSize, "kernelSize", kernelSize, "maximumTime", maximumTime, "minimumTime", minimumTime, "postpowerTime", postpowerTime, "prepowerThreshold", prepowerThreshold, "prepowerTime", prepowerTime, "releaseTime", releaseTime, "sampleRate", sampleRate, "silenceThreshold", silenceThreshold);
 }
 GapsDetector::~GapsDetector() {
-	delete _gapsdetector;
+	if (_gapsdetector) delete _gapsdetector;
 }
 void GapsDetector::configure(const float attackTime, const int frameSize, const int hopSize, const int kernelSize, const float maximumTime, const float minimumTime, const float postpowerTime, const float prepowerThreshold, const float prepowerTime, const float releaseTime, const float sampleRate, const float silenceThreshold) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_gapsdetector = factory.create("GapsDetector", "attackTime", attackTime, "frameSize", frameSize, "hopSize", hopSize, "kernelSize", kernelSize, "maximumTime", maximumTime, "minimumTime", minimumTime, "postpowerTime", postpowerTime, "prepowerThreshold", prepowerThreshold, "prepowerTime", prepowerTime, "releaseTime", releaseTime, "sampleRate", sampleRate, "silenceThreshold", silenceThreshold);
+	_gapsdetector->configure("attackTime", attackTime, "frameSize", frameSize, "hopSize", hopSize, "kernelSize", kernelSize, "maximumTime", maximumTime, "minimumTime", minimumTime, "postpowerTime", postpowerTime, "prepowerThreshold", prepowerThreshold, "prepowerTime", prepowerTime, "releaseTime", releaseTime, "sampleRate", sampleRate, "silenceThreshold", silenceThreshold);
 }
 val GapsDetector::compute(std::vector<float>& input_frame) {
 	_gapsdetector->input("frame").set(input_frame);
@@ -1782,14 +1721,13 @@ _gapsdetector->reset();
 // START GeometricMean definitions
 // check https://essentia.upf.edu/reference/std_GeometricMean.html
 GeometricMean::GeometricMean() {
-	configure();
+	_geometricmean = AlgorithmFactory::create("GeometricMean");
 }
 GeometricMean::~GeometricMean() {
-	delete _geometricmean;
+	if (_geometricmean) delete _geometricmean;
 }
 void GeometricMean::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_geometricmean = factory.create("GeometricMean");
+	_geometricmean->configure();
 }
 val GeometricMean::compute(std::vector<float>& input_array) {
 	_geometricmean->input("array").set(input_array);
@@ -1808,14 +1746,13 @@ _geometricmean->reset();
 // START HFC definitions
 // check https://essentia.upf.edu/reference/std_HFC.html
 HFC::HFC(const float sampleRate, const std::string& type) {
-	configure(sampleRate, type);
+	_hfc = AlgorithmFactory::create("HFC", "sampleRate", sampleRate, "type", type);
 }
 HFC::~HFC() {
-	delete _hfc;
+	if (_hfc) delete _hfc;
 }
 void HFC::configure(const float sampleRate, const std::string& type) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_hfc = factory.create("HFC", "sampleRate", sampleRate, "type", type);
+	_hfc->configure("sampleRate", sampleRate, "type", type);
 }
 val HFC::compute(std::vector<float>& input_spectrum) {
 	_hfc->input("spectrum").set(input_spectrum);
@@ -1834,14 +1771,13 @@ _hfc->reset();
 // START HPCP definitions
 // check https://essentia.upf.edu/reference/std_HPCP.html
 HPCP::HPCP(const bool bandPreset, const float bandSplitFrequency, const int harmonics, const float maxFrequency, const bool maxShifted, const float minFrequency, const bool nonLinear, const std::string& normalized, const float referenceFrequency, const float sampleRate, const int size, const std::string& weightType, const float windowSize) {
-	configure(bandPreset, bandSplitFrequency, harmonics, maxFrequency, maxShifted, minFrequency, nonLinear, normalized, referenceFrequency, sampleRate, size, weightType, windowSize);
+	_hpcp = AlgorithmFactory::create("HPCP", "bandPreset", bandPreset, "bandSplitFrequency", bandSplitFrequency, "harmonics", harmonics, "maxFrequency", maxFrequency, "maxShifted", maxShifted, "minFrequency", minFrequency, "nonLinear", nonLinear, "normalized", normalized, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate, "size", size, "weightType", weightType, "windowSize", windowSize);
 }
 HPCP::~HPCP() {
-	delete _hpcp;
+	if (_hpcp) delete _hpcp;
 }
 void HPCP::configure(const bool bandPreset, const float bandSplitFrequency, const int harmonics, const float maxFrequency, const bool maxShifted, const float minFrequency, const bool nonLinear, const std::string& normalized, const float referenceFrequency, const float sampleRate, const int size, const std::string& weightType, const float windowSize) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_hpcp = factory.create("HPCP", "bandPreset", bandPreset, "bandSplitFrequency", bandSplitFrequency, "harmonics", harmonics, "maxFrequency", maxFrequency, "maxShifted", maxShifted, "minFrequency", minFrequency, "nonLinear", nonLinear, "normalized", normalized, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate, "size", size, "weightType", weightType, "windowSize", windowSize);
+	_hpcp->configure("bandPreset", bandPreset, "bandSplitFrequency", bandSplitFrequency, "harmonics", harmonics, "maxFrequency", maxFrequency, "maxShifted", maxShifted, "minFrequency", minFrequency, "nonLinear", nonLinear, "normalized", normalized, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate, "size", size, "weightType", weightType, "windowSize", windowSize);
 }
 val HPCP::compute(std::vector<float>& input_frequencies, std::vector<float>& input_magnitudes) {
 	_hpcp->input("frequencies").set(input_frequencies);
@@ -1861,14 +1797,13 @@ _hpcp->reset();
 // START HarmonicBpm definitions
 // check https://essentia.upf.edu/reference/std_HarmonicBpm.html
 HarmonicBpm::HarmonicBpm(const float bpm, const float threshold, const float tolerance) {
-	configure(bpm, threshold, tolerance);
+	_harmonicbpm = AlgorithmFactory::create("HarmonicBpm", "bpm", bpm, "threshold", threshold, "tolerance", tolerance);
 }
 HarmonicBpm::~HarmonicBpm() {
-	delete _harmonicbpm;
+	if (_harmonicbpm) delete _harmonicbpm;
 }
 void HarmonicBpm::configure(const float bpm, const float threshold, const float tolerance) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_harmonicbpm = factory.create("HarmonicBpm", "bpm", bpm, "threshold", threshold, "tolerance", tolerance);
+	_harmonicbpm->configure("bpm", bpm, "threshold", threshold, "tolerance", tolerance);
 }
 val HarmonicBpm::compute(std::vector<float>& input_bpms) {
 	_harmonicbpm->input("bpms").set(input_bpms);
@@ -1887,14 +1822,13 @@ _harmonicbpm->reset();
 // START HarmonicPeaks definitions
 // check https://essentia.upf.edu/reference/std_HarmonicPeaks.html
 HarmonicPeaks::HarmonicPeaks(const int maxHarmonics, const float tolerance) {
-	configure(maxHarmonics, tolerance);
+	_harmonicpeaks = AlgorithmFactory::create("HarmonicPeaks", "maxHarmonics", maxHarmonics, "tolerance", tolerance);
 }
 HarmonicPeaks::~HarmonicPeaks() {
-	delete _harmonicpeaks;
+	if (_harmonicpeaks) delete _harmonicpeaks;
 }
 void HarmonicPeaks::configure(const int maxHarmonics, const float tolerance) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_harmonicpeaks = factory.create("HarmonicPeaks", "maxHarmonics", maxHarmonics, "tolerance", tolerance);
+	_harmonicpeaks->configure("maxHarmonics", maxHarmonics, "tolerance", tolerance);
 }
 val HarmonicPeaks::compute(std::vector<float>& input_frequencies, std::vector<float>& input_magnitudes, float input_pitch) {
 	_harmonicpeaks->input("frequencies").set(input_frequencies);
@@ -1918,14 +1852,13 @@ _harmonicpeaks->reset();
 // START HighPass definitions
 // check https://essentia.upf.edu/reference/std_HighPass.html
 HighPass::HighPass(const float cutoffFrequency, const float sampleRate) {
-	configure(cutoffFrequency, sampleRate);
+	_highpass = AlgorithmFactory::create("HighPass", "cutoffFrequency", cutoffFrequency, "sampleRate", sampleRate);
 }
 HighPass::~HighPass() {
-	delete _highpass;
+	if (_highpass) delete _highpass;
 }
 void HighPass::configure(const float cutoffFrequency, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_highpass = factory.create("HighPass", "cutoffFrequency", cutoffFrequency, "sampleRate", sampleRate);
+	_highpass->configure("cutoffFrequency", cutoffFrequency, "sampleRate", sampleRate);
 }
 val HighPass::compute(std::vector<float>& input_signal) {
 	_highpass->input("signal").set(input_signal);
@@ -1944,14 +1877,13 @@ _highpass->reset();
 // START HighResolutionFeatures definitions
 // check https://essentia.upf.edu/reference/std_HighResolutionFeatures.html
 HighResolutionFeatures::HighResolutionFeatures(const int maxPeaks) {
-	configure(maxPeaks);
+	_highresolutionfeatures = AlgorithmFactory::create("HighResolutionFeatures", "maxPeaks", maxPeaks);
 }
 HighResolutionFeatures::~HighResolutionFeatures() {
-	delete _highresolutionfeatures;
+	if (_highresolutionfeatures) delete _highresolutionfeatures;
 }
 void HighResolutionFeatures::configure(const int maxPeaks) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_highresolutionfeatures = factory.create("HighResolutionFeatures", "maxPeaks", maxPeaks);
+	_highresolutionfeatures->configure("maxPeaks", maxPeaks);
 }
 val HighResolutionFeatures::compute(std::vector<float>& input_hpcp) {
 	_highresolutionfeatures->input("hpcp").set(input_hpcp);
@@ -1976,14 +1908,13 @@ _highresolutionfeatures->reset();
 // START Histogram definitions
 // check https://essentia.upf.edu/reference/std_Histogram.html
 Histogram::Histogram(const float maxValue, const float minValue, const std::string& normalize, const int numberBins) {
-	configure(maxValue, minValue, normalize, numberBins);
+	_histogram = AlgorithmFactory::create("Histogram", "maxValue", maxValue, "minValue", minValue, "normalize", normalize, "numberBins", numberBins);
 }
 Histogram::~Histogram() {
-	delete _histogram;
+	if (_histogram) delete _histogram;
 }
 void Histogram::configure(const float maxValue, const float minValue, const std::string& normalize, const int numberBins) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_histogram = factory.create("Histogram", "maxValue", maxValue, "minValue", minValue, "normalize", normalize, "numberBins", numberBins);
+	_histogram->configure("maxValue", maxValue, "minValue", minValue, "normalize", normalize, "numberBins", numberBins);
 }
 val Histogram::compute(std::vector<float>& input_array) {
 	_histogram->input("array").set(input_array);
@@ -2005,14 +1936,13 @@ _histogram->reset();
 // START HprModelAnal definitions
 // check https://essentia.upf.edu/reference/std_HprModelAnal.html
 HprModelAnal::HprModelAnal(const int fftSize, const int freqDevOffset, const float freqDevSlope, const float harmDevSlope, const int hopSize, const float magnitudeThreshold, const float maxFrequency, const int maxPeaks, const int maxnSines, const float minFrequency, const int nHarmonics, const std::string& orderBy, const float sampleRate, const float stocf) {
-	configure(fftSize, freqDevOffset, freqDevSlope, harmDevSlope, hopSize, magnitudeThreshold, maxFrequency, maxPeaks, maxnSines, minFrequency, nHarmonics, orderBy, sampleRate, stocf);
+	_hprmodelanal = AlgorithmFactory::create("HprModelAnal", "fftSize", fftSize, "freqDevOffset", freqDevOffset, "freqDevSlope", freqDevSlope, "harmDevSlope", harmDevSlope, "hopSize", hopSize, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "maxPeaks", maxPeaks, "maxnSines", maxnSines, "minFrequency", minFrequency, "nHarmonics", nHarmonics, "orderBy", orderBy, "sampleRate", sampleRate, "stocf", stocf);
 }
 HprModelAnal::~HprModelAnal() {
-	delete _hprmodelanal;
+	if (_hprmodelanal) delete _hprmodelanal;
 }
 void HprModelAnal::configure(const int fftSize, const int freqDevOffset, const float freqDevSlope, const float harmDevSlope, const int hopSize, const float magnitudeThreshold, const float maxFrequency, const int maxPeaks, const int maxnSines, const float minFrequency, const int nHarmonics, const std::string& orderBy, const float sampleRate, const float stocf) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_hprmodelanal = factory.create("HprModelAnal", "fftSize", fftSize, "freqDevOffset", freqDevOffset, "freqDevSlope", freqDevSlope, "harmDevSlope", harmDevSlope, "hopSize", hopSize, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "maxPeaks", maxPeaks, "maxnSines", maxnSines, "minFrequency", minFrequency, "nHarmonics", nHarmonics, "orderBy", orderBy, "sampleRate", sampleRate, "stocf", stocf);
+	_hprmodelanal->configure("fftSize", fftSize, "freqDevOffset", freqDevOffset, "freqDevSlope", freqDevSlope, "harmDevSlope", harmDevSlope, "hopSize", hopSize, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "maxPeaks", maxPeaks, "maxnSines", maxnSines, "minFrequency", minFrequency, "nHarmonics", nHarmonics, "orderBy", orderBy, "sampleRate", sampleRate, "stocf", stocf);
 }
 val HprModelAnal::compute(std::vector<float>& input_frame, float input_pitch) {
 	_hprmodelanal->input("frame").set(input_frame);
@@ -2041,14 +1971,13 @@ _hprmodelanal->reset();
 // START HpsModelAnal definitions
 // check https://essentia.upf.edu/reference/std_HpsModelAnal.html
 HpsModelAnal::HpsModelAnal(const int fftSize, const int freqDevOffset, const float freqDevSlope, const float harmDevSlope, const int hopSize, const float magnitudeThreshold, const float maxFrequency, const int maxPeaks, const int maxnSines, const float minFrequency, const int nHarmonics, const std::string& orderBy, const float sampleRate, const float stocf) {
-	configure(fftSize, freqDevOffset, freqDevSlope, harmDevSlope, hopSize, magnitudeThreshold, maxFrequency, maxPeaks, maxnSines, minFrequency, nHarmonics, orderBy, sampleRate, stocf);
+	_hpsmodelanal = AlgorithmFactory::create("HpsModelAnal", "fftSize", fftSize, "freqDevOffset", freqDevOffset, "freqDevSlope", freqDevSlope, "harmDevSlope", harmDevSlope, "hopSize", hopSize, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "maxPeaks", maxPeaks, "maxnSines", maxnSines, "minFrequency", minFrequency, "nHarmonics", nHarmonics, "orderBy", orderBy, "sampleRate", sampleRate, "stocf", stocf);
 }
 HpsModelAnal::~HpsModelAnal() {
-	delete _hpsmodelanal;
+	if (_hpsmodelanal) delete _hpsmodelanal;
 }
 void HpsModelAnal::configure(const int fftSize, const int freqDevOffset, const float freqDevSlope, const float harmDevSlope, const int hopSize, const float magnitudeThreshold, const float maxFrequency, const int maxPeaks, const int maxnSines, const float minFrequency, const int nHarmonics, const std::string& orderBy, const float sampleRate, const float stocf) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_hpsmodelanal = factory.create("HpsModelAnal", "fftSize", fftSize, "freqDevOffset", freqDevOffset, "freqDevSlope", freqDevSlope, "harmDevSlope", harmDevSlope, "hopSize", hopSize, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "maxPeaks", maxPeaks, "maxnSines", maxnSines, "minFrequency", minFrequency, "nHarmonics", nHarmonics, "orderBy", orderBy, "sampleRate", sampleRate, "stocf", stocf);
+	_hpsmodelanal->configure("fftSize", fftSize, "freqDevOffset", freqDevOffset, "freqDevSlope", freqDevSlope, "harmDevSlope", harmDevSlope, "hopSize", hopSize, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "maxPeaks", maxPeaks, "maxnSines", maxnSines, "minFrequency", minFrequency, "nHarmonics", nHarmonics, "orderBy", orderBy, "sampleRate", sampleRate, "stocf", stocf);
 }
 val HpsModelAnal::compute(std::vector<float>& input_frame, float input_pitch) {
 	_hpsmodelanal->input("frame").set(input_frame);
@@ -2077,14 +2006,13 @@ _hpsmodelanal->reset();
 // START IDCT definitions
 // check https://essentia.upf.edu/reference/std_IDCT.html
 IDCT::IDCT(const int dctType, const int inputSize, const int liftering, const int outputSize) {
-	configure(dctType, inputSize, liftering, outputSize);
+	_idct = AlgorithmFactory::create("IDCT", "dctType", dctType, "inputSize", inputSize, "liftering", liftering, "outputSize", outputSize);
 }
 IDCT::~IDCT() {
-	delete _idct;
+	if (_idct) delete _idct;
 }
 void IDCT::configure(const int dctType, const int inputSize, const int liftering, const int outputSize) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_idct = factory.create("IDCT", "dctType", dctType, "inputSize", inputSize, "liftering", liftering, "outputSize", outputSize);
+	_idct->configure("dctType", dctType, "inputSize", inputSize, "liftering", liftering, "outputSize", outputSize);
 }
 val IDCT::compute(std::vector<float>& input_dct) {
 	_idct->input("dct").set(input_dct);
@@ -2103,14 +2031,13 @@ _idct->reset();
 // START IIR definitions
 // check https://essentia.upf.edu/reference/std_IIR.html
 IIR::IIR(const std::vector<float>& denominator, const std::vector<float>& numerator) {
-	configure(denominator, numerator);
+	_iir = AlgorithmFactory::create("IIR", "denominator", denominator, "numerator", numerator);
 }
 IIR::~IIR() {
-	delete _iir;
+	if (_iir) delete _iir;
 }
 void IIR::configure(const std::vector<float>& denominator, const std::vector<float>& numerator) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_iir = factory.create("IIR", "denominator", denominator, "numerator", numerator);
+	_iir->configure("denominator", denominator, "numerator", numerator);
 }
 val IIR::compute(std::vector<float>& input_signal) {
 	_iir->input("signal").set(input_signal);
@@ -2129,14 +2056,13 @@ _iir->reset();
 // START Inharmonicity definitions
 // check https://essentia.upf.edu/reference/std_Inharmonicity.html
 Inharmonicity::Inharmonicity() {
-	configure();
+	_inharmonicity = AlgorithmFactory::create("Inharmonicity");
 }
 Inharmonicity::~Inharmonicity() {
-	delete _inharmonicity;
+	if (_inharmonicity) delete _inharmonicity;
 }
 void Inharmonicity::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_inharmonicity = factory.create("Inharmonicity");
+	_inharmonicity->configure();
 }
 val Inharmonicity::compute(std::vector<float>& input_frequencies, std::vector<float>& input_magnitudes) {
 	_inharmonicity->input("frequencies").set(input_frequencies);
@@ -2156,14 +2082,13 @@ _inharmonicity->reset();
 // START InstantPower definitions
 // check https://essentia.upf.edu/reference/std_InstantPower.html
 InstantPower::InstantPower() {
-	configure();
+	_instantpower = AlgorithmFactory::create("InstantPower");
 }
 InstantPower::~InstantPower() {
-	delete _instantpower;
+	if (_instantpower) delete _instantpower;
 }
 void InstantPower::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_instantpower = factory.create("InstantPower");
+	_instantpower->configure();
 }
 val InstantPower::compute(std::vector<float>& input_array) {
 	_instantpower->input("array").set(input_array);
@@ -2182,14 +2107,13 @@ _instantpower->reset();
 // START Intensity definitions
 // check https://essentia.upf.edu/reference/std_Intensity.html
 Intensity::Intensity(const float sampleRate) {
-	configure(sampleRate);
+	_intensity = AlgorithmFactory::create("Intensity", "sampleRate", sampleRate);
 }
 Intensity::~Intensity() {
-	delete _intensity;
+	if (_intensity) delete _intensity;
 }
 void Intensity::configure(const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_intensity = factory.create("Intensity", "sampleRate", sampleRate);
+	_intensity->configure("sampleRate", sampleRate);
 }
 val Intensity::compute(std::vector<float>& input_signal) {
 	_intensity->input("signal").set(input_signal);
@@ -2208,14 +2132,13 @@ _intensity->reset();
 // START Key definitions
 // check https://essentia.upf.edu/reference/std_Key.html
 Key::Key(const int numHarmonics, const int pcpSize, const std::string& profileType, const float slope, const bool useMajMin, const bool usePolyphony, const bool useThreeChords) {
-	configure(numHarmonics, pcpSize, profileType, slope, useMajMin, usePolyphony, useThreeChords);
+	_key = AlgorithmFactory::create("Key", "numHarmonics", numHarmonics, "pcpSize", pcpSize, "profileType", profileType, "slope", slope, "useMajMin", useMajMin, "usePolyphony", usePolyphony, "useThreeChords", useThreeChords);
 }
 Key::~Key() {
-	delete _key;
+	if (_key) delete _key;
 }
 void Key::configure(const int numHarmonics, const int pcpSize, const std::string& profileType, const float slope, const bool useMajMin, const bool usePolyphony, const bool useThreeChords) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_key = factory.create("Key", "numHarmonics", numHarmonics, "pcpSize", pcpSize, "profileType", profileType, "slope", slope, "useMajMin", useMajMin, "usePolyphony", usePolyphony, "useThreeChords", useThreeChords);
+	_key->configure("numHarmonics", numHarmonics, "pcpSize", pcpSize, "profileType", profileType, "slope", slope, "useMajMin", useMajMin, "usePolyphony", usePolyphony, "useThreeChords", useThreeChords);
 }
 val Key::compute(std::vector<float>& input_pcp) {
 	_key->input("pcp").set(input_pcp);
@@ -2243,14 +2166,13 @@ _key->reset();
 // START KeyExtractor definitions
 // check https://essentia.upf.edu/reference/std_KeyExtractor.html
 KeyExtractor::KeyExtractor(const bool averageDetuningCorrection, const int frameSize, const int hopSize, const int hpcpSize, const float maxFrequency, const int maximumSpectralPeaks, const float minFrequency, const float pcpThreshold, const std::string& profileType, const float sampleRate, const float spectralPeaksThreshold, const float tuningFrequency, const std::string& weightType, const std::string& windowType) {
-	configure(averageDetuningCorrection, frameSize, hopSize, hpcpSize, maxFrequency, maximumSpectralPeaks, minFrequency, pcpThreshold, profileType, sampleRate, spectralPeaksThreshold, tuningFrequency, weightType, windowType);
+	_keyextractor = AlgorithmFactory::create("KeyExtractor", "averageDetuningCorrection", averageDetuningCorrection, "frameSize", frameSize, "hopSize", hopSize, "hpcpSize", hpcpSize, "maxFrequency", maxFrequency, "maximumSpectralPeaks", maximumSpectralPeaks, "minFrequency", minFrequency, "pcpThreshold", pcpThreshold, "profileType", profileType, "sampleRate", sampleRate, "spectralPeaksThreshold", spectralPeaksThreshold, "tuningFrequency", tuningFrequency, "weightType", weightType, "windowType", windowType);
 }
 KeyExtractor::~KeyExtractor() {
-	delete _keyextractor;
+	if (_keyextractor) delete _keyextractor;
 }
 void KeyExtractor::configure(const bool averageDetuningCorrection, const int frameSize, const int hopSize, const int hpcpSize, const float maxFrequency, const int maximumSpectralPeaks, const float minFrequency, const float pcpThreshold, const std::string& profileType, const float sampleRate, const float spectralPeaksThreshold, const float tuningFrequency, const std::string& weightType, const std::string& windowType) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_keyextractor = factory.create("KeyExtractor", "averageDetuningCorrection", averageDetuningCorrection, "frameSize", frameSize, "hopSize", hopSize, "hpcpSize", hpcpSize, "maxFrequency", maxFrequency, "maximumSpectralPeaks", maximumSpectralPeaks, "minFrequency", minFrequency, "pcpThreshold", pcpThreshold, "profileType", profileType, "sampleRate", sampleRate, "spectralPeaksThreshold", spectralPeaksThreshold, "tuningFrequency", tuningFrequency, "weightType", weightType, "windowType", windowType);
+	_keyextractor->configure("averageDetuningCorrection", averageDetuningCorrection, "frameSize", frameSize, "hopSize", hopSize, "hpcpSize", hpcpSize, "maxFrequency", maxFrequency, "maximumSpectralPeaks", maximumSpectralPeaks, "minFrequency", minFrequency, "pcpThreshold", pcpThreshold, "profileType", profileType, "sampleRate", sampleRate, "spectralPeaksThreshold", spectralPeaksThreshold, "tuningFrequency", tuningFrequency, "weightType", weightType, "windowType", windowType);
 }
 val KeyExtractor::compute(std::vector<float>& input_audio) {
 	_keyextractor->input("audio").set(input_audio);
@@ -2275,14 +2197,13 @@ _keyextractor->reset();
 // START LPC definitions
 // check https://essentia.upf.edu/reference/std_LPC.html
 LPC::LPC(const int order, const float sampleRate, const std::string& type) {
-	configure(order, sampleRate, type);
+	_lpc = AlgorithmFactory::create("LPC", "order", order, "sampleRate", sampleRate, "type", type);
 }
 LPC::~LPC() {
-	delete _lpc;
+	if (_lpc) delete _lpc;
 }
 void LPC::configure(const int order, const float sampleRate, const std::string& type) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_lpc = factory.create("LPC", "order", order, "sampleRate", sampleRate, "type", type);
+	_lpc->configure("order", order, "sampleRate", sampleRate, "type", type);
 }
 val LPC::compute(std::vector<float>& input_frame) {
 	_lpc->input("frame").set(input_frame);
@@ -2304,14 +2225,13 @@ _lpc->reset();
 // START Larm definitions
 // check https://essentia.upf.edu/reference/std_Larm.html
 Larm::Larm(const float attackTime, const float power, const float releaseTime, const float sampleRate) {
-	configure(attackTime, power, releaseTime, sampleRate);
+	_larm = AlgorithmFactory::create("Larm", "attackTime", attackTime, "power", power, "releaseTime", releaseTime, "sampleRate", sampleRate);
 }
 Larm::~Larm() {
-	delete _larm;
+	if (_larm) delete _larm;
 }
 void Larm::configure(const float attackTime, const float power, const float releaseTime, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_larm = factory.create("Larm", "attackTime", attackTime, "power", power, "releaseTime", releaseTime, "sampleRate", sampleRate);
+	_larm->configure("attackTime", attackTime, "power", power, "releaseTime", releaseTime, "sampleRate", sampleRate);
 }
 val Larm::compute(std::vector<float>& input_signal) {
 	_larm->input("signal").set(input_signal);
@@ -2330,14 +2250,13 @@ _larm->reset();
 // START Leq definitions
 // check https://essentia.upf.edu/reference/std_Leq.html
 Leq::Leq() {
-	configure();
+	_leq = AlgorithmFactory::create("Leq");
 }
 Leq::~Leq() {
-	delete _leq;
+	if (_leq) delete _leq;
 }
 void Leq::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_leq = factory.create("Leq");
+	_leq->configure();
 }
 val Leq::compute(std::vector<float>& input_signal) {
 	_leq->input("signal").set(input_signal);
@@ -2356,14 +2275,13 @@ _leq->reset();
 // START LevelExtractor definitions
 // check https://essentia.upf.edu/reference/std_LevelExtractor.html
 LevelExtractor::LevelExtractor(const int frameSize, const int hopSize) {
-	configure(frameSize, hopSize);
+	_levelextractor = AlgorithmFactory::create("LevelExtractor", "frameSize", frameSize, "hopSize", hopSize);
 }
 LevelExtractor::~LevelExtractor() {
-	delete _levelextractor;
+	if (_levelextractor) delete _levelextractor;
 }
 void LevelExtractor::configure(const int frameSize, const int hopSize) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_levelextractor = factory.create("LevelExtractor", "frameSize", frameSize, "hopSize", hopSize);
+	_levelextractor->configure("frameSize", frameSize, "hopSize", hopSize);
 }
 val LevelExtractor::compute(std::vector<float>& input_signal) {
 	_levelextractor->input("signal").set(input_signal);
@@ -2382,14 +2300,13 @@ _levelextractor->reset();
 // START LogAttackTime definitions
 // check https://essentia.upf.edu/reference/std_LogAttackTime.html
 LogAttackTime::LogAttackTime(const float sampleRate, const float startAttackThreshold, const float stopAttackThreshold) {
-	configure(sampleRate, startAttackThreshold, stopAttackThreshold);
+	_logattacktime = AlgorithmFactory::create("LogAttackTime", "sampleRate", sampleRate, "startAttackThreshold", startAttackThreshold, "stopAttackThreshold", stopAttackThreshold);
 }
 LogAttackTime::~LogAttackTime() {
-	delete _logattacktime;
+	if (_logattacktime) delete _logattacktime;
 }
 void LogAttackTime::configure(const float sampleRate, const float startAttackThreshold, const float stopAttackThreshold) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_logattacktime = factory.create("LogAttackTime", "sampleRate", sampleRate, "startAttackThreshold", startAttackThreshold, "stopAttackThreshold", stopAttackThreshold);
+	_logattacktime->configure("sampleRate", sampleRate, "startAttackThreshold", startAttackThreshold, "stopAttackThreshold", stopAttackThreshold);
 }
 val LogAttackTime::compute(std::vector<float>& input_signal) {
 	_logattacktime->input("signal").set(input_signal);
@@ -2414,14 +2331,13 @@ _logattacktime->reset();
 // START LogSpectrum definitions
 // check https://essentia.upf.edu/reference/std_LogSpectrum.html
 LogSpectrum::LogSpectrum(const float binsPerSemitone, const int frameSize, const int nOctave, const float rollOn, const float sampleRate) {
-	configure(binsPerSemitone, frameSize, nOctave, rollOn, sampleRate);
+	_logspectrum = AlgorithmFactory::create("LogSpectrum", "binsPerSemitone", binsPerSemitone, "frameSize", frameSize, "nOctave", nOctave, "rollOn", rollOn, "sampleRate", sampleRate);
 }
 LogSpectrum::~LogSpectrum() {
-	delete _logspectrum;
+	if (_logspectrum) delete _logspectrum;
 }
 void LogSpectrum::configure(const float binsPerSemitone, const int frameSize, const int nOctave, const float rollOn, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_logspectrum = factory.create("LogSpectrum", "binsPerSemitone", binsPerSemitone, "frameSize", frameSize, "nOctave", nOctave, "rollOn", rollOn, "sampleRate", sampleRate);
+	_logspectrum->configure("binsPerSemitone", binsPerSemitone, "frameSize", frameSize, "nOctave", nOctave, "rollOn", rollOn, "sampleRate", sampleRate);
 }
 val LogSpectrum::compute(std::vector<float>& input_spectrum) {
 	_logspectrum->input("spectrum").set(input_spectrum);
@@ -2446,14 +2362,13 @@ _logspectrum->reset();
 // START LoopBpmConfidence definitions
 // check https://essentia.upf.edu/reference/std_LoopBpmConfidence.html
 LoopBpmConfidence::LoopBpmConfidence(const float sampleRate) {
-	configure(sampleRate);
+	_loopbpmconfidence = AlgorithmFactory::create("LoopBpmConfidence", "sampleRate", sampleRate);
 }
 LoopBpmConfidence::~LoopBpmConfidence() {
-	delete _loopbpmconfidence;
+	if (_loopbpmconfidence) delete _loopbpmconfidence;
 }
 void LoopBpmConfidence::configure(const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_loopbpmconfidence = factory.create("LoopBpmConfidence", "sampleRate", sampleRate);
+	_loopbpmconfidence->configure("sampleRate", sampleRate);
 }
 val LoopBpmConfidence::compute(std::vector<float>& input_signal, float input_bpmEstimate) {
 	_loopbpmconfidence->input("signal").set(input_signal);
@@ -2473,14 +2388,13 @@ _loopbpmconfidence->reset();
 // START LoopBpmEstimator definitions
 // check https://essentia.upf.edu/reference/std_LoopBpmEstimator.html
 LoopBpmEstimator::LoopBpmEstimator(const float confidenceThreshold) {
-	configure(confidenceThreshold);
+	_loopbpmestimator = AlgorithmFactory::create("LoopBpmEstimator", "confidenceThreshold", confidenceThreshold);
 }
 LoopBpmEstimator::~LoopBpmEstimator() {
-	delete _loopbpmestimator;
+	if (_loopbpmestimator) delete _loopbpmestimator;
 }
 void LoopBpmEstimator::configure(const float confidenceThreshold) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_loopbpmestimator = factory.create("LoopBpmEstimator", "confidenceThreshold", confidenceThreshold);
+	_loopbpmestimator->configure("confidenceThreshold", confidenceThreshold);
 }
 val LoopBpmEstimator::compute(std::vector<float>& input_signal) {
 	_loopbpmestimator->input("signal").set(input_signal);
@@ -2499,14 +2413,13 @@ _loopbpmestimator->reset();
 // START Loudness definitions
 // check https://essentia.upf.edu/reference/std_Loudness.html
 Loudness::Loudness() {
-	configure();
+	_loudness = AlgorithmFactory::create("Loudness");
 }
 Loudness::~Loudness() {
-	delete _loudness;
+	if (_loudness) delete _loudness;
 }
 void Loudness::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_loudness = factory.create("Loudness");
+	_loudness->configure();
 }
 val Loudness::compute(std::vector<float>& input_signal) {
 	_loudness->input("signal").set(input_signal);
@@ -2525,14 +2438,13 @@ _loudness->reset();
 // START LoudnessVickers definitions
 // check https://essentia.upf.edu/reference/std_LoudnessVickers.html
 LoudnessVickers::LoudnessVickers(const float sampleRate) {
-	configure(sampleRate);
+	_loudnessvickers = AlgorithmFactory::create("LoudnessVickers", "sampleRate", sampleRate);
 }
 LoudnessVickers::~LoudnessVickers() {
-	delete _loudnessvickers;
+	if (_loudnessvickers) delete _loudnessvickers;
 }
 void LoudnessVickers::configure(const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_loudnessvickers = factory.create("LoudnessVickers", "sampleRate", sampleRate);
+	_loudnessvickers->configure("sampleRate", sampleRate);
 }
 val LoudnessVickers::compute(std::vector<float>& input_signal) {
 	_loudnessvickers->input("signal").set(input_signal);
@@ -2551,14 +2463,13 @@ _loudnessvickers->reset();
 // START LowLevelSpectralEqloudExtractor definitions
 // check https://essentia.upf.edu/reference/std_LowLevelSpectralEqloudExtractor.html
 LowLevelSpectralEqloudExtractor::LowLevelSpectralEqloudExtractor(const int frameSize, const int hopSize, const float sampleRate) {
-	configure(frameSize, hopSize, sampleRate);
+	_lowlevelspectraleqloudextractor = AlgorithmFactory::create("LowLevelSpectralEqloudExtractor", "frameSize", frameSize, "hopSize", hopSize, "sampleRate", sampleRate);
 }
 LowLevelSpectralEqloudExtractor::~LowLevelSpectralEqloudExtractor() {
-	delete _lowlevelspectraleqloudextractor;
+	if (_lowlevelspectraleqloudextractor) delete _lowlevelspectraleqloudextractor;
 }
 void LowLevelSpectralEqloudExtractor::configure(const int frameSize, const int hopSize, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_lowlevelspectraleqloudextractor = factory.create("LowLevelSpectralEqloudExtractor", "frameSize", frameSize, "hopSize", hopSize, "sampleRate", sampleRate);
+	_lowlevelspectraleqloudextractor->configure("frameSize", frameSize, "hopSize", hopSize, "sampleRate", sampleRate);
 }
 val LowLevelSpectralEqloudExtractor::compute(std::vector<float>& input_signal) {
 	_lowlevelspectraleqloudextractor->input("signal").set(input_signal);
@@ -2595,14 +2506,13 @@ _lowlevelspectraleqloudextractor->reset();
 // START LowLevelSpectralExtractor definitions
 // check https://essentia.upf.edu/reference/std_LowLevelSpectralExtractor.html
 LowLevelSpectralExtractor::LowLevelSpectralExtractor(const int frameSize, const int hopSize, const float sampleRate) {
-	configure(frameSize, hopSize, sampleRate);
+	_lowlevelspectralextractor = AlgorithmFactory::create("LowLevelSpectralExtractor", "frameSize", frameSize, "hopSize", hopSize, "sampleRate", sampleRate);
 }
 LowLevelSpectralExtractor::~LowLevelSpectralExtractor() {
-	delete _lowlevelspectralextractor;
+	if (_lowlevelspectralextractor) delete _lowlevelspectralextractor;
 }
 void LowLevelSpectralExtractor::configure(const int frameSize, const int hopSize, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_lowlevelspectralextractor = factory.create("LowLevelSpectralExtractor", "frameSize", frameSize, "hopSize", hopSize, "sampleRate", sampleRate);
+	_lowlevelspectralextractor->configure("frameSize", frameSize, "hopSize", hopSize, "sampleRate", sampleRate);
 }
 val LowLevelSpectralExtractor::compute(std::vector<float>& input_signal) {
 	_lowlevelspectralextractor->input("signal").set(input_signal);
@@ -2705,14 +2615,13 @@ _lowlevelspectralextractor->reset();
 // START LowPass definitions
 // check https://essentia.upf.edu/reference/std_LowPass.html
 LowPass::LowPass(const float cutoffFrequency, const float sampleRate) {
-	configure(cutoffFrequency, sampleRate);
+	_lowpass = AlgorithmFactory::create("LowPass", "cutoffFrequency", cutoffFrequency, "sampleRate", sampleRate);
 }
 LowPass::~LowPass() {
-	delete _lowpass;
+	if (_lowpass) delete _lowpass;
 }
 void LowPass::configure(const float cutoffFrequency, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_lowpass = factory.create("LowPass", "cutoffFrequency", cutoffFrequency, "sampleRate", sampleRate);
+	_lowpass->configure("cutoffFrequency", cutoffFrequency, "sampleRate", sampleRate);
 }
 val LowPass::compute(std::vector<float>& input_signal) {
 	_lowpass->input("signal").set(input_signal);
@@ -2731,14 +2640,13 @@ _lowpass->reset();
 // START MFCC definitions
 // check https://essentia.upf.edu/reference/std_MFCC.html
 MFCC::MFCC(const int dctType, const float highFrequencyBound, const int inputSize, const int liftering, const std::string& logType, const float lowFrequencyBound, const std::string& normalize, const int numberBands, const int numberCoefficients, const float sampleRate, const float silenceThreshold, const std::string& type, const std::string& warpingFormula, const std::string& weighting) {
-	configure(dctType, highFrequencyBound, inputSize, liftering, logType, lowFrequencyBound, normalize, numberBands, numberCoefficients, sampleRate, silenceThreshold, type, warpingFormula, weighting);
+	_mfcc = AlgorithmFactory::create("MFCC", "dctType", dctType, "highFrequencyBound", highFrequencyBound, "inputSize", inputSize, "liftering", liftering, "logType", logType, "lowFrequencyBound", lowFrequencyBound, "normalize", normalize, "numberBands", numberBands, "numberCoefficients", numberCoefficients, "sampleRate", sampleRate, "silenceThreshold", silenceThreshold, "type", type, "warpingFormula", warpingFormula, "weighting", weighting);
 }
 MFCC::~MFCC() {
-	delete _mfcc;
+	if (_mfcc) delete _mfcc;
 }
 void MFCC::configure(const int dctType, const float highFrequencyBound, const int inputSize, const int liftering, const std::string& logType, const float lowFrequencyBound, const std::string& normalize, const int numberBands, const int numberCoefficients, const float sampleRate, const float silenceThreshold, const std::string& type, const std::string& warpingFormula, const std::string& weighting) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_mfcc = factory.create("MFCC", "dctType", dctType, "highFrequencyBound", highFrequencyBound, "inputSize", inputSize, "liftering", liftering, "logType", logType, "lowFrequencyBound", lowFrequencyBound, "normalize", normalize, "numberBands", numberBands, "numberCoefficients", numberCoefficients, "sampleRate", sampleRate, "silenceThreshold", silenceThreshold, "type", type, "warpingFormula", warpingFormula, "weighting", weighting);
+	_mfcc->configure("dctType", dctType, "highFrequencyBound", highFrequencyBound, "inputSize", inputSize, "liftering", liftering, "logType", logType, "lowFrequencyBound", lowFrequencyBound, "normalize", normalize, "numberBands", numberBands, "numberCoefficients", numberCoefficients, "sampleRate", sampleRate, "silenceThreshold", silenceThreshold, "type", type, "warpingFormula", warpingFormula, "weighting", weighting);
 }
 val MFCC::compute(std::vector<float>& input_spectrum) {
 	_mfcc->input("spectrum").set(input_spectrum);
@@ -2760,14 +2668,13 @@ _mfcc->reset();
 // START MaxFilter definitions
 // check https://essentia.upf.edu/reference/std_MaxFilter.html
 MaxFilter::MaxFilter(const bool causal, const int width) {
-	configure(causal, width);
+	_maxfilter = AlgorithmFactory::create("MaxFilter", "causal", causal, "width", width);
 }
 MaxFilter::~MaxFilter() {
-	delete _maxfilter;
+	if (_maxfilter) delete _maxfilter;
 }
 void MaxFilter::configure(const bool causal, const int width) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_maxfilter = factory.create("MaxFilter", "causal", causal, "width", width);
+	_maxfilter->configure("causal", causal, "width", width);
 }
 val MaxFilter::compute(std::vector<float>& input_signal) {
 	_maxfilter->input("signal").set(input_signal);
@@ -2786,14 +2693,13 @@ _maxfilter->reset();
 // START MaxMagFreq definitions
 // check https://essentia.upf.edu/reference/std_MaxMagFreq.html
 MaxMagFreq::MaxMagFreq(const float sampleRate) {
-	configure(sampleRate);
+	_maxmagfreq = AlgorithmFactory::create("MaxMagFreq", "sampleRate", sampleRate);
 }
 MaxMagFreq::~MaxMagFreq() {
-	delete _maxmagfreq;
+	if (_maxmagfreq) delete _maxmagfreq;
 }
 void MaxMagFreq::configure(const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_maxmagfreq = factory.create("MaxMagFreq", "sampleRate", sampleRate);
+	_maxmagfreq->configure("sampleRate", sampleRate);
 }
 val MaxMagFreq::compute(std::vector<float>& input_spectrum) {
 	_maxmagfreq->input("spectrum").set(input_spectrum);
@@ -2812,14 +2718,13 @@ _maxmagfreq->reset();
 // START MaxToTotal definitions
 // check https://essentia.upf.edu/reference/std_MaxToTotal.html
 MaxToTotal::MaxToTotal() {
-	configure();
+	_maxtototal = AlgorithmFactory::create("MaxToTotal");
 }
 MaxToTotal::~MaxToTotal() {
-	delete _maxtototal;
+	if (_maxtototal) delete _maxtototal;
 }
 void MaxToTotal::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_maxtototal = factory.create("MaxToTotal");
+	_maxtototal->configure();
 }
 val MaxToTotal::compute(std::vector<float>& input_envelope) {
 	_maxtototal->input("envelope").set(input_envelope);
@@ -2838,14 +2743,13 @@ _maxtototal->reset();
 // START Mean definitions
 // check https://essentia.upf.edu/reference/std_Mean.html
 Mean::Mean() {
-	configure();
+	_mean = AlgorithmFactory::create("Mean");
 }
 Mean::~Mean() {
-	delete _mean;
+	if (_mean) delete _mean;
 }
 void Mean::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_mean = factory.create("Mean");
+	_mean->configure();
 }
 val Mean::compute(std::vector<float>& input_array) {
 	_mean->input("array").set(input_array);
@@ -2864,14 +2768,13 @@ _mean->reset();
 // START Median definitions
 // check https://essentia.upf.edu/reference/std_Median.html
 Median::Median() {
-	configure();
+	_median = AlgorithmFactory::create("Median");
 }
 Median::~Median() {
-	delete _median;
+	if (_median) delete _median;
 }
 void Median::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_median = factory.create("Median");
+	_median->configure();
 }
 val Median::compute(std::vector<float>& input_array) {
 	_median->input("array").set(input_array);
@@ -2890,14 +2793,13 @@ _median->reset();
 // START MedianFilter definitions
 // check https://essentia.upf.edu/reference/std_MedianFilter.html
 MedianFilter::MedianFilter(const int kernelSize) {
-	configure(kernelSize);
+	_medianfilter = AlgorithmFactory::create("MedianFilter", "kernelSize", kernelSize);
 }
 MedianFilter::~MedianFilter() {
-	delete _medianfilter;
+	if (_medianfilter) delete _medianfilter;
 }
 void MedianFilter::configure(const int kernelSize) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_medianfilter = factory.create("MedianFilter", "kernelSize", kernelSize);
+	_medianfilter->configure("kernelSize", kernelSize);
 }
 val MedianFilter::compute(std::vector<float>& input_array) {
 	_medianfilter->input("array").set(input_array);
@@ -2916,14 +2818,13 @@ _medianfilter->reset();
 // START MelBands definitions
 // check https://essentia.upf.edu/reference/std_MelBands.html
 MelBands::MelBands(const float highFrequencyBound, const int inputSize, const bool log, const float lowFrequencyBound, const std::string& normalize, const int numberBands, const float sampleRate, const std::string& type, const std::string& warpingFormula, const std::string& weighting) {
-	configure(highFrequencyBound, inputSize, log, lowFrequencyBound, normalize, numberBands, sampleRate, type, warpingFormula, weighting);
+	_melbands = AlgorithmFactory::create("MelBands", "highFrequencyBound", highFrequencyBound, "inputSize", inputSize, "log", log, "lowFrequencyBound", lowFrequencyBound, "normalize", normalize, "numberBands", numberBands, "sampleRate", sampleRate, "type", type, "warpingFormula", warpingFormula, "weighting", weighting);
 }
 MelBands::~MelBands() {
-	delete _melbands;
+	if (_melbands) delete _melbands;
 }
 void MelBands::configure(const float highFrequencyBound, const int inputSize, const bool log, const float lowFrequencyBound, const std::string& normalize, const int numberBands, const float sampleRate, const std::string& type, const std::string& warpingFormula, const std::string& weighting) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_melbands = factory.create("MelBands", "highFrequencyBound", highFrequencyBound, "inputSize", inputSize, "log", log, "lowFrequencyBound", lowFrequencyBound, "normalize", normalize, "numberBands", numberBands, "sampleRate", sampleRate, "type", type, "warpingFormula", warpingFormula, "weighting", weighting);
+	_melbands->configure("highFrequencyBound", highFrequencyBound, "inputSize", inputSize, "log", log, "lowFrequencyBound", lowFrequencyBound, "normalize", normalize, "numberBands", numberBands, "sampleRate", sampleRate, "type", type, "warpingFormula", warpingFormula, "weighting", weighting);
 }
 val MelBands::compute(std::vector<float>& input_spectrum) {
 	_melbands->input("spectrum").set(input_spectrum);
@@ -2942,14 +2843,13 @@ _melbands->reset();
 // START Meter definitions
 // check https://essentia.upf.edu/reference/std_Meter.html
 Meter::Meter() {
-	configure();
+	_meter = AlgorithmFactory::create("Meter");
 }
 Meter::~Meter() {
-	delete _meter;
+	if (_meter) delete _meter;
 }
 void Meter::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_meter = factory.create("Meter");
+	_meter->configure();
 }
 val Meter::compute(std::vector<std::vector<float> >& input_beatogram) {
 	_meter->input("beatogram").set(input_beatogram);
@@ -2968,14 +2868,13 @@ _meter->reset();
 // START MinMax definitions
 // check https://essentia.upf.edu/reference/std_MinMax.html
 MinMax::MinMax(const std::string& type) {
-	configure(type);
+	_minmax = AlgorithmFactory::create("MinMax", "type", type);
 }
 MinMax::~MinMax() {
-	delete _minmax;
+	if (_minmax) delete _minmax;
 }
 void MinMax::configure(const std::string& type) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_minmax = factory.create("MinMax", "type", type);
+	_minmax->configure("type", type);
 }
 val MinMax::compute(std::vector<float>& input_array) {
 	_minmax->input("array").set(input_array);
@@ -2997,14 +2896,13 @@ _minmax->reset();
 // START MinToTotal definitions
 // check https://essentia.upf.edu/reference/std_MinToTotal.html
 MinToTotal::MinToTotal() {
-	configure();
+	_mintototal = AlgorithmFactory::create("MinToTotal");
 }
 MinToTotal::~MinToTotal() {
-	delete _mintototal;
+	if (_mintototal) delete _mintototal;
 }
 void MinToTotal::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_mintototal = factory.create("MinToTotal");
+	_mintototal->configure();
 }
 val MinToTotal::compute(std::vector<float>& input_envelope) {
 	_mintototal->input("envelope").set(input_envelope);
@@ -3023,14 +2921,13 @@ _mintototal->reset();
 // START MovingAverage definitions
 // check https://essentia.upf.edu/reference/std_MovingAverage.html
 MovingAverage::MovingAverage(const int size) {
-	configure(size);
+	_movingaverage = AlgorithmFactory::create("MovingAverage", "size", size);
 }
 MovingAverage::~MovingAverage() {
-	delete _movingaverage;
+	if (_movingaverage) delete _movingaverage;
 }
 void MovingAverage::configure(const int size) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_movingaverage = factory.create("MovingAverage", "size", size);
+	_movingaverage->configure("size", size);
 }
 val MovingAverage::compute(std::vector<float>& input_signal) {
 	_movingaverage->input("signal").set(input_signal);
@@ -3049,14 +2946,13 @@ _movingaverage->reset();
 // START MultiPitchKlapuri definitions
 // check https://essentia.upf.edu/reference/std_MultiPitchKlapuri.html
 MultiPitchKlapuri::MultiPitchKlapuri(const float binResolution, const int frameSize, const float harmonicWeight, const int hopSize, const float magnitudeCompression, const int magnitudeThreshold, const float maxFrequency, const float minFrequency, const int numberHarmonics, const float referenceFrequency, const float sampleRate) {
-	configure(binResolution, frameSize, harmonicWeight, hopSize, magnitudeCompression, magnitudeThreshold, maxFrequency, minFrequency, numberHarmonics, referenceFrequency, sampleRate);
+	_multipitchklapuri = AlgorithmFactory::create("MultiPitchKlapuri", "binResolution", binResolution, "frameSize", frameSize, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "numberHarmonics", numberHarmonics, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate);
 }
 MultiPitchKlapuri::~MultiPitchKlapuri() {
-	delete _multipitchklapuri;
+	if (_multipitchklapuri) delete _multipitchklapuri;
 }
 void MultiPitchKlapuri::configure(const float binResolution, const int frameSize, const float harmonicWeight, const int hopSize, const float magnitudeCompression, const int magnitudeThreshold, const float maxFrequency, const float minFrequency, const int numberHarmonics, const float referenceFrequency, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_multipitchklapuri = factory.create("MultiPitchKlapuri", "binResolution", binResolution, "frameSize", frameSize, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "numberHarmonics", numberHarmonics, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate);
+	_multipitchklapuri->configure("binResolution", binResolution, "frameSize", frameSize, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "numberHarmonics", numberHarmonics, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate);
 }
 val MultiPitchKlapuri::compute(std::vector<float>& input_signal) {
 	_multipitchklapuri->input("signal").set(input_signal);
@@ -3075,14 +2971,14 @@ _multipitchklapuri->reset();
 // START MultiPitchMelodia definitions
 // check https://essentia.upf.edu/reference/std_MultiPitchMelodia.html
 MultiPitchMelodia::MultiPitchMelodia(const float binResolution, const int filterIterations, const int frameSize, const bool guessUnvoiced, const float harmonicWeight, const int hopSize, const float magnitudeCompression, const int magnitudeThreshold, const float maxFrequency, const int minDuration, const float minFrequency, const int numberHarmonics, const float peakDistributionThreshold, const float peakFrameThreshold, const float pitchContinuity, const float referenceFrequency, const float sampleRate, const int timeContinuity) {
-	configure(binResolution, filterIterations, frameSize, guessUnvoiced, harmonicWeight, hopSize, magnitudeCompression, magnitudeThreshold, maxFrequency, minDuration, minFrequency, numberHarmonics, peakDistributionThreshold, peakFrameThreshold, pitchContinuity, referenceFrequency, sampleRate, timeContinuity);
+	_multipitchmelodia = AlgorithmFactory::create("MultiPitchMelodia", "binResolution", binResolution, "filterIterations", filterIterations, "frameSize", frameSize, "guessUnvoiced", guessUnvoiced, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "minDuration", minDuration, "minFrequency", minFrequency, "numberHarmonics", numberHarmonics, "peakDistributionThreshold", peakDistributionThreshold, "peakFrameThreshold", peakFrameThreshold, "pitchContinuity", pitchContinuity, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate, "timeContinuity", timeContinuity);
 }
 MultiPitchMelodia::~MultiPitchMelodia() {
-	delete _multipitchmelodia;
+	if (_multipitchmelodia) delete _multipitchmelodia;
 }
 void MultiPitchMelodia::configure(const float binResolution, const int filterIterations, const int frameSize, const bool guessUnvoiced, const float harmonicWeight, const int hopSize, const float magnitudeCompression, const int magnitudeThreshold, const float maxFrequency, const int minDuration, const float minFrequency, const int numberHarmonics, const float peakDistributionThreshold, const float peakFrameThreshold, const float pitchContinuity, const float referenceFrequency, const float sampleRate, const int timeContinuity) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_multipitchmelodia = factory.create("MultiPitchMelodia", "binResolution", binResolution, "filterIterations", filterIterations, "frameSize", frameSize, "guessUnvoiced", guessUnvoiced, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "minDuration", minDuration, "minFrequency", minFrequency, "numberHarmonics", numberHarmonics, "peakDistributionThreshold", peakDistributionThreshold, "peakFrameThreshold", peakFrameThreshold, "pitchContinuity", pitchContinuity, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate, "timeContinuity", timeContinuity);
+	if (_multipitchmelodia) delete _multipitchmelodia;
+	_multipitchmelodia = AlgorithmFactory::create("MultiPitchMelodia", "binResolution", binResolution, "filterIterations", filterIterations, "frameSize", frameSize, "guessUnvoiced", guessUnvoiced, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "minDuration", minDuration, "minFrequency", minFrequency, "numberHarmonics", numberHarmonics, "peakDistributionThreshold", peakDistributionThreshold, "peakFrameThreshold", peakFrameThreshold, "pitchContinuity", pitchContinuity, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate, "timeContinuity", timeContinuity);
 }
 val MultiPitchMelodia::compute(std::vector<float>& input_signal) {
 	_multipitchmelodia->input("signal").set(input_signal);
@@ -3101,14 +2997,13 @@ _multipitchmelodia->reset();
 // START Multiplexer definitions
 // check https://essentia.upf.edu/reference/std_Multiplexer.html
 Multiplexer::Multiplexer(const int numberRealInputs, const int numberVectorRealInputs) {
-	configure(numberRealInputs, numberVectorRealInputs);
+	_multiplexer = AlgorithmFactory::create("Multiplexer", "numberRealInputs", numberRealInputs, "numberVectorRealInputs", numberVectorRealInputs);
 }
 Multiplexer::~Multiplexer() {
-	delete _multiplexer;
+	if (_multiplexer) delete _multiplexer;
 }
 void Multiplexer::configure(const int numberRealInputs, const int numberVectorRealInputs) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_multiplexer = factory.create("Multiplexer", "numberRealInputs", numberRealInputs, "numberVectorRealInputs", numberVectorRealInputs);
+	_multiplexer->configure("numberRealInputs", numberRealInputs, "numberVectorRealInputs", numberVectorRealInputs);
 }
 val Multiplexer::compute() {
 	std::vector<std::vector<float> > output_data;
@@ -3126,14 +3021,13 @@ _multiplexer->reset();
 // START NNLSChroma definitions
 // check https://essentia.upf.edu/reference/std_NNLSChroma.html
 NNLSChroma::NNLSChroma(const std::string& chromaNormalization, const int frameSize, const float sampleRate, const float spectralShape, const float spectralWhitening, const std::string& tuningMode, const bool useNNLS) {
-	configure(chromaNormalization, frameSize, sampleRate, spectralShape, spectralWhitening, tuningMode, useNNLS);
+	_nnlschroma = AlgorithmFactory::create("NNLSChroma", "chromaNormalization", chromaNormalization, "frameSize", frameSize, "sampleRate", sampleRate, "spectralShape", spectralShape, "spectralWhitening", spectralWhitening, "tuningMode", tuningMode, "useNNLS", useNNLS);
 }
 NNLSChroma::~NNLSChroma() {
-	delete _nnlschroma;
+	if (_nnlschroma) delete _nnlschroma;
 }
 void NNLSChroma::configure(const std::string& chromaNormalization, const int frameSize, const float sampleRate, const float spectralShape, const float spectralWhitening, const std::string& tuningMode, const bool useNNLS) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_nnlschroma = factory.create("NNLSChroma", "chromaNormalization", chromaNormalization, "frameSize", frameSize, "sampleRate", sampleRate, "spectralShape", spectralShape, "spectralWhitening", spectralWhitening, "tuningMode", tuningMode, "useNNLS", useNNLS);
+	_nnlschroma->configure("chromaNormalization", chromaNormalization, "frameSize", frameSize, "sampleRate", sampleRate, "spectralShape", spectralShape, "spectralWhitening", spectralWhitening, "tuningMode", tuningMode, "useNNLS", useNNLS);
 }
 val NNLSChroma::compute(std::vector<std::vector<float> >& input_logSpectrogram, std::vector<float>& input_meanTuning, std::vector<float>& input_localTuning) {
 	_nnlschroma->input("logSpectrogram").set(input_logSpectrogram);
@@ -3163,14 +3057,13 @@ _nnlschroma->reset();
 // START NoiseAdder definitions
 // check https://essentia.upf.edu/reference/std_NoiseAdder.html
 NoiseAdder::NoiseAdder(const bool fixSeed, const int level) {
-	configure(fixSeed, level);
+	_noiseadder = AlgorithmFactory::create("NoiseAdder", "fixSeed", fixSeed, "level", level);
 }
 NoiseAdder::~NoiseAdder() {
-	delete _noiseadder;
+	if (_noiseadder) delete _noiseadder;
 }
 void NoiseAdder::configure(const bool fixSeed, const int level) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_noiseadder = factory.create("NoiseAdder", "fixSeed", fixSeed, "level", level);
+	_noiseadder->configure("fixSeed", fixSeed, "level", level);
 }
 val NoiseAdder::compute(std::vector<float>& input_signal) {
 	_noiseadder->input("signal").set(input_signal);
@@ -3189,14 +3082,13 @@ _noiseadder->reset();
 // START NoiseBurstDetector definitions
 // check https://essentia.upf.edu/reference/std_NoiseBurstDetector.html
 NoiseBurstDetector::NoiseBurstDetector(const float alpha, const int silenceThreshold, const int threshold) {
-	configure(alpha, silenceThreshold, threshold);
+	_noiseburstdetector = AlgorithmFactory::create("NoiseBurstDetector", "alpha", alpha, "silenceThreshold", silenceThreshold, "threshold", threshold);
 }
 NoiseBurstDetector::~NoiseBurstDetector() {
-	delete _noiseburstdetector;
+	if (_noiseburstdetector) delete _noiseburstdetector;
 }
 void NoiseBurstDetector::configure(const float alpha, const int silenceThreshold, const int threshold) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_noiseburstdetector = factory.create("NoiseBurstDetector", "alpha", alpha, "silenceThreshold", silenceThreshold, "threshold", threshold);
+	_noiseburstdetector->configure("alpha", alpha, "silenceThreshold", silenceThreshold, "threshold", threshold);
 }
 val NoiseBurstDetector::compute(std::vector<float>& input_frame) {
 	_noiseburstdetector->input("frame").set(input_frame);
@@ -3215,14 +3107,13 @@ _noiseburstdetector->reset();
 // START NoveltyCurve definitions
 // check https://essentia.upf.edu/reference/std_NoveltyCurve.html
 NoveltyCurve::NoveltyCurve(const float frameRate, const bool normalize, const std::vector<float>& weightCurve, const std::string& weightCurveType) {
-	configure(frameRate, normalize, weightCurve, weightCurveType);
+	_noveltycurve = AlgorithmFactory::create("NoveltyCurve", "frameRate", frameRate, "normalize", normalize, "weightCurve", weightCurve, "weightCurveType", weightCurveType);
 }
 NoveltyCurve::~NoveltyCurve() {
-	delete _noveltycurve;
+	if (_noveltycurve) delete _noveltycurve;
 }
 void NoveltyCurve::configure(const float frameRate, const bool normalize, const std::vector<float>& weightCurve, const std::string& weightCurveType) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_noveltycurve = factory.create("NoveltyCurve", "frameRate", frameRate, "normalize", normalize, "weightCurve", weightCurve, "weightCurveType", weightCurveType);
+	_noveltycurve->configure("frameRate", frameRate, "normalize", normalize, "weightCurve", weightCurve, "weightCurveType", weightCurveType);
 }
 val NoveltyCurve::compute(std::vector<std::vector<float> >& input_frequencyBands) {
 	_noveltycurve->input("frequencyBands").set(input_frequencyBands);
@@ -3241,14 +3132,13 @@ _noveltycurve->reset();
 // START NoveltyCurveFixedBpmEstimator definitions
 // check https://essentia.upf.edu/reference/std_NoveltyCurveFixedBpmEstimator.html
 NoveltyCurveFixedBpmEstimator::NoveltyCurveFixedBpmEstimator(const int hopSize, const float maxBpm, const float minBpm, const float sampleRate, const float tolerance) {
-	configure(hopSize, maxBpm, minBpm, sampleRate, tolerance);
+	_noveltycurvefixedbpmestimator = AlgorithmFactory::create("NoveltyCurveFixedBpmEstimator", "hopSize", hopSize, "maxBpm", maxBpm, "minBpm", minBpm, "sampleRate", sampleRate, "tolerance", tolerance);
 }
 NoveltyCurveFixedBpmEstimator::~NoveltyCurveFixedBpmEstimator() {
-	delete _noveltycurvefixedbpmestimator;
+	if (_noveltycurvefixedbpmestimator) delete _noveltycurvefixedbpmestimator;
 }
 void NoveltyCurveFixedBpmEstimator::configure(const int hopSize, const float maxBpm, const float minBpm, const float sampleRate, const float tolerance) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_noveltycurvefixedbpmestimator = factory.create("NoveltyCurveFixedBpmEstimator", "hopSize", hopSize, "maxBpm", maxBpm, "minBpm", minBpm, "sampleRate", sampleRate, "tolerance", tolerance);
+	_noveltycurvefixedbpmestimator->configure("hopSize", hopSize, "maxBpm", maxBpm, "minBpm", minBpm, "sampleRate", sampleRate, "tolerance", tolerance);
 }
 val NoveltyCurveFixedBpmEstimator::compute(std::vector<float>& input_novelty) {
 	_noveltycurvefixedbpmestimator->input("novelty").set(input_novelty);
@@ -3270,14 +3160,13 @@ _noveltycurvefixedbpmestimator->reset();
 // START OddToEvenHarmonicEnergyRatio definitions
 // check https://essentia.upf.edu/reference/std_OddToEvenHarmonicEnergyRatio.html
 OddToEvenHarmonicEnergyRatio::OddToEvenHarmonicEnergyRatio() {
-	configure();
+	_oddtoevenharmonicenergyratio = AlgorithmFactory::create("OddToEvenHarmonicEnergyRatio");
 }
 OddToEvenHarmonicEnergyRatio::~OddToEvenHarmonicEnergyRatio() {
-	delete _oddtoevenharmonicenergyratio;
+	if (_oddtoevenharmonicenergyratio) delete _oddtoevenharmonicenergyratio;
 }
 void OddToEvenHarmonicEnergyRatio::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_oddtoevenharmonicenergyratio = factory.create("OddToEvenHarmonicEnergyRatio");
+	_oddtoevenharmonicenergyratio->configure();
 }
 val OddToEvenHarmonicEnergyRatio::compute(std::vector<float>& input_frequencies, std::vector<float>& input_magnitudes) {
 	_oddtoevenharmonicenergyratio->input("frequencies").set(input_frequencies);
@@ -3297,14 +3186,13 @@ _oddtoevenharmonicenergyratio->reset();
 // START OnsetDetection definitions
 // check https://essentia.upf.edu/reference/std_OnsetDetection.html
 OnsetDetection::OnsetDetection(const std::string& method, const float sampleRate) {
-	configure(method, sampleRate);
+	_onsetdetection = AlgorithmFactory::create("OnsetDetection", "method", method, "sampleRate", sampleRate);
 }
 OnsetDetection::~OnsetDetection() {
-	delete _onsetdetection;
+	if (_onsetdetection) delete _onsetdetection;
 }
 void OnsetDetection::configure(const std::string& method, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_onsetdetection = factory.create("OnsetDetection", "method", method, "sampleRate", sampleRate);
+	_onsetdetection->configure("method", method, "sampleRate", sampleRate);
 }
 val OnsetDetection::compute(std::vector<float>& input_spectrum, std::vector<float>& input_phase) {
 	_onsetdetection->input("spectrum").set(input_spectrum);
@@ -3324,14 +3212,13 @@ _onsetdetection->reset();
 // START OnsetDetectionGlobal definitions
 // check https://essentia.upf.edu/reference/std_OnsetDetectionGlobal.html
 OnsetDetectionGlobal::OnsetDetectionGlobal(const int frameSize, const int hopSize, const std::string& method, const float sampleRate) {
-	configure(frameSize, hopSize, method, sampleRate);
+	_onsetdetectionglobal = AlgorithmFactory::create("OnsetDetectionGlobal", "frameSize", frameSize, "hopSize", hopSize, "method", method, "sampleRate", sampleRate);
 }
 OnsetDetectionGlobal::~OnsetDetectionGlobal() {
-	delete _onsetdetectionglobal;
+	if (_onsetdetectionglobal) delete _onsetdetectionglobal;
 }
 void OnsetDetectionGlobal::configure(const int frameSize, const int hopSize, const std::string& method, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_onsetdetectionglobal = factory.create("OnsetDetectionGlobal", "frameSize", frameSize, "hopSize", hopSize, "method", method, "sampleRate", sampleRate);
+	_onsetdetectionglobal->configure("frameSize", frameSize, "hopSize", hopSize, "method", method, "sampleRate", sampleRate);
 }
 val OnsetDetectionGlobal::compute(std::vector<float>& input_signal) {
 	_onsetdetectionglobal->input("signal").set(input_signal);
@@ -3350,14 +3237,13 @@ _onsetdetectionglobal->reset();
 // START OnsetRate definitions
 // check https://essentia.upf.edu/reference/std_OnsetRate.html
 OnsetRate::OnsetRate() {
-	configure();
+	_onsetrate = AlgorithmFactory::create("OnsetRate");
 }
 OnsetRate::~OnsetRate() {
-	delete _onsetrate;
+	if (_onsetrate) delete _onsetrate;
 }
 void OnsetRate::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_onsetrate = factory.create("OnsetRate");
+	_onsetrate->configure();
 }
 val OnsetRate::compute(std::vector<float>& input_signal) {
 	_onsetrate->input("signal").set(input_signal);
@@ -3379,14 +3265,13 @@ _onsetrate->reset();
 // START OverlapAdd definitions
 // check https://essentia.upf.edu/reference/std_OverlapAdd.html
 OverlapAdd::OverlapAdd(const int frameSize, const float gain, const int hopSize) {
-	configure(frameSize, gain, hopSize);
+	_overlapadd = AlgorithmFactory::create("OverlapAdd", "frameSize", frameSize, "gain", gain, "hopSize", hopSize);
 }
 OverlapAdd::~OverlapAdd() {
-	delete _overlapadd;
+	if (_overlapadd) delete _overlapadd;
 }
 void OverlapAdd::configure(const int frameSize, const float gain, const int hopSize) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_overlapadd = factory.create("OverlapAdd", "frameSize", frameSize, "gain", gain, "hopSize", hopSize);
+	_overlapadd->configure("frameSize", frameSize, "gain", gain, "hopSize", hopSize);
 }
 val OverlapAdd::compute(std::vector<float>& input_signal) {
 	_overlapadd->input("signal").set(input_signal);
@@ -3405,14 +3290,13 @@ _overlapadd->reset();
 // START PeakDetection definitions
 // check https://essentia.upf.edu/reference/std_PeakDetection.html
 PeakDetection::PeakDetection(const bool interpolate, const int maxPeaks, const float maxPosition, const float minPeakDistance, const float minPosition, const std::string& orderBy, const float range, const float threshold) {
-	configure(interpolate, maxPeaks, maxPosition, minPeakDistance, minPosition, orderBy, range, threshold);
+	_peakdetection = AlgorithmFactory::create("PeakDetection", "interpolate", interpolate, "maxPeaks", maxPeaks, "maxPosition", maxPosition, "minPeakDistance", minPeakDistance, "minPosition", minPosition, "orderBy", orderBy, "range", range, "threshold", threshold);
 }
 PeakDetection::~PeakDetection() {
-	delete _peakdetection;
+	if (_peakdetection) delete _peakdetection;
 }
 void PeakDetection::configure(const bool interpolate, const int maxPeaks, const float maxPosition, const float minPeakDistance, const float minPosition, const std::string& orderBy, const float range, const float threshold) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_peakdetection = factory.create("PeakDetection", "interpolate", interpolate, "maxPeaks", maxPeaks, "maxPosition", maxPosition, "minPeakDistance", minPeakDistance, "minPosition", minPosition, "orderBy", orderBy, "range", range, "threshold", threshold);
+	_peakdetection->configure("interpolate", interpolate, "maxPeaks", maxPeaks, "maxPosition", maxPosition, "minPeakDistance", minPeakDistance, "minPosition", minPosition, "orderBy", orderBy, "range", range, "threshold", threshold);
 }
 val PeakDetection::compute(std::vector<float>& input_array) {
 	_peakdetection->input("array").set(input_array);
@@ -3434,14 +3318,13 @@ _peakdetection->reset();
 // START PercivalBpmEstimator definitions
 // check https://essentia.upf.edu/reference/std_PercivalBpmEstimator.html
 PercivalBpmEstimator::PercivalBpmEstimator(const int frameSize, const int frameSizeOSS, const int hopSize, const int hopSizeOSS, const int maxBPM, const int minBPM, const int sampleRate) {
-	configure(frameSize, frameSizeOSS, hopSize, hopSizeOSS, maxBPM, minBPM, sampleRate);
+	_percivalbpmestimator = AlgorithmFactory::create("PercivalBpmEstimator", "frameSize", frameSize, "frameSizeOSS", frameSizeOSS, "hopSize", hopSize, "hopSizeOSS", hopSizeOSS, "maxBPM", maxBPM, "minBPM", minBPM, "sampleRate", sampleRate);
 }
 PercivalBpmEstimator::~PercivalBpmEstimator() {
-	delete _percivalbpmestimator;
+	if (_percivalbpmestimator) delete _percivalbpmestimator;
 }
 void PercivalBpmEstimator::configure(const int frameSize, const int frameSizeOSS, const int hopSize, const int hopSizeOSS, const int maxBPM, const int minBPM, const int sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_percivalbpmestimator = factory.create("PercivalBpmEstimator", "frameSize", frameSize, "frameSizeOSS", frameSizeOSS, "hopSize", hopSize, "hopSizeOSS", hopSizeOSS, "maxBPM", maxBPM, "minBPM", minBPM, "sampleRate", sampleRate);
+	_percivalbpmestimator->configure("frameSize", frameSize, "frameSizeOSS", frameSizeOSS, "hopSize", hopSize, "hopSizeOSS", hopSizeOSS, "maxBPM", maxBPM, "minBPM", minBPM, "sampleRate", sampleRate);
 }
 val PercivalBpmEstimator::compute(std::vector<float>& input_signal) {
 	_percivalbpmestimator->input("signal").set(input_signal);
@@ -3460,14 +3343,13 @@ _percivalbpmestimator->reset();
 // START PercivalEnhanceHarmonics definitions
 // check https://essentia.upf.edu/reference/std_PercivalEnhanceHarmonics.html
 PercivalEnhanceHarmonics::PercivalEnhanceHarmonics() {
-	configure();
+	_percivalenhanceharmonics = AlgorithmFactory::create("PercivalEnhanceHarmonics");
 }
 PercivalEnhanceHarmonics::~PercivalEnhanceHarmonics() {
-	delete _percivalenhanceharmonics;
+	if (_percivalenhanceharmonics) delete _percivalenhanceharmonics;
 }
 void PercivalEnhanceHarmonics::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_percivalenhanceharmonics = factory.create("PercivalEnhanceHarmonics");
+	_percivalenhanceharmonics->configure();
 }
 val PercivalEnhanceHarmonics::compute(std::vector<float>& input_array) {
 	_percivalenhanceharmonics->input("array").set(input_array);
@@ -3486,14 +3368,13 @@ _percivalenhanceharmonics->reset();
 // START PercivalEvaluatePulseTrains definitions
 // check https://essentia.upf.edu/reference/std_PercivalEvaluatePulseTrains.html
 PercivalEvaluatePulseTrains::PercivalEvaluatePulseTrains() {
-	configure();
+	_percivalevaluatepulsetrains = AlgorithmFactory::create("PercivalEvaluatePulseTrains");
 }
 PercivalEvaluatePulseTrains::~PercivalEvaluatePulseTrains() {
-	delete _percivalevaluatepulsetrains;
+	if (_percivalevaluatepulsetrains) delete _percivalevaluatepulsetrains;
 }
 void PercivalEvaluatePulseTrains::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_percivalevaluatepulsetrains = factory.create("PercivalEvaluatePulseTrains");
+	_percivalevaluatepulsetrains->configure();
 }
 val PercivalEvaluatePulseTrains::compute(std::vector<float>& input_oss, std::vector<float>& input_positions) {
 	_percivalevaluatepulsetrains->input("oss").set(input_oss);
@@ -3513,14 +3394,13 @@ _percivalevaluatepulsetrains->reset();
 // START PitchContourSegmentation definitions
 // check https://essentia.upf.edu/reference/std_PitchContourSegmentation.html
 PitchContourSegmentation::PitchContourSegmentation(const int hopSize, const float minDuration, const int pitchDistanceThreshold, const int rmsThreshold, const int sampleRate, const int tuningFrequency) {
-	configure(hopSize, minDuration, pitchDistanceThreshold, rmsThreshold, sampleRate, tuningFrequency);
+	_pitchcontoursegmentation = AlgorithmFactory::create("PitchContourSegmentation", "hopSize", hopSize, "minDuration", minDuration, "pitchDistanceThreshold", pitchDistanceThreshold, "rmsThreshold", rmsThreshold, "sampleRate", sampleRate, "tuningFrequency", tuningFrequency);
 }
 PitchContourSegmentation::~PitchContourSegmentation() {
-	delete _pitchcontoursegmentation;
+	if (_pitchcontoursegmentation) delete _pitchcontoursegmentation;
 }
 void PitchContourSegmentation::configure(const int hopSize, const float minDuration, const int pitchDistanceThreshold, const int rmsThreshold, const int sampleRate, const int tuningFrequency) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_pitchcontoursegmentation = factory.create("PitchContourSegmentation", "hopSize", hopSize, "minDuration", minDuration, "pitchDistanceThreshold", pitchDistanceThreshold, "rmsThreshold", rmsThreshold, "sampleRate", sampleRate, "tuningFrequency", tuningFrequency);
+	_pitchcontoursegmentation->configure("hopSize", hopSize, "minDuration", minDuration, "pitchDistanceThreshold", pitchDistanceThreshold, "rmsThreshold", rmsThreshold, "sampleRate", sampleRate, "tuningFrequency", tuningFrequency);
 }
 val PitchContourSegmentation::compute(std::vector<float>& input_pitch, std::vector<float>& input_signal) {
 	_pitchcontoursegmentation->input("pitch").set(input_pitch);
@@ -3546,14 +3426,13 @@ _pitchcontoursegmentation->reset();
 // START PitchContours definitions
 // check https://essentia.upf.edu/reference/std_PitchContours.html
 PitchContours::PitchContours(const float binResolution, const int hopSize, const float minDuration, const float peakDistributionThreshold, const float peakFrameThreshold, const float pitchContinuity, const float sampleRate, const float timeContinuity) {
-	configure(binResolution, hopSize, minDuration, peakDistributionThreshold, peakFrameThreshold, pitchContinuity, sampleRate, timeContinuity);
+	_pitchcontours = AlgorithmFactory::create("PitchContours", "binResolution", binResolution, "hopSize", hopSize, "minDuration", minDuration, "peakDistributionThreshold", peakDistributionThreshold, "peakFrameThreshold", peakFrameThreshold, "pitchContinuity", pitchContinuity, "sampleRate", sampleRate, "timeContinuity", timeContinuity);
 }
 PitchContours::~PitchContours() {
-	delete _pitchcontours;
+	if (_pitchcontours) delete _pitchcontours;
 }
 void PitchContours::configure(const float binResolution, const int hopSize, const float minDuration, const float peakDistributionThreshold, const float peakFrameThreshold, const float pitchContinuity, const float sampleRate, const float timeContinuity) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_pitchcontours = factory.create("PitchContours", "binResolution", binResolution, "hopSize", hopSize, "minDuration", minDuration, "peakDistributionThreshold", peakDistributionThreshold, "peakFrameThreshold", peakFrameThreshold, "pitchContinuity", pitchContinuity, "sampleRate", sampleRate, "timeContinuity", timeContinuity);
+	_pitchcontours->configure("binResolution", binResolution, "hopSize", hopSize, "minDuration", minDuration, "peakDistributionThreshold", peakDistributionThreshold, "peakFrameThreshold", peakFrameThreshold, "pitchContinuity", pitchContinuity, "sampleRate", sampleRate, "timeContinuity", timeContinuity);
 }
 val PitchContours::compute(std::vector<std::vector<float> >& input_peakBins, std::vector<std::vector<float> >& input_peakSaliences) {
 	_pitchcontours->input("peakBins").set(input_peakBins);
@@ -3582,14 +3461,13 @@ _pitchcontours->reset();
 // START PitchContoursMelody definitions
 // check https://essentia.upf.edu/reference/std_PitchContoursMelody.html
 PitchContoursMelody::PitchContoursMelody(const float binResolution, const int filterIterations, const bool guessUnvoiced, const int hopSize, const float maxFrequency, const float minFrequency, const float referenceFrequency, const float sampleRate, const bool voiceVibrato, const float voicingTolerance) {
-	configure(binResolution, filterIterations, guessUnvoiced, hopSize, maxFrequency, minFrequency, referenceFrequency, sampleRate, voiceVibrato, voicingTolerance);
+	_pitchcontoursmelody = AlgorithmFactory::create("PitchContoursMelody", "binResolution", binResolution, "filterIterations", filterIterations, "guessUnvoiced", guessUnvoiced, "hopSize", hopSize, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate, "voiceVibrato", voiceVibrato, "voicingTolerance", voicingTolerance);
 }
 PitchContoursMelody::~PitchContoursMelody() {
-	delete _pitchcontoursmelody;
+	if (_pitchcontoursmelody) delete _pitchcontoursmelody;
 }
 void PitchContoursMelody::configure(const float binResolution, const int filterIterations, const bool guessUnvoiced, const int hopSize, const float maxFrequency, const float minFrequency, const float referenceFrequency, const float sampleRate, const bool voiceVibrato, const float voicingTolerance) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_pitchcontoursmelody = factory.create("PitchContoursMelody", "binResolution", binResolution, "filterIterations", filterIterations, "guessUnvoiced", guessUnvoiced, "hopSize", hopSize, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate, "voiceVibrato", voiceVibrato, "voicingTolerance", voicingTolerance);
+	_pitchcontoursmelody->configure("binResolution", binResolution, "filterIterations", filterIterations, "guessUnvoiced", guessUnvoiced, "hopSize", hopSize, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate, "voiceVibrato", voiceVibrato, "voicingTolerance", voicingTolerance);
 }
 val PitchContoursMelody::compute(std::vector<std::vector<float> >& input_contoursBins, std::vector<std::vector<float> >& input_contoursSaliences, std::vector<float>& input_contoursStartTimes, float input_duration) {
 	_pitchcontoursmelody->input("contoursBins").set(input_contoursBins);
@@ -3614,14 +3492,13 @@ _pitchcontoursmelody->reset();
 // START PitchContoursMonoMelody definitions
 // check https://essentia.upf.edu/reference/std_PitchContoursMonoMelody.html
 PitchContoursMonoMelody::PitchContoursMonoMelody(const float binResolution, const int filterIterations, const bool guessUnvoiced, const int hopSize, const float maxFrequency, const float minFrequency, const float referenceFrequency, const float sampleRate) {
-	configure(binResolution, filterIterations, guessUnvoiced, hopSize, maxFrequency, minFrequency, referenceFrequency, sampleRate);
+	_pitchcontoursmonomelody = AlgorithmFactory::create("PitchContoursMonoMelody", "binResolution", binResolution, "filterIterations", filterIterations, "guessUnvoiced", guessUnvoiced, "hopSize", hopSize, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate);
 }
 PitchContoursMonoMelody::~PitchContoursMonoMelody() {
-	delete _pitchcontoursmonomelody;
+	if (_pitchcontoursmonomelody) delete _pitchcontoursmonomelody;
 }
 void PitchContoursMonoMelody::configure(const float binResolution, const int filterIterations, const bool guessUnvoiced, const int hopSize, const float maxFrequency, const float minFrequency, const float referenceFrequency, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_pitchcontoursmonomelody = factory.create("PitchContoursMonoMelody", "binResolution", binResolution, "filterIterations", filterIterations, "guessUnvoiced", guessUnvoiced, "hopSize", hopSize, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate);
+	_pitchcontoursmonomelody->configure("binResolution", binResolution, "filterIterations", filterIterations, "guessUnvoiced", guessUnvoiced, "hopSize", hopSize, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate);
 }
 val PitchContoursMonoMelody::compute(std::vector<std::vector<float> >& input_contoursBins, std::vector<std::vector<float> >& input_contoursSaliences, std::vector<float>& input_contoursStartTimes, float input_duration) {
 	_pitchcontoursmonomelody->input("contoursBins").set(input_contoursBins);
@@ -3646,14 +3523,13 @@ _pitchcontoursmonomelody->reset();
 // START PitchContoursMultiMelody definitions
 // check https://essentia.upf.edu/reference/std_PitchContoursMultiMelody.html
 PitchContoursMultiMelody::PitchContoursMultiMelody(const float binResolution, const int filterIterations, const bool guessUnvoiced, const int hopSize, const float maxFrequency, const float minFrequency, const float referenceFrequency, const float sampleRate) {
-	configure(binResolution, filterIterations, guessUnvoiced, hopSize, maxFrequency, minFrequency, referenceFrequency, sampleRate);
+	_pitchcontoursmultimelody = AlgorithmFactory::create("PitchContoursMultiMelody", "binResolution", binResolution, "filterIterations", filterIterations, "guessUnvoiced", guessUnvoiced, "hopSize", hopSize, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate);
 }
 PitchContoursMultiMelody::~PitchContoursMultiMelody() {
-	delete _pitchcontoursmultimelody;
+	if (_pitchcontoursmultimelody) delete _pitchcontoursmultimelody;
 }
 void PitchContoursMultiMelody::configure(const float binResolution, const int filterIterations, const bool guessUnvoiced, const int hopSize, const float maxFrequency, const float minFrequency, const float referenceFrequency, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_pitchcontoursmultimelody = factory.create("PitchContoursMultiMelody", "binResolution", binResolution, "filterIterations", filterIterations, "guessUnvoiced", guessUnvoiced, "hopSize", hopSize, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate);
+	_pitchcontoursmultimelody->configure("binResolution", binResolution, "filterIterations", filterIterations, "guessUnvoiced", guessUnvoiced, "hopSize", hopSize, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate);
 }
 val PitchContoursMultiMelody::compute(std::vector<std::vector<float> >& input_contoursBins, std::vector<std::vector<float> >& input_contoursSaliences, std::vector<float>& input_contoursStartTimes, float input_duration) {
 	_pitchcontoursmultimelody->input("contoursBins").set(input_contoursBins);
@@ -3675,14 +3551,13 @@ _pitchcontoursmultimelody->reset();
 // START PitchFilter definitions
 // check https://essentia.upf.edu/reference/std_PitchFilter.html
 PitchFilter::PitchFilter(const int confidenceThreshold, const int minChunkSize, const bool useAbsolutePitchConfidence) {
-	configure(confidenceThreshold, minChunkSize, useAbsolutePitchConfidence);
+	_pitchfilter = AlgorithmFactory::create("PitchFilter", "confidenceThreshold", confidenceThreshold, "minChunkSize", minChunkSize, "useAbsolutePitchConfidence", useAbsolutePitchConfidence);
 }
 PitchFilter::~PitchFilter() {
-	delete _pitchfilter;
+	if (_pitchfilter) delete _pitchfilter;
 }
 void PitchFilter::configure(const int confidenceThreshold, const int minChunkSize, const bool useAbsolutePitchConfidence) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_pitchfilter = factory.create("PitchFilter", "confidenceThreshold", confidenceThreshold, "minChunkSize", minChunkSize, "useAbsolutePitchConfidence", useAbsolutePitchConfidence);
+	_pitchfilter->configure("confidenceThreshold", confidenceThreshold, "minChunkSize", minChunkSize, "useAbsolutePitchConfidence", useAbsolutePitchConfidence);
 }
 val PitchFilter::compute(std::vector<float>& input_pitch, std::vector<float>& input_pitchConfidence) {
 	_pitchfilter->input("pitch").set(input_pitch);
@@ -3702,14 +3577,14 @@ _pitchfilter->reset();
 // START PitchMelodia definitions
 // check https://essentia.upf.edu/reference/std_PitchMelodia.html
 PitchMelodia::PitchMelodia(const float binResolution, const int filterIterations, const int frameSize, const bool guessUnvoiced, const float harmonicWeight, const int hopSize, const float magnitudeCompression, const int magnitudeThreshold, const float maxFrequency, const int minDuration, const float minFrequency, const int numberHarmonics, const float peakDistributionThreshold, const float peakFrameThreshold, const float pitchContinuity, const float referenceFrequency, const float sampleRate, const int timeContinuity) {
-	configure(binResolution, filterIterations, frameSize, guessUnvoiced, harmonicWeight, hopSize, magnitudeCompression, magnitudeThreshold, maxFrequency, minDuration, minFrequency, numberHarmonics, peakDistributionThreshold, peakFrameThreshold, pitchContinuity, referenceFrequency, sampleRate, timeContinuity);
+	_pitchmelodia = AlgorithmFactory::create("PitchMelodia", "binResolution", binResolution, "filterIterations", filterIterations, "frameSize", frameSize, "guessUnvoiced", guessUnvoiced, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "minDuration", minDuration, "minFrequency", minFrequency, "numberHarmonics", numberHarmonics, "peakDistributionThreshold", peakDistributionThreshold, "peakFrameThreshold", peakFrameThreshold, "pitchContinuity", pitchContinuity, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate, "timeContinuity", timeContinuity);
 }
 PitchMelodia::~PitchMelodia() {
-	delete _pitchmelodia;
+	if (_pitchmelodia) delete _pitchmelodia;
 }
 void PitchMelodia::configure(const float binResolution, const int filterIterations, const int frameSize, const bool guessUnvoiced, const float harmonicWeight, const int hopSize, const float magnitudeCompression, const int magnitudeThreshold, const float maxFrequency, const int minDuration, const float minFrequency, const int numberHarmonics, const float peakDistributionThreshold, const float peakFrameThreshold, const float pitchContinuity, const float referenceFrequency, const float sampleRate, const int timeContinuity) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_pitchmelodia = factory.create("PitchMelodia", "binResolution", binResolution, "filterIterations", filterIterations, "frameSize", frameSize, "guessUnvoiced", guessUnvoiced, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "minDuration", minDuration, "minFrequency", minFrequency, "numberHarmonics", numberHarmonics, "peakDistributionThreshold", peakDistributionThreshold, "peakFrameThreshold", peakFrameThreshold, "pitchContinuity", pitchContinuity, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate, "timeContinuity", timeContinuity);
+	if (_pitchmelodia) delete _pitchmelodia;
+	_pitchmelodia = AlgorithmFactory::create("PitchMelodia", "binResolution", binResolution, "filterIterations", filterIterations, "frameSize", frameSize, "guessUnvoiced", guessUnvoiced, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "minDuration", minDuration, "minFrequency", minFrequency, "numberHarmonics", numberHarmonics, "peakDistributionThreshold", peakDistributionThreshold, "peakFrameThreshold", peakFrameThreshold, "pitchContinuity", pitchContinuity, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate, "timeContinuity", timeContinuity);
 }
 val PitchMelodia::compute(std::vector<float>& input_signal) {
 	_pitchmelodia->input("signal").set(input_signal);
@@ -3731,14 +3606,13 @@ _pitchmelodia->reset();
 // START PitchSalience definitions
 // check https://essentia.upf.edu/reference/std_PitchSalience.html
 PitchSalience::PitchSalience(const float highBoundary, const float lowBoundary, const float sampleRate) {
-	configure(highBoundary, lowBoundary, sampleRate);
+	_pitchsalience = AlgorithmFactory::create("PitchSalience", "highBoundary", highBoundary, "lowBoundary", lowBoundary, "sampleRate", sampleRate);
 }
 PitchSalience::~PitchSalience() {
-	delete _pitchsalience;
+	if (_pitchsalience) delete _pitchsalience;
 }
 void PitchSalience::configure(const float highBoundary, const float lowBoundary, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_pitchsalience = factory.create("PitchSalience", "highBoundary", highBoundary, "lowBoundary", lowBoundary, "sampleRate", sampleRate);
+	_pitchsalience->configure("highBoundary", highBoundary, "lowBoundary", lowBoundary, "sampleRate", sampleRate);
 }
 val PitchSalience::compute(std::vector<float>& input_spectrum) {
 	_pitchsalience->input("spectrum").set(input_spectrum);
@@ -3757,14 +3631,13 @@ _pitchsalience->reset();
 // START PitchSalienceFunction definitions
 // check https://essentia.upf.edu/reference/std_PitchSalienceFunction.html
 PitchSalienceFunction::PitchSalienceFunction(const float binResolution, const float harmonicWeight, const float magnitudeCompression, const float magnitudeThreshold, const int numberHarmonics, const float referenceFrequency) {
-	configure(binResolution, harmonicWeight, magnitudeCompression, magnitudeThreshold, numberHarmonics, referenceFrequency);
+	_pitchsaliencefunction = AlgorithmFactory::create("PitchSalienceFunction", "binResolution", binResolution, "harmonicWeight", harmonicWeight, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "numberHarmonics", numberHarmonics, "referenceFrequency", referenceFrequency);
 }
 PitchSalienceFunction::~PitchSalienceFunction() {
-	delete _pitchsaliencefunction;
+	if (_pitchsaliencefunction) delete _pitchsaliencefunction;
 }
 void PitchSalienceFunction::configure(const float binResolution, const float harmonicWeight, const float magnitudeCompression, const float magnitudeThreshold, const int numberHarmonics, const float referenceFrequency) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_pitchsaliencefunction = factory.create("PitchSalienceFunction", "binResolution", binResolution, "harmonicWeight", harmonicWeight, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "numberHarmonics", numberHarmonics, "referenceFrequency", referenceFrequency);
+	_pitchsaliencefunction->configure("binResolution", binResolution, "harmonicWeight", harmonicWeight, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "numberHarmonics", numberHarmonics, "referenceFrequency", referenceFrequency);
 }
 val PitchSalienceFunction::compute(std::vector<float>& input_frequencies, std::vector<float>& input_magnitudes) {
 	_pitchsaliencefunction->input("frequencies").set(input_frequencies);
@@ -3784,14 +3657,13 @@ _pitchsaliencefunction->reset();
 // START PitchSalienceFunctionPeaks definitions
 // check https://essentia.upf.edu/reference/std_PitchSalienceFunctionPeaks.html
 PitchSalienceFunctionPeaks::PitchSalienceFunctionPeaks(const float binResolution, const float maxFrequency, const float minFrequency, const float referenceFrequency) {
-	configure(binResolution, maxFrequency, minFrequency, referenceFrequency);
+	_pitchsaliencefunctionpeaks = AlgorithmFactory::create("PitchSalienceFunctionPeaks", "binResolution", binResolution, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "referenceFrequency", referenceFrequency);
 }
 PitchSalienceFunctionPeaks::~PitchSalienceFunctionPeaks() {
-	delete _pitchsaliencefunctionpeaks;
+	if (_pitchsaliencefunctionpeaks) delete _pitchsaliencefunctionpeaks;
 }
 void PitchSalienceFunctionPeaks::configure(const float binResolution, const float maxFrequency, const float minFrequency, const float referenceFrequency) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_pitchsaliencefunctionpeaks = factory.create("PitchSalienceFunctionPeaks", "binResolution", binResolution, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "referenceFrequency", referenceFrequency);
+	_pitchsaliencefunctionpeaks->configure("binResolution", binResolution, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "referenceFrequency", referenceFrequency);
 }
 val PitchSalienceFunctionPeaks::compute(std::vector<float>& input_salienceFunction) {
 	_pitchsaliencefunctionpeaks->input("salienceFunction").set(input_salienceFunction);
@@ -3813,14 +3685,13 @@ _pitchsaliencefunctionpeaks->reset();
 // START PitchYin definitions
 // check https://essentia.upf.edu/reference/std_PitchYin.html
 PitchYin::PitchYin(const int frameSize, const bool interpolate, const float maxFrequency, const float minFrequency, const float sampleRate, const float tolerance) {
-	configure(frameSize, interpolate, maxFrequency, minFrequency, sampleRate, tolerance);
+	_pitchyin = AlgorithmFactory::create("PitchYin", "frameSize", frameSize, "interpolate", interpolate, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "sampleRate", sampleRate, "tolerance", tolerance);
 }
 PitchYin::~PitchYin() {
-	delete _pitchyin;
+	if (_pitchyin) delete _pitchyin;
 }
 void PitchYin::configure(const int frameSize, const bool interpolate, const float maxFrequency, const float minFrequency, const float sampleRate, const float tolerance) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_pitchyin = factory.create("PitchYin", "frameSize", frameSize, "interpolate", interpolate, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "sampleRate", sampleRate, "tolerance", tolerance);
+	_pitchyin->configure("frameSize", frameSize, "interpolate", interpolate, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "sampleRate", sampleRate, "tolerance", tolerance);
 }
 val PitchYin::compute(std::vector<float>& input_signal) {
 	_pitchyin->input("signal").set(input_signal);
@@ -3842,14 +3713,13 @@ _pitchyin->reset();
 // START PitchYinFFT definitions
 // check https://essentia.upf.edu/reference/std_PitchYinFFT.html
 PitchYinFFT::PitchYinFFT(const int frameSize, const bool interpolate, const float maxFrequency, const float minFrequency, const float sampleRate, const float tolerance) {
-	configure(frameSize, interpolate, maxFrequency, minFrequency, sampleRate, tolerance);
+	_pitchyinfft = AlgorithmFactory::create("PitchYinFFT", "frameSize", frameSize, "interpolate", interpolate, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "sampleRate", sampleRate, "tolerance", tolerance);
 }
 PitchYinFFT::~PitchYinFFT() {
-	delete _pitchyinfft;
+	if (_pitchyinfft) delete _pitchyinfft;
 }
 void PitchYinFFT::configure(const int frameSize, const bool interpolate, const float maxFrequency, const float minFrequency, const float sampleRate, const float tolerance) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_pitchyinfft = factory.create("PitchYinFFT", "frameSize", frameSize, "interpolate", interpolate, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "sampleRate", sampleRate, "tolerance", tolerance);
+	_pitchyinfft->configure("frameSize", frameSize, "interpolate", interpolate, "maxFrequency", maxFrequency, "minFrequency", minFrequency, "sampleRate", sampleRate, "tolerance", tolerance);
 }
 val PitchYinFFT::compute(std::vector<float>& input_spectrum) {
 	_pitchyinfft->input("spectrum").set(input_spectrum);
@@ -3871,14 +3741,13 @@ _pitchyinfft->reset();
 // START PitchYinProbabilistic definitions
 // check https://essentia.upf.edu/reference/std_PitchYinProbabilistic.html
 PitchYinProbabilistic::PitchYinProbabilistic(const int frameSize, const int hopSize, const float lowRMSThreshold, const std::string& outputUnvoiced, const bool preciseTime, const float sampleRate) {
-	configure(frameSize, hopSize, lowRMSThreshold, outputUnvoiced, preciseTime, sampleRate);
+	_pitchyinprobabilistic = AlgorithmFactory::create("PitchYinProbabilistic", "frameSize", frameSize, "hopSize", hopSize, "lowRMSThreshold", lowRMSThreshold, "outputUnvoiced", outputUnvoiced, "preciseTime", preciseTime, "sampleRate", sampleRate);
 }
 PitchYinProbabilistic::~PitchYinProbabilistic() {
-	delete _pitchyinprobabilistic;
+	if (_pitchyinprobabilistic) delete _pitchyinprobabilistic;
 }
 void PitchYinProbabilistic::configure(const int frameSize, const int hopSize, const float lowRMSThreshold, const std::string& outputUnvoiced, const bool preciseTime, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_pitchyinprobabilistic = factory.create("PitchYinProbabilistic", "frameSize", frameSize, "hopSize", hopSize, "lowRMSThreshold", lowRMSThreshold, "outputUnvoiced", outputUnvoiced, "preciseTime", preciseTime, "sampleRate", sampleRate);
+	_pitchyinprobabilistic->configure("frameSize", frameSize, "hopSize", hopSize, "lowRMSThreshold", lowRMSThreshold, "outputUnvoiced", outputUnvoiced, "preciseTime", preciseTime, "sampleRate", sampleRate);
 }
 val PitchYinProbabilistic::compute(std::vector<float>& input_signal) {
 	_pitchyinprobabilistic->input("signal").set(input_signal);
@@ -3900,14 +3769,13 @@ _pitchyinprobabilistic->reset();
 // START PitchYinProbabilities definitions
 // check https://essentia.upf.edu/reference/std_PitchYinProbabilities.html
 PitchYinProbabilities::PitchYinProbabilities(const int frameSize, const float lowAmp, const bool preciseTime, const float sampleRate) {
-	configure(frameSize, lowAmp, preciseTime, sampleRate);
+	_pitchyinprobabilities = AlgorithmFactory::create("PitchYinProbabilities", "frameSize", frameSize, "lowAmp", lowAmp, "preciseTime", preciseTime, "sampleRate", sampleRate);
 }
 PitchYinProbabilities::~PitchYinProbabilities() {
-	delete _pitchyinprobabilities;
+	if (_pitchyinprobabilities) delete _pitchyinprobabilities;
 }
 void PitchYinProbabilities::configure(const int frameSize, const float lowAmp, const bool preciseTime, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_pitchyinprobabilities = factory.create("PitchYinProbabilities", "frameSize", frameSize, "lowAmp", lowAmp, "preciseTime", preciseTime, "sampleRate", sampleRate);
+	_pitchyinprobabilities->configure("frameSize", frameSize, "lowAmp", lowAmp, "preciseTime", preciseTime, "sampleRate", sampleRate);
 }
 val PitchYinProbabilities::compute(std::vector<float>& input_signal) {
 	_pitchyinprobabilities->input("signal").set(input_signal);
@@ -3932,14 +3800,13 @@ _pitchyinprobabilities->reset();
 // START PitchYinProbabilitiesHMM definitions
 // check https://essentia.upf.edu/reference/std_PitchYinProbabilitiesHMM.html
 PitchYinProbabilitiesHMM::PitchYinProbabilitiesHMM(const float minFrequency, const int numberBinsPerSemitone, const float selfTransition, const float yinTrust) {
-	configure(minFrequency, numberBinsPerSemitone, selfTransition, yinTrust);
+	_pitchyinprobabilitieshmm = AlgorithmFactory::create("PitchYinProbabilitiesHMM", "minFrequency", minFrequency, "numberBinsPerSemitone", numberBinsPerSemitone, "selfTransition", selfTransition, "yinTrust", yinTrust);
 }
 PitchYinProbabilitiesHMM::~PitchYinProbabilitiesHMM() {
-	delete _pitchyinprobabilitieshmm;
+	if (_pitchyinprobabilitieshmm) delete _pitchyinprobabilitieshmm;
 }
 void PitchYinProbabilitiesHMM::configure(const float minFrequency, const int numberBinsPerSemitone, const float selfTransition, const float yinTrust) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_pitchyinprobabilitieshmm = factory.create("PitchYinProbabilitiesHMM", "minFrequency", minFrequency, "numberBinsPerSemitone", numberBinsPerSemitone, "selfTransition", selfTransition, "yinTrust", yinTrust);
+	_pitchyinprobabilitieshmm->configure("minFrequency", minFrequency, "numberBinsPerSemitone", numberBinsPerSemitone, "selfTransition", selfTransition, "yinTrust", yinTrust);
 }
 val PitchYinProbabilitiesHMM::compute(std::vector<std::vector<float> >& input_pitchCandidates, std::vector<std::vector<float> >& input_probabilities) {
 	_pitchyinprobabilitieshmm->input("pitchCandidates").set(input_pitchCandidates);
@@ -3959,14 +3826,13 @@ _pitchyinprobabilitieshmm->reset();
 // START PowerMean definitions
 // check https://essentia.upf.edu/reference/std_PowerMean.html
 PowerMean::PowerMean(const float power) {
-	configure(power);
+	_powermean = AlgorithmFactory::create("PowerMean", "power", power);
 }
 PowerMean::~PowerMean() {
-	delete _powermean;
+	if (_powermean) delete _powermean;
 }
 void PowerMean::configure(const float power) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_powermean = factory.create("PowerMean", "power", power);
+	_powermean->configure("power", power);
 }
 val PowerMean::compute(std::vector<float>& input_array) {
 	_powermean->input("array").set(input_array);
@@ -3985,14 +3851,13 @@ _powermean->reset();
 // START PowerSpectrum definitions
 // check https://essentia.upf.edu/reference/std_PowerSpectrum.html
 PowerSpectrum::PowerSpectrum(const int size) {
-	configure(size);
+	_powerspectrum = AlgorithmFactory::create("PowerSpectrum", "size", size);
 }
 PowerSpectrum::~PowerSpectrum() {
-	delete _powerspectrum;
+	if (_powerspectrum) delete _powerspectrum;
 }
 void PowerSpectrum::configure(const int size) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_powerspectrum = factory.create("PowerSpectrum", "size", size);
+	_powerspectrum->configure("size", size);
 }
 val PowerSpectrum::compute(std::vector<float>& input_signal) {
 	_powerspectrum->input("signal").set(input_signal);
@@ -4011,14 +3876,14 @@ _powerspectrum->reset();
 // START PredominantPitchMelodia definitions
 // check https://essentia.upf.edu/reference/std_PredominantPitchMelodia.html
 PredominantPitchMelodia::PredominantPitchMelodia(const float binResolution, const int filterIterations, const int frameSize, const bool guessUnvoiced, const float harmonicWeight, const int hopSize, const float magnitudeCompression, const int magnitudeThreshold, const float maxFrequency, const int minDuration, const float minFrequency, const int numberHarmonics, const float peakDistributionThreshold, const float peakFrameThreshold, const float pitchContinuity, const float referenceFrequency, const float sampleRate, const int timeContinuity, const bool voiceVibrato, const float voicingTolerance) {
-	configure(binResolution, filterIterations, frameSize, guessUnvoiced, harmonicWeight, hopSize, magnitudeCompression, magnitudeThreshold, maxFrequency, minDuration, minFrequency, numberHarmonics, peakDistributionThreshold, peakFrameThreshold, pitchContinuity, referenceFrequency, sampleRate, timeContinuity, voiceVibrato, voicingTolerance);
+	_predominantpitchmelodia = AlgorithmFactory::create("PredominantPitchMelodia", "binResolution", binResolution, "filterIterations", filterIterations, "frameSize", frameSize, "guessUnvoiced", guessUnvoiced, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "minDuration", minDuration, "minFrequency", minFrequency, "numberHarmonics", numberHarmonics, "peakDistributionThreshold", peakDistributionThreshold, "peakFrameThreshold", peakFrameThreshold, "pitchContinuity", pitchContinuity, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate, "timeContinuity", timeContinuity, "voiceVibrato", voiceVibrato, "voicingTolerance", voicingTolerance);
 }
 PredominantPitchMelodia::~PredominantPitchMelodia() {
-	delete _predominantpitchmelodia;
+	if (_predominantpitchmelodia) delete _predominantpitchmelodia;
 }
 void PredominantPitchMelodia::configure(const float binResolution, const int filterIterations, const int frameSize, const bool guessUnvoiced, const float harmonicWeight, const int hopSize, const float magnitudeCompression, const int magnitudeThreshold, const float maxFrequency, const int minDuration, const float minFrequency, const int numberHarmonics, const float peakDistributionThreshold, const float peakFrameThreshold, const float pitchContinuity, const float referenceFrequency, const float sampleRate, const int timeContinuity, const bool voiceVibrato, const float voicingTolerance) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_predominantpitchmelodia = factory.create("PredominantPitchMelodia", "binResolution", binResolution, "filterIterations", filterIterations, "frameSize", frameSize, "guessUnvoiced", guessUnvoiced, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "minDuration", minDuration, "minFrequency", minFrequency, "numberHarmonics", numberHarmonics, "peakDistributionThreshold", peakDistributionThreshold, "peakFrameThreshold", peakFrameThreshold, "pitchContinuity", pitchContinuity, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate, "timeContinuity", timeContinuity, "voiceVibrato", voiceVibrato, "voicingTolerance", voicingTolerance);
+	if (_predominantpitchmelodia) delete _predominantpitchmelodia;
+	_predominantpitchmelodia = AlgorithmFactory::create("PredominantPitchMelodia", "binResolution", binResolution, "filterIterations", filterIterations, "frameSize", frameSize, "guessUnvoiced", guessUnvoiced, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "minDuration", minDuration, "minFrequency", minFrequency, "numberHarmonics", numberHarmonics, "peakDistributionThreshold", peakDistributionThreshold, "peakFrameThreshold", peakFrameThreshold, "pitchContinuity", pitchContinuity, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate, "timeContinuity", timeContinuity, "voiceVibrato", voiceVibrato, "voicingTolerance", voicingTolerance);
 }
 val PredominantPitchMelodia::compute(std::vector<float>& input_signal) {
 	_predominantpitchmelodia->input("signal").set(input_signal);
@@ -4040,14 +3905,13 @@ _predominantpitchmelodia->reset();
 // START RMS definitions
 // check https://essentia.upf.edu/reference/std_RMS.html
 RMS::RMS() {
-	configure();
+	_rms = AlgorithmFactory::create("RMS");
 }
 RMS::~RMS() {
-	delete _rms;
+	if (_rms) delete _rms;
 }
 void RMS::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_rms = factory.create("RMS");
+	_rms->configure();
 }
 val RMS::compute(std::vector<float>& input_array) {
 	_rms->input("array").set(input_array);
@@ -4066,14 +3930,13 @@ _rms->reset();
 // START RawMoments definitions
 // check https://essentia.upf.edu/reference/std_RawMoments.html
 RawMoments::RawMoments(const float range) {
-	configure(range);
+	_rawmoments = AlgorithmFactory::create("RawMoments", "range", range);
 }
 RawMoments::~RawMoments() {
-	delete _rawmoments;
+	if (_rawmoments) delete _rawmoments;
 }
 void RawMoments::configure(const float range) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_rawmoments = factory.create("RawMoments", "range", range);
+	_rawmoments->configure("range", range);
 }
 val RawMoments::compute(std::vector<float>& input_array) {
 	_rawmoments->input("array").set(input_array);
@@ -4092,14 +3955,13 @@ _rawmoments->reset();
 // START ReplayGain definitions
 // check https://essentia.upf.edu/reference/std_ReplayGain.html
 ReplayGain::ReplayGain(const float sampleRate) {
-	configure(sampleRate);
+	_replaygain = AlgorithmFactory::create("ReplayGain", "sampleRate", sampleRate);
 }
 ReplayGain::~ReplayGain() {
-	delete _replaygain;
+	if (_replaygain) delete _replaygain;
 }
 void ReplayGain::configure(const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_replaygain = factory.create("ReplayGain", "sampleRate", sampleRate);
+	_replaygain->configure("sampleRate", sampleRate);
 }
 val ReplayGain::compute(std::vector<float>& input_signal) {
 	_replaygain->input("signal").set(input_signal);
@@ -4118,14 +3980,13 @@ _replaygain->reset();
 // START Resample definitions
 // check https://essentia.upf.edu/reference/std_Resample.html
 Resample::Resample(const float inputSampleRate, const float outputSampleRate, const int quality) {
-	configure(inputSampleRate, outputSampleRate, quality);
+	_resample = AlgorithmFactory::create("Resample", "inputSampleRate", inputSampleRate, "outputSampleRate", outputSampleRate, "quality", quality);
 }
 Resample::~Resample() {
-	delete _resample;
+	if (_resample) delete _resample;
 }
 void Resample::configure(const float inputSampleRate, const float outputSampleRate, const int quality) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_resample = factory.create("Resample", "inputSampleRate", inputSampleRate, "outputSampleRate", outputSampleRate, "quality", quality);
+	_resample->configure("inputSampleRate", inputSampleRate, "outputSampleRate", outputSampleRate, "quality", quality);
 }
 val Resample::compute(std::vector<float>& input_signal) {
 	_resample->input("signal").set(input_signal);
@@ -4144,14 +4005,13 @@ _resample->reset();
 // START ResampleFFT definitions
 // check https://essentia.upf.edu/reference/std_ResampleFFT.html
 ResampleFFT::ResampleFFT(const int inSize, const int outSize) {
-	configure(inSize, outSize);
+	_resamplefft = AlgorithmFactory::create("ResampleFFT", "inSize", inSize, "outSize", outSize);
 }
 ResampleFFT::~ResampleFFT() {
-	delete _resamplefft;
+	if (_resamplefft) delete _resamplefft;
 }
 void ResampleFFT::configure(const int inSize, const int outSize) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_resamplefft = factory.create("ResampleFFT", "inSize", inSize, "outSize", outSize);
+	_resamplefft->configure("inSize", inSize, "outSize", outSize);
 }
 val ResampleFFT::compute(std::vector<float>& input_input) {
 	_resamplefft->input("input").set(input_input);
@@ -4170,14 +4030,13 @@ _resamplefft->reset();
 // START RhythmDescriptors definitions
 // check https://essentia.upf.edu/reference/std_RhythmDescriptors.html
 RhythmDescriptors::RhythmDescriptors() {
-	configure();
+	_rhythmdescriptors = AlgorithmFactory::create("RhythmDescriptors");
 }
 RhythmDescriptors::~RhythmDescriptors() {
-	delete _rhythmdescriptors;
+	if (_rhythmdescriptors) delete _rhythmdescriptors;
 }
 void RhythmDescriptors::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_rhythmdescriptors = factory.create("RhythmDescriptors");
+	_rhythmdescriptors->configure();
 }
 val RhythmDescriptors::compute(std::vector<float>& input_signal) {
 	_rhythmdescriptors->input("signal").set(input_signal);
@@ -4229,14 +4088,13 @@ _rhythmdescriptors->reset();
 // START RhythmExtractor definitions
 // check https://essentia.upf.edu/reference/std_RhythmExtractor.html
 RhythmExtractor::RhythmExtractor(const int frameHop, const int frameSize, const int hopSize, const float lastBeatInterval, const int maxTempo, const int minTempo, const int numberFrames, const float sampleRate, const std::vector<float>& tempoHints, const float tolerance, const bool useBands, const bool useOnset) {
-	configure(frameHop, frameSize, hopSize, lastBeatInterval, maxTempo, minTempo, numberFrames, sampleRate, tempoHints, tolerance, useBands, useOnset);
+	_rhythmextractor = AlgorithmFactory::create("RhythmExtractor", "frameHop", frameHop, "frameSize", frameSize, "hopSize", hopSize, "lastBeatInterval", lastBeatInterval, "maxTempo", maxTempo, "minTempo", minTempo, "numberFrames", numberFrames, "sampleRate", sampleRate, "tempoHints", tempoHints, "tolerance", tolerance, "useBands", useBands, "useOnset", useOnset);
 }
 RhythmExtractor::~RhythmExtractor() {
-	delete _rhythmextractor;
+	if (_rhythmextractor) delete _rhythmextractor;
 }
 void RhythmExtractor::configure(const int frameHop, const int frameSize, const int hopSize, const float lastBeatInterval, const int maxTempo, const int minTempo, const int numberFrames, const float sampleRate, const std::vector<float>& tempoHints, const float tolerance, const bool useBands, const bool useOnset) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_rhythmextractor = factory.create("RhythmExtractor", "frameHop", frameHop, "frameSize", frameSize, "hopSize", hopSize, "lastBeatInterval", lastBeatInterval, "maxTempo", maxTempo, "minTempo", minTempo, "numberFrames", numberFrames, "sampleRate", sampleRate, "tempoHints", tempoHints, "tolerance", tolerance, "useBands", useBands, "useOnset", useOnset);
+	_rhythmextractor->configure("frameHop", frameHop, "frameSize", frameSize, "hopSize", hopSize, "lastBeatInterval", lastBeatInterval, "maxTempo", maxTempo, "minTempo", minTempo, "numberFrames", numberFrames, "sampleRate", sampleRate, "tempoHints", tempoHints, "tolerance", tolerance, "useBands", useBands, "useOnset", useOnset);
 }
 val RhythmExtractor::compute(std::vector<float>& input_signal) {
 	_rhythmextractor->input("signal").set(input_signal);
@@ -4264,14 +4122,13 @@ _rhythmextractor->reset();
 // START RhythmExtractor2013 definitions
 // check https://essentia.upf.edu/reference/std_RhythmExtractor2013.html
 RhythmExtractor2013::RhythmExtractor2013(const int maxTempo, const std::string& method, const int minTempo) {
-	configure(maxTempo, method, minTempo);
+	_rhythmextractor2013 = AlgorithmFactory::create("RhythmExtractor2013", "maxTempo", maxTempo, "method", method, "minTempo", minTempo);
 }
 RhythmExtractor2013::~RhythmExtractor2013() {
-	delete _rhythmextractor2013;
+	if (_rhythmextractor2013) delete _rhythmextractor2013;
 }
 void RhythmExtractor2013::configure(const int maxTempo, const std::string& method, const int minTempo) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_rhythmextractor2013 = factory.create("RhythmExtractor2013", "maxTempo", maxTempo, "method", method, "minTempo", minTempo);
+	_rhythmextractor2013->configure("maxTempo", maxTempo, "method", method, "minTempo", minTempo);
 }
 val RhythmExtractor2013::compute(std::vector<float>& input_signal) {
 	_rhythmextractor2013->input("signal").set(input_signal);
@@ -4302,14 +4159,13 @@ _rhythmextractor2013->reset();
 // START RhythmTransform definitions
 // check https://essentia.upf.edu/reference/std_RhythmTransform.html
 RhythmTransform::RhythmTransform(const int frameSize, const int hopSize) {
-	configure(frameSize, hopSize);
+	_rhythmtransform = AlgorithmFactory::create("RhythmTransform", "frameSize", frameSize, "hopSize", hopSize);
 }
 RhythmTransform::~RhythmTransform() {
-	delete _rhythmtransform;
+	if (_rhythmtransform) delete _rhythmtransform;
 }
 void RhythmTransform::configure(const int frameSize, const int hopSize) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_rhythmtransform = factory.create("RhythmTransform", "frameSize", frameSize, "hopSize", hopSize);
+	_rhythmtransform->configure("frameSize", frameSize, "hopSize", hopSize);
 }
 val RhythmTransform::compute(std::vector<std::vector<float> >& input_melBands) {
 	_rhythmtransform->input("melBands").set(input_melBands);
@@ -4328,14 +4184,13 @@ _rhythmtransform->reset();
 // START RollOff definitions
 // check https://essentia.upf.edu/reference/std_RollOff.html
 RollOff::RollOff(const float cutoff, const float sampleRate) {
-	configure(cutoff, sampleRate);
+	_rolloff = AlgorithmFactory::create("RollOff", "cutoff", cutoff, "sampleRate", sampleRate);
 }
 RollOff::~RollOff() {
-	delete _rolloff;
+	if (_rolloff) delete _rolloff;
 }
 void RollOff::configure(const float cutoff, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_rolloff = factory.create("RollOff", "cutoff", cutoff, "sampleRate", sampleRate);
+	_rolloff->configure("cutoff", cutoff, "sampleRate", sampleRate);
 }
 val RollOff::compute(std::vector<float>& input_spectrum) {
 	_rolloff->input("spectrum").set(input_spectrum);
@@ -4354,14 +4209,13 @@ _rolloff->reset();
 // START SNR definitions
 // check https://essentia.upf.edu/reference/std_SNR.html
 SNR::SNR(const float MAAlpha, const float MMSEAlpha, const float NoiseAlpha, const int frameSize, const float noiseThreshold, const float sampleRate, const bool useBroadbadNoiseCorrection) {
-	configure(MAAlpha, MMSEAlpha, NoiseAlpha, frameSize, noiseThreshold, sampleRate, useBroadbadNoiseCorrection);
+	_snr = AlgorithmFactory::create("SNR", "MAAlpha", MAAlpha, "MMSEAlpha", MMSEAlpha, "NoiseAlpha", NoiseAlpha, "frameSize", frameSize, "noiseThreshold", noiseThreshold, "sampleRate", sampleRate, "useBroadbadNoiseCorrection", useBroadbadNoiseCorrection);
 }
 SNR::~SNR() {
-	delete _snr;
+	if (_snr) delete _snr;
 }
 void SNR::configure(const float MAAlpha, const float MMSEAlpha, const float NoiseAlpha, const int frameSize, const float noiseThreshold, const float sampleRate, const bool useBroadbadNoiseCorrection) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_snr = factory.create("SNR", "MAAlpha", MAAlpha, "MMSEAlpha", MMSEAlpha, "NoiseAlpha", NoiseAlpha, "frameSize", frameSize, "noiseThreshold", noiseThreshold, "sampleRate", sampleRate, "useBroadbadNoiseCorrection", useBroadbadNoiseCorrection);
+	_snr->configure("MAAlpha", MAAlpha, "MMSEAlpha", MMSEAlpha, "NoiseAlpha", NoiseAlpha, "frameSize", frameSize, "noiseThreshold", noiseThreshold, "sampleRate", sampleRate, "useBroadbadNoiseCorrection", useBroadbadNoiseCorrection);
 }
 val SNR::compute(std::vector<float>& input_frame) {
 	_snr->input("frame").set(input_frame);
@@ -4386,14 +4240,13 @@ _snr->reset();
 // START SaturationDetector definitions
 // check https://essentia.upf.edu/reference/std_SaturationDetector.html
 SaturationDetector::SaturationDetector(const float differentialThreshold, const float energyThreshold, const int frameSize, const int hopSize, const float minimumDuration, const float sampleRate) {
-	configure(differentialThreshold, energyThreshold, frameSize, hopSize, minimumDuration, sampleRate);
+	_saturationdetector = AlgorithmFactory::create("SaturationDetector", "differentialThreshold", differentialThreshold, "energyThreshold", energyThreshold, "frameSize", frameSize, "hopSize", hopSize, "minimumDuration", minimumDuration, "sampleRate", sampleRate);
 }
 SaturationDetector::~SaturationDetector() {
-	delete _saturationdetector;
+	if (_saturationdetector) delete _saturationdetector;
 }
 void SaturationDetector::configure(const float differentialThreshold, const float energyThreshold, const int frameSize, const int hopSize, const float minimumDuration, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_saturationdetector = factory.create("SaturationDetector", "differentialThreshold", differentialThreshold, "energyThreshold", energyThreshold, "frameSize", frameSize, "hopSize", hopSize, "minimumDuration", minimumDuration, "sampleRate", sampleRate);
+	_saturationdetector->configure("differentialThreshold", differentialThreshold, "energyThreshold", energyThreshold, "frameSize", frameSize, "hopSize", hopSize, "minimumDuration", minimumDuration, "sampleRate", sampleRate);
 }
 val SaturationDetector::compute(std::vector<float>& input_frame) {
 	_saturationdetector->input("frame").set(input_frame);
@@ -4415,14 +4268,13 @@ _saturationdetector->reset();
 // START Scale definitions
 // check https://essentia.upf.edu/reference/std_Scale.html
 Scale::Scale(const bool clipping, const float factor, const float maxAbsValue) {
-	configure(clipping, factor, maxAbsValue);
+	_scale = AlgorithmFactory::create("Scale", "clipping", clipping, "factor", factor, "maxAbsValue", maxAbsValue);
 }
 Scale::~Scale() {
-	delete _scale;
+	if (_scale) delete _scale;
 }
 void Scale::configure(const bool clipping, const float factor, const float maxAbsValue) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_scale = factory.create("Scale", "clipping", clipping, "factor", factor, "maxAbsValue", maxAbsValue);
+	_scale->configure("clipping", clipping, "factor", factor, "maxAbsValue", maxAbsValue);
 }
 val Scale::compute(std::vector<float>& input_signal) {
 	_scale->input("signal").set(input_signal);
@@ -4441,14 +4293,13 @@ _scale->reset();
 // START SineSubtraction definitions
 // check https://essentia.upf.edu/reference/std_SineSubtraction.html
 SineSubtraction::SineSubtraction(const int fftSize, const int hopSize, const float sampleRate) {
-	configure(fftSize, hopSize, sampleRate);
+	_sinesubtraction = AlgorithmFactory::create("SineSubtraction", "fftSize", fftSize, "hopSize", hopSize, "sampleRate", sampleRate);
 }
 SineSubtraction::~SineSubtraction() {
-	delete _sinesubtraction;
+	if (_sinesubtraction) delete _sinesubtraction;
 }
 void SineSubtraction::configure(const int fftSize, const int hopSize, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_sinesubtraction = factory.create("SineSubtraction", "fftSize", fftSize, "hopSize", hopSize, "sampleRate", sampleRate);
+	_sinesubtraction->configure("fftSize", fftSize, "hopSize", hopSize, "sampleRate", sampleRate);
 }
 val SineSubtraction::compute(std::vector<float>& input_frame, std::vector<float>& input_magnitudes, std::vector<float>& input_frequencies, std::vector<float>& input_phases) {
 	_sinesubtraction->input("frame").set(input_frame);
@@ -4470,14 +4321,13 @@ _sinesubtraction->reset();
 // START SingleBeatLoudness definitions
 // check https://essentia.upf.edu/reference/std_SingleBeatLoudness.html
 SingleBeatLoudness::SingleBeatLoudness(const float beatDuration, const float beatWindowDuration, const std::vector<float>& frequencyBands, const std::string& onsetStart, const float sampleRate) {
-	configure(beatDuration, beatWindowDuration, frequencyBands, onsetStart, sampleRate);
+	_singlebeatloudness = AlgorithmFactory::create("SingleBeatLoudness", "beatDuration", beatDuration, "beatWindowDuration", beatWindowDuration, "frequencyBands", frequencyBands, "onsetStart", onsetStart, "sampleRate", sampleRate);
 }
 SingleBeatLoudness::~SingleBeatLoudness() {
-	delete _singlebeatloudness;
+	if (_singlebeatloudness) delete _singlebeatloudness;
 }
 void SingleBeatLoudness::configure(const float beatDuration, const float beatWindowDuration, const std::vector<float>& frequencyBands, const std::string& onsetStart, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_singlebeatloudness = factory.create("SingleBeatLoudness", "beatDuration", beatDuration, "beatWindowDuration", beatWindowDuration, "frequencyBands", frequencyBands, "onsetStart", onsetStart, "sampleRate", sampleRate);
+	_singlebeatloudness->configure("beatDuration", beatDuration, "beatWindowDuration", beatWindowDuration, "frequencyBands", frequencyBands, "onsetStart", onsetStart, "sampleRate", sampleRate);
 }
 val SingleBeatLoudness::compute(std::vector<float>& input_beat) {
 	_singlebeatloudness->input("beat").set(input_beat);
@@ -4499,14 +4349,13 @@ _singlebeatloudness->reset();
 // START Slicer definitions
 // check https://essentia.upf.edu/reference/std_Slicer.html
 Slicer::Slicer(const std::vector<float>& endTimes, const float sampleRate, const std::vector<float>& startTimes, const std::string& timeUnits) {
-	configure(endTimes, sampleRate, startTimes, timeUnits);
+	_slicer = AlgorithmFactory::create("Slicer", "endTimes", endTimes, "sampleRate", sampleRate, "startTimes", startTimes, "timeUnits", timeUnits);
 }
 Slicer::~Slicer() {
-	delete _slicer;
+	if (_slicer) delete _slicer;
 }
 void Slicer::configure(const std::vector<float>& endTimes, const float sampleRate, const std::vector<float>& startTimes, const std::string& timeUnits) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_slicer = factory.create("Slicer", "endTimes", endTimes, "sampleRate", sampleRate, "startTimes", startTimes, "timeUnits", timeUnits);
+	_slicer->configure("endTimes", endTimes, "sampleRate", sampleRate, "startTimes", startTimes, "timeUnits", timeUnits);
 }
 val Slicer::compute(std::vector<float>& input_audio) {
 	_slicer->input("audio").set(input_audio);
@@ -4525,14 +4374,13 @@ _slicer->reset();
 // START SpectralCentroidTime definitions
 // check https://essentia.upf.edu/reference/std_SpectralCentroidTime.html
 SpectralCentroidTime::SpectralCentroidTime(const float sampleRate) {
-	configure(sampleRate);
+	_spectralcentroidtime = AlgorithmFactory::create("SpectralCentroidTime", "sampleRate", sampleRate);
 }
 SpectralCentroidTime::~SpectralCentroidTime() {
-	delete _spectralcentroidtime;
+	if (_spectralcentroidtime) delete _spectralcentroidtime;
 }
 void SpectralCentroidTime::configure(const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_spectralcentroidtime = factory.create("SpectralCentroidTime", "sampleRate", sampleRate);
+	_spectralcentroidtime->configure("sampleRate", sampleRate);
 }
 val SpectralCentroidTime::compute(std::vector<float>& input_array) {
 	_spectralcentroidtime->input("array").set(input_array);
@@ -4551,14 +4399,13 @@ _spectralcentroidtime->reset();
 // START SpectralComplexity definitions
 // check https://essentia.upf.edu/reference/std_SpectralComplexity.html
 SpectralComplexity::SpectralComplexity(const float magnitudeThreshold, const float sampleRate) {
-	configure(magnitudeThreshold, sampleRate);
+	_spectralcomplexity = AlgorithmFactory::create("SpectralComplexity", "magnitudeThreshold", magnitudeThreshold, "sampleRate", sampleRate);
 }
 SpectralComplexity::~SpectralComplexity() {
-	delete _spectralcomplexity;
+	if (_spectralcomplexity) delete _spectralcomplexity;
 }
 void SpectralComplexity::configure(const float magnitudeThreshold, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_spectralcomplexity = factory.create("SpectralComplexity", "magnitudeThreshold", magnitudeThreshold, "sampleRate", sampleRate);
+	_spectralcomplexity->configure("magnitudeThreshold", magnitudeThreshold, "sampleRate", sampleRate);
 }
 val SpectralComplexity::compute(std::vector<float>& input_spectrum) {
 	_spectralcomplexity->input("spectrum").set(input_spectrum);
@@ -4577,14 +4424,13 @@ _spectralcomplexity->reset();
 // START SpectralContrast definitions
 // check https://essentia.upf.edu/reference/std_SpectralContrast.html
 SpectralContrast::SpectralContrast(const int frameSize, const float highFrequencyBound, const float lowFrequencyBound, const float neighbourRatio, const int numberBands, const float sampleRate, const float staticDistribution) {
-	configure(frameSize, highFrequencyBound, lowFrequencyBound, neighbourRatio, numberBands, sampleRate, staticDistribution);
+	_spectralcontrast = AlgorithmFactory::create("SpectralContrast", "frameSize", frameSize, "highFrequencyBound", highFrequencyBound, "lowFrequencyBound", lowFrequencyBound, "neighbourRatio", neighbourRatio, "numberBands", numberBands, "sampleRate", sampleRate, "staticDistribution", staticDistribution);
 }
 SpectralContrast::~SpectralContrast() {
-	delete _spectralcontrast;
+	if (_spectralcontrast) delete _spectralcontrast;
 }
 void SpectralContrast::configure(const int frameSize, const float highFrequencyBound, const float lowFrequencyBound, const float neighbourRatio, const int numberBands, const float sampleRate, const float staticDistribution) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_spectralcontrast = factory.create("SpectralContrast", "frameSize", frameSize, "highFrequencyBound", highFrequencyBound, "lowFrequencyBound", lowFrequencyBound, "neighbourRatio", neighbourRatio, "numberBands", numberBands, "sampleRate", sampleRate, "staticDistribution", staticDistribution);
+	_spectralcontrast->configure("frameSize", frameSize, "highFrequencyBound", highFrequencyBound, "lowFrequencyBound", lowFrequencyBound, "neighbourRatio", neighbourRatio, "numberBands", numberBands, "sampleRate", sampleRate, "staticDistribution", staticDistribution);
 }
 val SpectralContrast::compute(std::vector<float>& input_spectrum) {
 	_spectralcontrast->input("spectrum").set(input_spectrum);
@@ -4606,14 +4452,13 @@ _spectralcontrast->reset();
 // START SpectralPeaks definitions
 // check https://essentia.upf.edu/reference/std_SpectralPeaks.html
 SpectralPeaks::SpectralPeaks(const float magnitudeThreshold, const float maxFrequency, const int maxPeaks, const float minFrequency, const std::string& orderBy, const float sampleRate) {
-	configure(magnitudeThreshold, maxFrequency, maxPeaks, minFrequency, orderBy, sampleRate);
+	_spectralpeaks = AlgorithmFactory::create("SpectralPeaks", "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "maxPeaks", maxPeaks, "minFrequency", minFrequency, "orderBy", orderBy, "sampleRate", sampleRate);
 }
 SpectralPeaks::~SpectralPeaks() {
-	delete _spectralpeaks;
+	if (_spectralpeaks) delete _spectralpeaks;
 }
 void SpectralPeaks::configure(const float magnitudeThreshold, const float maxFrequency, const int maxPeaks, const float minFrequency, const std::string& orderBy, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_spectralpeaks = factory.create("SpectralPeaks", "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "maxPeaks", maxPeaks, "minFrequency", minFrequency, "orderBy", orderBy, "sampleRate", sampleRate);
+	_spectralpeaks->configure("magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "maxPeaks", maxPeaks, "minFrequency", minFrequency, "orderBy", orderBy, "sampleRate", sampleRate);
 }
 val SpectralPeaks::compute(std::vector<float>& input_spectrum) {
 	_spectralpeaks->input("spectrum").set(input_spectrum);
@@ -4635,14 +4480,13 @@ _spectralpeaks->reset();
 // START SpectralWhitening definitions
 // check https://essentia.upf.edu/reference/std_SpectralWhitening.html
 SpectralWhitening::SpectralWhitening(const float maxFrequency, const float sampleRate) {
-	configure(maxFrequency, sampleRate);
+	_spectralwhitening = AlgorithmFactory::create("SpectralWhitening", "maxFrequency", maxFrequency, "sampleRate", sampleRate);
 }
 SpectralWhitening::~SpectralWhitening() {
-	delete _spectralwhitening;
+	if (_spectralwhitening) delete _spectralwhitening;
 }
 void SpectralWhitening::configure(const float maxFrequency, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_spectralwhitening = factory.create("SpectralWhitening", "maxFrequency", maxFrequency, "sampleRate", sampleRate);
+	_spectralwhitening->configure("maxFrequency", maxFrequency, "sampleRate", sampleRate);
 }
 val SpectralWhitening::compute(std::vector<float>& input_spectrum, std::vector<float>& input_frequencies, std::vector<float>& input_magnitudes) {
 	_spectralwhitening->input("spectrum").set(input_spectrum);
@@ -4663,14 +4507,13 @@ _spectralwhitening->reset();
 // START Spectrum definitions
 // check https://essentia.upf.edu/reference/std_Spectrum.html
 Spectrum::Spectrum(const int size) {
-	configure(size);
+	_spectrum = AlgorithmFactory::create("Spectrum", "size", size);
 }
 Spectrum::~Spectrum() {
-	delete _spectrum;
+	if (_spectrum) delete _spectrum;
 }
 void Spectrum::configure(const int size) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_spectrum = factory.create("Spectrum", "size", size);
+	_spectrum->configure("size", size);
 }
 val Spectrum::compute(std::vector<float>& input_frame) {
 	_spectrum->input("frame").set(input_frame);
@@ -4689,14 +4532,13 @@ _spectrum->reset();
 // START SpectrumCQ definitions
 // check https://essentia.upf.edu/reference/std_SpectrumCQ.html
 SpectrumCQ::SpectrumCQ(const int binsPerOctave, const float minFrequency, const int minimumKernelSize, const int numberBins, const float sampleRate, const float scale, const float threshold, const std::string& windowType, const bool zeroPhase) {
-	configure(binsPerOctave, minFrequency, minimumKernelSize, numberBins, sampleRate, scale, threshold, windowType, zeroPhase);
+	_spectrumcq = AlgorithmFactory::create("SpectrumCQ", "binsPerOctave", binsPerOctave, "minFrequency", minFrequency, "minimumKernelSize", minimumKernelSize, "numberBins", numberBins, "sampleRate", sampleRate, "scale", scale, "threshold", threshold, "windowType", windowType, "zeroPhase", zeroPhase);
 }
 SpectrumCQ::~SpectrumCQ() {
-	delete _spectrumcq;
+	if (_spectrumcq) delete _spectrumcq;
 }
 void SpectrumCQ::configure(const int binsPerOctave, const float minFrequency, const int minimumKernelSize, const int numberBins, const float sampleRate, const float scale, const float threshold, const std::string& windowType, const bool zeroPhase) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_spectrumcq = factory.create("SpectrumCQ", "binsPerOctave", binsPerOctave, "minFrequency", minFrequency, "minimumKernelSize", minimumKernelSize, "numberBins", numberBins, "sampleRate", sampleRate, "scale", scale, "threshold", threshold, "windowType", windowType, "zeroPhase", zeroPhase);
+	_spectrumcq->configure("binsPerOctave", binsPerOctave, "minFrequency", minFrequency, "minimumKernelSize", minimumKernelSize, "numberBins", numberBins, "sampleRate", sampleRate, "scale", scale, "threshold", threshold, "windowType", windowType, "zeroPhase", zeroPhase);
 }
 val SpectrumCQ::compute(std::vector<float>& input_frame) {
 	_spectrumcq->input("frame").set(input_frame);
@@ -4715,14 +4557,13 @@ _spectrumcq->reset();
 // START SpectrumToCent definitions
 // check https://essentia.upf.edu/reference/std_SpectrumToCent.html
 SpectrumToCent::SpectrumToCent(const int bands, const float centBinResolution, const int inputSize, const bool log, const float minimumFrequency, const std::string& normalize, const float sampleRate, const std::string& type) {
-	configure(bands, centBinResolution, inputSize, log, minimumFrequency, normalize, sampleRate, type);
+	_spectrumtocent = AlgorithmFactory::create("SpectrumToCent", "bands", bands, "centBinResolution", centBinResolution, "inputSize", inputSize, "log", log, "minimumFrequency", minimumFrequency, "normalize", normalize, "sampleRate", sampleRate, "type", type);
 }
 SpectrumToCent::~SpectrumToCent() {
-	delete _spectrumtocent;
+	if (_spectrumtocent) delete _spectrumtocent;
 }
 void SpectrumToCent::configure(const int bands, const float centBinResolution, const int inputSize, const bool log, const float minimumFrequency, const std::string& normalize, const float sampleRate, const std::string& type) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_spectrumtocent = factory.create("SpectrumToCent", "bands", bands, "centBinResolution", centBinResolution, "inputSize", inputSize, "log", log, "minimumFrequency", minimumFrequency, "normalize", normalize, "sampleRate", sampleRate, "type", type);
+	_spectrumtocent->configure("bands", bands, "centBinResolution", centBinResolution, "inputSize", inputSize, "log", log, "minimumFrequency", minimumFrequency, "normalize", normalize, "sampleRate", sampleRate, "type", type);
 }
 val SpectrumToCent::compute(std::vector<float>& input_spectrum) {
 	_spectrumtocent->input("spectrum").set(input_spectrum);
@@ -4744,14 +4585,13 @@ _spectrumtocent->reset();
 // START Spline definitions
 // check https://essentia.upf.edu/reference/std_Spline.html
 Spline::Spline(const float beta1, const float beta2, const std::string& type, const std::vector<float>& xPoints, const std::vector<float>& yPoints) {
-	configure(beta1, beta2, type, xPoints, yPoints);
+	_spline = AlgorithmFactory::create("Spline", "beta1", beta1, "beta2", beta2, "type", type, "xPoints", xPoints, "yPoints", yPoints);
 }
 Spline::~Spline() {
-	delete _spline;
+	if (_spline) delete _spline;
 }
 void Spline::configure(const float beta1, const float beta2, const std::string& type, const std::vector<float>& xPoints, const std::vector<float>& yPoints) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_spline = factory.create("Spline", "beta1", beta1, "beta2", beta2, "type", type, "xPoints", xPoints, "yPoints", yPoints);
+	_spline->configure("beta1", beta1, "beta2", beta2, "type", type, "xPoints", xPoints, "yPoints", yPoints);
 }
 val Spline::compute(float input_x) {
 	_spline->input("x").set(input_x);
@@ -4770,14 +4610,13 @@ _spline->reset();
 // START SprModelAnal definitions
 // check https://essentia.upf.edu/reference/std_SprModelAnal.html
 SprModelAnal::SprModelAnal(const int fftSize, const int freqDevOffset, const float freqDevSlope, const int hopSize, const float magnitudeThreshold, const float maxFrequency, const int maxPeaks, const int maxnSines, const float minFrequency, const std::string& orderBy, const float sampleRate) {
-	configure(fftSize, freqDevOffset, freqDevSlope, hopSize, magnitudeThreshold, maxFrequency, maxPeaks, maxnSines, minFrequency, orderBy, sampleRate);
+	_sprmodelanal = AlgorithmFactory::create("SprModelAnal", "fftSize", fftSize, "freqDevOffset", freqDevOffset, "freqDevSlope", freqDevSlope, "hopSize", hopSize, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "maxPeaks", maxPeaks, "maxnSines", maxnSines, "minFrequency", minFrequency, "orderBy", orderBy, "sampleRate", sampleRate);
 }
 SprModelAnal::~SprModelAnal() {
-	delete _sprmodelanal;
+	if (_sprmodelanal) delete _sprmodelanal;
 }
 void SprModelAnal::configure(const int fftSize, const int freqDevOffset, const float freqDevSlope, const int hopSize, const float magnitudeThreshold, const float maxFrequency, const int maxPeaks, const int maxnSines, const float minFrequency, const std::string& orderBy, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_sprmodelanal = factory.create("SprModelAnal", "fftSize", fftSize, "freqDevOffset", freqDevOffset, "freqDevSlope", freqDevSlope, "hopSize", hopSize, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "maxPeaks", maxPeaks, "maxnSines", maxnSines, "minFrequency", minFrequency, "orderBy", orderBy, "sampleRate", sampleRate);
+	_sprmodelanal->configure("fftSize", fftSize, "freqDevOffset", freqDevOffset, "freqDevSlope", freqDevSlope, "hopSize", hopSize, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "maxPeaks", maxPeaks, "maxnSines", maxnSines, "minFrequency", minFrequency, "orderBy", orderBy, "sampleRate", sampleRate);
 }
 val SprModelAnal::compute(std::vector<float>& input_frame) {
 	_sprmodelanal->input("frame").set(input_frame);
@@ -4805,14 +4644,13 @@ _sprmodelanal->reset();
 // START SprModelSynth definitions
 // check https://essentia.upf.edu/reference/std_SprModelSynth.html
 SprModelSynth::SprModelSynth(const int fftSize, const int hopSize, const float sampleRate) {
-	configure(fftSize, hopSize, sampleRate);
+	_sprmodelsynth = AlgorithmFactory::create("SprModelSynth", "fftSize", fftSize, "hopSize", hopSize, "sampleRate", sampleRate);
 }
 SprModelSynth::~SprModelSynth() {
-	delete _sprmodelsynth;
+	if (_sprmodelsynth) delete _sprmodelsynth;
 }
 void SprModelSynth::configure(const int fftSize, const int hopSize, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_sprmodelsynth = factory.create("SprModelSynth", "fftSize", fftSize, "hopSize", hopSize, "sampleRate", sampleRate);
+	_sprmodelsynth->configure("fftSize", fftSize, "hopSize", hopSize, "sampleRate", sampleRate);
 }
 val SprModelSynth::compute(std::vector<float>& input_magnitudes, std::vector<float>& input_frequencies, std::vector<float>& input_phases, std::vector<float>& input_res) {
 	_sprmodelsynth->input("magnitudes").set(input_magnitudes);
@@ -4840,14 +4678,13 @@ _sprmodelsynth->reset();
 // START SpsModelAnal definitions
 // check https://essentia.upf.edu/reference/std_SpsModelAnal.html
 SpsModelAnal::SpsModelAnal(const int fftSize, const int freqDevOffset, const float freqDevSlope, const int hopSize, const float magnitudeThreshold, const float maxFrequency, const int maxPeaks, const int maxnSines, const float minFrequency, const std::string& orderBy, const float sampleRate, const float stocf) {
-	configure(fftSize, freqDevOffset, freqDevSlope, hopSize, magnitudeThreshold, maxFrequency, maxPeaks, maxnSines, minFrequency, orderBy, sampleRate, stocf);
+	_spsmodelanal = AlgorithmFactory::create("SpsModelAnal", "fftSize", fftSize, "freqDevOffset", freqDevOffset, "freqDevSlope", freqDevSlope, "hopSize", hopSize, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "maxPeaks", maxPeaks, "maxnSines", maxnSines, "minFrequency", minFrequency, "orderBy", orderBy, "sampleRate", sampleRate, "stocf", stocf);
 }
 SpsModelAnal::~SpsModelAnal() {
-	delete _spsmodelanal;
+	if (_spsmodelanal) delete _spsmodelanal;
 }
 void SpsModelAnal::configure(const int fftSize, const int freqDevOffset, const float freqDevSlope, const int hopSize, const float magnitudeThreshold, const float maxFrequency, const int maxPeaks, const int maxnSines, const float minFrequency, const std::string& orderBy, const float sampleRate, const float stocf) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_spsmodelanal = factory.create("SpsModelAnal", "fftSize", fftSize, "freqDevOffset", freqDevOffset, "freqDevSlope", freqDevSlope, "hopSize", hopSize, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "maxPeaks", maxPeaks, "maxnSines", maxnSines, "minFrequency", minFrequency, "orderBy", orderBy, "sampleRate", sampleRate, "stocf", stocf);
+	_spsmodelanal->configure("fftSize", fftSize, "freqDevOffset", freqDevOffset, "freqDevSlope", freqDevSlope, "hopSize", hopSize, "magnitudeThreshold", magnitudeThreshold, "maxFrequency", maxFrequency, "maxPeaks", maxPeaks, "maxnSines", maxnSines, "minFrequency", minFrequency, "orderBy", orderBy, "sampleRate", sampleRate, "stocf", stocf);
 }
 val SpsModelAnal::compute(std::vector<float>& input_frame) {
 	_spsmodelanal->input("frame").set(input_frame);
@@ -4875,14 +4712,13 @@ _spsmodelanal->reset();
 // START SpsModelSynth definitions
 // check https://essentia.upf.edu/reference/std_SpsModelSynth.html
 SpsModelSynth::SpsModelSynth(const int fftSize, const int hopSize, const float sampleRate, const float stocf) {
-	configure(fftSize, hopSize, sampleRate, stocf);
+	_spsmodelsynth = AlgorithmFactory::create("SpsModelSynth", "fftSize", fftSize, "hopSize", hopSize, "sampleRate", sampleRate, "stocf", stocf);
 }
 SpsModelSynth::~SpsModelSynth() {
-	delete _spsmodelsynth;
+	if (_spsmodelsynth) delete _spsmodelsynth;
 }
 void SpsModelSynth::configure(const int fftSize, const int hopSize, const float sampleRate, const float stocf) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_spsmodelsynth = factory.create("SpsModelSynth", "fftSize", fftSize, "hopSize", hopSize, "sampleRate", sampleRate, "stocf", stocf);
+	_spsmodelsynth->configure("fftSize", fftSize, "hopSize", hopSize, "sampleRate", sampleRate, "stocf", stocf);
 }
 val SpsModelSynth::compute(std::vector<float>& input_magnitudes, std::vector<float>& input_frequencies, std::vector<float>& input_phases, std::vector<float>& input_stocenv) {
 	_spsmodelsynth->input("magnitudes").set(input_magnitudes);
@@ -4910,14 +4746,13 @@ _spsmodelsynth->reset();
 // START StartStopCut definitions
 // check https://essentia.upf.edu/reference/std_StartStopCut.html
 StartStopCut::StartStopCut(const int frameSize, const int hopSize, const float maximumStartTime, const float maximumStopTime, const float sampleRate, const int threshold) {
-	configure(frameSize, hopSize, maximumStartTime, maximumStopTime, sampleRate, threshold);
+	_startstopcut = AlgorithmFactory::create("StartStopCut", "frameSize", frameSize, "hopSize", hopSize, "maximumStartTime", maximumStartTime, "maximumStopTime", maximumStopTime, "sampleRate", sampleRate, "threshold", threshold);
 }
 StartStopCut::~StartStopCut() {
-	delete _startstopcut;
+	if (_startstopcut) delete _startstopcut;
 }
 void StartStopCut::configure(const int frameSize, const int hopSize, const float maximumStartTime, const float maximumStopTime, const float sampleRate, const int threshold) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_startstopcut = factory.create("StartStopCut", "frameSize", frameSize, "hopSize", hopSize, "maximumStartTime", maximumStartTime, "maximumStopTime", maximumStopTime, "sampleRate", sampleRate, "threshold", threshold);
+	_startstopcut->configure("frameSize", frameSize, "hopSize", hopSize, "maximumStartTime", maximumStartTime, "maximumStopTime", maximumStopTime, "sampleRate", sampleRate, "threshold", threshold);
 }
 val StartStopCut::compute(std::vector<float>& input_audio) {
 	_startstopcut->input("audio").set(input_audio);
@@ -4939,14 +4774,13 @@ _startstopcut->reset();
 // START StartStopSilence definitions
 // check https://essentia.upf.edu/reference/std_StartStopSilence.html
 StartStopSilence::StartStopSilence(const int threshold) {
-	configure(threshold);
+	_startstopsilence = AlgorithmFactory::create("StartStopSilence", "threshold", threshold);
 }
 StartStopSilence::~StartStopSilence() {
-	delete _startstopsilence;
+	if (_startstopsilence) delete _startstopsilence;
 }
 void StartStopSilence::configure(const int threshold) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_startstopsilence = factory.create("StartStopSilence", "threshold", threshold);
+	_startstopsilence->configure("threshold", threshold);
 }
 val StartStopSilence::compute(std::vector<float>& input_frame) {
 	_startstopsilence->input("frame").set(input_frame);
@@ -4968,14 +4802,13 @@ _startstopsilence->reset();
 // START StochasticModelAnal definitions
 // check https://essentia.upf.edu/reference/std_StochasticModelAnal.html
 StochasticModelAnal::StochasticModelAnal(const int fftSize, const int hopSize, const float sampleRate, const float stocf) {
-	configure(fftSize, hopSize, sampleRate, stocf);
+	_stochasticmodelanal = AlgorithmFactory::create("StochasticModelAnal", "fftSize", fftSize, "hopSize", hopSize, "sampleRate", sampleRate, "stocf", stocf);
 }
 StochasticModelAnal::~StochasticModelAnal() {
-	delete _stochasticmodelanal;
+	if (_stochasticmodelanal) delete _stochasticmodelanal;
 }
 void StochasticModelAnal::configure(const int fftSize, const int hopSize, const float sampleRate, const float stocf) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_stochasticmodelanal = factory.create("StochasticModelAnal", "fftSize", fftSize, "hopSize", hopSize, "sampleRate", sampleRate, "stocf", stocf);
+	_stochasticmodelanal->configure("fftSize", fftSize, "hopSize", hopSize, "sampleRate", sampleRate, "stocf", stocf);
 }
 val StochasticModelAnal::compute(std::vector<float>& input_frame) {
 	_stochasticmodelanal->input("frame").set(input_frame);
@@ -4994,14 +4827,13 @@ _stochasticmodelanal->reset();
 // START StochasticModelSynth definitions
 // check https://essentia.upf.edu/reference/std_StochasticModelSynth.html
 StochasticModelSynth::StochasticModelSynth(const int fftSize, const int hopSize, const float sampleRate, const float stocf) {
-	configure(fftSize, hopSize, sampleRate, stocf);
+	_stochasticmodelsynth = AlgorithmFactory::create("StochasticModelSynth", "fftSize", fftSize, "hopSize", hopSize, "sampleRate", sampleRate, "stocf", stocf);
 }
 StochasticModelSynth::~StochasticModelSynth() {
-	delete _stochasticmodelsynth;
+	if (_stochasticmodelsynth) delete _stochasticmodelsynth;
 }
 void StochasticModelSynth::configure(const int fftSize, const int hopSize, const float sampleRate, const float stocf) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_stochasticmodelsynth = factory.create("StochasticModelSynth", "fftSize", fftSize, "hopSize", hopSize, "sampleRate", sampleRate, "stocf", stocf);
+	_stochasticmodelsynth->configure("fftSize", fftSize, "hopSize", hopSize, "sampleRate", sampleRate, "stocf", stocf);
 }
 val StochasticModelSynth::compute(std::vector<float>& input_stocenv) {
 	_stochasticmodelsynth->input("stocenv").set(input_stocenv);
@@ -5020,14 +4852,13 @@ _stochasticmodelsynth->reset();
 // START StrongDecay definitions
 // check https://essentia.upf.edu/reference/std_StrongDecay.html
 StrongDecay::StrongDecay(const float sampleRate) {
-	configure(sampleRate);
+	_strongdecay = AlgorithmFactory::create("StrongDecay", "sampleRate", sampleRate);
 }
 StrongDecay::~StrongDecay() {
-	delete _strongdecay;
+	if (_strongdecay) delete _strongdecay;
 }
 void StrongDecay::configure(const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_strongdecay = factory.create("StrongDecay", "sampleRate", sampleRate);
+	_strongdecay->configure("sampleRate", sampleRate);
 }
 val StrongDecay::compute(std::vector<float>& input_signal) {
 	_strongdecay->input("signal").set(input_signal);
@@ -5046,14 +4877,13 @@ _strongdecay->reset();
 // START StrongPeak definitions
 // check https://essentia.upf.edu/reference/std_StrongPeak.html
 StrongPeak::StrongPeak() {
-	configure();
+	_strongpeak = AlgorithmFactory::create("StrongPeak");
 }
 StrongPeak::~StrongPeak() {
-	delete _strongpeak;
+	if (_strongpeak) delete _strongpeak;
 }
 void StrongPeak::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_strongpeak = factory.create("StrongPeak");
+	_strongpeak->configure();
 }
 val StrongPeak::compute(std::vector<float>& input_spectrum) {
 	_strongpeak->input("spectrum").set(input_spectrum);
@@ -5072,14 +4902,13 @@ _strongpeak->reset();
 // START SuperFluxExtractor definitions
 // check https://essentia.upf.edu/reference/std_SuperFluxExtractor.html
 SuperFluxExtractor::SuperFluxExtractor(const float combine, const int frameSize, const int hopSize, const float ratioThreshold, const float sampleRate, const float threshold) {
-	configure(combine, frameSize, hopSize, ratioThreshold, sampleRate, threshold);
+	_superfluxextractor = AlgorithmFactory::create("SuperFluxExtractor", "combine", combine, "frameSize", frameSize, "hopSize", hopSize, "ratioThreshold", ratioThreshold, "sampleRate", sampleRate, "threshold", threshold);
 }
 SuperFluxExtractor::~SuperFluxExtractor() {
-	delete _superfluxextractor;
+	if (_superfluxextractor) delete _superfluxextractor;
 }
 void SuperFluxExtractor::configure(const float combine, const int frameSize, const int hopSize, const float ratioThreshold, const float sampleRate, const float threshold) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_superfluxextractor = factory.create("SuperFluxExtractor", "combine", combine, "frameSize", frameSize, "hopSize", hopSize, "ratioThreshold", ratioThreshold, "sampleRate", sampleRate, "threshold", threshold);
+	_superfluxextractor->configure("combine", combine, "frameSize", frameSize, "hopSize", hopSize, "ratioThreshold", ratioThreshold, "sampleRate", sampleRate, "threshold", threshold);
 }
 val SuperFluxExtractor::compute(std::vector<float>& input_signal) {
 	_superfluxextractor->input("signal").set(input_signal);
@@ -5098,14 +4927,13 @@ _superfluxextractor->reset();
 // START SuperFluxNovelty definitions
 // check https://essentia.upf.edu/reference/std_SuperFluxNovelty.html
 SuperFluxNovelty::SuperFluxNovelty(const int binWidth, const int frameWidth) {
-	configure(binWidth, frameWidth);
+	_superfluxnovelty = AlgorithmFactory::create("SuperFluxNovelty", "binWidth", binWidth, "frameWidth", frameWidth);
 }
 SuperFluxNovelty::~SuperFluxNovelty() {
-	delete _superfluxnovelty;
+	if (_superfluxnovelty) delete _superfluxnovelty;
 }
 void SuperFluxNovelty::configure(const int binWidth, const int frameWidth) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_superfluxnovelty = factory.create("SuperFluxNovelty", "binWidth", binWidth, "frameWidth", frameWidth);
+	_superfluxnovelty->configure("binWidth", binWidth, "frameWidth", frameWidth);
 }
 val SuperFluxNovelty::compute(std::vector<std::vector<float> >& input_bands) {
 	_superfluxnovelty->input("bands").set(input_bands);
@@ -5124,14 +4952,13 @@ _superfluxnovelty->reset();
 // START SuperFluxPeaks definitions
 // check https://essentia.upf.edu/reference/std_SuperFluxPeaks.html
 SuperFluxPeaks::SuperFluxPeaks(const float combine, const float frameRate, const float pre_avg, const float pre_max, const float ratioThreshold, const float threshold) {
-	configure(combine, frameRate, pre_avg, pre_max, ratioThreshold, threshold);
+	_superfluxpeaks = AlgorithmFactory::create("SuperFluxPeaks", "combine", combine, "frameRate", frameRate, "pre_avg", pre_avg, "pre_max", pre_max, "ratioThreshold", ratioThreshold, "threshold", threshold);
 }
 SuperFluxPeaks::~SuperFluxPeaks() {
-	delete _superfluxpeaks;
+	if (_superfluxpeaks) delete _superfluxpeaks;
 }
 void SuperFluxPeaks::configure(const float combine, const float frameRate, const float pre_avg, const float pre_max, const float ratioThreshold, const float threshold) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_superfluxpeaks = factory.create("SuperFluxPeaks", "combine", combine, "frameRate", frameRate, "pre_avg", pre_avg, "pre_max", pre_max, "ratioThreshold", ratioThreshold, "threshold", threshold);
+	_superfluxpeaks->configure("combine", combine, "frameRate", frameRate, "pre_avg", pre_avg, "pre_max", pre_max, "ratioThreshold", ratioThreshold, "threshold", threshold);
 }
 val SuperFluxPeaks::compute(std::vector<float>& input_novelty) {
 	_superfluxpeaks->input("novelty").set(input_novelty);
@@ -5150,14 +4977,13 @@ _superfluxpeaks->reset();
 // START TCToTotal definitions
 // check https://essentia.upf.edu/reference/std_TCToTotal.html
 TCToTotal::TCToTotal() {
-	configure();
+	_tctototal = AlgorithmFactory::create("TCToTotal");
 }
 TCToTotal::~TCToTotal() {
-	delete _tctototal;
+	if (_tctototal) delete _tctototal;
 }
 void TCToTotal::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_tctototal = factory.create("TCToTotal");
+	_tctototal->configure();
 }
 val TCToTotal::compute(std::vector<float>& input_envelope) {
 	_tctototal->input("envelope").set(input_envelope);
@@ -5176,14 +5002,13 @@ _tctototal->reset();
 // START TempoScaleBands definitions
 // check https://essentia.upf.edu/reference/std_TempoScaleBands.html
 TempoScaleBands::TempoScaleBands(const std::vector<float>& bandsGain, const float frameTime) {
-	configure(bandsGain, frameTime);
+	_temposcalebands = AlgorithmFactory::create("TempoScaleBands", "bandsGain", bandsGain, "frameTime", frameTime);
 }
 TempoScaleBands::~TempoScaleBands() {
-	delete _temposcalebands;
+	if (_temposcalebands) delete _temposcalebands;
 }
 void TempoScaleBands::configure(const std::vector<float>& bandsGain, const float frameTime) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_temposcalebands = factory.create("TempoScaleBands", "bandsGain", bandsGain, "frameTime", frameTime);
+	_temposcalebands->configure("bandsGain", bandsGain, "frameTime", frameTime);
 }
 val TempoScaleBands::compute(std::vector<float>& input_bands) {
 	_temposcalebands->input("bands").set(input_bands);
@@ -5205,14 +5030,13 @@ _temposcalebands->reset();
 // START TempoTap definitions
 // check https://essentia.upf.edu/reference/std_TempoTap.html
 TempoTap::TempoTap(const int frameHop, const int frameSize, const int maxTempo, const int minTempo, const int numberFrames, const float sampleRate, const std::vector<float>& tempoHints) {
-	configure(frameHop, frameSize, maxTempo, minTempo, numberFrames, sampleRate, tempoHints);
+	_tempotap = AlgorithmFactory::create("TempoTap", "frameHop", frameHop, "frameSize", frameSize, "maxTempo", maxTempo, "minTempo", minTempo, "numberFrames", numberFrames, "sampleRate", sampleRate, "tempoHints", tempoHints);
 }
 TempoTap::~TempoTap() {
-	delete _tempotap;
+	if (_tempotap) delete _tempotap;
 }
 void TempoTap::configure(const int frameHop, const int frameSize, const int maxTempo, const int minTempo, const int numberFrames, const float sampleRate, const std::vector<float>& tempoHints) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_tempotap = factory.create("TempoTap", "frameHop", frameHop, "frameSize", frameSize, "maxTempo", maxTempo, "minTempo", minTempo, "numberFrames", numberFrames, "sampleRate", sampleRate, "tempoHints", tempoHints);
+	_tempotap->configure("frameHop", frameHop, "frameSize", frameSize, "maxTempo", maxTempo, "minTempo", minTempo, "numberFrames", numberFrames, "sampleRate", sampleRate, "tempoHints", tempoHints);
 }
 val TempoTap::compute(std::vector<float>& input_featuresFrame) {
 	_tempotap->input("featuresFrame").set(input_featuresFrame);
@@ -5234,14 +5058,13 @@ _tempotap->reset();
 // START TempoTapDegara definitions
 // check https://essentia.upf.edu/reference/std_TempoTapDegara.html
 TempoTapDegara::TempoTapDegara(const int maxTempo, const int minTempo, const std::string& resample, const float sampleRateODF) {
-	configure(maxTempo, minTempo, resample, sampleRateODF);
+	_tempotapdegara = AlgorithmFactory::create("TempoTapDegara", "maxTempo", maxTempo, "minTempo", minTempo, "resample", resample, "sampleRateODF", sampleRateODF);
 }
 TempoTapDegara::~TempoTapDegara() {
-	delete _tempotapdegara;
+	if (_tempotapdegara) delete _tempotapdegara;
 }
 void TempoTapDegara::configure(const int maxTempo, const int minTempo, const std::string& resample, const float sampleRateODF) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_tempotapdegara = factory.create("TempoTapDegara", "maxTempo", maxTempo, "minTempo", minTempo, "resample", resample, "sampleRateODF", sampleRateODF);
+	_tempotapdegara->configure("maxTempo", maxTempo, "minTempo", minTempo, "resample", resample, "sampleRateODF", sampleRateODF);
 }
 val TempoTapDegara::compute(std::vector<float>& input_onsetDetections) {
 	_tempotapdegara->input("onsetDetections").set(input_onsetDetections);
@@ -5260,14 +5083,13 @@ _tempotapdegara->reset();
 // START TempoTapMaxAgreement definitions
 // check https://essentia.upf.edu/reference/std_TempoTapMaxAgreement.html
 TempoTapMaxAgreement::TempoTapMaxAgreement() {
-	configure();
+	_tempotapmaxagreement = AlgorithmFactory::create("TempoTapMaxAgreement");
 }
 TempoTapMaxAgreement::~TempoTapMaxAgreement() {
-	delete _tempotapmaxagreement;
+	if (_tempotapmaxagreement) delete _tempotapmaxagreement;
 }
 void TempoTapMaxAgreement::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_tempotapmaxagreement = factory.create("TempoTapMaxAgreement");
+	_tempotapmaxagreement->configure();
 }
 val TempoTapMaxAgreement::compute(std::vector<std::vector<float> >& input_tickCandidates) {
 	_tempotapmaxagreement->input("tickCandidates").set(input_tickCandidates);
@@ -5289,14 +5111,13 @@ _tempotapmaxagreement->reset();
 // START TempoTapTicks definitions
 // check https://essentia.upf.edu/reference/std_TempoTapTicks.html
 TempoTapTicks::TempoTapTicks(const int frameHop, const int hopSize, const float sampleRate) {
-	configure(frameHop, hopSize, sampleRate);
+	_tempotapticks = AlgorithmFactory::create("TempoTapTicks", "frameHop", frameHop, "hopSize", hopSize, "sampleRate", sampleRate);
 }
 TempoTapTicks::~TempoTapTicks() {
-	delete _tempotapticks;
+	if (_tempotapticks) delete _tempotapticks;
 }
 void TempoTapTicks::configure(const int frameHop, const int hopSize, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_tempotapticks = factory.create("TempoTapTicks", "frameHop", frameHop, "hopSize", hopSize, "sampleRate", sampleRate);
+	_tempotapticks->configure("frameHop", frameHop, "hopSize", hopSize, "sampleRate", sampleRate);
 }
 val TempoTapTicks::compute(std::vector<float>& input_periods, std::vector<float>& input_phases) {
 	_tempotapticks->input("periods").set(input_periods);
@@ -5319,14 +5140,13 @@ _tempotapticks->reset();
 // START TensorflowInputFSDSINet definitions
 // check https://essentia.upf.edu/reference/std_TensorflowInputFSDSINet.html
 TensorflowInputFSDSINet::TensorflowInputFSDSINet() {
-	configure();
+	_tensorflowinputfsdsinet = AlgorithmFactory::create("TensorflowInputFSDSINet");
 }
 TensorflowInputFSDSINet::~TensorflowInputFSDSINet() {
-	delete _tensorflowinputfsdsinet;
+	if (_tensorflowinputfsdsinet) delete _tensorflowinputfsdsinet;
 }
 void TensorflowInputFSDSINet::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_tensorflowinputfsdsinet = factory.create("TensorflowInputFSDSINet");
+	_tensorflowinputfsdsinet->configure();
 }
 val TensorflowInputFSDSINet::compute(std::vector<float>& input_frame) {
 	_tensorflowinputfsdsinet->input("frame").set(input_frame);
@@ -5345,14 +5165,13 @@ _tensorflowinputfsdsinet->reset();
 // START TensorflowInputMusiCNN definitions
 // check https://essentia.upf.edu/reference/std_TensorflowInputMusiCNN.html
 TensorflowInputMusiCNN::TensorflowInputMusiCNN() {
-	configure();
+	_tensorflowinputmusicnn = AlgorithmFactory::create("TensorflowInputMusiCNN");
 }
 TensorflowInputMusiCNN::~TensorflowInputMusiCNN() {
-	delete _tensorflowinputmusicnn;
+	if (_tensorflowinputmusicnn) delete _tensorflowinputmusicnn;
 }
 void TensorflowInputMusiCNN::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_tensorflowinputmusicnn = factory.create("TensorflowInputMusiCNN");
+	_tensorflowinputmusicnn->configure();
 }
 val TensorflowInputMusiCNN::compute(std::vector<float>& input_frame) {
 	_tensorflowinputmusicnn->input("frame").set(input_frame);
@@ -5371,14 +5190,13 @@ _tensorflowinputmusicnn->reset();
 // START TensorflowInputTempoCNN definitions
 // check https://essentia.upf.edu/reference/std_TensorflowInputTempoCNN.html
 TensorflowInputTempoCNN::TensorflowInputTempoCNN() {
-	configure();
+	_tensorflowinputtempocnn = AlgorithmFactory::create("TensorflowInputTempoCNN");
 }
 TensorflowInputTempoCNN::~TensorflowInputTempoCNN() {
-	delete _tensorflowinputtempocnn;
+	if (_tensorflowinputtempocnn) delete _tensorflowinputtempocnn;
 }
 void TensorflowInputTempoCNN::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_tensorflowinputtempocnn = factory.create("TensorflowInputTempoCNN");
+	_tensorflowinputtempocnn->configure();
 }
 val TensorflowInputTempoCNN::compute(std::vector<float>& input_frame) {
 	_tensorflowinputtempocnn->input("frame").set(input_frame);
@@ -5397,14 +5215,13 @@ _tensorflowinputtempocnn->reset();
 // START TensorflowInputVGGish definitions
 // check https://essentia.upf.edu/reference/std_TensorflowInputVGGish.html
 TensorflowInputVGGish::TensorflowInputVGGish() {
-	configure();
+	_tensorflowinputvggish = AlgorithmFactory::create("TensorflowInputVGGish");
 }
 TensorflowInputVGGish::~TensorflowInputVGGish() {
-	delete _tensorflowinputvggish;
+	if (_tensorflowinputvggish) delete _tensorflowinputvggish;
 }
 void TensorflowInputVGGish::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_tensorflowinputvggish = factory.create("TensorflowInputVGGish");
+	_tensorflowinputvggish->configure();
 }
 val TensorflowInputVGGish::compute(std::vector<float>& input_frame) {
 	_tensorflowinputvggish->input("frame").set(input_frame);
@@ -5423,14 +5240,13 @@ _tensorflowinputvggish->reset();
 // START TonalExtractor definitions
 // check https://essentia.upf.edu/reference/std_TonalExtractor.html
 TonalExtractor::TonalExtractor(const int frameSize, const int hopSize, const float tuningFrequency) {
-	configure(frameSize, hopSize, tuningFrequency);
+	_tonalextractor = AlgorithmFactory::create("TonalExtractor", "frameSize", frameSize, "hopSize", hopSize, "tuningFrequency", tuningFrequency);
 }
 TonalExtractor::~TonalExtractor() {
-	delete _tonalextractor;
+	if (_tonalextractor) delete _tonalextractor;
 }
 void TonalExtractor::configure(const int frameSize, const int hopSize, const float tuningFrequency) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_tonalextractor = factory.create("TonalExtractor", "frameSize", frameSize, "hopSize", hopSize, "tuningFrequency", tuningFrequency);
+	_tonalextractor->configure("frameSize", frameSize, "hopSize", hopSize, "tuningFrequency", tuningFrequency);
 }
 val TonalExtractor::compute(std::vector<float>& input_signal) {
 	_tonalextractor->input("signal").set(input_signal);
@@ -5482,14 +5298,13 @@ _tonalextractor->reset();
 // START TonicIndianArtMusic definitions
 // check https://essentia.upf.edu/reference/std_TonicIndianArtMusic.html
 TonicIndianArtMusic::TonicIndianArtMusic(const float binResolution, const int frameSize, const float harmonicWeight, const int hopSize, const float magnitudeCompression, const float magnitudeThreshold, const float maxTonicFrequency, const float minTonicFrequency, const int numberHarmonics, const int numberSaliencePeaks, const float referenceFrequency, const float sampleRate) {
-	configure(binResolution, frameSize, harmonicWeight, hopSize, magnitudeCompression, magnitudeThreshold, maxTonicFrequency, minTonicFrequency, numberHarmonics, numberSaliencePeaks, referenceFrequency, sampleRate);
+	_tonicindianartmusic = AlgorithmFactory::create("TonicIndianArtMusic", "binResolution", binResolution, "frameSize", frameSize, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxTonicFrequency", maxTonicFrequency, "minTonicFrequency", minTonicFrequency, "numberHarmonics", numberHarmonics, "numberSaliencePeaks", numberSaliencePeaks, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate);
 }
 TonicIndianArtMusic::~TonicIndianArtMusic() {
-	delete _tonicindianartmusic;
+	if (_tonicindianartmusic) delete _tonicindianartmusic;
 }
 void TonicIndianArtMusic::configure(const float binResolution, const int frameSize, const float harmonicWeight, const int hopSize, const float magnitudeCompression, const float magnitudeThreshold, const float maxTonicFrequency, const float minTonicFrequency, const int numberHarmonics, const int numberSaliencePeaks, const float referenceFrequency, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_tonicindianartmusic = factory.create("TonicIndianArtMusic", "binResolution", binResolution, "frameSize", frameSize, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxTonicFrequency", maxTonicFrequency, "minTonicFrequency", minTonicFrequency, "numberHarmonics", numberHarmonics, "numberSaliencePeaks", numberSaliencePeaks, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate);
+	_tonicindianartmusic->configure("binResolution", binResolution, "frameSize", frameSize, "harmonicWeight", harmonicWeight, "hopSize", hopSize, "magnitudeCompression", magnitudeCompression, "magnitudeThreshold", magnitudeThreshold, "maxTonicFrequency", maxTonicFrequency, "minTonicFrequency", minTonicFrequency, "numberHarmonics", numberHarmonics, "numberSaliencePeaks", numberSaliencePeaks, "referenceFrequency", referenceFrequency, "sampleRate", sampleRate);
 }
 val TonicIndianArtMusic::compute(std::vector<float>& input_signal) {
 	_tonicindianartmusic->input("signal").set(input_signal);
@@ -5508,14 +5323,13 @@ _tonicindianartmusic->reset();
 // START TriangularBands definitions
 // check https://essentia.upf.edu/reference/std_TriangularBands.html
 TriangularBands::TriangularBands(const std::vector<float>& frequencyBands, const int inputSize, const bool log, const std::string& normalize, const float sampleRate, const std::string& type, const std::string& weighting) {
-	configure(frequencyBands, inputSize, log, normalize, sampleRate, type, weighting);
+	_triangularbands = AlgorithmFactory::create("TriangularBands", "frequencyBands", frequencyBands, "inputSize", inputSize, "log", log, "normalize", normalize, "sampleRate", sampleRate, "type", type, "weighting", weighting);
 }
 TriangularBands::~TriangularBands() {
-	delete _triangularbands;
+	if (_triangularbands) delete _triangularbands;
 }
 void TriangularBands::configure(const std::vector<float>& frequencyBands, const int inputSize, const bool log, const std::string& normalize, const float sampleRate, const std::string& type, const std::string& weighting) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_triangularbands = factory.create("TriangularBands", "frequencyBands", frequencyBands, "inputSize", inputSize, "log", log, "normalize", normalize, "sampleRate", sampleRate, "type", type, "weighting", weighting);
+	_triangularbands->configure("frequencyBands", frequencyBands, "inputSize", inputSize, "log", log, "normalize", normalize, "sampleRate", sampleRate, "type", type, "weighting", weighting);
 }
 val TriangularBands::compute(std::vector<float>& input_spectrum) {
 	_triangularbands->input("spectrum").set(input_spectrum);
@@ -5534,14 +5348,13 @@ _triangularbands->reset();
 // START TriangularBarkBands definitions
 // check https://essentia.upf.edu/reference/std_TriangularBarkBands.html
 TriangularBarkBands::TriangularBarkBands(const float highFrequencyBound, const int inputSize, const bool log, const float lowFrequencyBound, const std::string& normalize, const int numberBands, const float sampleRate, const std::string& type, const std::string& weighting) {
-	configure(highFrequencyBound, inputSize, log, lowFrequencyBound, normalize, numberBands, sampleRate, type, weighting);
+	_triangularbarkbands = AlgorithmFactory::create("TriangularBarkBands", "highFrequencyBound", highFrequencyBound, "inputSize", inputSize, "log", log, "lowFrequencyBound", lowFrequencyBound, "normalize", normalize, "numberBands", numberBands, "sampleRate", sampleRate, "type", type, "weighting", weighting);
 }
 TriangularBarkBands::~TriangularBarkBands() {
-	delete _triangularbarkbands;
+	if (_triangularbarkbands) delete _triangularbarkbands;
 }
 void TriangularBarkBands::configure(const float highFrequencyBound, const int inputSize, const bool log, const float lowFrequencyBound, const std::string& normalize, const int numberBands, const float sampleRate, const std::string& type, const std::string& weighting) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_triangularbarkbands = factory.create("TriangularBarkBands", "highFrequencyBound", highFrequencyBound, "inputSize", inputSize, "log", log, "lowFrequencyBound", lowFrequencyBound, "normalize", normalize, "numberBands", numberBands, "sampleRate", sampleRate, "type", type, "weighting", weighting);
+	_triangularbarkbands->configure("highFrequencyBound", highFrequencyBound, "inputSize", inputSize, "log", log, "lowFrequencyBound", lowFrequencyBound, "normalize", normalize, "numberBands", numberBands, "sampleRate", sampleRate, "type", type, "weighting", weighting);
 }
 val TriangularBarkBands::compute(std::vector<float>& input_spectrum) {
 	_triangularbarkbands->input("spectrum").set(input_spectrum);
@@ -5560,14 +5373,13 @@ _triangularbarkbands->reset();
 // START Trimmer definitions
 // check https://essentia.upf.edu/reference/std_Trimmer.html
 Trimmer::Trimmer(const bool checkRange, const float endTime, const float sampleRate, const float startTime) {
-	configure(checkRange, endTime, sampleRate, startTime);
+	_trimmer = AlgorithmFactory::create("Trimmer", "checkRange", checkRange, "endTime", endTime, "sampleRate", sampleRate, "startTime", startTime);
 }
 Trimmer::~Trimmer() {
-	delete _trimmer;
+	if (_trimmer) delete _trimmer;
 }
 void Trimmer::configure(const bool checkRange, const float endTime, const float sampleRate, const float startTime) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_trimmer = factory.create("Trimmer", "checkRange", checkRange, "endTime", endTime, "sampleRate", sampleRate, "startTime", startTime);
+	_trimmer->configure("checkRange", checkRange, "endTime", endTime, "sampleRate", sampleRate, "startTime", startTime);
 }
 val Trimmer::compute(std::vector<float>& input_signal) {
 	_trimmer->input("signal").set(input_signal);
@@ -5586,14 +5398,13 @@ _trimmer->reset();
 // START Tristimulus definitions
 // check https://essentia.upf.edu/reference/std_Tristimulus.html
 Tristimulus::Tristimulus() {
-	configure();
+	_tristimulus = AlgorithmFactory::create("Tristimulus");
 }
 Tristimulus::~Tristimulus() {
-	delete _tristimulus;
+	if (_tristimulus) delete _tristimulus;
 }
 void Tristimulus::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_tristimulus = factory.create("Tristimulus");
+	_tristimulus->configure();
 }
 val Tristimulus::compute(std::vector<float>& input_frequencies, std::vector<float>& input_magnitudes) {
 	_tristimulus->input("frequencies").set(input_frequencies);
@@ -5613,14 +5424,13 @@ _tristimulus->reset();
 // START TruePeakDetector definitions
 // check https://essentia.upf.edu/reference/std_TruePeakDetector.html
 TruePeakDetector::TruePeakDetector(const bool blockDC, const bool emphasise, const int oversamplingFactor, const int quality, const float sampleRate, const float threshold, const int version) {
-	configure(blockDC, emphasise, oversamplingFactor, quality, sampleRate, threshold, version);
+	_truepeakdetector = AlgorithmFactory::create("TruePeakDetector", "blockDC", blockDC, "emphasise", emphasise, "oversamplingFactor", oversamplingFactor, "quality", quality, "sampleRate", sampleRate, "threshold", threshold, "version", version);
 }
 TruePeakDetector::~TruePeakDetector() {
-	delete _truepeakdetector;
+	if (_truepeakdetector) delete _truepeakdetector;
 }
 void TruePeakDetector::configure(const bool blockDC, const bool emphasise, const int oversamplingFactor, const int quality, const float sampleRate, const float threshold, const int version) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_truepeakdetector = factory.create("TruePeakDetector", "blockDC", blockDC, "emphasise", emphasise, "oversamplingFactor", oversamplingFactor, "quality", quality, "sampleRate", sampleRate, "threshold", threshold, "version", version);
+	_truepeakdetector->configure("blockDC", blockDC, "emphasise", emphasise, "oversamplingFactor", oversamplingFactor, "quality", quality, "sampleRate", sampleRate, "threshold", threshold, "version", version);
 }
 val TruePeakDetector::compute(std::vector<float>& input_signal) {
 	_truepeakdetector->input("signal").set(input_signal);
@@ -5642,14 +5452,13 @@ _truepeakdetector->reset();
 // START TuningFrequency definitions
 // check https://essentia.upf.edu/reference/std_TuningFrequency.html
 TuningFrequency::TuningFrequency(const float resolution) {
-	configure(resolution);
+	_tuningfrequency = AlgorithmFactory::create("TuningFrequency", "resolution", resolution);
 }
 TuningFrequency::~TuningFrequency() {
-	delete _tuningfrequency;
+	if (_tuningfrequency) delete _tuningfrequency;
 }
 void TuningFrequency::configure(const float resolution) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_tuningfrequency = factory.create("TuningFrequency", "resolution", resolution);
+	_tuningfrequency->configure("resolution", resolution);
 }
 val TuningFrequency::compute(std::vector<float>& input_frequencies, std::vector<float>& input_magnitudes) {
 	_tuningfrequency->input("frequencies").set(input_frequencies);
@@ -5672,14 +5481,13 @@ _tuningfrequency->reset();
 // START TuningFrequencyExtractor definitions
 // check https://essentia.upf.edu/reference/std_TuningFrequencyExtractor.html
 TuningFrequencyExtractor::TuningFrequencyExtractor(const int frameSize, const int hopSize) {
-	configure(frameSize, hopSize);
+	_tuningfrequencyextractor = AlgorithmFactory::create("TuningFrequencyExtractor", "frameSize", frameSize, "hopSize", hopSize);
 }
 TuningFrequencyExtractor::~TuningFrequencyExtractor() {
-	delete _tuningfrequencyextractor;
+	if (_tuningfrequencyextractor) delete _tuningfrequencyextractor;
 }
 void TuningFrequencyExtractor::configure(const int frameSize, const int hopSize) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_tuningfrequencyextractor = factory.create("TuningFrequencyExtractor", "frameSize", frameSize, "hopSize", hopSize);
+	_tuningfrequencyextractor->configure("frameSize", frameSize, "hopSize", hopSize);
 }
 val TuningFrequencyExtractor::compute(std::vector<float>& input_signal) {
 	_tuningfrequencyextractor->input("signal").set(input_signal);
@@ -5698,14 +5506,13 @@ _tuningfrequencyextractor->reset();
 // START UnaryOperator definitions
 // check https://essentia.upf.edu/reference/std_UnaryOperator.html
 UnaryOperator::UnaryOperator(const float scale, const float shift, const std::string& type) {
-	configure(scale, shift, type);
+	_unaryoperator = AlgorithmFactory::create("UnaryOperator", "scale", scale, "shift", shift, "type", type);
 }
 UnaryOperator::~UnaryOperator() {
-	delete _unaryoperator;
+	if (_unaryoperator) delete _unaryoperator;
 }
 void UnaryOperator::configure(const float scale, const float shift, const std::string& type) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_unaryoperator = factory.create("UnaryOperator", "scale", scale, "shift", shift, "type", type);
+	_unaryoperator->configure("scale", scale, "shift", shift, "type", type);
 }
 val UnaryOperator::compute(std::vector<float>& input_array) {
 	_unaryoperator->input("array").set(input_array);
@@ -5724,14 +5531,13 @@ _unaryoperator->reset();
 // START UnaryOperatorStream definitions
 // check https://essentia.upf.edu/reference/std_UnaryOperatorStream.html
 UnaryOperatorStream::UnaryOperatorStream(const float scale, const float shift, const std::string& type) {
-	configure(scale, shift, type);
+	_unaryoperatorstream = AlgorithmFactory::create("UnaryOperatorStream", "scale", scale, "shift", shift, "type", type);
 }
 UnaryOperatorStream::~UnaryOperatorStream() {
-	delete _unaryoperatorstream;
+	if (_unaryoperatorstream) delete _unaryoperatorstream;
 }
 void UnaryOperatorStream::configure(const float scale, const float shift, const std::string& type) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_unaryoperatorstream = factory.create("UnaryOperatorStream", "scale", scale, "shift", shift, "type", type);
+	_unaryoperatorstream->configure("scale", scale, "shift", shift, "type", type);
 }
 val UnaryOperatorStream::compute(std::vector<float>& input_array) {
 	_unaryoperatorstream->input("array").set(input_array);
@@ -5750,14 +5556,13 @@ _unaryoperatorstream->reset();
 // START Variance definitions
 // check https://essentia.upf.edu/reference/std_Variance.html
 Variance::Variance() {
-	configure();
+	_variance = AlgorithmFactory::create("Variance");
 }
 Variance::~Variance() {
-	delete _variance;
+	if (_variance) delete _variance;
 }
 void Variance::configure() {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_variance = factory.create("Variance");
+	_variance->configure();
 }
 val Variance::compute(std::vector<float>& input_array) {
 	_variance->input("array").set(input_array);
@@ -5776,14 +5581,13 @@ _variance->reset();
 // START Vibrato definitions
 // check https://essentia.upf.edu/reference/std_Vibrato.html
 Vibrato::Vibrato(const float maxExtend, const float maxFrequency, const float minExtend, const float minFrequency, const float sampleRate) {
-	configure(maxExtend, maxFrequency, minExtend, minFrequency, sampleRate);
+	_vibrato = AlgorithmFactory::create("Vibrato", "maxExtend", maxExtend, "maxFrequency", maxFrequency, "minExtend", minExtend, "minFrequency", minFrequency, "sampleRate", sampleRate);
 }
 Vibrato::~Vibrato() {
-	delete _vibrato;
+	if (_vibrato) delete _vibrato;
 }
 void Vibrato::configure(const float maxExtend, const float maxFrequency, const float minExtend, const float minFrequency, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_vibrato = factory.create("Vibrato", "maxExtend", maxExtend, "maxFrequency", maxFrequency, "minExtend", minExtend, "minFrequency", minFrequency, "sampleRate", sampleRate);
+	_vibrato->configure("maxExtend", maxExtend, "maxFrequency", maxFrequency, "minExtend", minExtend, "minFrequency", minFrequency, "sampleRate", sampleRate);
 }
 val Vibrato::compute(std::vector<float>& input_pitch) {
 	_vibrato->input("pitch").set(input_pitch);
@@ -5805,14 +5609,13 @@ _vibrato->reset();
 // START WarpedAutoCorrelation definitions
 // check https://essentia.upf.edu/reference/std_WarpedAutoCorrelation.html
 WarpedAutoCorrelation::WarpedAutoCorrelation(const int maxLag, const float sampleRate) {
-	configure(maxLag, sampleRate);
+	_warpedautocorrelation = AlgorithmFactory::create("WarpedAutoCorrelation", "maxLag", maxLag, "sampleRate", sampleRate);
 }
 WarpedAutoCorrelation::~WarpedAutoCorrelation() {
-	delete _warpedautocorrelation;
+	if (_warpedautocorrelation) delete _warpedautocorrelation;
 }
 void WarpedAutoCorrelation::configure(const int maxLag, const float sampleRate) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_warpedautocorrelation = factory.create("WarpedAutoCorrelation", "maxLag", maxLag, "sampleRate", sampleRate);
+	_warpedautocorrelation->configure("maxLag", maxLag, "sampleRate", sampleRate);
 }
 val WarpedAutoCorrelation::compute(std::vector<float>& input_array) {
 	_warpedautocorrelation->input("array").set(input_array);
@@ -5831,14 +5634,13 @@ _warpedautocorrelation->reset();
 // START Welch definitions
 // check https://essentia.upf.edu/reference/std_Welch.html
 Welch::Welch(const int averagingFrames, const int fftSize, const int frameSize, const float sampleRate, const std::string& scaling, const std::string& windowType) {
-	configure(averagingFrames, fftSize, frameSize, sampleRate, scaling, windowType);
+	_welch = AlgorithmFactory::create("Welch", "averagingFrames", averagingFrames, "fftSize", fftSize, "frameSize", frameSize, "sampleRate", sampleRate, "scaling", scaling, "windowType", windowType);
 }
 Welch::~Welch() {
-	delete _welch;
+	if (_welch) delete _welch;
 }
 void Welch::configure(const int averagingFrames, const int fftSize, const int frameSize, const float sampleRate, const std::string& scaling, const std::string& windowType) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_welch = factory.create("Welch", "averagingFrames", averagingFrames, "fftSize", fftSize, "frameSize", frameSize, "sampleRate", sampleRate, "scaling", scaling, "windowType", windowType);
+	_welch->configure("averagingFrames", averagingFrames, "fftSize", fftSize, "frameSize", frameSize, "sampleRate", sampleRate, "scaling", scaling, "windowType", windowType);
 }
 val Welch::compute(std::vector<float>& input_frame) {
 	_welch->input("frame").set(input_frame);
@@ -5857,14 +5659,13 @@ _welch->reset();
 // START Windowing definitions
 // check https://essentia.upf.edu/reference/std_Windowing.html
 Windowing::Windowing(const int constantsDecimals, const bool normalized, const int size, const bool splitPadding, const bool symmetric, const std::string& type, const int zeroPadding, const bool zeroPhase) {
-	configure(constantsDecimals, normalized, size, splitPadding, symmetric, type, zeroPadding, zeroPhase);
+	_windowing = AlgorithmFactory::create("Windowing", "constantsDecimals", constantsDecimals, "normalized", normalized, "size", size, "splitPadding", splitPadding, "symmetric", symmetric, "type", type, "zeroPadding", zeroPadding, "zeroPhase", zeroPhase);
 }
 Windowing::~Windowing() {
-	delete _windowing;
+	if (_windowing) delete _windowing;
 }
 void Windowing::configure(const int constantsDecimals, const bool normalized, const int size, const bool splitPadding, const bool symmetric, const std::string& type, const int zeroPadding, const bool zeroPhase) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_windowing = factory.create("Windowing", "constantsDecimals", constantsDecimals, "normalized", normalized, "size", size, "splitPadding", splitPadding, "symmetric", symmetric, "type", type, "zeroPadding", zeroPadding, "zeroPhase", zeroPhase);
+	_windowing->configure("constantsDecimals", constantsDecimals, "normalized", normalized, "size", size, "splitPadding", splitPadding, "symmetric", symmetric, "type", type, "zeroPadding", zeroPadding, "zeroPhase", zeroPhase);
 }
 val Windowing::compute(std::vector<float>& input_frame) {
 	_windowing->input("frame").set(input_frame);
@@ -5883,14 +5684,13 @@ _windowing->reset();
 // START ZeroCrossingRate definitions
 // check https://essentia.upf.edu/reference/std_ZeroCrossingRate.html
 ZeroCrossingRate::ZeroCrossingRate(const float threshold) {
-	configure(threshold);
+	_zerocrossingrate = AlgorithmFactory::create("ZeroCrossingRate", "threshold", threshold);
 }
 ZeroCrossingRate::~ZeroCrossingRate() {
-	delete _zerocrossingrate;
+	if (_zerocrossingrate) delete _zerocrossingrate;
 }
 void ZeroCrossingRate::configure(const float threshold) {
-	AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-	_zerocrossingrate = factory.create("ZeroCrossingRate", "threshold", threshold);
+	_zerocrossingrate->configure("threshold", threshold);
 }
 val ZeroCrossingRate::compute(std::vector<float>& input_signal) {
 	_zerocrossingrate->input("signal").set(input_signal);

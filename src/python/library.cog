@@ -43,17 +43,15 @@ void _initEssentia() {
 
 // START FrameGenerator definitions
 FrameGenerator::FrameGenerator(int frameSize, int hopSize) {
-  configure(frameSize, hopSize);
+  _framecutter = AlgorithmFactory::create("FrameCutter",
+                "frameSize", frameSize,
+                "hopSize", hopSize);
 }
 FrameGenerator::~FrameGenerator() {
   delete _framecutter;
 }
 void FrameGenerator::configure(int frameSize, int hopSize) {
-    // create algorithm instances
-  AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
-  _framecutter = factory.create("FrameCutter",
-                  "frameSize", frameSize,
-                  "hopSize", hopSize);
+  _framecutter->configure("frameSize", frameSize, "hopSize", hopSize);
 }
 std::vector<std::vector<float> > FrameGenerator::compute(const val& signalArray) {
   // convert JS typed typed float 32 array to std::vector<float>
