@@ -1,4 +1,6 @@
-let esLib = require('../../index');
+// get lib from node_modules to ensure release version (old func interface), not newer potentially OOP local builds
+let esLib = require('essentia.js');
+
 const essentia = new esLib.Essentia(esLib.EssentiaWASM);
 let mfccModule = require('../../src/cpp/MFCC/mfcc.umd.js');
 let fs = require('fs');
@@ -96,7 +98,7 @@ fs.readFile(audioFilePath, (err, data) => {
       }
     }
     var json = JSON.stringify(resultsObj);
-    fs.writeFile('mfcc.json', json, 'utf8', function (err) {
+    fs.writeFile('mfcc_comparison_node.json', json, 'utf8', function (err) {
       if (err) {
         console.log("An error occured while writing MFCC JSON Object to File.");
         return console.log(err);
