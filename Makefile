@@ -31,7 +31,7 @@ build:
 	@echo "Compiling + linking emscripten embind cpp bindings directly to js, wasm files ..."
 
 	@echo "... compiling async builds..."
-	@emcc -lembind -Oz $(BINDING_ESSENTIAJS) $(INCLUDE_ESSENTIAJS) \
+	@emcc -Oz $(BINDING_ESSENTIAJS) $(INCLUDE_ESSENTIAJS) \
 	   -lembind -lessentia -L $(LIB_DIR_ESSENTIA) \
 		 -I $(EIGEN_PATH) -I $(INCLUDE_DIR_ESSENTIA)\
 		 -s WASM=1 \
@@ -46,7 +46,7 @@ build:
 	@echo "Done ..."
 
 	@echo "... compiling sync builds..."
-	@emcc --bind -Oz $(BINDING_ESSENTIAJS) $(INCLUDE_ESSENTIAJS) \
+	@emcc -Oz $(BINDING_ESSENTIAJS) $(INCLUDE_ESSENTIAJS) \
 		 -lembind -lessentia -L $(LIB_DIR_ESSENTIA) \
 		 -I $(EIGEN_PATH) -I $(INCLUDE_DIR_ESSENTIA)\
 	   -s WASM=1 \
