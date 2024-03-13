@@ -1,0 +1,1 @@
+import { EssentiaWASM } from "/builds/essentia-wasm.es.js";
