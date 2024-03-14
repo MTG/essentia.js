@@ -46,7 +46,18 @@ class FrameGenerator {
 };
 
 // val MonoMixer(std::vector<float>& left_channel, std::vector<float>& right_channel);
-// val LoudnessEBUR128(std::vector<float>& left_channel, std::vector<float>& right_channel, const float hopSize=0.1, const float sampleRate=44100, const bool startAtZero=false);
+// val LoudnessEBUR128();
+class LoudnessEBUR128 {
+  public:
+    LoudnessEBUR128(const float hopSize=0.1, const float sampleRate=44100, const bool startAtZero=false);
+    ~LoudnessEBUR128();
+    void configure(const float hopSize=0.1, const float sampleRate=44100, const bool startAtZero=false);
+    val compute(std::vector<float>& left_channel, std::vector<float>& right_channel);
+    void reset();
+  private:
+    Algorithm* _algoStereoMuxer;
+    Algorithm* _algoLoudnessEBUR128;
+};
 // NOTE: The following code snippets are machine generated. Do not edit.    
 /*[[[cog
 import cog

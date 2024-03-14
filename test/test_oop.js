@@ -1,8 +1,72 @@
 const { expect } = require('chai');
 const EssentiaWASM = require('../dist/essentia-wasm.umd.js');
-const { ready, FrequencyBands, arrayToVector, vectorToArray } = require('../dist/essentia.js-core.umd.js');
+const { ready, FrequencyBands, LoudnessEBUR128, arrayToVector, vectorToArray } = require('../dist/essentia.js-core.umd.js');
 
 ready(EssentiaWASM);
+
+describe('LoudnessEBUR128:instantiation', () => {
+  let loudnessEBUR128Instance;
+  it('should instantiate algorithm correctly', () => {
+    loudnessEBUR128Instance = new LoudnessEBUR128();
+  });
+  it('should delete instance', () => {
+    loudnessEBUR128Instance.delete();
+  })
+});
+
+describe('LoudnessEBUR128:functionality', () => {
+  let loudnessEBUR128Instance;
+
+  beforeEach(() => {
+    // Initialize the LoudnessEBUR128 instance before each test
+    loudnessEBUR128Instance = new LoudnessEBUR128();
+  });
+
+  afterEach(() => {
+    // clear object from C++/WASM memory
+    loudnessEBUR128Instance.delete();
+  })
+
+  it('should initialize with default params', () => {
+    expect(loudnessEBUR128Instance).to.be.instanceOf(LoudnessEBUR128);
+  });
+
+  it('should configure with valid parameters', () => {
+    expect(() => {
+      loudnessEBUR128Instance.configure(0.05, 48000, true); // hopSize in seconds
+    }).to.not.throw();
+  });
+
+  it('should throw an error when configuring with invalid `hopSize` param', () => {
+    expect(() => {
+      loudnessEBUR128Instance.configure('hello');
+    }).to.throw();
+  });
+
+  it('should throw an error when configuring with invalid `sampleRate` param', () => {
+    expect(() => {
+      loudnessEBUR128Instance.configure(512, '16000');
+    }).to.throw();
+   });
+
+  it('should compute with valid input', () => {
+    const signalData = Array(44100*5).fill(0).map( _ => Math.random() ); // 5s audio
+    const signalVector = arrayToVector(signalData);
+    const result = loudnessEBUR128Instance.compute(signalVector, signalVector);
+    console.log('loudnessebur128 output', result);
+    // Add assertions to check the result of the computation
+    expect(result).to.be.an('object');
+    // for some reason chaining `and.to.have.property`s wasn't working
+    expect(result).to.have.property('momentaryLoudness');
+    expect(result).to.have.property('shortTermLoudness');
+    expect(result).to.have.property('integratedLoudness');
+    expect(result).to.have.property('loudnessRange');
+    // Chai cannot check for type VectorFloat, so quick conversion to bypass that
+    expect(vectorToArray(result['momentaryLoudness'])).to.be.a('Float32Array');
+    expect(vectorToArray(result['shortTermLoudness'])).to.be.a('Float32Array');
+  });
+
+});
 
 describe('FrequencyBands:instantiation', () => {
   let frequencyBandsInstance;

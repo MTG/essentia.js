@@ -215,7 +215,7 @@ class LoudnessEBUR128 {
    * @param {boolean} [startAtZero=false] start momentary/short-term loudness estimation at time 0 (zero-centered loudness estimation windows) if true; otherwise start both windows at time 0 (time positions for momentary and short-term values will not be syncronized)
   */
   constructor(hopSize: number=0.1, sampleRate: number=44100, startAtZero: boolean=false) {
-    this.algoInstance = new wasmBackend.LoudnessEBUR128();
+    this.algoInstance = new wasmBackend.LoudnessEBUR128(hopSize, sampleRate, startAtZero);
   }
   /**
    * Configure algorithm with default or given params
@@ -226,7 +226,7 @@ class LoudnessEBUR128 {
    * @memberof LoudnessEBUR128
   */
   configure(hopSize: number=0.1, sampleRate: number=44100, startAtZero: boolean=false) {
-    this.algoInstance.configure();
+    this.algoInstance.configure(hopSize, sampleRate, startAtZero);
   }
   /**
    * Execute algorithm with given inputs

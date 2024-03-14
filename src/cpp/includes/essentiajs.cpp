@@ -127,37 +127,51 @@ void FrameGenerator::reset() {
 
 // This a wrapper for LoudnessEBUR128 algorithm to accept both left and right channels of an stereo audio signal seperately
 // check https://essentia.upf.edu/reference/std_LoudnessEBUR128.html for algorithm details
-// val EssentiaJS::LoudnessEBUR128(std::vector<float>& left_channel, std::vector<float>& right_channel, const float hopSize, const float sampleRate, const bool startAtZero) {
-//   AlgorithmFactory& factory = standard::AlgorithmFactory::instance();
+LoudnessEBUR128::LoudnessEBUR128(const float hopSize, const float sampleRate, const bool startAtZero) {
+  _algoStereoMuxer = AlgorithmFactory::create("StereoMuxer");
+  _algoLoudnessEBUR128 = AlgorithmFactory::create("LoudnessEBUR128", "hopSize", hopSize, "sampleRate", sampleRate, "startAtZero", startAtZero);
+}
 
-//   Algorithm* algoStereoMuxer = factory.create("StereoMuxer");
-//   algoStereoMuxer->input("left").set(left_channel);
-//   algoStereoMuxer->input("right").set(right_channel);
-//   std::vector<StereoSample> stereoSignal;
-//   algoStereoMuxer->output("audio").set(stereoSignal);
-//   algoStereoMuxer->compute();
-//   delete algoStereoMuxer;
+LoudnessEBUR128::~LoudnessEBUR128() {
+  if (_algoStereoMuxer) delete _algoStereoMuxer;
+  if (_algoLoudnessEBUR128) delete _algoLoudnessEBUR128;
+}
 
-//   Algorithm* algoLoudnessEBUR128 = factory.create("LoudnessEBUR128", "hopSize", hopSize, "sampleRate", sampleRate, "startAtZero", startAtZero);
-//   algoLoudnessEBUR128->input("signal").set(stereoSignal);
-//   std::vector<float> output_momentaryLoudness;
-//   std::vector<float> output_shortTermLoudness;
-//   float output_integratedLoudness;
-//   float output_loudnessRange;
-//   algoLoudnessEBUR128->output("momentaryLoudness").set(output_momentaryLoudness);
-//   algoLoudnessEBUR128->output("shortTermLoudness").set(output_shortTermLoudness);
-//   algoLoudnessEBUR128->output("integratedLoudness").set(output_integratedLoudness);
-//   algoLoudnessEBUR128->output("loudnessRange").set(output_loudnessRange);
-//   algoLoudnessEBUR128->compute();
-//   val outputLoudnessEBUR128(val::object());
-//   outputLoudnessEBUR128.set("momentaryLoudness", output_momentaryLoudness);
-//   outputLoudnessEBUR128.set("shortTermLoudness", output_shortTermLoudness);
-//   outputLoudnessEBUR128.set("integratedLoudness", output_integratedLoudness);
-//   outputLoudnessEBUR128.set("loudnessRange", output_loudnessRange);
+void LoudnessEBUR128::configure(const float hopSize, const float sampleRate, const bool startAtZero) {
+  _algoStereoMuxer->configure();
+  _algoLoudnessEBUR128->configure("hopSize", hopSize, "sampleRate", sampleRate, "startAtZero", startAtZero);
+}
 
-//   delete algoLoudnessEBUR128;
-//   return outputLoudnessEBUR128;
-// }
+val LoudnessEBUR128::compute(std::vector<float>& left_channel, std::vector<float>& right_channel) {
+  _algoStereoMuxer->input("left").set(left_channel);
+  _algoStereoMuxer->input("right").set(right_channel);
+  std::vector<StereoSample> stereoSignal;
+  _algoStereoMuxer->output("audio").set(stereoSignal);
+  _algoStereoMuxer->compute();
+
+  _algoLoudnessEBUR128->input("signal").set(stereoSignal);
+  std::vector<float> output_momentaryLoudness;
+  std::vector<float> output_shortTermLoudness;
+  float output_integratedLoudness;
+  float output_loudnessRange;
+  _algoLoudnessEBUR128->output("momentaryLoudness").set(output_momentaryLoudness);
+  _algoLoudnessEBUR128->output("shortTermLoudness").set(output_shortTermLoudness);
+  _algoLoudnessEBUR128->output("integratedLoudness").set(output_integratedLoudness);
+  _algoLoudnessEBUR128->output("loudnessRange").set(output_loudnessRange);
+  _algoLoudnessEBUR128->compute();
+  val outputLoudnessEBUR128(val::object());
+  outputLoudnessEBUR128.set("momentaryLoudness", output_momentaryLoudness);
+  outputLoudnessEBUR128.set("shortTermLoudness", output_shortTermLoudness);
+  outputLoudnessEBUR128.set("integratedLoudness", output_integratedLoudness);
+  outputLoudnessEBUR128.set("loudnessRange", output_loudnessRange);
+
+  return outputLoudnessEBUR128;
+}
+
+void LoudnessEBUR128::reset() {
+  _algoStereoMuxer->reset();
+  _algoLoudnessEBUR128->reset();
+}
 
 // NOTE: The following code snippets are machine generated. Do not edit.
 

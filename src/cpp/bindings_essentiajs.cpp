@@ -31,6 +31,12 @@ EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) {
     .function("compute", &FrameGenerator::compute)
     .function("reset", &FrameGenerator::reset)
     ;
+  class_<LoudnessEBUR128>("LoudnessEBUR128")
+    .constructor<float, float, bool>()
+    .function("configure", &LoudnessEBUR128::configure)
+    .function("compute", &LoudnessEBUR128::compute)
+    .function("reset", &LoudnessEBUR128::reset)
+    ;
   // NOTE: The following code snippets are machine generated. Do not edit.
 
   class_<AfterMaxToBeforeMaxEnergyRatio>("AfterMaxToBeforeMaxEnergyRatio")
