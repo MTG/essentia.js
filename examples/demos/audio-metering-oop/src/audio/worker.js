@@ -6,24 +6,24 @@ self.error = function (msg) {
     throw Error(`audio-worker error: \n ${msg}`);
 };
 
-const useExtractor = true;
 // INIT
-import { Essentia, EssentiaWASM } from 'essentia.js';
+import {EssentiaWASM} from './essentia-wasm.es.js'
+import { ready, RMS, LoudnessEBUR128, BinaryOperator, arrayToVector, vectorToArray } from './essentia.js-core.es.js';
 import { SpectralProfileWASM } from './spectralProfile2.module.js';
 
 self.frameSize = 2048;
 self.hopSize = 32768; // equivalent to downsampling for spectral profile
 
-self.essentia = null;
 try {
-    self.essentia = new Essentia(EssentiaWASM.EssentiaWASM);
+    ready(EssentiaWASM);
 } catch (err) { error(err) }
 
 
 // COMMS
 onmessage = function listenToMainThread(msg) {
     if (msg.data.shutdown) {
-        cleanup();
+        close();
+        log('context closed');
         self.postMessage({shutdownFinished: true});
     }
     if (!msg.data.audioData) {
@@ -39,13 +39,10 @@ onmessage = function listenToMainThread(msg) {
     delete msg.data.audioData;
 };
 
-function cleanup () {
-    if (self.essentia) {
-        self.essentia.shutdown();
-        log('essentia was shutdown')
+function cleanup (cppObjectsArray) {
+    for (let obj of cppObjectsArray) {
+        obj.delete();
     }
-    close();
-    log('context closed')
 }
 
 // AUDIO FUNCS
@@ -54,19 +51,17 @@ function getMonoMix(track) {
 }
 
 function analyse (track) {
-    const left = self.essentia.arrayToVector(track[0]);
-    const right = self.essentia.arrayToVector(track[1]);
+    const left = arrayToVector(track[0]);
+    const right = arrayToVector(track[1]);
 
     const monoMix = getMonoMix(track);
-    const monoMixVector = self.essentia.arrayToVector(monoMix);
+    const monoMixVector = arrayToVector(monoMix);
 
     console.time('loudness');
     const loudness = getLoudness(left, right, monoMixVector);
     console.timeEnd('loudness');
 
-    left.delete();
-    right.delete();
-    monoMixVector.delete();
+    cleanup([left, right, monoMixVector]);
 
     return {
         loudness: loudness,
@@ -80,19 +75,34 @@ function analyse (track) {
 }
 
 function getLoudness (left, right, mono) {
-    let loudnessOut = self.essentia.LoudnessEBUR128(left, right);
-    let rmsMono = self.essentia.RMS(mono).rms;
-    // let rmsRight = self.essentia.RMS(right).rms;
-    return {
+    const loudnessEBUR128 = new LoudnessEBUR128();
+    const rms = new RMS();
+
+    let loudnessOut = loudnessEBUR128.compute(left, right);
+    let rmsMono = rms.compute(mono).rms;
+
+    const result = {
         integrated: loudnessOut.integratedLoudness,
         range: loudnessOut.loudnessRange,
-        momentary: Array.from(self.essentia.vectorToArray(loudnessOut.momentaryLoudness)),
-        shortTerm: Array.from(self.essentia.vectorToArray(loudnessOut.shortTermLoudness)),
+        momentary: Array.from(vectorToArray(loudnessOut.momentaryLoudness)),
+        shortTerm: Array.from(vectorToArray(loudnessOut.shortTermLoudness)),
         rms: {
             mono: 20*Math.log10(rmsMono),
             // right: 20*Math.log10(rmsRight)
         }
     }
+
+    cleanup([loudnessEBUR128, rms, loudnessOut.momentaryLoudness, loudnessOut.shortTermLoudness]);
+    
+    return result;
+}
+
+function accumVector(vec) {
+    let accum = 0;
+    for (let i = 0; i < vec.size(); i++) {
+        accum += vec.get(i);
+    }
+    return accum;
 }
 
 function phaseCorrelation (L, R) {
@@ -101,28 +111,28 @@ function phaseCorrelation (L, R) {
 	const n = L.length;
 	if (n == 0) return null;
 
-	let sumL = 0,
-		sumR = 0,
-		sumLR = 0,
-		sumL2 = 0,
-		sumR2 = 0;
-	
+    const vectorMultiply = new BinaryOperator("multiply");
+    const leftVector = arrayToVector(L);
+    const rightVector = arrayToVector(R);
 
-    // compute sums
-    L.map( (leftSamp, idx) => {
-        const rightSamp = R[idx];
-        sumL += leftSamp;
-        sumR += rightSamp;
-        sumLR += leftSamp * rightSamp;
-        sumL2 += leftSamp * leftSamp;
-        sumR2 += rightSamp * rightSamp;
-    })
+    const leftRightVector = vectorMultiply.compute(leftVector, rightVector).array;
+    const left2Vector = vectorMultiply.compute(leftVector, leftVector).array;
+    const right2Vector = vectorMultiply.compute(rightVector, rightVector).array;
+
+	let sumL = L.reduce( (accum, elem) => accum+elem ),
+		sumR = R.reduce( (accum, elem) => accum+elem ),
+		sumLR = accumVector(leftRightVector),
+		sumL2 = accumVector(left2Vector),
+		sumR2 = accumVector(right2Vector);
+	
+    cleanup([vectorMultiply, leftVector, rightVector, leftRightVector, left2Vector, right2Vector]);
 
     console.timeEnd('phase-correlation');
 	return (n * sumLR - sumL * sumR) / Math.sqrt((n * sumL2 - sumL * sumL) * (n * sumR2 - sumR * sumR));
 }
 
 function getSpectralProfile (monoMix) {
+
     const spectralExtractor = new SpectralProfileWASM.SpectralProfile(self.frameSize, self.hopSize, 'median');
     // arrayToVector implementations differ between essentia.js and custom extractors
     // spectralProfile only works with output from its own arrayToVector
