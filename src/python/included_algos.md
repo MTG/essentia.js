@@ -178,6 +178,7 @@ TempoTap
 TempoTapDegara
 TempoTapMaxAgreement
 TempoTapTicks
+TensorflowInputFSDSINet
 TensorflowInputMusiCNN
 TensorflowInputTempoCNN
 TensorflowInputVGGish

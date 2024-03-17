@@ -22,38 +22,56 @@
 #ifndef ESSENTIAJS_H
 #define ESSENTIAJS_H
 
+#include <vector>
+#include <essentia/algorithmfactory.h>
+#include <essentia/essentiamath.h>
 #include <emscripten/bind.h>
 
+using namespace essentia;
+using namespace essentia::standard;
 using namespace emscripten;
 
-class EssentiaJS {
+void _initEssentia(bool debugger=false);
+
+// method for generating frames from a given audio signal
+class FrameGenerator {
   public:
-    // property to store the current essentia library version
-    std::string essentiaVersion;
-    // constructor for instantiating the essentia algo registry with an optional argument to enable debug mode 
-    EssentiaJS(bool debugger=false);
-    ~EssentiaJS(){};
-    // method for shutdown essentia instance
-    void shutdown();
-    // method for generating frames from a given audio signal
-    std::vector<std::vector<float> > FrameGenerator(const val& signalArray, int frameSize, int hopSize);
-    val MonoMixer(std::vector<float>& left_channel, std::vector<float>& right_channel);
-    val LoudnessEBUR128(std::vector<float>& left_channel, std::vector<float>& right_channel, const float hopSize=0.1, const float sampleRate=44100, const bool startAtZero=false);
-    // NOTE: The following code snippets are machine generated. Do not edit.    
-    /*[[[cog
-    import cog
-    from code_generator import generate_headers, TO_INCLUDE_ALGOS
-    cog.outl(" ")
-    cog.outl("// class property which stores all the list of essentia algorithm names available in essentia.js")
-    c_algo_list = str(TO_INCLUDE_ALGOS)
-    cog.outl('std::string algorithmNames = "%s";' % c_algo_list)
-    cog.outl("// class methods to call various essentia algorithms")
-    headers = generate_headers()
-    for ln in headers:
-      cog.outl("%s;" % ln)
-    ]]]*/
-    //[[[end]]]
+    FrameGenerator(int frameSize=1024, int hopSize=512);
+    ~FrameGenerator();
+    void configure(int frameSize=1024, int hopSize=512);
+    std::vector< std::vector<float> > compute(const val& signalArray);
+    void reset();
+  private:
+    Algorithm* _framecutter;
 };
+
+// val MonoMixer(std::vector<float>& left_channel, std::vector<float>& right_channel);
+// val LoudnessEBUR128();
+class LoudnessEBUR128 {
+  public:
+    LoudnessEBUR128(const float hopSize=0.1, const float sampleRate=44100, const bool startAtZero=false);
+    ~LoudnessEBUR128();
+    void configure(const float hopSize=0.1, const float sampleRate=44100, const bool startAtZero=false);
+    val compute(std::vector<float>& left_channel, std::vector<float>& right_channel);
+    void reset();
+  private:
+    Algorithm* _algoStereoMuxer;
+    Algorithm* _algoLoudnessEBUR128;
+};
+// NOTE: The following code snippets are machine generated. Do not edit.    
+/*[[[cog
+import cog
+from code_generator import generate_headers, TO_INCLUDE_ALGOS
+cog.outl(" ")
+cog.outl("// class property which stores all the list of essentia algorithm names available in essentia.js")
+c_algo_list = str(TO_INCLUDE_ALGOS)
+cog.outl(f'const std::string ALGORITHM_NAMES = "{c_algo_list}";')
+cog.outl("// class methods to call various essentia algorithms")
+headers = generate_headers()
+for ln in headers:
+  cog.outl(ln)
+]]]*/
+//[[[end]]]
 
 // convert a Float32 JS typed array into std::vector<float>
 std::vector<float> float32ArrayToVector(const val &arr);
