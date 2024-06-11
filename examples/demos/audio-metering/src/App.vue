@@ -48,7 +48,7 @@ import DemoFooter from "./components/DemoFooter.vue";
 
 import { audioEngine } from './audio/engine.js';
 // developing/testing TrackResults.vue
-import exampleTrackAnalysis from '../cypress/integration/exampleAnalysis';
+// import exampleTrackAnalysis from '../cypress/integration/exampleAnalysis';
 
 export default {
   components: {

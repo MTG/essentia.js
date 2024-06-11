@@ -45,7 +45,6 @@ function deg2rad (degrees) {
   return degrees * Math.PI / 180;
 }
 const ALPHAS = ['10', '07', '05', '03', '01'];
-const sampleSkip = 256;
 
 export default {
 	props: {
@@ -56,7 +55,11 @@ export default {
 			default: undefined,
 			required: true
 		},
-		strokeColor: String
+		strokeColor: String,
+        animatedPhase: {
+            default: false,
+            required: false
+        }
 	},
 	data () {
 		return {
@@ -65,6 +68,12 @@ export default {
 			variationMemo: Array(5).fill(0)
 		}
 	},
+    computed: {
+        sampleSkip: function () {
+            if (this.animatedPhase) return 256;
+            if (!this.animatedPhase) return 1;
+        }
+    },
     watch: {
         refTrack(newVal) {
             if (newVal !== undefined) {
@@ -90,17 +99,21 @@ export default {
             ctx.rotate(deg2rad(-135));
             ctx.lineWidth = 2;
 
-            // this.variationMemo.map( (v, i) => {
-            //     this.drawVariation(v, ALPHAS[i])
-            // });
+            if (this.animatedPhase) {
+                this.variationMemo.map( (v, i) => {
+                    this.drawVariation(data, v, color, ALPHAS[i], ctx)
+                });
+            }
             this.drawVariation(data, 0, color, '10', ctx);
 
             this.variationMemo.pop();
             this.variationMemo.unshift(this.variation);
             this.variation++;
-            this.variation %= sampleSkip;
+            this.variation %= this.sampleSkip;
             ctx.restore();
-            // requestAnimationFrame(this.drawPhase.bind(this));
+            if (this.animatedPhase) {
+                requestAnimationFrame(() => this.drawPhase(data, ctx, color));
+            }
         },
         drawAxes (ctx, signsColor) {
             const axesColor = '#BBBBBB';
@@ -145,7 +158,7 @@ export default {
             const rightCh = data[1];
             ctx.strokeStyle = `${phaseColor}${alpha}`;
             let pastPoint = null;
-            for (let s = 0; s < leftCh.length; s+=sampleSkip) {
+            for (let s = 0; s < leftCh.length; s+=this.sampleSkip) {
                 ctx.beginPath();
                 const leftSample = leftCh[s+variation];
                 const rightSample = rightCh[s+variation];
@@ -176,6 +189,7 @@ export default {
 			this.drawAxes(axesCtx, color);
 			// this.animationFrame = requestAnimationFrame(this.drawPhase.bind(this));
 			this.drawPhase([this.leftCh, this.rightCh],lissajousCtx, color);
+            this.$emit("phase-image", {})
 		},
 		drawRef(color) {
 			const refAxesCtx = this.$refs.refAxes.getContext('2d');
