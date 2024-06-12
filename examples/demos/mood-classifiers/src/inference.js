@@ -1,61 +1,65 @@
 importScripts('./lib/tf.min.3.5.0.js');
-importScripts('./lib/essentia.js-model.umd.js');
 
-let model;
-let modelName = "";
-let modelLoaded = false;
-let modelReady = false;
-
-const modelTagOrder = {
-    'mood_happy': [true, false],
-    'mood_sad': [false, true],
-    'mood_relaxed': [false, true],
-    'mood_aggressive': [true, false],
-    'danceability': [true, false]
+let classifiers = {
+    'mood_happy': {
+        isLoaded: false,
+        tagOrder: [true, false],
+        model: null
+    }, 
+    'mood_sad': {
+        isLoaded: false,
+        tagOrder: [false, true],
+        model: null
+    }, 
+    'mood_relaxed': {
+        isLoaded: false,
+        tagOrder: [false, true],
+        model: null
+    }, 
+    'mood_aggressive': {
+        isLoaded: false,
+        tagOrder: [true, false],
+        model: null
+    }, 
+    'danceability': {
+        isLoaded: false,
+        tagOrder: [true, false],
+        model: null
+    },
+    'emomusic': {
+        isLoaded: false,
+        tagOrder: ['valence', 'arousal'],
+        model: null
+    }
 };
 
-function initModel() {
-    model = new EssentiaModel.TensorflowMusiCNN(tf, getModelURL(modelName));
-    
-    loadModel(modelName).then((isLoaded) => {
-        if (isLoaded) {
-            modelLoaded = true;
-            // perform dry run to warm them up
-            warmUp();
-        } 
-    });
+async function initModel(name) {
+    classifiers[name].model = await tf.loadGraphModel(getModelURL(name));
+    console.info(`Model ${name} has been loaded!`);
+    classifiers[name].isLoaded = true;
 }
 
-function getModelURL() {
-    return `../models/${modelName}-musicnn-msd-2/model.json`;
+function getModelURL(modelName) {
+    return `../models/${modelName}-msd-musicnn-1/tfjs/model.json`;
 }
 
-async function loadModel() {
-    await model.initialize();
-    // warm-up: perform dry run to prepare WebGL shader operations
-    console.info(`Model ${modelName} has been loaded!`);
-    return true;
-}
-
-function warmUp() {
-    const fakeFeatures = {
-        melSpectrum: getZeroMatrix(187, 96),
-        frameSize: 187,
-        melBandsSize: 96,
-        patchSize: 187
-    };
-
-    const fakeStart = Date.now();
-
-    model.predict(fakeFeatures, false).then(() => {
-        console.info(`${modelName}: Warm up inference took: ${Date.now() - fakeStart}`);
-        modelReady = true;
-        if (modelLoaded && modelReady) console.log(`${modelName} loaded and ready.`);
-    });
+function arrayToTensorAsBatches(embeddingsArray, patchSize) {
+    let inputTensor = tf.tensor2d(embeddingsArray, [embeddingsArray.length, patchSize]);
+    return inputTensor;
 }
 
 async function initTensorflowWASM() {
-    if (tf.getBackend() != 'wasm') {
+    let defaultBackend;
+    tf.ready().then( () => {
+        defaultBackend = tf.getBackend();
+        console.log('default tfjs backend is: ', defaultBackend);
+        for (let n of Object.keys(classifiers)) {
+            initModel(n);
+        }
+    });
+    
+    if (defaultBackend != 'wasm') {
+        return;
         importScripts('./lib/tf-backend-wasm-3.5.0.js');
         // importScripts('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm/dist/tf-backend-wasm.js');
         tf.setBackend('wasm');
@@ -69,6 +73,20 @@ async function initTensorflowWASM() {
     }
 }
 
+function twoValuesAverage(arrayOfArrays) {
+    const length = arrayOfArrays.length;
+    if (length === 0) return [0, 0];
+
+    const [firstValuesSum, secondValuesSum] = arrayOfArrays.reduce(
+        ([firstAcc, secondAcc], [firstVal, secondVal]) => [
+            firstAcc + firstVal,
+            secondAcc + secondVal
+        ],
+        [0, 0]
+    );
+
+    return [firstValuesSum/length, secondValuesSum/length];
+}
 
 function outputPredictions(p) {
     postMessage({
@@ -76,55 +94,50 @@ function outputPredictions(p) {
     });
 }
 
-function twoValuesAverage (arrayOfArrays) {
-    let firstValues = [];
-    let secondValues = [];
+function modelsPredict(embeddings) {
+    const inferenceStart = Date.now();
+    let inputTensor = arrayToTensorAsBatches(embeddings, 200);
+    const emomusicInputTensor = tf.tensor3d(embeddings.map(e => [e]), [embeddings.length, 1, 200]);
+    
+    let predictions = {};
 
-    arrayOfArrays.forEach((v) => {
-        firstValues.push(v[0]);
-        secondValues.push(v[1]);
-    });
-
-    const firstValuesAvg = firstValues.reduce((acc, val) => acc + val) / firstValues.length;
-    const secondValuesAvg = secondValues.reduce((acc, val) => acc + val) / secondValues.length;
-
-    return [firstValuesAvg, secondValuesAvg];
-}
-
-function modelPredict(features) {
-    if (modelReady) {
-        const inferenceStart = Date.now();
-
-        model.predict(features, true).then((predictions) => {
-            const summarizedPredictions = twoValuesAverage(predictions);
+    for (let name of Object.keys(classifiers)) {
+        if (classifiers[name].isLoaded) {
+            let output;
+            if (name == "emomusic") {
+                output = classifiers[name].model.execute(emomusicInputTensor);
+            } else {
+                output = classifiers[name].model.execute(inputTensor);
+            }
+            let outputArray = output.arraySync();
+            
+            const summarizedPredictions = twoValuesAverage(outputArray);
             // format predictions, grab only positive one
-            const results = summarizedPredictions.filter((_, i) => modelTagOrder[modelName][i])[0];
-
-            console.info(`${modelName}: Inference took: ${Date.now() - inferenceStart}`);
-            // output to main thread
-            outputPredictions(results);
-            model.dispose();
-        });
+            if (name == "emomusic") {
+                predictions[name] = { 
+                    [classifiers[name]['tagOrder'][0]]: summarizedPredictions[0],
+                    [classifiers[name]['tagOrder'][1]]: summarizedPredictions[1]
+                };
+            } else {
+                const result = summarizedPredictions.filter((_, i) => classifiers[name].tagOrder[i])[0];
+                predictions[name] = result;
+            }
+            
+            console.info(`${name}: Inference took: ${Date.now() - inferenceStart}ms`);
+            
+        }
     }
+    outputPredictions(predictions);
+    inputTensor.dispose();
 }
 
-function getZeroMatrix(x, y) {
-    let matrix = new Array(x);
-    for (let f = 0; f < x; f++) {
-        matrix[f] = new Array(y).fill(0);
-    }
-    return matrix;
-}
-
+initTensorflowWASM();
 
 onmessage = function listenToMainThread(msg) {
-    // listen for audio features
-    if (msg.data.name) {
-        modelName = msg.data.name;
-        initTensorflowWASM();
-    } else if (msg.data.features) {
-        console.log("From inference worker: I've got features!");
+    // listen for audio embeddings
+    if (msg.data.embeddings) {
+        console.log("From inference worker: I've got embeddings!");
         // should/can this eventhandler run async functions
-        modelPredict(msg.data.features);
+        modelsPredict(msg.data.embeddings);
     }
 };

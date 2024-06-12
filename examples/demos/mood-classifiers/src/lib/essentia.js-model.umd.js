@@ -254,7 +254,7 @@
             // setup feature extractor based on the given `extractorType` input.
             switch (this.extractorType) {
                 case "musicnn": {
-                    if (audioFrame.length != this.frameSize)
+                    if (frame.size() != this.frameSize)
                         throw new Error("The chosen `extractorType` only works with an audio signal frame size of " + this.frameSize);
                     var spectrum = this.essentia.TensorflowInputMusiCNN(frame);
                     return {
@@ -312,7 +312,7 @@
             var melSpectrogram = [];
             var framewiseFeature = null;
             for (var i = 0; i < frames.size(); i++) {
-                framewiseFeature = this.compute(this.vectorToArray(frames.get(i)));
+                framewiseFeature = this.compute(frames.get(i));
                 melSpectrogram.push(framewiseFeature.melSpectrum);
             }
             framewiseFeature.melSpectrum = melSpectrogram;
@@ -539,11 +539,13 @@
          * Run inference on the given audio feature input and returns the activations
          * @param {InputMusiCNN} inputFeature audio feature required by the MusiCNN model.
          * @param {boolean} [zeroPadding=false] whether to do zero-padding to the input feature.
+         * @param {boolean} [embeddings=false] whether to output embeddings or final layer outputs
          * @returns {array} activations of the output layer of the model
          * @memberof TensorflowMusiCNN
          */
-        TensorflowMusiCNN.prototype.predict = function (inputFeature, zeroPadding) {
+        TensorflowMusiCNN.prototype.predict = function (inputFeature, zeroPadding, embeddings) {
             if (zeroPadding === void 0) { zeroPadding = false; }
+            if (embeddings === void 0) { embeddings = false; }
             return __awaiter(this, void 0, void 0, function () {
                 var featureTensor, modelInputs, results, resultsArray;
                 return __generator(this, function (_a) {
@@ -553,7 +555,8 @@
                             modelInputs = this.disambiguateExtraInputs();
                             // add the input feature tensor to the model inputs
                             modelInputs.push(featureTensor);
-                            results = this.model.execute(modelInputs);
+                            let outputNode = embeddings ? "model/batch_normalization_10/batchnorm/add_1" : "model/Sigmoid";
+                            results = this.model.execute(modelInputs, outputNode);
                             // free tensors
                             featureTensor.dispose();
                             return [4 /*yield*/, results.array()];

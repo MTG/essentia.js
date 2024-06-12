@@ -1,3 +1,5 @@
+import WaveSurfer from "wavesurfer.js";
+
 class AnalysisResults {
     constructor(classifierNames) {
         this.analysisMeters = {};
