@@ -25,6 +25,11 @@ let classifiers = {
         isLoaded: false,
         tagOrder: [true, false],
         model: null
+    },
+    'emomusic': {
+        isLoaded: false,
+        tagOrder: ['valence', 'arousal'],
+        model: null
     }
 };
 
@@ -92,18 +97,31 @@ function outputPredictions(p) {
 function modelsPredict(embeddings) {
     const inferenceStart = Date.now();
     let inputTensor = arrayToTensorAsBatches(embeddings, 200);
+    const emomusicInputTensor = tf.tensor3d(embeddings.map(e => [e]), [embeddings.length, 1, 200]);
     
     let predictions = {};
 
     for (let name of Object.keys(classifiers)) {
         if (classifiers[name].isLoaded) {
-            let output = classifiers[name].model.execute(inputTensor);
+            let output;
+            if (name == "emomusic") {
+                output = classifiers[name].model.execute(emomusicInputTensor);
+            } else {
+                output = classifiers[name].model.execute(inputTensor);
+            }
             let outputArray = output.arraySync();
             
             const summarizedPredictions = twoValuesAverage(outputArray);
             // format predictions, grab only positive one
-            const results = summarizedPredictions.filter((_, i) => classifiers[name].tagOrder[i])[0];
-            predictions[name] = results;
+            if (name == "emomusic") {
+                predictions[name] = { 
+                    [classifiers[name]['tagOrder'][0]]: summarizedPredictions[0],
+                    [classifiers[name]['tagOrder'][1]]: summarizedPredictions[1]
+                };
+            } else {
+                const result = summarizedPredictions.filter((_, i) => classifiers[name].tagOrder[i])[0];
+                predictions[name] = result;
+            }
             
             console.info(`${name}: Inference took: ${Date.now() - inferenceStart}ms`);
             

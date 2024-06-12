@@ -118,16 +118,15 @@ function createInferenceWorker() {
         // listen out for model output
         if (msg.data.predictions) {
             const preds = msg.data.predictions;
-            displayPredictions(preds);
             console.log(`received predictions: `, preds);
+            displayPredictions(preds);
         }
     };
 }
 
 function displayPredictions(predictions) {
     console.log(`inference took ${Date.now() - inferenceStartTime}ms in total`);
-    const allPredictions = {};
-    Object.assign(allPredictions, ...predictions);
+    const allPredictions = {...predictions};
     resultsViz.updateMeters(allPredictions);
     resultsViz.updateValueBoxes(essentiaAnalysis);
     toggleLoader();
