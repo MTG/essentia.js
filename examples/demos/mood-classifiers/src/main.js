@@ -19,7 +19,7 @@ let controls;
 const dropInput = document.createElement('input');
 dropInput.setAttribute('type', 'file');
 dropInput.addEventListener('change', () => {
-    processFileUpload(dropInput.files);
+    handleFileUpload(dropInput.files);
 })
 
 const dropArea = document.querySelector('#file-drop-area');
@@ -27,7 +27,7 @@ dropArea.addEventListener('dragover', (e) => { e.preventDefault() });
 dropArea.addEventListener('drop', (e) => {
     e.preventDefault();
     const files = e.dataTransfer.files;
-    processFileUpload(files);
+    handleFileUpload(files);
 })
 dropArea.addEventListener('click', () => {
     dropInput.click();
@@ -35,28 +35,27 @@ dropArea.addEventListener('click', () => {
 
 
 
-function processFileUpload(files) {
+function handleFileUpload(files) {
     if (files.length > 1) {
         alert("Only single-file uploads are supported currently");
         throw Error("Multiple file upload attempted, cannot process.");
     } else if (files.length) {
         files[0].arrayBuffer().then((ab) => {
-            decodeFile(ab);
+            toggleLoader();
             wavesurfer = toggleUploadDisplayHTML('display');
             wavesurfer.loadBlob(files[0]);
             controls = new PlaybackControls(wavesurfer);
             controls.toggleEnabled(false);
+            processFile(ab);
         })
     }
 }
 
-function decodeFile(arrayBuffer) {
+function processFile(arrayBuffer) {
     audioCtx.resume().then(() => {
         audioCtx.decodeAudioData(arrayBuffer).then(async function handleDecodedAudio(audioBuffer) {
             console.info("Done decoding audio!");
-            
-            toggleLoader();
-            
+                        
             const prepocessedAudio = preprocess(audioBuffer);
             await audioCtx.suspend();
 
