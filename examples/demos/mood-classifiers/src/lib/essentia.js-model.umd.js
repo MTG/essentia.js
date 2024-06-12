@@ -254,7 +254,7 @@
             // setup feature extractor based on the given `extractorType` input.
             switch (this.extractorType) {
                 case "musicnn": {
-                    if (audioFrame.length != this.frameSize)
+                    if (frame.size() != this.frameSize)
                         throw new Error("The chosen `extractorType` only works with an audio signal frame size of " + this.frameSize);
                     var spectrum = this.essentia.TensorflowInputMusiCNN(frame);
                     return {
@@ -312,7 +312,7 @@
             var melSpectrogram = [];
             var framewiseFeature = null;
             for (var i = 0; i < frames.size(); i++) {
-                framewiseFeature = this.compute(this.vectorToArray(frames.get(i)));
+                framewiseFeature = this.compute(frames.get(i));
                 melSpectrogram.push(framewiseFeature.melSpectrum);
             }
             framewiseFeature.melSpectrum = melSpectrogram;
