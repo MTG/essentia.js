@@ -18,31 +18,35 @@
  */
 
 // NOTE: This source code is auto-generated.
-
+#include <emscripten/bind.h>
 #include "./includes/essentiajs.h"
 
 // expose essentiajs class to js using embind wrappers
-EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) { 
+EMSCRIPTEN_BINDINGS(CLASS_EssentiaJS) {
+  function("init", &_initEssentia);
+  constant("algorithmNames", ALGORITHM_NAMES);
+  class_<FrameGenerator>("FrameGenerator")
+    .constructor<int, int>()
+    .function("configure", &FrameGenerator::configure)
+    .function("compute", &FrameGenerator::compute)
+    .function("reset", &FrameGenerator::reset)
+    ;
+  class_<LoudnessEBUR128>("LoudnessEBUR128")
+    .constructor<float, float, bool>()
+    .function("configure", &LoudnessEBUR128::configure)
+    .function("compute", &LoudnessEBUR128::compute)
+    .function("reset", &LoudnessEBUR128::reset)
+    ;
   // NOTE: The following code snippets are machine generated. Do not edit.
-  class_<EssentiaJS>("EssentiaJS")
-    .constructor<bool>()
-    .property("version", &EssentiaJS::essentiaVersion)
-    .property("algorithmNames", &EssentiaJS::algorithmNames)
-    .function("shutdown", &EssentiaJS::shutdown)
-    .function("FrameGenerator", &EssentiaJS::FrameGenerator)
-    .function("MonoMixer", &EssentiaJS::MonoMixer)
-    .function("LoudnessEBUR128", &EssentiaJS::LoudnessEBUR128)
-    /*[[[cog
-    import logging
-    import cog
-    from code_generator import TO_INCLUDE_ALGOS
-    logging.basicConfig(level='INFO')
-    logging.info("Generating emscripten bindings for the essentia...")
-    for algo_name in TO_INCLUDE_ALGOS:
-      cog.outl('.function("%s", &EssentiaJS::%s)' % (algo_name, algo_name))
-    cog.out(";")
-    ]]]*/
-    //[[[end]]]
+  /*[[[cog
+  import cog
+  from code_generator import generate_bindings
+
+  bindings = generate_bindings()
+  for ln in bindings:
+    cog.outl(ln)
+  ]]]*/
+  //[[[end]]]
   // utility function to convert a Float32 JS typed array into std::vector<float>
   function("arrayToVector", &float32ArrayToVector);
   // expose stl datatypes to js
