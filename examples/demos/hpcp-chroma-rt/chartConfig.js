@@ -22,7 +22,7 @@ const CHART_CONFIG = {
     data: {
         datasets: [{
             data: Array(12).fill(1),
-            backgroundColor: KEYS.map(k => `hsl(${PITCH_CLASS_COLORS[k]}, 0%, 25%)`),
+            backgroundColor: KEYS.map(k => `hsl(${PITCH_CLASS_COLORS[k]}, 0%, 50%)`),
             borderAlign: 'inner'
         }],
         labels: KEYS

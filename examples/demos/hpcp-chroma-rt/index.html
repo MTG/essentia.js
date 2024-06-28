@@ -8,9 +8,11 @@
       type="text/css"
       href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
     />
-    <title>essentia.js examples</title>
+    <link rel="stylesheet" type="text/css" href="/demos/styles/essentia-colors.css">
+    <link rel="stylesheet" type="text/css" href="/demos/styles/demos.css">
+    <title>essentia.js HPCP Chroma</title>
   </head>
-  <body style="background-color:  #000000!important;">
+  <body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia-wasm.web.js"></script>
@@ -21,252 +23,241 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw==" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
 
-    <div class="ui main_wrapper landing-image">
-      <div class="ui header centered" id="header">
-        <a href="index.html">
-          <img
-            id="header-img"
-            src="https://github.com/MTG/essentia.js/blob/master/src/assets/img/essentiajsbanner.png?raw=true"
-          />
-        </a>
-        <div>
-          <h2 class="ui header white-text" style="color: azure;">
-            HPCP Chroma Feature Extraction
-          </h2>
-          <div class="ui basic large button">
-            <a href="https://github.com/MTG/essentia.js/tree/dev/examples/hpcp-chroma-rt/" target="_blank" class="ui small button">Code<i class="right github icon"></i></a>
+    <header class="ui header" style="background-color: var(--footer-header-dark-blue); margin-top: 0;">
+      <div class="ui container grid">
+        <div class="ui eight column row">
+          <div class="ui left floated column">
+            <a href="https://github.com/MTG/essentia.js">
+              <object data="/demos/assets/essentiajs-logo-4.0.svg" type="image/svg+xml" width="230" height="50"></object>
+            </a>
+          </div> 
+          <div class="ui right floated column">
+            <button class="ui right floated small button">
+              <a href="https://github.com/MTG/essentia.js/tree/dev/examples/hpcp-chroma-rt/" target="_blank">Code<i class="right github icon"></i></a>
+            </button>
           </div>
-        </div>
-
-
-      <div class="ui divider" style="height: 5px; width: 2px;"></div>
-        
-      <div class="body-container">
-        <div class="ui centered one column grid container">
-          <div class="ui vertical buttons row">
-            <center>
-              <button
-                id="recordButton"
-                class="ui red inverted big button record-button"
-              >
-                Mic &nbsp;&nbsp;<i class="microphone icon"></i>
-              </button>
-            </center>
-          </div>
-
-          <canvas
-            id="chroma-chart"
-            class="ui centered segment"
-            style="width: 650px; height: 300px; background-color: transparent;"
-          ></canvas>
         </div>
       </div>
+    </header>
 
-      <div class="ui diverder" style="height: 50px;"></div>
+    <main class="ui container">
+      <h1 class="ui center aligned huge dividing header">
+        HPCP Chroma
+      </h1>
+  
+      <div class="ui centered one column padded grid">
+        <div class="ui container">
+            <button
+              id="recordButton"
+              class="ui inverted big button record-button"
+              style="background-color: var(--main-red-light);"
+            >
+              Mic &nbsp;&nbsp;<i class="microphone icon"></i>
+            </button>
+        </div>
 
-      <center>
-        <div class="footer" style="margin-top: 30px; height: 20%;">
-          <a class="demo_logo" target="_blank" href="//essentia.upf.edu">
-            <img
-              id="logo"
-              src="https://essentia.upf.edu/documentation/_static/essentia_logo.svg"
-              alt="MTG Logo"
-              style="margin-left: 40px; height: 70px;"
-            />
+        <canvas
+          id="chroma-chart"
+          style="width: 650px; height: 300px; background-color: transparent;"
+        ></canvas>
+      </div>
+    </main>
+  
+    <footer style="background-color: var(--footer-header-dark-blue);">
+      <div class="ui container">
+        <div class="ui grid">
+          <a target="_blank" href="//essentia.upf.edu" class="ui four wide column">
+            <img id="logo" src="/demos/assets/essentia_logo.svg" alt="MTG Logo"
+              style="margin-left: 40px; height: 70px;">
           </a>
-          <a target="_blank" href="https://www.upf.edu/web/mtg">
-            <img
-              class="essnt-footer_mtg-logo"
-              src="https://mtg.github.io/assets/img/upflogo.png"
-              alt="mtg logo"
-              style="width:300px; height: 70px;"
-            />
+          <a target="_blank" href="https://www.upf.edu/web/mtg" class="ui four wide column">
+            <img src="/demos/assets/MTG_RGB_logo-02.svg" alt="mtg logo"
+                style="height: 70px;">
           </a>
         </div>
-      </center>
+      </div>
+    </footer>
 
-      <script src="./chartConfig.js"></script>
+    <script src="./chartConfig.js"></script>
 
-      <script>
-        // global var to load essentia.js core instance
-        let essentiaExtractor;
-        let isEssentiaInstance = false;
-        // global var for web audio API AudioContext
-        let audioCtx;
-        // buffer size microphone stream (bufferSize is high in order to make PitchYinProbabilistic algo to work)
-        let bufferSize = 8192;
-        let hopSize = 2048;
+    <script>
+      // global var to load essentia.js core instance
+      let essentiaExtractor;
+      let isEssentiaInstance = false;
+      // global var for web audio API AudioContext
+      let audioCtx;
+      // buffer size microphone stream (bufferSize is high in order to make PitchYinProbabilistic algo to work)
+      let bufferSize = 8192;
+      let hopSize = 2048;
 
-        let mic, scriptNode, gain;
+      let mic, scriptNode, gain;
 
-        try {
-          const AudioContext = window.AudioContext || window.webkitAudioContext;
-          audioCtx = new AudioContext();
-        } catch (e) {
-          throw "Could not instantiate AudioContext: " + e.message;
-        }
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      } catch (e) {
+        throw "Could not instantiate AudioContext: " + e.message;
+      }
 
-        // global var getUserMedia mic stream
-        let gumStream;
+      // global var getUserMedia mic stream
+      let gumStream;
 
-        // settings for plotting
-        let chromaChart;
+      // settings for plotting
+      let chromaChart;
 
-        // record native microphone input and do further audio processing on each audio buffer using the given callback functions
-        function startMicRecordStream(
-          audioCtx,
-          bufferSize,
-          onProcessCallback,
-          btnCallback
-        ) {
-          // cross-browser support for getUserMedia
-          navigator.getUserMedia =
-            navigator.getUserMedia ||
-            navigator.webkitGetUserMedia ||
-            navigator.mozGetUserMedia ||
-            navigator.msGetUserMedia;
-          window.URL =
-            window.URL || window.webkitURL || window.mozURL || window.msURL;
+      // record native microphone input and do further audio processing on each audio buffer using the given callback functions
+      function startMicRecordStream(
+        audioCtx,
+        bufferSize,
+        onProcessCallback,
+        btnCallback
+      ) {
+        // cross-browser support for getUserMedia
+        navigator.getUserMedia =
+          navigator.getUserMedia ||
+          navigator.webkitGetUserMedia ||
+          navigator.mozGetUserMedia ||
+          navigator.msGetUserMedia;
+        window.URL =
+          window.URL || window.webkitURL || window.mozURL || window.msURL;
 
-          if (navigator.getUserMedia) {
-            console.log("Initializing audio...");
-            navigator.getUserMedia(
-              { audio: true, video: false },
-              function(stream) {
-                gumStream = stream;
-                if (gumStream.active) {
-                  console.log(
-                    "Audio context sample rate = " + audioCtx.sampleRate
-                  );
-                  mic = audioCtx.createMediaStreamSource(stream);
-                  // We need the buffer size that is a power of two
-                  if (bufferSize % 2 != 0 || bufferSize < 4096) {
-                    throw "Choose a buffer size that is a power of two and greater than 4096";
-                  }
-                  // In most platforms where the sample rate is 44.1 kHz or 48 kHz,
-                  // and the default bufferSize will be 4096, giving 10-12 updates/sec.
-                  console.log("Buffer size = " + bufferSize);
-                  if (audioCtx.state == "suspended") {
-                    audioCtx.resume();
-                  }
-                  scriptNode = audioCtx.createScriptProcessor(bufferSize, 1, 1);
-                  // onprocess callback (here we can use essentia.js algos)
-                  scriptNode.onaudioprocess = onProcessCallback;
-                  // It seems necessary to connect the stream to a sink for the pipeline to work, contrary to documentataions.
-                  // As a workaround, here we create a gain node with zero gain, and connect temp to the system audio output.
-                  gain = audioCtx.createGain();
-                  gain.gain.setValueAtTime(0, audioCtx.currentTime);
-                  mic.connect(scriptNode);
-                  scriptNode.connect(gain);
-                  gain.connect(audioCtx.destination);
-
-                  if (btnCallback) {
-                    btnCallback();
-                  }
-                } else {
-                  throw "Mic stream not active";
-                }
-              },
-              function(message) {
-                throw "Could not access microphone - " + message;
-              }
-            );
-          } else {
-            throw "Could not access microphone - getUserMedia not available";
-          }
-        }
-
-        function stopMicRecordStream() {
-          console.log("Stopped recording ...");
-          // stop mic stream
-          gumStream.getAudioTracks().forEach(function(track) {
-            track.stop();
-          });
-          $("#recordButton").removeClass("recording");
-          $("#recordButton").html(
-            'Mic &nbsp;&nbsp;<i class="microphone icon"></i>'
-          );
-          audioCtx.suspend().then(() => {
-            mic.disconnect();
-            gain.disconnect();
-            scriptNode.disconnect();
-
-            mic, gain, scriptNode = null;
-          });
-        }
-
-        // ScriptNodeProcessor callback function to extract pitchyin feature using essentia.js and plotting it on the front-end
-        function onRecordEssentiaFeatureExtractor(event) {
-
-          let audioBuffer = event.inputBuffer.getChannelData(0);
-
-          // compute RMS for thresholding:
-          const rms = essentiaExtractor.RMS(essentiaExtractor.arrayToVector(audioBuffer)).rms;
-          console.info(rms);
-          if (rms >= 0.05) {
-            // compute hpcp for overlapping frames of audio
-            const hpcp = essentiaExtractor.hpcpExtractor(audioBuffer);
-            // console.log(`raw: ${hpcp}`);
-
-            const scaledHPCP = hpcp.map(i => 100* Math.tanh(Math.pow(i*0.5, 2)));
-            // console.log(`scaled: ${scaledHPCP}`);
-
-            chromaChart.data.datasets[0].backgroundColor = KEYS.map((k, i) => `hsl(${PITCH_CLASS_COLORS[k]}, ${scaledHPCP[i]}%, ${25+scaledHPCP[i]/3}%)`);
-            // here we call the plotting function to display realtime feature extraction results
-            chromaChart.update();
-          } else {
-            chromaChart.data.datasets[0].backgroundColor = KEYS.map((k, i) => `hsl(${PITCH_CLASS_COLORS[k]}, 0%, 25%)`);
-            chromaChart.update();
-          }
-
-        }
-
-        $(document).ready(function() {
-          // create essentia plot instance
-          chromaChart = new Chart(canvas.getContext('2d'), CHART_CONFIG);
-
-          // add event listeners to ui objects
-          $("#recordButton").click(function() {
-            let recording = $(this).hasClass("recording");
-            if (!recording) {
-              $(this).prop("disabled", true);
-
-              // loads the WASM backend and runs the feature extraction
-              EssentiaWASM().then(function(essentiaWasmModule) {
-                if (!isEssentiaInstance) {
-                  essentiaExtractor = new EssentiaExtractor(essentiaWasmModule);
-                  // settings specific to an algorithm
-                  // essentiaExtractor.profile.HPCP.nonLinear = true;
-                            // modifying default extractor settings
-                  essentiaExtractor.frameSize = bufferSize;
-                  essentiaExtractor.hopSize = hopSize;
-                  essentiaExtractor.sampleRate = audioCtx.sampleRate;
-                  essentiaExtractor.profile.HPCP.normalized = 'none';
-                  essentiaExtractor.profile.HPCP.harmonics = 0;
-                  console.log('profile changed')
-                  isEssentiaInstance = true;
-                }
-                // start microphone stream using getUserMedia
-                startMicRecordStream(
-                  audioCtx,
-                  bufferSize,
-                  onRecordEssentiaFeatureExtractor, // essentia.js feature extractor callback function
-                  function() {
-                    // called when the promise fulfilled
-                    $("#recordButton").addClass("recording");
-                    $("#recordButton").html(
-                      'Stop &nbsp;&nbsp;<i class="stop icon"></i>'
-                    );
-                    $("#recordButton").prop("disabled", false);
-                  }
+        if (navigator.getUserMedia) {
+          console.log("Initializing audio...");
+          navigator.getUserMedia(
+            { audio: true, video: false },
+            function(stream) {
+              gumStream = stream;
+              if (gumStream.active) {
+                console.log(
+                  "Audio context sample rate = " + audioCtx.sampleRate
                 );
-              });
-            } else {
-              stopMicRecordStream();
+                mic = audioCtx.createMediaStreamSource(stream);
+                // We need the buffer size that is a power of two
+                if (bufferSize % 2 != 0 || bufferSize < 4096) {
+                  throw "Choose a buffer size that is a power of two and greater than 4096";
+                }
+                // In most platforms where the sample rate is 44.1 kHz or 48 kHz,
+                // and the default bufferSize will be 4096, giving 10-12 updates/sec.
+                console.log("Buffer size = " + bufferSize);
+                if (audioCtx.state == "suspended") {
+                  audioCtx.resume();
+                }
+                scriptNode = audioCtx.createScriptProcessor(bufferSize, 1, 1);
+                // onprocess callback (here we can use essentia.js algos)
+                scriptNode.onaudioprocess = onProcessCallback;
+                // It seems necessary to connect the stream to a sink for the pipeline to work, contrary to documentataions.
+                // As a workaround, here we create a gain node with zero gain, and connect temp to the system audio output.
+                gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                mic.connect(scriptNode);
+                scriptNode.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (btnCallback) {
+                  btnCallback();
+                }
+              } else {
+                throw "Mic stream not active";
+              }
+            },
+            function(message) {
+              throw "Could not access microphone - " + message;
             }
-          }); // end recordButton onClick
+          );
+        } else {
+          throw "Could not access microphone - getUserMedia not available";
+        }
+      }
+
+      function stopMicRecordStream() {
+        console.log("Stopped recording ...");
+        // stop mic stream
+        gumStream.getAudioTracks().forEach(function(track) {
+          track.stop();
         });
-      </script>
-    </div>
+        $("#recordButton").removeClass("recording");
+        $("#recordButton").html(
+          'Mic &nbsp;&nbsp;<i class="microphone icon"></i>'
+        );
+        audioCtx.suspend().then(() => {
+          mic.disconnect();
+          gain.disconnect();
+          scriptNode.disconnect();
+
+          mic, gain, scriptNode = null;
+        });
+      }
+
+      // ScriptNodeProcessor callback function to extract pitchyin feature using essentia.js and plotting it on the front-end
+      function onRecordEssentiaFeatureExtractor(event) {
+
+        let audioBuffer = event.inputBuffer.getChannelData(0);
+
+        // compute RMS for thresholding:
+        const rms = essentiaExtractor.RMS(essentiaExtractor.arrayToVector(audioBuffer)).rms;
+        if (rms >= 0.05) {
+          // compute hpcp for overlapping frames of audio
+          const hpcp = essentiaExtractor.hpcpExtractor(audioBuffer);
+          // console.log(`raw: ${hpcp}`);
+
+          const scaledHPCP = hpcp.map(i => 100* Math.tanh(Math.pow(i*0.5, 2)));
+          // console.log(`scaled: ${scaledHPCP}`);
+
+          chromaChart.data.datasets[0].backgroundColor = KEYS.map((k, i) => `hsl(${PITCH_CLASS_COLORS[k]}, ${scaledHPCP[i]}%, ${50+scaledHPCP[i]/3}%)`);
+          // here we call the plotting function to display realtime feature extraction results
+          chromaChart.update();
+        } else {
+          chromaChart.data.datasets[0].backgroundColor = KEYS.map((k, i) => `hsl(${PITCH_CLASS_COLORS[k]}, 0%, 50%)`);
+          chromaChart.update();
+        }
+
+      }
+
+      $(document).ready(function() {
+        // create essentia plot instance
+        chromaChart = new Chart(canvas.getContext('2d'), CHART_CONFIG);
+
+        // add event listeners to ui objects
+        $("#recordButton").click(function() {
+          let recording = $(this).hasClass("recording");
+          if (!recording) {
+            $(this).prop("disabled", true);
+
+            // loads the WASM backend and runs the feature extraction
+            EssentiaWASM().then(function(essentiaWasmModule) {
+              if (!isEssentiaInstance) {
+                essentiaExtractor = new EssentiaExtractor(essentiaWasmModule);
+                // settings specific to an algorithm
+                // essentiaExtractor.profile.HPCP.nonLinear = true;
+                          // modifying default extractor settings
+                essentiaExtractor.frameSize = bufferSize;
+                essentiaExtractor.hopSize = hopSize;
+                essentiaExtractor.sampleRate = audioCtx.sampleRate;
+                essentiaExtractor.profile.HPCP.normalized = 'none';
+                essentiaExtractor.profile.HPCP.harmonics = 0;
+                console.log('profile changed')
+                isEssentiaInstance = true;
+              }
+              // start microphone stream using getUserMedia
+              startMicRecordStream(
+                audioCtx,
+                bufferSize,
+                onRecordEssentiaFeatureExtractor, // essentia.js feature extractor callback function
+                function() {
+                  // called when the promise fulfilled
+                  $("#recordButton").addClass("recording");
+                  $("#recordButton").html(
+                    'Stop &nbsp;&nbsp;<i class="stop icon"></i>'
+                  );
+                  $("#recordButton").prop("disabled", false);
+                }
+              );
+            });
+          } else {
+            stopMicRecordStream();
+          }
+        }); // end recordButton onClick
+      });
+    </script>
   </body>
 </html>

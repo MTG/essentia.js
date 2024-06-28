@@ -18,10 +18,10 @@ mainTemplate.innerHTML = `
             box-sizing: border-box;
             display: inline-block;
 
-            --button-color: #FC5656;
-            --button-color-active: #B02A2A;
+            --button-color: #ff5a5f;
+            --button-color-active: #ac4142;
             --text-color: #000000;
-            --meter-dot-color: #F7E017;
+            --meter-dot-color: #eeff41;
         }
 
         * {

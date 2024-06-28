@@ -1,0 +1,23 @@
+/* footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+} */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header,footer {
+  flex-shrink: 0; /* Prevents shrinking */
+  flex-grow: 0; /* Prevents growing */
+}
+
+main {
+  flex-grow: 1; /* Allows the main content to grow and push the footer down if necessary */
+}
