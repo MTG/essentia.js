@@ -57,19 +57,12 @@
 
       const smoother = new Smoother(20);
 
-      // show console.log on html div
-      window.console.logToScreen = function(str) {
-        let node = document.createElement("div");
-        node.appendChild(document.createTextNode(str));
-        document.getElementById("myLog").appendChild(node);
-      };
-
       const audioButton = document.querySelector('mic-toggle-button');
 
       audioButton.addEventListener('click', function() {
         if(!isRecording) {
             audioContext = audioButton.audio.ctx;
-            startEssentiaAnalyser(audioContext).then(()=>console.logToScreen('essentia analyzer started'));
+            startEssentiaAnalyser(audioContext);
             return;
         }
         if(isRecording) {
@@ -77,7 +70,6 @@
             track.stop();
             gumStream.removeTrack(track);
           });
-          console.logToScreen('Closing audio context ...');
 
           micNode.disconnect();
           analyserNode.disconnect();
@@ -106,7 +98,6 @@
         async function setupAudioGraph(stream) {
           gumStream = stream;
           if (gumStream.active) {
-            console.logToScreen('Sample Rate = ' + audioContext.sampleRate);
             micNode = audioContext.createMediaStreamSource(stream);
             analyserNode = audioContext.createAnalyser();
             analyserNode.fftSize = 2 * 128;
@@ -114,12 +105,9 @@
 
             // create essentia node only once (avoid registering processor repeatedly)
             if (!essentiaNode) {
-              console.logToScreen("Creating EssentiaNode instance ...")
               essentiaNode = await createEssentiaNode(audioContext);
             }
 
-            console.logToScreen("Mic => essentiaWorklet => audioContext.destination ....");
-            console.logToScreen("Calculating RMS level from microphone input ....");
             // connect mic stream to essentia node
             audioButton.connectToAudioNode(essentiaNode);
             // If it isn't connected to destination, the worklet is not executed
@@ -133,9 +121,6 @@
           }
         }
         if (navigator.mediaDevices.getUserMedia) {
-          document.getElementById("myLog").innerHTML = ""; // empty on-screen log
-          console.logToScreen(".................................")
-          console.logToScreen('Initializing mic input stream ...')
           navigator.mediaDevices.getUserMedia({audio: {sampleRate: {exact: audioContext.sampleRate }}, video: false}).then((stream) => {
             setupAudioGraph(stream);
           }).catch(function(message) {
@@ -145,15 +130,15 @@
       }
     </script>
 
-    <div class="ui header" style="background-color: var(--footer-header-dark-blue); margin: none;">
+    <header class="ui header" style="background-color: var(--footer-header-dark-blue); margin-top: 0;">
       <div class="ui container">
         <a href="https://github.com/MTG/essentia.js">
           <object data="/demos/assets/essentiajs-logo-4.0.svg" type="image/svg+xml" width="230" height="50"></object>
         </a>
       </div>
-    </div>
+    </header>
 
-    <div class="ui container">
+    <main class="ui container">
       <h1 class="ui center aligned huge dividing header">
         RMS Level
       </h1>
@@ -161,25 +146,25 @@
         <span class="">
           <mic-toggle-button></mic-toggle-button>
         </span>
-        <span id="rms" class="" style="width: 30rem;">
+        <span id="rms" class="">
           <span id="rms-value">0</span> <span>dBFS</span>
         </span>
       </div>
-    </div>
+    </main>
     
     <footer style="background-color: var(--footer-header-dark-blue);">
       <div class="ui container">
         <div class="ui grid">
-          <a target="_blank" href="//essentia.upf.edu" class="ui four wide column">
+          <a target="_blank" href="//essentia.upf.edu" class="ui left floated column">
             <img id="logo" src="/demos/assets/essentia_logo.svg" alt="MTG Logo"
               style="margin-left: 40px; height: 70px;">
           </a>
-          <a target="_blank" href="https://www.upf.edu/web/mtg" class="ui four wide column">
+          <a target="_blank" href="https://www.upf.edu/web/mtg" class="ui left floated column">
             <img src="/demos/assets/MTG_RGB_logo-02.svg" alt="mtg logo"
                 style="height: 70px;">
           </a>
   
-          <div class="ui eight wide column">
+          <div class="ui three wide right floated column">
             <div class="ui content" style="color: white;">
               using
               <a href="https://developer.mozilla.org/en-US/docs/Web/API/AudioWorklet" style="color: #ededed; text-decoration: underline solid;">AudioWorklets</a>
