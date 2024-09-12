@@ -35,39 +35,42 @@ class MelspectrogramProcessor extends AudioWorkletProcessor {
         this._accumData = [new Float32Array(this._bufferSize)];
         this._spectrum;
 
-        // SAB config
-        this.port.onmessage = e => {
-          this._audio_writer = new AudioWriter(new RingBuffer(e.data.sab, Float32Array));
-        };
+        this.zeros = new Float32Array(128-this._melNumBands);
+        this.zeroPaddedSpectrum;
     }
 
     process(inputList, outputList, params) {
         let input = inputList[0];
         let output = outputList[0];
 
+        // console.log(`worklet frame ${currentFrame/128}`);
+        // console.log('input: ', Array.from(input[0]));
         this._inputRingBuffer.push(input);
+        // console.log('inRB: ', Array.from(this._inputRingBuffer._channelData[0]));
 
         if (this._inputRingBuffer.framesAvailable >= this._bufferSize) {
 
-            this._inputRingBuffer.pull(this._accumData);
+          this._inputRingBuffer.pull(this._accumData);
+          // console.log('accumData: ', Array.from(this._accumData[0]));
 
-            this._spectrum = this._extractor.melSpectrumExtractor(this._accumData[0], this._sampleRate);
-            if (this._audio_writer.available_write() >= this._melNumBands) {
-              this._audio_writer.enqueue(this._spectrum);
-            }
-
-            let zeros = new Float32Array(128-this._spectrum.length);
-            let zeroPaddedSpectrum = Float32Concat(this._spectrum, zeros);
-
-            this._outputRingBuffer.push([zeroPaddedSpectrum]);
-            
-            // reset variables
-            this._accumData = [new Float32Array(this._bufferSize)];
-            this._spectrum = null;
+          this._spectrum = this._extractor.melSpectrumExtractor(this._accumData[0], this._sampleRate);
+          // console.log('spectrum: ', Array.from(this._spectrum));
+          this.zeroPaddedSpectrum = Float32Concat(this._spectrum, this.zeros);
+          
+          // reset variables
+          this._accumData = [new Float32Array(this._bufferSize)];
+          this._spectrum = null;
+        } 
+        
+        if (this.zeroPaddedSpectrum) {
+          for (let i = 0; i < output[0].length; i++) {
+            output[0][i] = this.zeroPaddedSpectrum[i];
+          }
         }
+        // this._outputRingBuffer.push([this.zeroPaddedSpectrum]);
+        // this._outputRingBuffer.pull(output); // if ringbuffer does not have enough frames, output will be silent
+        // console.log('output: ', output[0]);
 
-        this._outputRingBuffer.pull(output); // if ringbuffer does not have enough frames, output will be silent
-        // console.log(output[0]);
         return true;
     }
 }

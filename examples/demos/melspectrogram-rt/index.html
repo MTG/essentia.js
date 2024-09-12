@@ -109,7 +109,7 @@
                 let bufferSize = 1024;
                 let hopSize = 512;
                 let melNumBands = 96;
-
+                
                 try {
                     AudioContext = window.AudioContext || window.webkitAudioContext;
                     audioCtx = new AudioContext();
@@ -121,9 +121,9 @@
                 let gumStream;
                 // global audio node variables
                 let mic;
-                let gain;
                 let melspectrogramNode;
-                let splitter;
+                let analyserNode;
+                let melspectrumBuffer;
 
                 // Shared data with AudioWorkletGlobalScope
                 let audioReader;
@@ -325,8 +325,8 @@
                         }
 
                         mic = audioCtx.createMediaStreamSource(gumStream);
-                        gain = audioCtx.createGain();
-                        gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                        analyserNode = audioCtx.createAnalyser();
+                        melspectrumBuffer = new Float32Array(melNumBands);
 
                         let codeForProcessorModule = ["https://cdn.jsdelivr.net/npm/essentia.js@0.1.3/dist/essentia-wasm.umd.js",
                         "https://cdn.jsdelivr.net/npm/essentia.js@0.1.3/dist/essentia.js-extractor.umd.js", 
@@ -356,11 +356,6 @@
                 }
 
                 function setupAudioGraph() {
-                    // 50ms of buffer, increase in case of glitches
-                    let sab = exports.RingBuffer.getStorageForCapacity(melNumBands*18, Float32Array);
-                    let rb = new exports.RingBuffer(sab, Float32Array);
-                    audioReader = new exports.AudioReader(rb);
-
                     melspectrogramNode = new AudioWorkletNode(audioCtx, 'melspectrogram-processor', {
                         processorOptions: {
                             bufferSize: bufferSize,
@@ -370,22 +365,8 @@
                         }
                     });
 
-                    try {
-                        melspectrogramNode.port.postMessage({
-                            sab: sab,
-                        });
-                    } catch(_){
-                        alert("No SharedArrayBuffer tranfer support, try another browser.");
-                        $("#recordButton").off('click', onRecordClickHandler);
-                        $("#recordButton").prop("disabled", true);
-                        return;
-                    }
-
-                    // It seems necessary to connect the stream to a sink for the pipeline to work, contrary to documentataions.
-                    // As a workaround, here we create a gain node with zero gain, and connect temp to the system audio output.
                     mic.connect(melspectrogramNode);
-                    melspectrogramNode.connect(gain);
-                    gain.connect(audioCtx.destination);
+                    melspectrogramNode.connect(analyserNode);
 
                     requestAnimationFrame(animateSpectrogram); // start plot animation
                 }
@@ -394,25 +375,20 @@
                 let elapsed;
                 // draw melspectrogram frames
                 function animateSpectrogram(timestamp) {
-                    if (animationStart === undefined)
-                        animationStart = timestamp;
+                    if (animationStart === undefined) animationStart = timestamp;
                     elapsed = timestamp - animationStart;
                     animationLoopId = requestAnimationFrame(animateSpectrogram);
-                    /* SAB method */
-                    let melspectrumBuffer = new Float32Array(melNumBands);
-                    if (audioReader.available_read() >= melNumBands) {
-                        let toread = audioReader.dequeue(melspectrumBuffer);
-                        if (toread !== 0) {
-                            // scale spectrum values to 0 - 255
-                            let scaledMelspectrum = melspectrumBuffer.map(x => Math.round(x*35.5))
-                            // save into full spectrogram for drawing on stop
-                            plot.spectrumAccum.push(scaledMelspectrum);
+                    
+                    // get descriptor data
+                    analyserNode.getFloatTimeDomainData(melspectrumBuffer);
+                    // scale spectrum values to 0 - 255
+                    let scaledMelspectrum = melspectrumBuffer.map(x => Math.round(x*35.5))
+                    // save into full spectrogram for drawing on stop
+                    plot.spectrumAccum.push(scaledMelspectrum);
 
-                            // here we call the plotting function to display realtime feature extraction results
-                            drawMovingSpectro(scaledMelspectrum);
-                        } 
-                    }
-                } 
+                    // here we call the plotting function to display realtime feature extraction results
+                    drawMovingSpectro(scaledMelspectrum);
+                }
 
                 function drawMovingSpectro(spectrum) {
                     if (!plot.isFull) {
@@ -450,9 +426,9 @@
                     for (let i = 0; i < plot.canvas.height; i++) {
                         const invertedIndex = melNumBands - i;
                         singleFrameSlice.data[4 * i + 0] = 61 + (spectrum[invertedIndex] * redRange); // R
-                        singleFrameSlice.data[4 * i + 1] = (spectrum[invertedIndex] * 81/255); // G
-                        singleFrameSlice.data[4 * i + 2] = (spectrum[invertedIndex] * 68/255); // B
-                        singleFrameSlice.data[4 * i + 3] = spectrum[invertedIndex];         // A
+                        singleFrameSlice.data[4 * i + 1] = (spectrum[invertedIndex] * 81/255);        // G
+                        singleFrameSlice.data[4 * i + 2] = (spectrum[invertedIndex] * 68/255);        // B
+                        singleFrameSlice.data[4 * i + 3] = spectrum[invertedIndex] * 1.5;             // A
                     }
                     plot.ctx.putImageData(singleFrameSlice, plot.cursor, 0);
                 }
@@ -492,10 +468,9 @@
                         // disconnect nodes
                         mic.disconnect();
                         melspectrogramNode.disconnect();
-                        gain.disconnect();
                         mic = undefined; 
                         melspectrogramNode = undefined; 
-                        gain = undefined;
+                        analyserNode = undefined;
 
                         console.log("Stopped recording ...");
                     });
@@ -503,29 +478,10 @@
 
                 $(document).ready(function() {
                     // check for SharedArrayBuffer support:
-                    try {
-                        const testSAB = new SharedArrayBuffer(1);
-                        delete testSAB;  
-                        plot.init();
-                        axes.init();
-                        // add event listeners to ui objects
-                        $("#recordButton").on('click', onRecordClickHandler);
-                    } catch (e) {
-                        if (e instanceof ReferenceError && !crossOriginIsolated) {
-                            $("#recordButton").prop('disabled', true);
-                            // redirect to cross-origin isolated SAB-capable version on Netlify
-                            window.location = "https://essentiajs-melspectrogram.netlify.app";
-                            return;
-                        }
-
-                        // Unknown malfunction: alert user and offer alternative
-                        $("#recordButtonContainer").before(`
-                            <div class="ui message">
-                                <div class="header">Unable to run app</div>
-                                <p><a href="https://essentiajs-melspectrogram.netlify.app">Check out this version! <i class="external alternate icon"></i><a/></p>
-                                <p style="font-weight: 300;"><a href="https://github.com/MTG/essentia.js/issues">Let us know <i class="icon comment"></i></a></p>
-                            </div>`);
-                    }
+                    plot.init();
+                    axes.init();
+                    // add event listeners to ui objects
+                    $("#recordButton").on('click', onRecordClickHandler);
                 });
             })();
             </script>
