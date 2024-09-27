@@ -80,7 +80,7 @@ class PitchProcessor extends AudioWorkletProcessor {
     }
 }
 
-registerProcessor("pitchyinprob-processor", PitchProcessor);
+registerProcessor("pitchyinfft-processor", PitchProcessor);
 
 
 

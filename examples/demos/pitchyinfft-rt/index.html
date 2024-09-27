@@ -189,7 +189,7 @@
 
                         let codeForProcessorModule = ["https://cdn.jsdelivr.net/npm/essentia.js@0.1.3/dist/essentia-wasm.umd.js", 
                                                     "https://cdn.jsdelivr.net/npm/essentia.js@0.1.3/dist/essentia.js-core.umd.js", 
-                                                    "pitchyinprob-processor.js", 
+                                                    "pitchyinfft-processor.js", 
                                                     "https://unpkg.com/ringbuf.js@0.1.0/dist/index.js"];
 
                         // inject Essentia.js code into AudioWorkletGlobalScope context, then setup audio graph and start animation
@@ -215,7 +215,7 @@
                 }
 
                 function setupAudioGraph() {
-                    pitchNode = new AudioWorkletNode(audioCtx, 'pitchyinprob-processor', {
+                    pitchNode = new AudioWorkletNode(audioCtx, 'pitchyinfft-processor', {
                         processorOptions: {
                             bufferSize: bufferSize,
                             sampleRate: audioCtx.sampleRate,
