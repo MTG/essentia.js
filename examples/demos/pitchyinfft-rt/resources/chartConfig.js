@@ -34,6 +34,8 @@ function getTimeLabels(n) {
 const DISPLAY_LENGTH_SECONDS = 5;
 const NUM_ANALYSIS_FRAMES = Math.ceil( DISPLAY_LENGTH_SECONDS / (REFRESH_RATE/1000) );
 
+const FONT_COLOR = "#616161";
+
 const DATA = {
   "labels": getTimeLabels(NUM_ANALYSIS_FRAMES),
   "yLabels": [],
@@ -87,7 +89,7 @@ const OPTIONS = {
     "labels": {
       "fontSize": 11,
       "boxWidth": 22,
-      "fontColor": "#a1a1a1",
+      "fontColor": FONT_COLOR,
       "filter": function (item, chart) {
         return item.text.includes("Pitch");
       }
@@ -110,7 +112,7 @@ const OPTIONS = {
       },
       "ticks": {
         "fontSize": 11,
-        "fontColor": "#a1a1a1",
+        "fontColor": FONT_COLOR,
         "maxRotation": 15,
         "autoSkip": true,
         "autoSkipPadding": 10
@@ -118,7 +120,7 @@ const OPTIONS = {
       "scaleLabel": {
         "display": true,
         "fontSize": 11,
-        "fontColor": "#a1a1a1",
+        "fontColor": FONT_COLOR,
         "labelString": "Time (seconds)"
       }
     }],
@@ -134,7 +136,7 @@ const OPTIONS = {
           "min": 50,
           "max": 3500,
           "fontSize": 11,
-          "fontColor": "#a1a1a1",
+          "fontColor": FONT_COLOR,
           "callback": function(...args) {
             const value = Chart.Ticks.formatters.logarithmic.call(this, ...args);
             if (value.length) {
@@ -146,7 +148,7 @@ const OPTIONS = {
         "scaleLabel": {
           "display": true,
           "fontSize": 11,
-          "fontColor": "#a1a1a1",
+          "fontColor": FONT_COLOR,
           "labelString": "Pitch (Hz)"
         }
       },
@@ -163,7 +165,7 @@ const OPTIONS = {
         },
         "ticks": {
           "fontSize": 11,
-          "fontColor": "#a1a1a1",
+          "fontColor": FONT_COLOR,
           "callback": function(value, index, values) {
             return value;
           }
@@ -171,7 +173,7 @@ const OPTIONS = {
         "scaleLabel": {
           "display": true,
           "fontSize": 11,
-          "fontColor": "#a1a1a1",
+          "fontColor": FONT_COLOR,
           "labelString": "Pitch Class"
         }
       },
@@ -188,7 +190,7 @@ const OPTIONS = {
           "min": 50,
           "max": 3500,
           "fontSize": 11,
-          "fontColor": "#a1a1a1",
+          "fontColor": FONT_COLOR,
           "callback": function(...args) {
             const value = Chart.Ticks.formatters.logarithmic.call(this, ...args);
             if (value.length) {
