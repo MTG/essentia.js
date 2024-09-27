@@ -106,24 +106,14 @@
             
             <script>
             (function() {
-                let AudioContext;
-                // global var for web audio API AudioContext
-                let audioCtx;
                 let bufferSize = 8192;
-
-                try {
-                    AudioContext = window.AudioContext || window.webkitAudioContext;
-                    audioCtx = new AudioContext();
-                } catch (e) {
-                    throw "Could not instantiate AudioContext: " + e.message;
-                }
-
                 // global var getUserMedia mic stream
                 let gumStream;
                 // global audio node variables
                 let mic;
-                let gain;
                 let pitchNode;
+                let analyserNode;
+                let pitchBuffer = new Float32Array(4);
 
                 // Shared data with AudioWorkletGlobalScope
                 let audioReader;
@@ -133,19 +123,6 @@
                 let canvas = document.getElementById("axesDiv");
                 let pitchAccum = [];
                 let rmsAccum = [];
-                let refreshRate = bufferSize / audioCtx.sampleRate * 1000;
-
-                // calculate time axis labels
-                function getTimeLabels(n) {
-                    // where `n` is number of pitch values or time frames to be represented
-                    let xlabels = [];
-                    for (let i = 0; i < n; i++) {
-                        xlabels.push(Math.round(Math.round(i * refreshRate) / 100) / 10) // time in secs rounded to 1 decimal place
-                    }
-                    return xlabels;
-                }
-
-                DATA.labels = getTimeLabels(30);
 
                 // console.log("before chart creation");
                 // console.log(RMS_ARRAY);
@@ -163,10 +140,10 @@
 
                 function resetChartData() {
                     rms_pointer = RMS_ARRAY;
-                    pitchChart.data.labels = getTimeLabels(30);
-                    pitchChart.data.datasets[0].data = Array(30).fill(100);
-                    pitchChart.data.datasets[1].data = Array(30).fill(AXES_PITCHES[0]);
-                    pitchChart.data.datasets[2].data = Array(30).fill(AXES_PITCHES.slice(-1)[0]);
+                    pitchChart.data.labels = getTimeLabels(NUM_ANALYSIS_FRAMES);
+                    pitchChart.data.datasets[0].data = Array(NUM_ANALYSIS_FRAMES).fill(100);
+                    pitchChart.data.datasets[1].data = Array(NUM_ANALYSIS_FRAMES).fill(AXES_PITCHES[0]);
+                    pitchChart.data.datasets[2].data = Array(NUM_ANALYSIS_FRAMES).fill(AXES_PITCHES.slice(-1)[0]);
                     pitchChart.update();
                 }
 
@@ -208,8 +185,7 @@
                         }
 
                         mic = audioCtx.createMediaStreamSource(gumStream);
-                        gain = audioCtx.createGain();
-                        gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                        analyserNode = new AnalyserNode(audioCtx, {channelCountMode: "explicit", channelCount: 1, fftSize: 128});
 
                         let codeForProcessorModule = ["https://cdn.jsdelivr.net/npm/essentia.js@0.1.3/dist/essentia-wasm.umd.js", 
                                                     "https://cdn.jsdelivr.net/npm/essentia.js@0.1.3/dist/essentia.js-core.umd.js", 
@@ -239,33 +215,19 @@
                 }
 
                 function setupAudioGraph() {
-                    let sab = exports.RingBuffer.getStorageForCapacity(3, Float32Array); // capacity: three float32 values [pitch, confidence, rms]
-                    let rb = new exports.RingBuffer(sab, Float32Array);
-                    audioReader = new exports.AudioReader(rb);
-
                     pitchNode = new AudioWorkletNode(audioCtx, 'pitchyinprob-processor', {
                         processorOptions: {
                             bufferSize: bufferSize,
                             sampleRate: audioCtx.sampleRate,
-                        }
+                        },
+                        outputChannelCount: [1]
                     });
 
-                    try {
-                        pitchNode.port.postMessage({
-                            sab: sab,
-                        });
-                    } catch(_){
-                        alert("No SharedArrayBuffer tranfer support, try another browser.");
-                        $("#recordButton").off('click', onRecordClickHandler);
-                        $("#recordButton").prop("disabled", true);
-                        return;
-                    }
 
                     // It seems necessary to connect the stream to a sink for the pipeline to work, contrary to documentataions.
-                    // As a workaround, here we create a gain node with zero gain, and connect temp to the system audio output.
+                    // As a workaround, here we create a analyserNode node with zero analyserNode, and connect temp to the system audio output.
                     mic.connect(pitchNode);
-                    pitchNode.connect(gain);
-                    gain.connect(audioCtx.destination);
+                    pitchNode.connect(analyserNode);
 
                     requestAnimationFrame(animatePitch); // start plot animation
                 }
@@ -277,30 +239,22 @@
                     // if (animationStart === undefined)
 
                     animationId = requestAnimationFrame(animatePitch);
-                    /* SAB method */
-                    let pitchBuffer = new Float32Array(3);
-                    if (audioReader.available_read() >= 1) {
-                        let read = audioReader.dequeue(pitchBuffer);
-                        if (read !== 0) {
-                            // console.info("main: ", pitchBuffer[0], pitchBuffer[1], pitchBuffer[2]);
-                            // elapsed = timestamp - animationStart;
-                            // animationStart = timestamp;
-                            // console.info(elapsed);
-                            CONFIDENCE_ARRAY.push(pitchBuffer[1]);
-                            CONFIDENCE_ARRAY.shift();
-                            const logRMS = 1 + Math.log10(pitchBuffer[2] + Number.MIN_VALUE) * 0.5;
-                            rmsAccum.push(logRMS);
-                            RMS_ARRAY.push(logRMS);
-                            RMS_ARRAY.shift();
-                            pitchAccum.push(pitchBuffer[0]);
-                            pitchChart.data.datasets[0].data.push(pitchBuffer[0]);
-                            pitchChart.data.datasets[0].data.shift();
 
-                            // console.info("before chart update");
-                            pitchChart.update();
-                            // console.info("AFTER chart update");
-                        } 
-                    }
+                    analyserNode.getFloatTimeDomainData(pitchBuffer);
+
+                    CONFIDENCE_ARRAY.push(pitchBuffer[1]);
+                    CONFIDENCE_ARRAY.shift();
+                    const logRMS = 1 + Math.log10(pitchBuffer[2] + Number.MIN_VALUE) * 0.5;
+                    rmsAccum.push(logRMS);
+                    RMS_ARRAY.push(logRMS);
+                    RMS_ARRAY.shift();
+                    pitchAccum.push(pitchBuffer[0]);
+                    pitchChart.data.datasets[0].data.push(pitchBuffer[0]);
+                    pitchChart.data.datasets[0].data.shift();
+
+                    // console.info("before chart update");
+                    pitchChart.update();
+                    // console.info("AFTER chart update");
                 }
 
                 function drawFullPitchContour() {
@@ -335,10 +289,10 @@
                         // disconnect nodes
                         mic.disconnect();
                         pitchNode.disconnect();
-                        gain.disconnect();
+                        analyserNode.disconnect();
                         mic = undefined; 
                         pitchNode = undefined; 
-                        gain = undefined;
+                        analyserNode = undefined;
 
                         console.log("Stopped recording ...");
                     });
@@ -348,27 +302,6 @@
                     // check for SharedArrayBuffer support:
                     // add event listeners to ui objects
                     $("#recordButton").on('click', onRecordClickHandler);
-
-
-                    try {
-                        const testSAB = new SharedArrayBuffer(1);
-                        delete testSAB;
-                    } catch (e) {
-                        if (e instanceof ReferenceError && !crossOriginIsolated) {
-                            $("#recordButton").prop("disabled", true);
-                            // redirect to cross-origin isolated SAB-capable version on Netlify
-                            window.location = "https://essentiajs-pitchmelodia.netlify.app";
-                            return;
-                        }
-
-                        // Unknown malfunction: alert user and offer alternative
-                        $("#recordButtonContainer").before(`
-                            <div class="ui message">
-                                <div class="header">Unable to run app</div>
-                                <p><a href="https://essentiajs-melspectrogram.netlify.app">Check out this version! <i class="external alternate icon"></i><a/></p>
-                                <p style="font-weight: 300;"><a href="https://github.com/MTG/essentia.js/issues">Let us know <i class="icon comment"></i></a></p>
-                            </div>`);
-                    }
                 });
             })();
             </script>

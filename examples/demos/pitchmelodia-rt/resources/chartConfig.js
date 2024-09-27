@@ -7,8 +7,35 @@
 //   // console.info("borderWidth: ", logRMS);
 //   return logRMS * 8; // max 6 pixels wide
 // }
+let AudioContext;
+// global var for web audio API AudioContext
+let audioCtx;
+
+try {
+    AudioContext = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AudioContext();
+} catch (e) {
+    throw "Could not instantiate AudioContext: " + e.message;
+}
+
+// assuming FPS = 60Hz
+const REFRESH_RATE = 1000/60; // milliseconds
+
+// calculate time axis labels
+function getTimeLabels(n) {
+    // where `n` is number of pitch values or time frames to be represented
+    let xlabels = [];
+    for (let i = 0; i < n; i++) {
+        xlabels.push(Math.round(Math.round(i * REFRESH_RATE) / 100) / 10) // time in secs rounded to 1 decimal place
+    }
+    return xlabels;
+}
+
+const DISPLAY_LENGTH_SECONDS = 5;
+const NUM_ANALYSIS_FRAMES = Math.ceil( DISPLAY_LENGTH_SECONDS / (REFRESH_RATE/1000) );
+
 const DATA = {
-  "labels": [],
+  "labels": getTimeLabels(NUM_ANALYSIS_FRAMES),
   "yLabels": [],
   "datasets": [{
     "data": [],
@@ -195,8 +222,8 @@ const PITCH_CLASS_COLORS = {
   'B': 'hsl(180, 25%, 50%)'
 };
 
-const CONFIDENCE_ARRAY = Array(30).fill(0);
-const RMS_ARRAY = Array(30).fill(0);
+const CONFIDENCE_ARRAY = Array(NUM_ANALYSIS_FRAMES).fill(0);
+const RMS_ARRAY = Array(NUM_ANALYSIS_FRAMES).fill(0);
 let rms_pointer = RMS_ARRAY;
 
 function getPitchScale() {
@@ -221,9 +248,9 @@ function freqToPitchClass(f) {
 
 // fill in data, labels, and setup axes
 
-for (var i = 0; i < 30; i++) DATA.datasets[0].data.push(100);
-for (var i = 0; i < 30; i++) DATA.datasets[1].data.push(AXES_PITCHES[0]);
-for (var i = 0; i < 30; i++) DATA.datasets[2].data.push(AXES_PITCHES.slice(-1)[0]);
+for (var i = 0; i < NUM_ANALYSIS_FRAMES; i++) DATA.datasets[0].data.push(100);
+for (var i = 0; i < NUM_ANALYSIS_FRAMES; i++) DATA.datasets[1].data.push(AXES_PITCHES[0]);
+for (var i = 0; i < NUM_ANALYSIS_FRAMES; i++) DATA.datasets[2].data.push(AXES_PITCHES.slice(-1)[0]);
 
 for (var p of AXES_PITCHES) {
     DATA.yLabels.push(freqToPitchClass(p));
