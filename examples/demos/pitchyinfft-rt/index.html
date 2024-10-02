@@ -17,10 +17,12 @@
         
         <div class="ui container">
             <div class="ui padded grid centered">
-                <button id="recordButton" class="ui red basic big button" role="switch">
-                    Mic &nbsp;&nbsp;
-                    <i class="microphone icon"></i>
-                </button>
+                <div class="one column centered row">
+                    <button id="recordButton" class="ui red basic big button" role="switch">
+                        Mic &nbsp;&nbsp;
+                        <i class="microphone icon"></i>
+                    </button>
+                </div>
                 <canvas
                     id="axesDiv"
                     class="ui centered"
@@ -65,9 +67,6 @@
                 let pitchNode;
                 let analyserNode;
                 let pitchBuffer = new Float32Array(4);
-
-                // Shared data with AudioWorkletGlobalScope
-                let audioReader;
 
                 // Visualization objects
                 let animationId;
@@ -250,7 +249,6 @@
                 }
 
                 $(document).ready(function() {
-                    // check for SharedArrayBuffer support:
                     // add event listeners to ui objects
                     $("#recordButton").on('click', onRecordClickHandler);
                 });

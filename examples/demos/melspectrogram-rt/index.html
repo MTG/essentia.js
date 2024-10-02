@@ -10,71 +10,24 @@
         />
         <title>essentia.js Melspectrogram</title>
     </head>
-    <body style="background-color:  #000000!important;">
+    <body>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw==" crossorigin="anonymous"></script>
 
-        <div class="ui main_wrapper landing-image">
-            <div class="ui header centered" id="header">
-                <a href="https://mtg.github.io/essentia.js/" target="_blank">
-                    <img
-                        id="header-img"
-                        src="./images/essentiajsbanner.png"
-                    />
-                </a>
-                <div>
-                    <h2 class="ui header white-text" style="color: azure;">
-                        Real-time mel-spectrogram visualization
-                    </h2>
-                    <div class="ui basic large button">
-                        <a href="https://github.com/MTG/essentia.js/tree/dev/examples/melspectrogram-rt/" target="_blank" class="ui small button">Code<i class="right github icon"></i></a>
-                    </div>
+        <div class="ui container">
+            <div class="ui padded grid centered">
+                <div class="one column centered row">
+                    <button id="recordButton" class="ui red basic big button" role="switch">
+                        Mic &nbsp;&nbsp;<i class="microphone icon"></i>
+                    </button>
                 </div>
-
-
-            <div class="ui divider" style="height: 5px; width: 2px;"></div>
-                
-            <div class="body-container">
-                <div class="ui centered one column grid container">
-                    <div class="ui vertical buttons row" id="recordButtonContainer">
-                        <center>
-                            <button id="recordButton" class="ui red inverted big button record-button" role="switch">
-                                Mic &nbsp;&nbsp;<i class="microphone icon"></i>
-                            </button>
-                        </center>
-                    </div>
-
-                    <canvas
-                        id="axesDiv"
-                        class="ui centered"
-                        style="width: 800px; height: 388px; background-color: transparent;"
-                    ></div>
-                </div>
+                <canvas
+                    id="axesDiv"
+                    class="ui centered"
+                    style="width: 800px; height: 388px;"
+                ></canvas>
             </div>
-
-            <div class="ui divider" style="height: 50px;"></div>
-
-            <center>
-                <div class="footer" style="margin-top: 30px; height: 20%;">
-                    <a class="demo_logo" target="_blank" href="//essentia.upf.edu">
-                        <img
-                            id="logo"
-                            src="./images/essentia_logo.svg"
-                            alt="MTG Logo"
-                            style="margin-left: 40px; height: 70px;"
-                        />
-                    </a>
-                    <a target="_blank" href="https://www.upf.edu/web/mtg">
-                        <img
-                            class="essnt-footer_mtg-logo"
-                            src="./images/upflogo.png"
-                            alt="mtg logo"
-                            style="width:300px; height: 70px;"
-                        />
-                    </a>
-                </div>
-            </center>
             
             <script>
                 exports = {};
@@ -127,6 +80,8 @@
 
                 // Shared data with AudioWorkletGlobalScope
                 let audioReader;
+
+                const fontColor = "#6c6c6c";
 
                 // Plot Settings
                 const plot = {
@@ -187,8 +142,8 @@
                         this.canvas.width = 800;
                         this.canvas.height = 388;
                         this.ctx = this.canvas.getContext('2d');
-                        this.ctx.strokeStyle = "#8c8c8c";
-                        this.ctx.fillStyle = "#8c8c8c";
+                        this.ctx.strokeStyle = fontColor;
+                        this.ctx.fillStyle = fontColor;
                         this.ctx.lineWidth = 1;
 
                         // calculate tick pixel coordinates
@@ -231,7 +186,7 @@
                         })
                     },
                     drawXTickLabels: function() {
-                        this.ctx.fillStyle = "#8c8c8c";
+                        this.ctx.fillStyle = fontColor;
                         this.xticks.forEach((tick, idx) => {
                             this.ctx.fillText(this.xtickLabels[idx], tick[0]-(this.fontSize/3), this.canvas.height-(this.yOffset*0.6));
                         });
@@ -428,7 +383,7 @@
                         singleFrameSlice.data[4 * i + 0] = 61 + (spectrum[invertedIndex] * redRange); // R
                         singleFrameSlice.data[4 * i + 1] = (spectrum[invertedIndex] * 81/255);        // G
                         singleFrameSlice.data[4 * i + 2] = (spectrum[invertedIndex] * 68/255);        // B
-                        singleFrameSlice.data[4 * i + 3] = spectrum[invertedIndex] * 1.5;             // A
+                        singleFrameSlice.data[4 * i + 3] = spectrum[invertedIndex] * 2;             // A
                     }
                     plot.ctx.putImageData(singleFrameSlice, plot.cursor, 0);
                 }
