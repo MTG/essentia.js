@@ -1,5 +1,6 @@
 import { AnalysisResults, toggleUploadDisplayHTML, PlaybackControls } from './viz.js';
 import { preprocess, shortenAudio } from './audioUtils.js';
+import inferenceWorkerURL from './iacantoInferenceWorker.js?url';
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
@@ -67,8 +68,9 @@ function processFile(arrayBuffer) {
             let audioData = shortenAudio(prepocessedAudio, KEEP_PERCENTAGE, true); // <-- TRIMMED start/end
 
             // send for feature extraction
-            featureExtractionWorker.postMessage({
-                audio: audioData.buffer
+            inferenceWorker.postMessage({
+                arrayBuffer: audioData.buffer,
+                type: "audio"
             }, [audioData.buffer]);
             audioData = null;
         })
@@ -112,7 +114,7 @@ function createFeatureExtractionWorker() {
 }
 
 function createInferenceWorker() {
-    inferenceWorker = new Worker('./src/inference.js');
+    inferenceWorker = new Worker(inferenceWorkerURL, {type: "module"});
     inferenceWorker.onmessage = function listenToWorker(msg) {
         // listen out for model output
         if (msg.data.predictions) {
@@ -141,7 +143,6 @@ function toggleLoader() {
 
 window.onload = () => {
     createInferenceWorker();
-    createFeatureExtractionWorker();
     EssentiaWASM().then((wasmModule) => {
         essentia = new wasmModule.EssentiaJS(false);
         essentia.arrayToVector = wasmModule.arrayToVector;
