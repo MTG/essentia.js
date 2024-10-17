@@ -96,7 +96,7 @@ function runClassifiers(embeddings) {
       // format predictions, grab only positive output
       predictions[name] = summarizedPredictions;
     })
-    console.log(`inference took: ${Date.now() - inferenceStart}ms`);
+    console.log(`classifier heads took: ${Date.now() - inferenceStart}ms`);
   });
 }
 

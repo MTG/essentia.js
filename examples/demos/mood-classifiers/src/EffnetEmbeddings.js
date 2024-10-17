@@ -1,6 +1,7 @@
-import { EssentiaModel } from "essentia.js";
+import { EssentiaWASM } from "./lib/essentia-custom-extractor.module.js";
 import modelUrl from '../models/effnet-based/discogs-effnet-bsdynamic-1.onnx?url';
 
+EssentiaWASM.init();
 
 export default class EffnetEmbeddings {
   /*
@@ -8,10 +9,9 @@ export default class EffnetEmbeddings {
   constructor (essentiaWasm, ortModule) {
     this.ort = ortModule;
     this.url = modelUrl;
-    this.tfInputMusiCNN = new EssentiaModel.EssentiaTFInputExtractor(essentiaWasm, "musicnn", true);
-    this.frameSize = this.tfInputMusiCNN.frameSize;
+    this.tfInputMusiCNN = new EssentiaWASM.ObjectOrientedTFInputMusiCNN();
+    this.frameSize = 512;
     this.hopSize = Math.floor(this.frameSize / 2);
-    console.log(this.tfInputMusiCNN);
 
     this.patchSize = 128;
     this.session = null;
@@ -27,7 +27,12 @@ export default class EffnetEmbeddings {
     const melspectrogramStart = Date.now();
     if (!this.session) throw Error ('Effnet ORT session doesnt exist, please await .initialize() before calling predict');
     // console.log('audio for embeddings', audio);
-    const melspectrogram = this.tfInputMusiCNN.computeFrameWise(audio, this.hopSize).melSpectrum;
+    const frames = EssentiaWASM.FrameGenerator(audio, this.frameSize, this.hopSize);
+    const melspectrogram = [];
+    for (let i=0; i < frames.size(); i++) {
+      const bandsVector = this.tfInputMusiCNN.compute(frames.get(i));
+      melspectrogram.push(EssentiaWASM.vect2ArrayCpp(bandsVector));
+    }
     console.log(`melspectrogram took ${Date.now() - melspectrogramStart}ms`);
 
     const embeddingsStartTime = Date.now();
