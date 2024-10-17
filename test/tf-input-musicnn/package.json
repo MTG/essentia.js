@@ -1,0 +1,17 @@
+{
+  "name": "tf-input-musicnn-tests",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.4.8"
+  },
+  "dependencies": {
+    "essentia.js": "^0.1.3"
+  }
+}
