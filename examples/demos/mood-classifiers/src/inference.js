@@ -1,143 +1,128 @@
-importScripts('./lib/tf.min.3.5.0.js');
+import EffnetEmbeddings from "./EffnetEmbeddings.js";
+import { HeadModelORT } from "./HeadModel.js";
+import modelState from "./modelState.js";
 
-let classifiers = {
-    'mood_happy': {
-        isLoaded: false,
-        tagOrder: [true, false],
-        model: null
-    }, 
-    'mood_sad': {
-        isLoaded: false,
-        tagOrder: [false, true],
-        model: null
-    }, 
-    'mood_relaxed': {
-        isLoaded: false,
-        tagOrder: [false, true],
-        model: null
-    }, 
-    'mood_aggressive': {
-        isLoaded: false,
-        tagOrder: [true, false],
-        model: null
-    }, 
-    'danceability': {
-        isLoaded: false,
-        tagOrder: [true, false],
-        model: null
-    },
-    'emomusic': {
-        isLoaded: false,
-        tagOrder: ['valence', 'arousal'],
-        model: null
-    }
+import * as ort from 'onnxruntime-web';
+
+import wasm from "onnxruntime-web/dist/ort-wasm.wasm?url"
+import wasmThreaded from "onnxruntime-web/dist/ort-wasm-threaded.wasm?url"
+import wasmSimd from "onnxruntime-web/dist/ort-wasm-simd.wasm?url"
+import wasmSimdThreaded from "onnxruntime-web/dist/ort-wasm-simd-threaded.wasm?url"
+
+ort.env.wasm.wasmPaths = {
+  "ort-wasm.wasm": wasm,
+  "ort-wasm-threaded.wasm": wasmThreaded,
+  "ort-wasm-simd.wasm": wasmSimd,
+  "ort-wasm-simd-threaded.wasm": wasmSimdThreaded,
 };
 
-async function initModel(name) {
-    classifiers[name].model = await tf.loadGraphModel(getModelURL(name));
-    console.info(`Model ${name} has been loaded!`);
-    classifiers[name].isLoaded = true;
+const effnetEmbeddings = new EffnetEmbeddings(ort);
+const classifiers = Object.keys(modelState);
+
+let audioArray = null;
+let modelsReady = false; 
+let waitingForInference = false;
+
+function getPositives(tensor, name) {
+  const reshapeTemp = [];
+  const innerDim = tensor.dims[1]
+  for (let i = 0; i < tensor.size; i += innerDim) {
+    const innerTemp = tensor.data.slice(i, i+innerDim);
+    const positive = innerTemp.filter((_, j) => modelState[name].tagOrder[j])[0];
+    reshapeTemp.push(positive);
+  }
+  return reshapeTemp;
 }
 
-function getModelURL(modelName) {
-    return `../models/${modelName}-msd-musicnn-1/tfjs/model.json`;
+function average(arr) {
+  const length = arr.length;
+  if (length === 0) return 0;
+
+  const sum = arr.reduce( (acc, val) => acc + val, 0 );
+
+  return sum/length;
 }
 
-function arrayToTensorAsBatches(embeddingsArray, patchSize) {
-    let inputTensor = tf.tensor2d(embeddingsArray, [embeddingsArray.length, patchSize]);
-    return inputTensor;
+
+function initModels() {
+  let initPromiseArray = [];
+  initPromiseArray.push(effnetEmbeddings.initialize());
+  
+  for (let n of classifiers) {
+    modelState[n].model = HeadModelORT.create(n, "effnet", ort);
+    initPromiseArray.push(modelState[n].model.initialize());
+  }
+  
+  Promise.all(initPromiseArray).then( () => {
+    // update initialized state: message ExtractorManager
+    self.postMessage({type: "initialised"});
+    console.log('EffNet model initialised');
+    classifiers.forEach( n => {
+      modelState[n].isLoaded = true;
+      console.info(`${n} classifier initialised`);
+    })
+
+    modelsReady = true;
+    if (waitingForInference) runModels();
+  })
 }
 
-async function initTensorflowWASM() {
-    let defaultBackend;
-    tf.ready().then( () => {
-        defaultBackend = tf.getBackend();
-        console.log('default tfjs backend is: ', defaultBackend);
-        for (let n of Object.keys(classifiers)) {
-            initModel(n);
-        }
-    });
+initModels();
+
+async function runClassifiers(embeddings) {
+  const inferenceStart = performance.now();
+  let predictions = {};
+  // use array of promises pattern here too
+  const predictPromiseArray = [];
+  for (let n of classifiers) {
+    predictPromiseArray.push( modelState[n].model.predict(embeddings) );
+  }
+  const outputs = await Promise.all(predictPromiseArray);
+  outputs.forEach( o => {
+    const name = o.modelName;
+    const outputTensor = o.activations;
+    let outputArray = outputTensor.data;
+    let positivesArray = outputArray;
     
-    if (defaultBackend != 'wasm') {
-        return;
-        importScripts('./lib/tf-backend-wasm-3.5.0.js');
-        // importScripts('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm/dist/tf-backend-wasm.js');
-        tf.setBackend('wasm');
-        tf.ready().then(() => {
-            console.info('tfjs WASM backend successfully initialized!');
-            initModel();
-        }).catch(() => {
-            console.error(`tfjs WASM could NOT be initialized, defaulting to ${tf.getBackend()}`);
-            return false;
-        });
+    if (!["approachability", "engagement"].includes(name)) {
+      positivesArray = getPositives(outputTensor, name);
     }
-}
-
-function twoValuesAverage(arrayOfArrays) {
-    const length = arrayOfArrays.length;
-    if (length === 0) return [0, 0];
-
-    const [firstValuesSum, secondValuesSum] = arrayOfArrays.reduce(
-        ([firstAcc, secondAcc], [firstVal, secondVal]) => [
-            firstAcc + firstVal,
-            secondAcc + secondVal
-        ],
-        [0, 0]
-    );
-
-    return [firstValuesSum/length, secondValuesSum/length];
-}
-
-function outputPredictions(p) {
-    postMessage({
-        predictions: p
-    });
-}
-
-function modelsPredict(embeddings) {
-    const inferenceStart = Date.now();
-    let inputTensor = arrayToTensorAsBatches(embeddings, 200);
-    const emomusicInputTensor = tf.tensor3d(embeddings.map(e => [e]), [embeddings.length, 1, 200]);
     
-    let predictions = {};
-
-    for (let name of Object.keys(classifiers)) {
-        if (classifiers[name].isLoaded) {
-            let output;
-            if (name == "emomusic") {
-                output = classifiers[name].model.execute(emomusicInputTensor);
-            } else {
-                output = classifiers[name].model.execute(inputTensor);
-            }
-            let outputArray = output.arraySync();
-            
-            const summarizedPredictions = twoValuesAverage(outputArray);
-            // format predictions, grab only positive one
-            if (name == "emomusic") {
-                predictions[name] = { 
-                    [classifiers[name]['tagOrder'][0]]: summarizedPredictions[0],
-                    [classifiers[name]['tagOrder'][1]]: summarizedPredictions[1]
-                };
-            } else {
-                const result = summarizedPredictions.filter((_, i) => classifiers[name].tagOrder[i])[0];
-                predictions[name] = result;
-            }
-            
-            console.info(`${name}: Inference took: ${Date.now() - inferenceStart}ms`);
-            
-        }
-    }
-    outputPredictions(predictions);
-    inputTensor.dispose();
+    const summarizedPredictions = average(positivesArray);
+    // format predictions, grab only positive output
+    predictions[name] = summarizedPredictions;
+  })
+  console.log(`classifier heads took: ${performance.now() - inferenceStart}ms`);
+  return predictions;
 }
 
-initTensorflowWASM();
-
-onmessage = function listenToMainThread(msg) {
-    // listen for audio embeddings
-    if (msg.data.embeddings) {
-        console.log("From inference worker: I've got embeddings!");
-        // should/can this eventhandler run async functions
-        modelsPredict(msg.data.embeddings);
-    }
+async function runModels() {
+  const inferenceStart = performance.now();
+  const embeddings = await effnetEmbeddings.predict(audioArray);
+  // feed to classifier heads
+  const predictions = await runClassifiers(embeddings);
+  const inferenceTotal = performance.now() - inferenceStart;
+  console.log(`total inference time: ${inferenceTotal}ms, for ${audioArray.length / 16000}s recording`);
+  postMessage({
+    predictions: predictions
+  });
 };
+
+self.onmessage = async (msg) => {
+  switch (msg.data.type) {
+    case 'audio':
+      console.log('worker received audio');
+      audioArray = new Float32Array(msg.data.arrayBuffer);
+
+      if (!modelsReady) {
+        waitingForInference = true;
+        break;
+      }
+      runModels();
+
+      break;
+  
+    default:
+      break;
+  }
+}

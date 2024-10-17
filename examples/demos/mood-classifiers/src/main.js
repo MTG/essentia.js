@@ -1,6 +1,6 @@
 import { AnalysisResults, toggleUploadDisplayHTML, PlaybackControls } from './viz.js';
 import { preprocess, shortenAudio } from './audioUtils.js';
-import inferenceWorkerURL from './iacantoInferenceWorker.js?url';
+import inferenceWorkerURL from './inference.js?url';
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
@@ -8,10 +8,8 @@ const KEEP_PERCENTAGE = 0.15; // keep only 15% of audio file
 
 let essentia = null;
 let essentiaAnalysis;
-let featureExtractionWorker = null;
 const modelNames = ['mood_happy' , 'mood_sad', 'mood_relaxed', 'mood_aggressive', 'danceability'];
 let inferenceWorker;
-let inferenceStartTime = 0;
 
 const resultsViz = new AnalysisResults(modelNames);
 let wavesurfer;
@@ -91,28 +89,6 @@ function computeKeyBPM (audioSignal) {
     };
 }
 
-function createFeatureExtractionWorker() {
-    featureExtractionWorker = new Worker('./src/featureExtraction.js');
-    featureExtractionWorker.postMessage({
-        init: true
-    });
-    featureExtractionWorker.onmessage = function listenToFeatureExtractionWorker(msg) {
-        // feed to models
-        if (msg.data.embeddings) {
-            console.log("main received embeddings");
-            console.log(msg.data.embeddings);
-            inferenceStartTime = Date.now();
-            // send features off to each of the models
-            inferenceWorker.postMessage({
-                embeddings: msg.data.embeddings
-            });
-            // msg.data.embeddings = null;
-        }
-        // free worker resource until next audio is uploaded
-        // featureExtractionWorker.terminate();
-    };
-}
-
 function createInferenceWorker() {
     inferenceWorker = new Worker(inferenceWorkerURL, {type: "module"});
     inferenceWorker.onmessage = function listenToWorker(msg) {
@@ -126,7 +102,6 @@ function createInferenceWorker() {
 }
 
 function displayPredictions(predictions) {
-    console.log(`inference took ${Date.now() - inferenceStartTime}ms in total`);
     const allPredictions = {...predictions};
     resultsViz.updateMeters(allPredictions);
     resultsViz.updateValueBoxes(essentiaAnalysis);

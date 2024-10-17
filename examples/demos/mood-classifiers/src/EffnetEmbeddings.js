@@ -6,7 +6,7 @@ EssentiaWASM.init();
 export default class EffnetEmbeddings {
   /*
   */
-  constructor (essentiaWasm, ortModule) {
+  constructor (ortModule) {
     this.ort = ortModule;
     this.url = modelUrl;
     this.tfInputMusiCNN = new EssentiaWASM.ObjectOrientedTFInputMusiCNN();
