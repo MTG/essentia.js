@@ -1,4 +1,5 @@
 import { EssentiaWASM } from "./lib/essentia-custom-extractor.module.js";
+// import { EssentiaWASM, EssentiaModel } from "essentia.js";
 import modelUrl from '../models/effnet-based/discogs-effnet-bsdynamic-1.onnx?url';
 
 EssentiaWASM.init();
@@ -10,6 +11,7 @@ export default class EffnetEmbeddings {
     this.ort = ortModule;
     this.url = modelUrl;
     this.tfInputMusiCNN = new EssentiaWASM.ObjectOrientedTFInputMusiCNN();
+    // this.tfInputMusiCNN = new EssentiaModel.EssentiaTFInputExtractor(EssentiaWASM.EssentiaWASM, "musicnn", true);
     this.frameSize = 512;
     this.hopSize = Math.floor(this.frameSize / 2);
 
@@ -33,6 +35,9 @@ export default class EffnetEmbeddings {
       const bandsVector = this.tfInputMusiCNN.compute(frames.get(i));
       melspectrogram.push(EssentiaWASM.vect2ArrayCpp(bandsVector));
     }
+
+    // const melspectrogram = this.tfInputMusiCNN.computeFrameWise(audio, this.hopSize).melSpectrum;
+
     console.log(`melspectrogram took ${Date.now() - melspectrogramStart}ms`);
 
     const embeddingsStartTime = Date.now();
@@ -46,8 +51,12 @@ export default class EffnetEmbeddings {
     }
 
     const flattenedMelspectrogram = new Float32Array(melspectrogram.length * this.numMelBands);
-    for (let f of melspectrogram) {
-      f.forEach( (bandValue, i) => flattenedMelspectrogram[i] = bandValue);
+    for (let f=0; f < melspectrogram.length; f++) {
+      const melbandsFrame = melspectrogram[f];
+      for (let b=0; b < melbandsFrame.length; b++) {
+        const bandValue = melbandsFrame[b]
+        flattenedMelspectrogram[f+b] = bandValue;
+      }
     }
 
     const ortInputTensor = new this.ort.Tensor('float32', flattenedMelspectrogram, [numPatches, this.patchSize, this.numMelBands]);

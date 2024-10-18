@@ -4,7 +4,7 @@ import inferenceWorkerURL from './inference.js?url';
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
-const KEEP_PERCENTAGE = 0.15; // keep only 15% of audio file
+const KEEP_PERCENTAGE = 0.5; // keep only 15% of audio file
 
 let essentia = null;
 let essentiaAnalysis;

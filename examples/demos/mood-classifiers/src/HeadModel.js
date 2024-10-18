@@ -29,9 +29,9 @@ export class HeadModelORT {
   async predict (inputTensor) {
     // const inputTensorTypedArray = inputTensor.dataSync();
     // const ortInputTensor = new ort.Tensor('float32', inputTensorTypedArray);
-    // console.log(`${this.name} input tensor`, inputTensor);
+    // console.log(`${this.name} input  tensor`, inputTensor);
     const ortOutputTensor = await this.session.run({"embeddings": inputTensor});
-    console.log(`${this.name} (${this.embeddingsSource}-based) inference done: `, ortOutputTensor["activations"]);
+    // console.log(`${this.name} (${this.embeddingsSource}-based) activations: `, ortOutputTensor["activations"]);
     return {"modelName": this.name, "activations": ortOutputTensor["activations"]};
   }
 }

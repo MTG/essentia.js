@@ -78,6 +78,7 @@ async function runClassifiers(embeddings) {
     predictPromiseArray.push( modelState[n].model.predict(embeddings) );
   }
   const outputs = await Promise.all(predictPromiseArray);
+  // console.log('un-processed classifier outputs', outputs);
   outputs.forEach( o => {
     const name = o.modelName;
     const outputTensor = o.activations;
@@ -99,6 +100,7 @@ async function runClassifiers(embeddings) {
 async function runModels() {
   const inferenceStart = performance.now();
   const embeddings = await effnetEmbeddings.predict(audioArray);
+  // console.log('embeddings: ', embeddings.data)
   // feed to classifier heads
   const predictions = await runClassifiers(embeddings);
   const inferenceTotal = performance.now() - inferenceStart;

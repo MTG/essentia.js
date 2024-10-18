@@ -50,6 +50,22 @@ function downsampleArray(audioIn, sampleRateIn, sampleRateOut) {
     return result;
 }
 
+function downsample(audioBuffer, sourceSR, targetSR) {
+    const offlineCtx = new OfflineAudioContext(audioBuffer.numberOfChannels,
+        audioBuffer.duration * targetSR,
+        targetSR);
+
+    // Play it from the beginning.
+    const offlineSource = offlineCtx.createBufferSource();
+    offlineSource.buffer = audioBuffer;
+    offlineSource.connect(offlineCtx.destination);
+    offlineSource.start();
+    offlineCtx.startRendering().then((resampled) => {
+    // `resampled` contains an AudioBuffer resampled at 16000Hz.
+    // use resampled.getChannelData(x) to get an Float32Array for channel x.
+    })
+}
+
 
 function shortenAudio (audioIn, keepRatio=0.5, trim=false) {
     /* 
