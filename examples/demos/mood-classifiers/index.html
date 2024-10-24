@@ -15,9 +15,6 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js" integrity="sha512-dqw6X88iGgZlTsONxZK9ePmJEFrmHwpuMrsUChjAw1mRUhUITE5QU9pkcSox+ynfLhL15Sv2al5A0LVyDCmtUw==" crossorigin="anonymous"></script>
     </head>
     <body>
-        <header>
-           <h1>Mood Audio Analysis with <a id="essentia-header-link" href="https://mtg.github.io/essentia.js/" target="_blank">Essentia.js <sup><i class="tiny external alternate icon"></i></sup></a> Models</h1>
-        </header>
         <main id="main">
             <div id="file-select-area">
                 <!-- <button id="file-select-btn">Select Audio</button> -->
@@ -55,6 +52,16 @@
                     <!-- <h2>Aggressiveness</h2> -->
                     <div class="classifier-meter" data-classifier="Aggressiveness"></div>
                 </div>
+                <div id="engagement" class="classifier">
+                    <span>👁</span>
+                    <!-- <h2>Engagement</h2> -->
+                    <div class="classifier-meter" data-classifier="Engagement"></div>
+                </div>
+                <div id="approachability" class="classifier">
+                    <span>🧠</span>
+                    <!-- <h2>Approachability</h2> -->
+                    <div class="classifier-meter" data-classifier="Approachability"></div>
+                </div>
                 <div id="bpm-and-key">
                     <div id="bpm" class="row-container">
                         <div class="tag">BPM</div>
@@ -68,17 +75,6 @@
             </div>
         </main>
 
-        <footer id="links">
-            <div id="mtg-logo" class="footer-block">
-                <p>Made at</p>
-                <a href="https://www.upf.edu/web/mtg/" target="_blank"><img src="images/mtg-logo.png" alt="Music Technology Group logo"></a> 
-            </div>
-            <div id="essentiajs-logo" class="footer-block">
-                <p>Using audio analysis from</p> 
-                <a href="https://mtg.github.io/essentia.js/" target="_blank"><img src="images/essentia.js-logo.png" alt="Javascript audio analysis library Essentia.js"></a>
-            </div>
-        </footer>
-
         <script src="https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia-wasm.web.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/essentia.js@0.1.0/dist/essentia.js-core.js"></script>
         <script src="src/main.js" type="module" async defer></script>
@@ -89,7 +85,7 @@
                     <i class="step backward icon"></i>
                     Backward
                 </button>
-                <button id="play" class="ui primary button tiny">
+                <button id="play" class="ui button tiny">
                     <i class="play icon"></i>
                     Play/
                     <i class="pause icon"></i>

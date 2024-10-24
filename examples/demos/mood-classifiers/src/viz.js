@@ -1,5 +1,9 @@
 import WaveSurfer from "wavesurfer.js";
 
+const style = getComputedStyle(document.body);
+const mainBlueDark = style.getPropertyValue("--main-blue-dark");
+const footerHeaderBlue = style.getPropertyValue("--footer-header-dark-blue");
+
 class AnalysisResults {
     constructor(classifierNames) {
         this.analysisMeters = {};
@@ -47,8 +51,8 @@ function toggleUploadDisplayHTML(mode) {
 
             return WaveSurfer.create({
                 container: '#waveform',
-                progressColor: '#F7AF39',
-                waveColor: '#a16607'
+                progressColor: footerHeaderBlue,
+                waveColor: mainBlueDark
             });
         
         case 'upload':

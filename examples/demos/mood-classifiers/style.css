@@ -1,12 +1,10 @@
+@import url("../styles/essentia-colors.css");
+
 *, *::before, *::after {
     box-sizing: border-box;
 }
 
 :root {
-    --light-blue: #84c0f9;
-    --main-blue: #399af7;
-    --dark-blue: #1C4B78;
-
     --meter-width: 0;
 }
 
@@ -111,6 +109,10 @@ a#essentia-header-link:active {
     /* margin-top: 1rem; */
 }
 
+.controls#play {
+    background-color: var(--main-blue-dark)!important;
+}
+
 #loader {
     position: absolute;
     width: 100%;
@@ -141,7 +143,7 @@ a#essentia-header-link:active {
 #key-value, #bpm-value {
     width: 70%;
     margin: 0 0.3rem;
-    border: 1px solid #444444;
+    border: 1px solid var(--footer-header-dark-blue);
     border-radius: 2px;
 
     text-align: center;
@@ -162,7 +164,7 @@ span {
     height: 1.8rem;
     position: relative;
 
-    border: .05rem solid var(--dark-blue);
+    border: .05rem solid var(--footer-header-dark-blue);
     border-radius: .1rem;
     margin: .5rem 0;
 }
@@ -171,7 +173,7 @@ span {
     display: flex;
     align-items: center;
 
-    background-color: #F7AF39;
+    background-color: var(--main-red-light);
     width: calc(var(--meter-width, 0) * 1%);
     max-width: calc(100% - 0.3rem);
     min-width: 0;
@@ -186,60 +188,4 @@ span {
     content: attr(data-classifier);
     text-align: center;
     font-size: 1rem;
-}
-
-
-/* FOOTER */
-
-footer#links {
-    width: 100%;
-
-    display: flex;
-    justify-content: space-evenly;
-    align-content: center;
-    padding-top: 1rem;
-
-    color: #ffffff;
-    font-weight: 300;
-    font-size: 1rem;
-    background-color: var(--light-blue);
-
-    position: absolute;
-    bottom: 0vh;
-}
-
-.footer-block {
-    display: flex;
-
-    text-align: center;
-    align-content: center;
-    margin-bottom: 0.5rem;
-}
-
-.footer-block p {
-    margin: auto!important;
-}
-
-.footer-block a {
-    height: fit-content;
-    margin: auto 0;
-}
-
-.footer-block img {
-    margin-left: 2rem;
-    /* height: 2.5rem; */
-    border-radius: 5px;
-}
-
-.footer-block img:hover {
-    /* border: solid 1px white; */
-    box-shadow: 0 0 0 1px white;
-}
-
-[alt="Javascript audio analysis library Essentia.js"] {
-    height: 2.5rem;
-}
-
-[alt="Music Technology Group logo"] {
-    height: 3.5rem;
 }
