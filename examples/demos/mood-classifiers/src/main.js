@@ -4,11 +4,11 @@ import inferenceWorkerURL from './inference.js?url';
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
-const KEEP_PERCENTAGE = 0.5; // keep only 15% of audio file
+const KEEP_PERCENTAGE = 0.85; // keep only 15% of audio file
 
 let essentia = null;
 let essentiaAnalysis;
-const modelNames = ['mood_happy' , 'mood_sad', 'mood_relaxed', 'mood_aggressive', 'danceability'];
+const modelNames = ['mood_happy' , 'mood_sad', 'mood_relaxed', 'mood_aggressive', 'danceability', 'engagement', 'approachability'];
 let inferenceWorker;
 
 const resultsViz = new AnalysisResults(modelNames);

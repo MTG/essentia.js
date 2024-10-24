@@ -56,7 +56,7 @@ function initModels() {
   Promise.all(initPromiseArray).then( () => {
     // update initialized state: message ExtractorManager
     self.postMessage({type: "initialised"});
-    console.log('EffNet model initialised');
+    console.info('EffNet model initialised');
     classifiers.forEach( n => {
       modelState[n].isLoaded = true;
       console.info(`${n} classifier initialised`);
@@ -83,6 +83,7 @@ async function runClassifiers(embeddings) {
     const name = o.modelName;
     const outputTensor = o.activations;
     let outputArray = outputTensor.data;
+    console.debug(`${name} output tensor:`, Array.from(outputArray), outputTensor.dims);
     let positivesArray = outputArray;
     
     if (!["approachability", "engagement"].includes(name)) {
@@ -93,18 +94,19 @@ async function runClassifiers(embeddings) {
     // format predictions, grab only positive output
     predictions[name] = summarizedPredictions;
   })
-  console.log(`classifier heads took: ${performance.now() - inferenceStart}ms`);
+  console.info(`classifier heads took: ${performance.now() - inferenceStart}ms`);
   return predictions;
 }
 
 async function runModels() {
   const inferenceStart = performance.now();
   const embeddings = await effnetEmbeddings.predict(audioArray);
-  // console.log('embeddings: ', embeddings.data)
+  // console.debug('embeddings data: ', Array.from(embeddings.data));
+  // console.debug('embeddings dims: ', Array.from(embeddings.dims));
   // feed to classifier heads
   const predictions = await runClassifiers(embeddings);
   const inferenceTotal = performance.now() - inferenceStart;
-  console.log(`total inference time: ${inferenceTotal}ms, for ${audioArray.length / 16000}s recording`);
+  console.info(`total inference time: ${inferenceTotal}ms, for ${audioArray.length / 16000}s recording`);
   postMessage({
     predictions: predictions
   });
@@ -113,7 +115,7 @@ async function runModels() {
 self.onmessage = async (msg) => {
   switch (msg.data.type) {
     case 'audio':
-      console.log('worker received audio');
+      console.info('worker received audio');
       audioArray = new Float32Array(msg.data.arrayBuffer);
 
       if (!modelsReady) {

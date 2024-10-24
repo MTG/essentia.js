@@ -22,7 +22,7 @@ export class HeadModelORT {
 
   async initialize () {
     this.session = await this.ort.InferenceSession.create(this.url, { executionProviders: ['wasm'] });
-    // console.log(`${this.name} session`, this.session);
+    console.debug(`${this.name} session`, this.session);
     this.isReady = true;
   }
 

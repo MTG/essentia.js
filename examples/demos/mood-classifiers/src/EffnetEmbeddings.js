@@ -21,14 +21,14 @@ export default class EffnetEmbeddings {
   }
   
   async initialize () {
-    // console.log('effnet init')
+    // console.info('effnet init')
     this.session = await this.ort.InferenceSession.create(this.url, { executionProviders: ['wasm'] });
   }
 
   async predict (audio) {
     const melspectrogramStart = Date.now();
     if (!this.session) throw Error ('Effnet ORT session doesnt exist, please await .initialize() before calling predict');
-    // console.log('audio for embeddings', audio);
+    // console.debug('audio for embeddings', audio);
     const frames = EssentiaWASM.FrameGenerator(audio, this.frameSize, this.hopSize);
     const melspectrogram = [];
     for (let i=0; i < frames.size(); i++) {
@@ -38,7 +38,7 @@ export default class EffnetEmbeddings {
 
     // const melspectrogram = this.tfInputMusiCNN.computeFrameWise(audio, this.hopSize).melSpectrum;
 
-    console.log(`melspectrogram took ${Date.now() - melspectrogramStart}ms`);
+    // console.info(`melspectrogram took ${Date.now() - melspectrogramStart}ms`);
 
     const embeddingsStartTime = Date.now();
     const numPatches = Math.ceil(melspectrogram.length / this.patchSize);
@@ -60,9 +60,9 @@ export default class EffnetEmbeddings {
     }
 
     const ortInputTensor = new this.ort.Tensor('float32', flattenedMelspectrogram, [numPatches, this.patchSize, this.numMelBands]);
-    // console.log('effnet shaped input tensor', ortInputTensor);
+    // console.debug('effnet shaped input tensor data (melspectrogram)', Array.from(ortInputTensor.data));
     const ortOutputTensor = await this.session.run({melspectrogram: ortInputTensor});
-    console.log(`embeddings took ${Date.now() - embeddingsStartTime}ms`);
+    console.info(`embeddings took ${Date.now() - embeddingsStartTime}ms`);
     
     return ortOutputTensor.embeddings;
   }
