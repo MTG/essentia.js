@@ -567,6 +567,12 @@ def get_types_summary():
 def parse_param_range(param_range):
 	pass
 
+def gen_valid_input(name, input_type):
+	if name == 'signal' and input_type in ['vector_real', 'vector_complex']:
+		return f'Array(5*44100).fill(0).map( _ => Math.random() );'
+	elif map_types_to_js(input_type) == 'VectorVectorFloat':
+		return 
+
 def parse_to_test_suite(algorithm_name):
 	algo = getattr(estd, algorithm_name)()
 	doc_dict = algo.getStruct()
@@ -575,7 +581,21 @@ def parse_to_test_suite(algorithm_name):
 
 	invalid_parameter_cases = list()
 	valid_parameters_obj = "{}"
+	
+	default_input_size = 1028
+	# generate valid inputs
+	for param in doc_dict['parameters']:
+		# TODO: should take type into account: strings, vector_vector_float, vector string, etc
+		if param['name'] in ['inputSize', 'frameSize']:
+			default_input_size = param['default']
+	
+	# find correct output props
+	# TODO: check output value correctness?
+	output_props_test_checks = list()
+	for out in doc_dict['outputs']:
+		output_props_test_checks.append(f"expect(result).to.have.property('{out['name']}');")
 
+	newline = '\n'
 	suite_template = f"""
 	describe('{algorithm_name}:instantiation', () => {{
 		let {instance_variable};
@@ -591,15 +611,21 @@ def parse_to_test_suite(algorithm_name):
 
 	describe('{algorithm_name}:functionality', () => {{
 		let {instance_variable};
+		let {algorithm_name}ValidInput;
+		let {algorithm_name}ValidInputVector;
 
 		before(() => {{
 			{instance_variable} = new {algorithm_name}();
+			{algorithm_name}ValidInput = Array({default_input_size}).fill(0).map( _ => Math.random() );
+			{algorithm_name}ValidInputVector = arrayToVector({algorithm_name}ValidInput)
 		}});
 		after(() => {{
-			{instance_variable}.delete();
+			if ({instance_variable}) {instance_variable}.delete();
+			{algorithm_name}ValidInputVector.delete();
 		}});
 
-		it('should configure with valid parameters', () => {{
+		it('should configure with valid parameters', function () {{
+			if (!{instance_variable}) this.skip();
 			expect(() => {{
 				{instance_variable}.configure({valid_parameters_obj});
 			}}).to.not.throw();
@@ -607,10 +633,16 @@ def parse_to_test_suite(algorithm_name):
 
 		// invalid param cases
 
-		/*
-		it('should compute with valid input', () => {{
-			const result = {instance_variable}.compute()
-		}}); */
+		
+		it('should compute with valid input', function () {{
+			let result;
+			if (!{instance_variable}) this.skip();
+			expect(() => {{
+				result = {instance_variable}.compute({algorithm_name}ValidInputVector);
+			}}).to.not.throw();
+			// output has expected props
+			{newline.join(output_props_test_checks)}
+		}});
 	}});
 	"""
 	return suite_template
@@ -648,3 +680,12 @@ def get_possible_input_output_params(algorithms=TO_INCLUDE_ALGOS):
 		"param_types": param_types,
 		"param_ranges": param_ranges
 	}
+
+def get_input_size_params(algorithms=TO_INCLUDE_ALGOS):
+	for algo in algorithms:
+		a = getattr(estd, algo)()
+		doc = a.getStruct()
+
+		for param in doc['parameters']:
+			if param['name'] in ['inputSize', 'frameSize']:
+				print(param)

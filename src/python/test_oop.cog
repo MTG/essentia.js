@@ -18,6 +18,24 @@ const {
 
 ready(EssentiaWASM);
 
+const randArray = (size) => Array(size).fill(0).map( _ => Math.random() );
+
+function genRandVectorFloat(size) {
+  return arrayToVector(randArray(size));
+}
+
+function genRandVectorVectorFloat(innerSize, outerSize) {
+  let vvfloat = new EssentiaWASM.VectorVectorFloat();
+  while (vvfloat.size() < outerSize) {
+    vvfloat.push_back(getRandVectorFloat(innerSize));
+  }
+  return vvfloat;
+}
+
+function getRandVectorString(size) {
+  // only 
+}
+
 // NOTE: The following code snippets are machine generated. Do not edit.
 /*[[[cog
 import cog
