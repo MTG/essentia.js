@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function
-from builtins import str
 import os
 import argparse
 import essentia.standard as estd
@@ -32,6 +30,7 @@ DEFAULT_EXCLUDE_ALGOS = [# requires FFTW, TagLib or Chromaprint dependencies
                         # requires Gaia and Tensorflow dependencies
                         'GaiaTransform', 'MusicExtractorSVM', 
                         'TensorflowPredict', 'TensorflowPredictMusiCNN', 'TensorflowPredictVGGish',
+                        # expect tensor_real type
                         'TensorNormalize', 'TensorTranspose',
                         # these algortihms expect a matrix_real input or output types which are not yet supported for the JS bindings 
                         'BpmHistogram', 'FadeDetection', 'HumDetector', 'Onsets', 'Panning', 'SBic', 'SingleGaussian',

@@ -1,0 +1,47 @@
+const { expect } = require('chai');
+const EssentiaWASM = require('../dist/essentia-wasm.umd.js');
+const {
+  ready,
+  arrayToVector,
+  vectorToArray,
+  FrameGenerator,
+  MonoMixer,
+  LoudnessEBUR128,
+  /*[[[cog
+  import cog
+  from configure_bindings import TO_INCLUDE_ALGOS
+  for algo in TO_INCLUDE_ALGOS:
+    cog.outl(f"{algo},")
+  ]]]*/
+  //[[[end]]]
+} = require('../dist/essentia.js-core.umd.js');
+
+ready(EssentiaWASM);
+
+const randArray = (size) => Array(size).fill(0).map( _ => Math.random() );
+
+function genRandVectorFloat(size) {
+  return arrayToVector(randArray(size));
+}
+
+function genRandVectorVectorFloat(innerSize, outerSize) {
+  let vvfloat = new EssentiaWASM.VectorVectorFloat();
+  while (vvfloat.size() < outerSize) {
+    vvfloat.push_back(getRandVectorFloat(innerSize));
+  }
+  return vvfloat;
+}
+
+function getRandVectorString(size) {
+  // only 
+}
+
+// NOTE: The following code snippets are machine generated. Do not edit.
+/*[[[cog
+import cog
+from code_generator import generate_integration_tests
+suites = generate_integration_tests()
+for suite in suites:
+  cog.outl(suite)
+]]]*/
+//[[[end]]]

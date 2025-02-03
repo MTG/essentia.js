@@ -1,0 +1,10 @@
+/*[[[cog
+import cog
+from code_generator import generate_ts_param_types
+algos = generate_ts_param_types()
+for algo in algos:
+  for ln in algo:
+    cog.outl(ln)
+  cog.outl(' ')
+]]]*/
+//[[[end]]]

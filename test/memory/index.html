@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Essentia.js OOP MEMORY TEST</title>
+  <script src="/dist/essentia-wasm.web.js" defer></script>
+</head>
+<body>
+  <button id="oop-launch-test">Launch OOP test</button>
+  <input type="checkbox" name="clear-objects" id="oop-clear-objects">
+  <label for="clear-objects">Clear objects after test</label>
+  
+  <button id="std-launch-test">Launch STD test</button>
+  <input type="checkbox" name="std-clear-objects" id="std-clear-objects">
+  <label for="std-clear-objects">Clear objects after test</label>
+  
+  <script type="module" src="/test/memory/main.js"></script>
+  <script type="module" src="/test/memory/std.js"></script>
+</body>
+</html>

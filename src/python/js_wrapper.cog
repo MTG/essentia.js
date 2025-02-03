@@ -20,196 +20,269 @@
 
 // NOTE: The following code snippets are machine generated. Do not edit.
 
+import * as paramTypes from "./param_types";
+
+let wasmBackend: any;
+
 /**
- * essentia.js-core JS API
- * @class 
- * @example
- * const essentia = new Essentia(EssentiaWASM);
+ * Set module-wide WASM instance and initialise Essentia
+ * @function
+ * @param {EssentiaEmscriptenModule} EssentiaWASM Essentia WebAssembly backend (emcripten global module object) which is loaded from 'essentia-wasm.*.js file'
+*/
+function ready(EssentiaWASM: any, isDebug: boolean = false) {
+  wasmBackend = EssentiaWASM;
+  wasmBackend.init(isDebug);
+}
+
+
+/**
+ * Decode and returns the audio buffer of a given audio url or blob uri using Web Audio API. 
+ * (NOTE: This method doesn't works on Safari browser)
+ * @async
+ * @method
+ * @param {string} audioURL web url or blob uri of a audio file
+ * @param {AudioContext} webAudioCtx an instance of Web Audio API `AudioContext`
+ * @returns {AudioBuffer} decoded audio buffer object
+ * @memberof Essentia
  */
-class Essentia {
-  /** 
-  * @property {EssentiaEmscriptenModule} this.module Essentia WASM emcripten global module object 
-  * @property {string} this.version Essentia WASM backend version
-  * @property {string} this.algorithmNames List of available Essentia alogrithms from the WASM backend
-  */
-  private algorithms: any;
-  public module: any;
-  public version: string;
-  public algorithmNames: string;
+async function getAudioBufferFromURL(audioURL: string, webAudioCtx: AudioContext) {
+  const response = await fetch(audioURL);
+  const arrayBuffer = await response.arrayBuffer();
+  const audioBuffer = await webAudioCtx.decodeAudioData(arrayBuffer);
+  return audioBuffer;
+}
 
-  /**  
-  * @constructs
-  * @param {EssentiaWASM} Essentia WASM backend (emcripten global module object) which is loaded from 'essentia-wasm.*.js file'
-  * @param {boolean} [isDebug=false]
-  */
-  constructor(public EssentiaWASM: any, public isDebug: boolean=false) {
-    this.algorithms = new EssentiaWASM.EssentiaJS(isDebug);
-    this.module = EssentiaWASM;
-    this.version = this.algorithms.version;
-    this.algorithmNames = this.algorithms.algorithmNames;
+/**
+ * Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API. 
+ * (NOTE: This method doesn't works on Safari browser)
+ * @async
+ * @method
+ * @param {string} audioURL web url or blob uri of a audio file
+ * @param {AudioContext} webAudioCtx an instance of Web Audio API `AudioContext`
+ * @param {number} [channel=0] audio channel number
+ * @returns {Float32Array} decode and returns the audio data as Float32 array for the given channel
+ * @memberof Essentia
+ */
+async function getAudioChannelDataFromURL(audioURL: string, webAudioCtx: AudioContext, channel: number=0) {
+  const response = await fetch(audioURL);
+  const arrayBuffer = await response.arrayBuffer();
+  const audioBuffer = await webAudioCtx.decodeAudioData(arrayBuffer);
+  return audioBuffer.getChannelData(channel);
+}
+
+/**
+ * Convert an AudioBuffer object to a Mono audio signal array. The audio signal is downmixed
+ * to mono using essentia `MonoMixer` algorithm if the audio buffer has 2 channels of audio.
+ * Throws an expection if the input AudioBuffer object has more than 2 channels of audio.
+ * @method
+ * @param {AudioBuffer} buffer `AudioBuffer` object decoded from an audio file.
+ * @returns {Float32Array} audio channel data. (downmixed to mono if its stereo signal).
+ * @memberof Essentia
+ */
+function audioBufferToMonoSignal(buffer: AudioBuffer): Float32Array {
+  if (buffer.numberOfChannels === 1) {
+    return buffer.getChannelData(0);
   }
+  if (buffer.numberOfChannels === 2) {
+    const left = wasmBackend.arrayToVector(buffer.getChannelData(0));
+    const right = wasmBackend.arrayToVector(buffer.getChannelData(1));
+    let monoSignal = wasmBackend.MonoMixer(left, right).audio;
+    return wasmBackend.vectorToArray(monoSignal);
+  }
+  throw new Error('Unexpected number of channels found in audio buffer. Only accepts mono or stereo audio buffers.');
+}
+
+/**
+ * Convert an input JS array into VectorFloat type
+ * @function
+ * @param {Float32Array} inputArray input JS typed array
+ * @returns {VectorFloat} returns vector float
+*/
+function arrayToVector(inputArray: any) {
+  return wasmBackend.arrayToVector(inputArray);
+}
+
+/**
+ * Convert an input VectorFloat array into typed JS Float32Array 
+ * @function 
+ * @param {VectorFloat} inputVector input VectorFloat array
+ * @returns {Float32Array} returns converted JS typed array
+*/
+function vectorToArray(inputVector: any): Float32Array {
+  return wasmBackend.vectorToArray(inputVector);
+}
+
+/**
+ * Cuts an audio signal data into overlapping frames given frame size and hop size 
+ * @class
+ */
+class FrameGenerator {
+  private algoInstance: any;
 
   /**
-   * Decode and returns the audio buffer of a given audio url or blob uri using Web Audio API. 
-   * (NOTE: This method doesn't works on Safari browser)
-   * @async
-   * @method
-   * @param {string} audioURL web url or blob uri of a audio file
-   * @param {AudioContext} webAudioCtx an instance of Web Audio API `AudioContext`
-   * @returns {AudioBuffer} decoded audio buffer object
-   * @memberof Essentia
-   */
-  async getAudioBufferFromURL(audioURL: string, webAudioCtx: AudioContext) {
-    const response = await fetch(audioURL);
-    const arrayBuffer = await response.arrayBuffer();
-    const audioBuffer = await webAudioCtx.decodeAudioData(arrayBuffer);
-    return audioBuffer;
-  }
-
-  /**
-   * Decode and returns the audio channel data from an given audio url or blob uri using Web Audio API. 
-   * (NOTE: This method doesn't works on Safari browser)
-   * @async
-   * @method
-   * @param {string} audioURL web url or blob uri of a audio file
-   * @param {AudioContext} webAudioCtx an instance of Web Audio API `AudioContext`
-   * @param {number} [channel=0] audio channel number
-   * @returns {Float32Array} decode and returns the audio data as Float32 array for the given channel
-   * @memberof Essentia
-   */
-  async getAudioChannelDataFromURL(audioURL: string, webAudioCtx: AudioContext, channel: number=0) {
-    const response = await fetch(audioURL);
-    const arrayBuffer = await response.arrayBuffer();
-    const audioBuffer = await webAudioCtx.decodeAudioData(arrayBuffer);
-    return audioBuffer.getChannelData(channel);
-  }
-
-  /**
-   * Convert an AudioBuffer object to a Mono audio signal array. The audio signal is downmixed
-   * to mono using essentia `MonoMixer` algorithm if the audio buffer has 2 channels of audio.
-   * Throws an expection if the input AudioBuffer object has more than 2 channels of audio.
-   * @method
-   * @param {AudioBuffer} buffer `AudioBuffer` object decoded from an audio file.
-   * @returns {Float32Array} audio channel data. (downmixed to mono if its stereo signal).
-   * @memberof Essentia
-   */
-  audioBufferToMonoSignal(buffer: AudioBuffer): Float32Array {
-    if (buffer.numberOfChannels === 1) {
-      return buffer.getChannelData(0);
-    }
-    if (buffer.numberOfChannels === 2) {
-      const left = this.arrayToVector(buffer.getChannelData(0));
-      const right = this.arrayToVector(buffer.getChannelData(1));
-      let monoSignal = this.MonoMixer(left, right).audio;
-      return this.vectorToArray(monoSignal);
-    }
-    throw new Error('Unexpected number of channels found in audio buffer. Only accepts mono or stereo audio buffers.');
-  }
-
-  /**
-   * Method to shutdown essentia algorithm instance after it's use
-   * @method
-   * @memberof Essentia
-   */
-  shutdown(): void {
-    this.algorithms.shutdown();
-  }
-
-  /**
-   * Method for re-instantiating essentia algorithms instance after using the shutdown method
-   * @method
-   * @memberof Essentia
-   */
-  reinstantiate(): void {
-    this.algorithms = new this.module.EssentiaJS(this.isDebug);
-  }
-
-  /**
-   * Delete essentiajs class instance
-   * @method
-   * @memberof Essentia
-   */
-  delete(): void {
-    this.algorithms.delete();
-  }
-
-  /**
-   * Convert an input JS array into VectorFloat type
-   * @method
-   * @param {Float32Array} inputArray input JS typed array
-   * @returns {VectorFloat} returns vector float
-   * @memberof Essentia
-   */
-  arrayToVector(inputArray: any) {
-    return this.module.arrayToVector(inputArray);
-  }
-
-  /**
-   * Convert an input VectorFloat array into typed JS Float32Array 
-   * @method 
-   * @param {VectorFloat} inputVector input VectorFloat array
-   * @returns {Float32Array} returns converted JS typed array
-   * @memberof Essentia
-   */
-  vectorToArray(inputVector: any): Float32Array {
-    return this.module.vectorToArray(inputVector);
-  }
-
-  /**
-   * Cuts an audio signal data into overlapping frames given frame size and hop size 
-   * @method
-   * @param {Float32Array} inputAudioData a single channel audio channel data
+   * Creates an instance of the algorithm and initializes it by configuring with default or given params
+   * @constructor
    * @param {number} [frameSize=2048] frame size for cutting the audio signal
    * @param {number} [hopSize=1024] size of overlapping frame 
-   * @returns {VectorVectorFloat} Returns a 2D vector float of sliced audio frames 
-   * @memberof Essentia
-   */
-  FrameGenerator(inputAudioData: Float32Array, frameSize: number=2048, hopSize: number=1024) {
-    return this.algorithms.FrameGenerator(inputAudioData, frameSize, hopSize);
+  */
+  constructor(frameSize: number=2048, hopSize: number=1024) {
+    this.algoInstance = new wasmBackend.FrameGenerator(frameSize, hopSize);
   }
 
   /**
-  * This algorithm downmixes the signal into a single channel given a stereo signal. It is a wrapper around https://essentia.upf.edu/reference/std_MonoMixer.html.
-  * @method
-  * @param {VectorFloat} leftChannel the left channel of the stereo audio signal
-  * @param {VectorFloat} rightChannel the right channel of the stereo audio signal
-  * @returns {object} {audio: 'the downmixed mono signal'}
-  * @memberof Essentia
+   * Configure algorithm with default or given params
+   * @method
+   * @param {number} [frameSize=2048] frame size for cutting the audio signal
+   * @param {number} [hopSize=1024] size of overlapping frame 
+   * @memberof FrameGenerator
   */
-  MonoMixer(leftSignal: any, rightSignal: any) {
-    return this.algorithms.MonoMixer(leftSignal, rightSignal);
+  configure(frameSize: number=2048, hopSize: number=1024) {
+    this.algoInstance.configure(frameSize, hopSize);
   }
 
   /**
-  * This algorithm computes the EBUR128 loudness descriptors of an audio signal. It is a wrapper around https://essentia.upf.edu/reference/std_LoudnessEBUR128.html.
-  * @method
-  * @param {VectorFloat} leftChannel the left channel of the stereo audio signal
-  * @param {VectorFloat} rightChannel the right channel of the stereo audio signal
-  * @param {number} [hopSize=0.1] the hop size with which the loudness is computed [s]
-  * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
-  * @param {boolean} [startAtZero=false] start momentary/short-term loudness estimation at time 0 (zero-centered loudness estimation windows) if true; otherwise start both windows at time 0 (time positions for momentary and short-term values will not be syncronized)
-  * @returns {object} {momentaryLoudness: 'momentary loudness (over 400ms) (LUFS)', shortTermLoudness: 'short-term loudness (over 3 seconds) (LUFS)', integratedLoudness: 'integrated loudness (overall) (LUFS)', loudnessRange: 'loudness range over an arbitrary long time interval [3] (dB, LU)'}
-  * @memberof Essentia
+   * Execute algorithm with given inputs
+   * @method
+   * @param {Float32Array} inputAudioData a single channel audio channel data
+   * @returns {VectorVectorFloat} Returns a 2D vector float of sliced audio frames
+   * @memberof FrameGenerator 
   */
-  LoudnessEBUR128(leftSignal: any, rightSignal: any, hopSize: number=0.1, sampleRate: number=44100, startAtZero: boolean=false) {
-    return this.algorithms.LoudnessEBUR128(leftSignal, rightSignal, hopSize, sampleRate, startAtZero);
+  compute(inputAudioData: Float32Array) {
+    return this.algoInstance.compute(inputAudioData);
   }
 
-  // NOTE: The following code snippets are machine generated. Do not edit.
-  /*[[[cog
-  import cog
-  from code_generator import generate_typescript_wrapper
-  algos = generate_typescript_wrapper()
-  for algo in algos:
-    for ln in algo:
-      cog.outl(ln)
-    cog.outl(' ')
-  ]]]*/
-  //[[[end]]]
-
+  /**
+   * Delete algorithm instance
+   * @method
+   * @memberof FrameGenerator 
+  */
+  delete() {
+    this.algoInstance.delete();
+  }
 }
+
+/**
+ * This algorithm downmixes the signal into a single channel given a stereo signal. It is a wrapper around https://essentia.upf.edu/reference/std_MonoMixer.html.
+ * @class
+*/
+class MonoMixer {
+  private algoInstance: any;
+  /**
+   * Creates an instance of the algorithm and initializes it by configuring with default or given params
+   * @constructor
+  */
+  constructor() {
+    this.algoInstance = new wasmBackend.MonoMixer();
+  }
+  /**
+   * Configure algorithm with default or given params
+   * @method
+   * @memberof MonoMixer
+  */
+  configure() {
+    this.algoInstance.configure();
+  }
+  /**
+   * Execute algorithm with given inputs
+   * @method
+   * @param {VectorFloat} leftChannel the left channel of the stereo audio signal
+   * @param {VectorFloat} rightChannel the right channel of the stereo audio signal
+   * @returns {object} {audio: 'the downmixed mono signal'}
+   * @memberof MonoMixer 
+  */
+  compute(leftSignal: any, rightSignal: any) {
+    return this.algoInstance.compute(leftSignal, rightSignal);
+  }
+  /**
+   * Delete algorithm instance
+   * @method
+   * @memberof MonoMixer 
+  */
+  delete() {
+    this.algoInstance.delete();
+  }
+}
+
+/**
+ * This algorithm computes the EBUR128 loudness descriptors of an audio signal. It is a wrapper around https://essentia.upf.edu/reference/std_LoudnessEBUR128.html.
+ * @class
+*/
+class LoudnessEBUR128 {
+  private algoInstance: any;
+  /**
+   * Creates an instance of the algorithm and initializes it by configuring with default or given params
+   * @constructor
+   * @param {number} [hopSize=0.1] the hop size with which the loudness is computed [s]
+   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
+   * @param {boolean} [startAtZero=false] start momentary/short-term loudness estimation at time 0 (zero-centered loudness estimation windows) if true; otherwise start both windows at time 0 (time positions for momentary and short-term values will not be syncronized)
+  */
+  constructor(hopSize: number=0.1, sampleRate: number=44100, startAtZero: boolean=false) {
+    this.algoInstance = new wasmBackend.LoudnessEBUR128(hopSize, sampleRate, startAtZero);
+  }
+  /**
+   * Configure algorithm with default or given params
+   * @method
+   * @param {number} [hopSize=0.1] the hop size with which the loudness is computed [s]
+   * @param {number} [sampleRate=44100] the sampling rate of the audio signal [Hz]
+   * @param {boolean} [startAtZero=false] start momentary/short-term loudness estimation at time 0 (zero-centered loudness estimation windows) if true; otherwise start both windows at time 0 (time positions for momentary and short-term values will not be syncronized)
+   * @memberof LoudnessEBUR128
+  */
+  configure(hopSize: number=0.1, sampleRate: number=44100, startAtZero: boolean=false) {
+    this.algoInstance.configure(hopSize, sampleRate, startAtZero);
+  }
+  /**
+   * Execute algorithm with given inputs
+   * @method
+   * @param {VectorFloat} leftChannel the left channel of the stereo audio signal
+   * @param {VectorFloat} rightChannel the right channel of the stereo audio signal
+   * @returns {object} {momentaryLoudness: 'momentary loudness (over 400ms) (LUFS)', shortTermLoudness: 'short-term loudness (over 3 seconds) (LUFS)', integratedLoudness: 'integrated loudness (overall) (LUFS)', loudnessRange: 'loudness range over an arbitrary long time interval [3] (dB, LU)'}
+   * @memberof LoudnessEBUR128 
+  */
+  compute(leftSignal: any, rightSignal: any) {
+    return this.algoInstance.compute(leftSignal, rightSignal);
+  }
+  /**
+   * Delete algorithm instance
+   * @method
+   * @memberof LoudnessEBUR128 
+  */
+  delete() {
+    this.algoInstance.delete();
+  }
+}
+
+// NOTE: The following code snippets are machine generated. Do not edit.
+/*[[[cog
+import cog
+from code_generator import generate_typescript_wrapper
+algos = generate_typescript_wrapper()
+for algo in algos:
+  for ln in algo:
+    cog.outl(ln)
+  cog.outl(' ')
+]]]*/
+//[[[end]]]
+
+
 
 /*
 @exports
 */
-export default Essentia;
+export {
+  getAudioBufferFromURL,
+  getAudioChannelDataFromURL,
+  audioBufferToMonoSignal,
+  arrayToVector,
+  vectorToArray,
+  FrameGenerator,
+  MonoMixer,
+  LoudnessEBUR128,
+  /*[[[cog
+  import cog
+  from configure_bindings import TO_INCLUDE_ALGOS
+  for algo in TO_INCLUDE_ALGOS:
+    cog.outl(f"{algo},")
+  ]]]*/
+  //[[[end]]]
+  ready
+};

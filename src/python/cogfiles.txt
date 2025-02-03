@@ -2,3 +2,5 @@ header.cog -o ../cpp/includes/essentiajs.h
 library.cog -o ../cpp/includes/essentiajs.cpp
 bindings.cog -o ../cpp/bindings_essentiajs.cpp
 js_wrapper.cog -o ../typescript/core_api.ts
+ts_param_types.cog -o ../typescript/param_types.ts
+test_oop.cog -o ../../test/test_oop.js
