@@ -44,7 +44,7 @@
                 import { DATA, OPTIONS, NUM_ANALYSIS_FRAMES, AXES_PITCHES, RMS_ARRAY, rmsPointer, getTimeLabels } from "./resources/chartConfig.js";
                     
                 let bufferSize = 8192;
-                const audioCtx = new AudioContext();
+                let audioCtx = new AudioContext();
                 // global var getUserMedia mic stream
                 let gumStream;
                 // global audio node variables
