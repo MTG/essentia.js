@@ -1,15 +1,20 @@
 <template>
   <div id="file-select-area">
-    <input type="file" ref="fileInput" @change="handleFileUpload" />
+    <div id="file-drop-area"
+      @dragover="e=>e.preventDefault()"
+      @drop="dropHandler"
+      @click="()=>fileInput.click()"
+    >
+      <span>Drop file here or click to upload</span>
+    </div>
+    <input type="file" ref="fileInput" @change="handleFileUpload" style="display: none"/>
     <div id="waveform"></div>
-    <template id="playback-controls">
-      <div class="controls">
-        <button @click="skipBackward">Backward</button>
-        <button @click="togglePlayPause">{{ isPlaying ? 'Pause' : 'Play' }}</button>
-        <button @click="skipForward">Forward</button>
-        <button @click="toggleMute">{{ isMuted ? 'Unmute' : 'Mute' }}</button>
-      </div>
-    </template>
+    <div class="controls">
+      <button @click="controls.skipBackward"  :disabled="!controlsEnabled">Backward</button>
+      <button @click="controls.togglePlayPause" :disabled="!controlsEnabled">{{ isPlaying ? 'Pause' : 'Play' }}</button>
+      <button @click="controls.skipForward" :disabled="!controlsEnabled">Forward</button>
+      <button @click="controls.toggleMute" :disabled="!controlsEnabled">{{ isMuted ? 'Unmute' : 'Mute' }}</button>
+    </div>
   </div>
   <div id="results">
     <div id="loader" class="dimmer" :class="{disabled: !loaderActive, active: loaderActive}">
@@ -33,14 +38,21 @@
 </template>
 
 <script setup lang="js">
-import { ref, onMounted } from 'vue';
+import { ref, useTemplateRef } from 'vue';
 import { useMoodClassifier, useAnalysisResults } from './moodClassifierComposables';
 
-const { fileInput, wavesurfer, controls, isPlaying, isMuted, classifiers, handleFileUpload, skipBackward, togglePlayPause, skipForward, toggleMute, updateMeters, updateValueBoxes } = useMoodClassifier();
+const { isPlaying, isMuted, classifiers, handleFileUpload, controls, controlsEnabled} = useMoodClassifier();
 
 const loaderActive = ref(false); // displayPredictions()-false, handleFileUpload()-true
 
 const { predictions, bpmFormatted, keyFormatted } = useAnalysisResults();
+
+const fileInput = useTemplateRef("fileInput");
+
+function dropHandler (e) {
+    e.preventDefault();
+    handleFileUpload(e);
+}
 
 </script>
 

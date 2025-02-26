@@ -1,7 +1,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import WaveSurfer from 'wavesurfer.js';
 import { useColors } from '../../useColors';
-import { EssentiaJS, EssentiaWASM } from 'essentia.js';
+import { Essentia, EssentiaWASM } from 'essentia.js';
 import inferenceWorkerURL from './inference.js?url';
 
 const { footerHeaderDarkBlue, mainBlueDark } = useColors();
@@ -25,7 +25,7 @@ export function useAnalysisResults() {
 
   onMounted(() => {
     // createInferenceWorker();
-    essentia = new EssentiaWASM.EssentiaJS(false);
+    essentia = new Essentia(EssentiaWASM.EssentiaWASM, false);
   })
   onUnmounted(() => {
     essentia.shutdown();
@@ -51,15 +51,15 @@ export function useAnalysisResults() {
 }
 
 export function useMoodClassifier() {
-  const fileInput = ref(null);
   // const wavesurfer = WaveSurfer.create({
   //   container: '#waveform',
   //   progressColor: footerHeaderDarkBlue,
   //   waveColor: mainBlueDark,
   // });
-  const controls = ref(null);
+
   const isPlaying = ref(false);
   const isMuted = ref(false);
+  const controlsEnabled = ref(false)
 
   const classifiers = ref({
     danceability: { icon: '💃🏻', label: 'Daceability' },
@@ -72,54 +72,47 @@ export function useMoodClassifier() {
   });
 
   function handleFileUpload(event) {
-    const file = event.target.files?.[0];
-    if (file) wavesurfer.loadBlob(file);
+    const files = event.dataTransfer ? event.dataTransfer.files : event.target.files;
+    if (files.length > 1) {
+      alert("Only single-file uploads are supported currently");
+      throw Error("Multiple file upload attempted, cannot process.");
+    } else if (files.length) {
+      files[0].arrayBuffer().then((ab) => {
+        toggleLoader();
+        wavesurfer = toggleUploadDisplayHTML('display');
+        wavesurfer.loadBlob(files[0]);
+        controlsEnabled.value = false;
+        processFile(ab);
+      })
+    }
   }
 
-  function skipBackward() {
-    wavesurfer.skipBackward();
-  }
-
-  function togglePlayPause() {
-    isPlaying.value = !isPlaying.value;
-    wavesurfer.playPause();
-  }
-
-  function skipForward() {
-    wavesurfer.skipForward();
-  }
-
-  function toggleMute() {
-    isMuted.value = !isMuted.value;
-    wavesurfer.toggleMute();
-  }
-
-  function updateMeters(values) {
-    Object.entries(classifiers.value).forEach(([key]) => {
-      const meter = document.querySelector(`#${key} > .classifier-meter`);
-      if (meter) meter.style.setProperty('--meter-width', values[key] * 100 + '%');
-    });
-  }
-
-  function updateValueBoxes(essentiaAnalysis) {
-    const stringBpm = essentiaAnalysis.bpm.toString();
-    const formattedBpm = stringBpm.slice(0, stringBpm.indexOf('.') + 2);
-    document.getElementById('bpm-value').textContent = formattedBpm;
-    document.getElementById('key-value').textContent = `${essentiaAnalysis.keyData.key} ${essentiaAnalysis.keyData.scale}`;
-  }
+  const controls = {
+    skipBackward() {
+      wavesurfer.skipBackward();
+    },
+  
+    togglePlayPause() {
+      isPlaying.value = !isPlaying.value;
+      wavesurfer.playPause();
+    },
+  
+    skipForward() {
+      wavesurfer.skipForward();
+    },
+  
+    toggleMute() {
+      isMuted.value = !isMuted.value;
+      wavesurfer.toggleMute();
+    }
+  };
 
   return {
-    fileInput,
     controls,
+    controlsEnabled,
     isPlaying,
     isMuted,
     classifiers,
-    handleFileUpload,
-    skipBackward,
-    togglePlayPause,
-    skipForward,
-    toggleMute,
-    updateMeters,
-    updateValueBoxes,
+    handleFileUpload
   };
 }
