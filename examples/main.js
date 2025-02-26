@@ -5,12 +5,12 @@ import { createWebHistory, createRouter } from 'vue-router';
 import LandingPage from './LandingPage.vue';
 import RMS from './demos/rms-rt/RMS.vue';
 import MelSpectrogram from './demos/melspectrogram-rt/MelSpectrogram.vue';
-// import Moods from './demos/mood-classifiers/MoodClassifiers.vue';
+import MoodClassifiers from './demos/mood-classifiers/src/MoodClassifier.vue';
 
 const routes = [
   { path: '/demos/melspectrogram-rt', component: MelSpectrogram },
   { path: '/demos/rms-rt', component: RMS },
-  // { path: '/demos/mood-classifiers', component: MoodClassifiers },
+  { path: '/demos/mood-classifiers', component: MoodClassifiers },
 ];
 
 const router = createRouter({
