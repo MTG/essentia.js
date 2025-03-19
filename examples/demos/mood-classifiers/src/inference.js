@@ -70,33 +70,27 @@ function initModels() {
 
 initModels();
 
-async function runClassifiers(embeddings) {
-  const inferenceStart = performance.now();
-  let predictions = {};
+function runClassifiers(embeddings) {
   // use array of promises pattern here too
-  const predictPromiseArray = [];
   for (let n of classifiers) {
-    predictPromiseArray.push( modelState[n].model.predict(embeddings) );
+    modelState[n].model.predict(embeddings).then(o => {
+      const name = o.modelName;
+      const outputTensor = o.activations;
+      let outputArray = outputTensor.data;
+      // console.debug(`${name} output tensor:`, Array.from(outputArray), outputTensor.dims);
+      let positivesArray = outputArray;
+      
+      // format predictions, grab only positive output
+      if (!["approachability", "engagement"].includes(name)) {
+        positivesArray = getPositives(outputTensor, name);
+      }
+      
+      const summarizedPredictions = average(positivesArray);
+      postMessage({
+        predictions: [name, summarizedPredictions]
+      });
+    });
   }
-  const outputs = await Promise.all(predictPromiseArray);
-  // console.log('un-processed classifier outputs', outputs);
-  outputs.forEach( o => {
-    const name = o.modelName;
-    const outputTensor = o.activations;
-    let outputArray = outputTensor.data;
-    // console.debug(`${name} output tensor:`, Array.from(outputArray), outputTensor.dims);
-    let positivesArray = outputArray;
-    
-    if (!["approachability", "engagement"].includes(name)) {
-      positivesArray = getPositives(outputTensor, name);
-    }
-    
-    const summarizedPredictions = average(positivesArray);
-    // format predictions, grab only positive output
-    predictions[name] = summarizedPredictions;
-  })
-  console.info(`classifier heads took: ${performance.now() - inferenceStart}ms`);
-  return predictions;
 }
 
 async function runModels() {
@@ -105,12 +99,9 @@ async function runModels() {
   // console.debug('embeddings data: ', Array.from(embeddings.data));
   // console.debug('embeddings dims: ', Array.from(embeddings.dims));
   // feed to classifier heads
-  const predictions = await runClassifiers(embeddings);
+  runClassifiers(embeddings);
   const inferenceTotal = performance.now() - inferenceStart;
   console.info(`total inference time: ${inferenceTotal}ms, for ${audioArray.length / 16000}s recording`);
-  postMessage({
-    predictions: predictions
-  });
 };
 
 self.onmessage = async (msg) => {

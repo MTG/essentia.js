@@ -61,8 +61,9 @@ export function useAnalysisResults() {
     inferenceWorker.onmessage = function listenToWorker(msg) {
       // listen out for model output
       if (msg.data.predictions) {
-        predictions.value = msg.data.predictions;
-        console.log(`received predictions: `, predictions);
+        const modelName = msg.data.predictions[0];
+        predictions.value[modelName] = msg.data.predictions[1];
+        console.log(`received predictions for ${modelName}`);
       }
     };
   }
