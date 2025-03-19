@@ -41,9 +41,19 @@
 
 <script setup lang="js">
 import { ref, useTemplateRef, computed } from 'vue';
-import { useMoodClassifier, useAnalysisResults } from './moodClassifierComposables';
+import { useWaveformDisplay, useAnalysisResults } from './moodClassifierComposables';
 
-const { isPlaying, isMuted, classifiers, handleFileUpload, controls, controlsEnabled, displayMode} = useMoodClassifier();
+const classifiers = {
+  danceability: { icon: '💃🏻', label: 'Daceability' },
+  mood_happy: { icon: '😁', label: 'Happy' },
+  mood_sad: { icon: '😢', label: 'Sad' },
+  mood_relaxed: { icon: '😌', label: 'Relaxed' },
+  mood_aggressive: { icon: '👊', label: 'Aggressiveness' },
+  engagement: { icon: '👁', label: 'Engagement' },
+  approachability: { icon: '🧠', label: 'Approachability' },
+};
+
+const { isPlaying, isMuted, handleFileUpload, controls, controlsEnabled, displayMode} = useWaveformDisplay();
 
 const loaderActive = computed(() => {
   return displayMode !== "upload" && displayMode !== "waveform";

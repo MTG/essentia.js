@@ -15,9 +15,6 @@ let essentia;
 let inferenceWorker;
 
 const predictions = ref({});
-const controlsEnabled = ref(false)
-
-// TODO: watch predictions
 const essentiaAnalysis = ref({keyData: null, bpm: null});
 
 function processFile(arrayBuffer) {
@@ -94,21 +91,12 @@ export function useAnalysisResults() {
   }
 }
 
-export function useMoodClassifier() {
+export function useWaveformDisplay() {
   const isPlaying = ref(false);
   const isMuted = ref(false);
   const displayMode = ref("upload");
+  const controlsEnabled = ref(false);
   let wavesurfer;
-  
-  const classifiers = ref({
-    danceability: { icon: '💃🏻', label: 'Daceability' },
-    mood_happy: { icon: '😁', label: 'Happy' },
-    mood_sad: { icon: '😢', label: 'Sad' },
-    mood_relaxed: { icon: '😌', label: 'Relaxed' },
-    mood_aggressive: { icon: '👊', label: 'Aggressiveness' },
-    engagement: { icon: '👁', label: 'Engagement' },
-    approachability: { icon: '🧠', label: 'Approachability' },
-  });
   
   function handleFileUpload(event) {
     const files = event.dataTransfer ? event.dataTransfer.files : event.target.files;
@@ -158,7 +146,6 @@ export function useMoodClassifier() {
     controlsEnabled,
     isPlaying,
     isMuted,
-    classifiers,
     handleFileUpload,
     displayMode
   };
