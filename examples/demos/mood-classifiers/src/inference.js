@@ -9,6 +9,7 @@ import wasmThreaded from "onnxruntime-web/dist/ort-wasm-threaded.wasm?url"
 import wasmSimd from "onnxruntime-web/dist/ort-wasm-simd.wasm?url"
 import wasmSimdThreaded from "onnxruntime-web/dist/ort-wasm-simd-threaded.wasm?url"
 
+
 ort.env.wasm.wasmPaths = {
   "ort-wasm.wasm": wasm,
   "ort-wasm-threaded.wasm": wasmThreaded,
@@ -83,7 +84,7 @@ async function runClassifiers(embeddings) {
     const name = o.modelName;
     const outputTensor = o.activations;
     let outputArray = outputTensor.data;
-    console.debug(`${name} output tensor:`, Array.from(outputArray), outputTensor.dims);
+    // console.debug(`${name} output tensor:`, Array.from(outputArray), outputTensor.dims);
     let positivesArray = outputArray;
     
     if (!["approachability", "engagement"].includes(name)) {

@@ -1,38 +1,81 @@
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import WaveSurfer from 'wavesurfer.js';
 import { useColors } from '../../useColors';
 import { Essentia, EssentiaWASM } from 'essentia.js';
 import inferenceWorkerURL from './inference.js?url';
+import { preprocess, shortenAudio } from './audioUtils.js';
 
 const { footerHeaderDarkBlue, mainBlueDark } = useColors();
+
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+const audioCtx = new AudioContext();
+const KEEP_PERCENTAGE = 0.85; // keep only 15% of audio fil
 
 let essentia;
 let inferenceWorker;
 
-export function useAnalysisResults() {
-  const predictions = ref({});
+const predictions = ref({});
+const controlsEnabled = ref(false)
 
+// TODO: watch predictions
+const essentiaAnalysis = ref({keyData: null, bpm: null});
+
+function processFile(arrayBuffer) {
+  audioCtx.resume().then(() => {
+    audioCtx.decodeAudioData(arrayBuffer).then(async function handleDecodedAudio(audioBuffer) {
+      console.info("Done decoding audio!");
+      
+      const prepocessedAudio = preprocess(audioBuffer);
+      await audioCtx.suspend();
+      
+      if (essentia) {
+        computeKeyBPM(prepocessedAudio);
+      }
+      
+      // reduce amount of audio to analyse
+      let audioData = shortenAudio(prepocessedAudio, KEEP_PERCENTAGE, true); // <-- TRIMMED start/end
+      
+      // send for feature extraction
+      inferenceWorker.postMessage({
+        arrayBuffer: audioData.buffer,
+        type: "audio"
+      }, [audioData.buffer]);
+      audioData = null;
+    })
+  })
+}
+
+function computeKeyBPM (audioSignal) {
+  let vectorSignal = essentia.arrayToVector(audioSignal);
+  essentiaAnalysis.value.keyData = essentia.KeyExtractor(vectorSignal, true, 4096, 4096, 12, 3500, 60, 25, 0.2, 'bgate', 16000, 0.0001, 440, 'cosine', 'hann');
+  essentiaAnalysis.value.bpm = essentia.PercivalBpmEstimator(vectorSignal, 1024, 2048, 128, 128, 210, 50, 16000).bpm;
+  
+  // const bpm = essentia.RhythmExtractor(vectorSignal, 1024, 1024, 256, 0.1, 208, 40, 1024, 16000, [], 0.24, true, true).bpm;
+  // const bpm = essentia.RhythmExtractor2013(vectorSignal, 208, 'multifeature', 40).bpm;
+}
+
+export function useAnalysisResults() {
+  
   function createInferenceWorker() {
     inferenceWorker = new Worker(inferenceWorkerURL, {type: "module"});
     inferenceWorker.onmessage = function listenToWorker(msg) {
       // listen out for model output
       if (msg.data.predictions) {
         predictions.value = msg.data.predictions;
-        console.log(`received predictions: `, preds);
+        console.log(`received predictions: `, predictions);
       }
     };
   }
-
+  
   onMounted(() => {
-    // createInferenceWorker();
+    createInferenceWorker();
     essentia = new Essentia(EssentiaWASM.EssentiaWASM, false);
   })
   onUnmounted(() => {
     essentia.shutdown();
-    inferenceWorker.delete();
+    inferenceWorker.terminate();
   })
-
-  const essentiaAnalysis = ref({keyData: null, bpm: null});
+  
   const bpmFormatted = computed(() => {
     if (!essentiaAnalysis.value.bpm) return '';
     const stringBpm = essentiaAnalysis.value.bpm.toString();
@@ -42,7 +85,7 @@ export function useAnalysisResults() {
     if (!essentiaAnalysis.value.keyData) return '';
     return `${essentiaAnalysis.value.keyData.key} ${essentiaAnalysis.value.keyData.scale}`;
   })
-
+  
   return {
     predictions,
     bpmFormatted,
@@ -51,16 +94,11 @@ export function useAnalysisResults() {
 }
 
 export function useMoodClassifier() {
-  // const wavesurfer = WaveSurfer.create({
-  //   container: '#waveform',
-  //   progressColor: footerHeaderDarkBlue,
-  //   waveColor: mainBlueDark,
-  // });
-
   const isPlaying = ref(false);
   const isMuted = ref(false);
-  const controlsEnabled = ref(false)
-
+  const displayMode = ref("upload");
+  let wavesurfer;
+  
   const classifiers = ref({
     danceability: { icon: '💃🏻', label: 'Daceability' },
     mood_happy: { icon: '😁', label: 'Happy' },
@@ -70,7 +108,7 @@ export function useMoodClassifier() {
     engagement: { icon: '👁', label: 'Engagement' },
     approachability: { icon: '🧠', label: 'Approachability' },
   });
-
+  
   function handleFileUpload(event) {
     const files = event.dataTransfer ? event.dataTransfer.files : event.target.files;
     if (files.length > 1) {
@@ -78,41 +116,49 @@ export function useMoodClassifier() {
       throw Error("Multiple file upload attempted, cannot process.");
     } else if (files.length) {
       files[0].arrayBuffer().then((ab) => {
-        toggleLoader();
-        wavesurfer = toggleUploadDisplayHTML('display');
-        wavesurfer.loadBlob(files[0]);
-        controlsEnabled.value = false;
-        processFile(ab);
+        displayMode.value = "waveform";
+        nextTick( () => {
+          wavesurfer = WaveSurfer.create({
+            container: '#waveform',
+            progressColor: footerHeaderDarkBlue,
+            waveColor: mainBlueDark,
+          });
+          
+          wavesurfer.loadBlob(files[0]);
+          controlsEnabled.value = true;
+          processFile(ab);
+        })
       })
     }
   }
-
+  
   const controls = {
     skipBackward() {
       wavesurfer.skipBackward();
     },
-  
+    
     togglePlayPause() {
       isPlaying.value = !isPlaying.value;
       wavesurfer.playPause();
     },
-  
+    
     skipForward() {
       wavesurfer.skipForward();
     },
-  
+    
     toggleMute() {
       isMuted.value = !isMuted.value;
       wavesurfer.toggleMute();
     }
   };
-
+  
   return {
     controls,
     controlsEnabled,
     isPlaying,
     isMuted,
     classifiers,
-    handleFileUpload
+    handleFileUpload,
+    displayMode
   };
 }

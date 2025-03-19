@@ -27,11 +27,25 @@ export class HeadModelORT {
   }
 
   async predict (inputTensor) {
-    // const inputTensorTypedArray = inputTensor.dataSync();
-    // const ortInputTensor = new ort.Tensor('float32', inputTensorTypedArray);
-    // console.log(`${this.name} input  tensor`, inputTensor);
-    const ortOutputTensor = await this.session.run({"embeddings": inputTensor});
+    // const numBatches = inputTensor.dims[0];
+    // const numOutputValues = ["engagement", "approachability"].includes(this.name) ? 1 : 2;
+    // const outputDataShape = [numBatches, numOutputValues];
+    // // console.log(outputDataShape);
+    // const outputDataTensor = Float32Array.from(Array(numBatches*numOutputValues).fill(0));
+    // const outputTensor = new this.ort.Tensor('float32', outputDataTensor, outputDataShape);
+    // let feeds = undefined;
+    // if (["engagement", "approachability", "danceability"].includes(this.name)) {
+    //   feeds = {"activations": outputTensor};
+    // }
+    try {
+      const ortOutputTensor = await this.session.run({"embeddings": inputTensor}); //, feeds)
+      console.log(`${this.name} completed successfully`, ortOutputTensor);
+      return {"modelName": this.name, "activations": ortOutputTensor};
+    }
+    catch (err) {
+      console.log(`${this.name} just failed with...`)
+      console.trace(err)
+    };
     // console.log(`${this.name} (${this.embeddingsSource}-based) activations: `, ortOutputTensor["activations"]);
-    return {"modelName": this.name, "activations": ortOutputTensor["activations"]};
   }
 }
