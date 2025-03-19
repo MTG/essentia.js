@@ -40,7 +40,7 @@ export class HeadModelORT {
     try {
       const ortOutputTensor = await this.session.run({"embeddings": inputTensor}); //, feeds)
       console.log(`${this.name} completed successfully`, ortOutputTensor);
-      return {"modelName": this.name, "activations": ortOutputTensor};
+      return {"modelName": this.name, "activations": ortOutputTensor["activations"]};
     }
     catch (err) {
       console.log(`${this.name} just failed with...`)
