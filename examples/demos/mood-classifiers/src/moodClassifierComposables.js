@@ -109,8 +109,8 @@ export function useWaveformDisplay() {
         nextTick( () => {
           wavesurfer = WaveSurfer.create({
             container: '#waveform',
-            progressColor: footerHeaderDarkBlue,
-            waveColor: mainBlueDark,
+            progressColor: footerHeaderDarkBlue.value,
+            waveColor: mainBlueDark.value,
           });
           
           wavesurfer.loadBlob(files[0]);

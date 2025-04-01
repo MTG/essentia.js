@@ -1,39 +1,53 @@
 <template>
-  <div id="file-select-area">
-    <input type="file" ref="fileInput" @change="handleFileUpload" style="display: none"/>
-    <div id="file-drop-area"
-      v-if="displayMode === 'upload'"
-      @dragover="e=>e.preventDefault()"
-      @drop="dropHandler"
-      @click="()=>fileInput.click()">
-      <span>Drop file here or click to upload</span>
-    </div>
-    <template v-else-if="displayMode === 'waveform'">
-      <div id="waveform"></div>
-      <div class="controls">
-        <button @click="controls.skipBackward"  :disabled="!controlsEnabled">Backward</button>
-        <button @click="controls.togglePlayPause" :disabled="!controlsEnabled">{{ isPlaying ? 'Pause' : 'Play' }}</button>
-        <button @click="controls.skipForward" :disabled="!controlsEnabled">Forward</button>
-        <button @click="controls.toggleMute" :disabled="!controlsEnabled">{{ isMuted ? 'Unmute' : 'Mute' }}</button>
+  <div class="ui container">
+    <div id="file-select-area">
+      <input type="file" ref="fileInput" @change="handleFileUpload" style="display: none"/>
+      <div id="file-drop-area"
+        v-if="displayMode === 'upload'"
+        @dragover="e=>e.preventDefault()"
+        @drop="dropHandler"
+        @click="()=>fileInput.click()">
+        <span>Drop file here or click to upload</span>
       </div>
-    </template>
-    <div id="loader" v-else class="dimmer" :class="{disabled: !loaderActive, active: loaderActive}">
-      <div class="indeterminate text loader">Analyzing track... This may take a few seconds.</div>
-    </div>
-  </div>
-  <div id="results">
-    <div v-for="(classifier, key) in classifiers" :key="key" class="classifier">
-      <span>{{ classifier.icon }}</span>
-      <div class="classifier-meter" :data-classifier="classifier.label" :style="{'--meter-width': predictions[key]*100}"></div>
-    </div>
-    <div id="bpm-and-key">
-      <div id="bpm" class="row-container">
-        <div class="tag">BPM</div>
-        <div id="bpm-value">{{ bpmFormatted }}</div>
+      <template v-else-if="displayMode === 'waveform'">
+        <div id="waveform"></div>
+        <div class="controls">
+          <button @click="controls.skipBackward"  :disabled="!controlsEnabled" class="ui labeled icon button">
+            <i class="backward icon"></i>
+            Backward
+          </button>
+          <button @click="controls.togglePlayPause" :disabled="!controlsEnabled" class="ui primary labeled icon button">
+            <i class="icon" :class="{play: !isPlaying, pause: isPlaying}"></i>
+            {{ isPlaying ? 'Pause' : 'Play' }}
+          </button>
+          <button @click="controls.skipForward" :disabled="!controlsEnabled" class="ui labeled icon button">
+            Forward
+            <i class="forward icon"></i>
+          </button>
+          <button @click="controls.toggleMute" :disabled="!controlsEnabled" class="ui labeled icon button">
+            <i class="mute icon"></i>
+            {{ isMuted ? 'Unmute' : 'Mute' }}
+          </button>
+        </div>
+      </template>
+      <div id="loader" v-else class="dimmer" :class="{disabled: !loaderActive, active: loaderActive}">
+        <div class="indeterminate text loader">Analyzing track... This may take a few seconds.</div>
       </div>
-      <div id="key" class="row-container">
-        <div class="tag">Key</div>
-        <div id="key-value">{{ keyFormatted }}</div>
+    </div>
+    <div id="results">
+      <div v-for="(classifier, key) in classifiers" :key="key" class="results-row">
+        <span class="icon-span">{{ classifier.icon }}</span>
+        <div class="classifier-meter" :data-classifier="classifier.label" :style="{'--meter-width': predictions[key]*100}"></div>
+      </div>
+      <div id="bpm-and-key">
+        <div id="bpm" class="results-row">
+          <span class="tag">BPM</span>
+          <div id="bpm-value">{{ bpmFormatted }}</div>
+        </div>
+        <div id="key" class="results-row">
+          <span class="tag">Key</span>
+          <div id="key-value">{{ keyFormatted }}</div>
+        </div>
       </div>
     </div>
   </div>
@@ -44,7 +58,7 @@ import { ref, useTemplateRef, computed } from 'vue';
 import { useWaveformDisplay, useAnalysisResults } from './moodClassifierComposables';
 
 const classifiers = {
-  danceability: { icon: '💃🏻', label: 'Daceability' },
+  danceability: { icon: '💃🏻', label: 'Danceability' },
   mood_happy: { icon: '😁', label: 'Happy' },
   mood_sad: { icon: '😢', label: 'Sad' },
   mood_relaxed: { icon: '😌', label: 'Relaxed' },
@@ -102,29 +116,12 @@ a#essentia-header-link:active {
     color: var(--dark-blue);
 }
 
-#main {
-    display: grid;
-    grid-template-columns: 3fr 2fr;
-    align-items: center;
-
-    margin: 3rem auto;
-    height: 30vh;
-}
 
 
 /* FILE UPLOAD AREA */
-/* button {
-    font-size: 1rem;
-    padding: .33rem .66rem;
-} */
 
 #file-select-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly;
-
-    height: 30vh;
+  margin-bottom: 2rem;
 }
 
 #file-drop-area {
@@ -133,7 +130,7 @@ a#essentia-header-link:active {
 
     background-color: #f7f7f7;
     height: 100%;
-    width: 80%;
+    /* width: 80%; */
 
     text-align: center;
     line-height: 30vh;
@@ -152,28 +149,23 @@ a#essentia-header-link:active {
     line-height: normal;
 }
 
-#waveform {
-    width: 90%;
-}
-
-
 /* RESULTS AREA */
 
 #results {
-    height: 100%;
+    /* height: 100%;
     max-width: 80%;
     position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
+    justify-content: space-evenly; */
 }
 
 .controls {
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: center;
 
-    /* margin-top: 1rem; */
+    margin-top: 1rem;
 }
 
 .controls#play {
@@ -190,25 +182,36 @@ a#essentia-header-link:active {
     border-radius: 1rem;
 }
 
-.classifier {
+.results-row {
     display: flex;
-    align-items: center;
-    justify-content: flex-start;
+    /* align-items: center; */
+    /* justify-content: flex-start; */
 }
 
 #bpm-and-key {
-    margin-top: 1.8rem;
+    /* margin-top: 1.8rem; */
     height: 1.8rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    justify-content: end;
+    /* display: grid; */
+    /* grid-template-columns: 1fr 1fr; */
 }
 
-.tag {
+span {
+  margin: auto .8rem;
+  &.tag {
     font-weight: bold;
+    font-size: 1rem;
+  }
+
+  &.icon-span {
+    font-size: 1.5rem!important;
+  }
 }
 
 #key-value, #bpm-value {
-    width: 70%;
+    /* width: 70%; */
+    min-width: 10rem;
     margin: 0 0.3rem;
     border: 1px solid var(--footer-header-dark-blue);
     border-radius: 2px;
@@ -216,44 +219,39 @@ a#essentia-header-link:active {
     text-align: center;
 }
 
-.row-container {
-    display: flex;
-    flex-direction: row;
-}
-
-span {
-    margin: auto .8rem;
-    font-size: 1.5rem!important;
-}
-
 .classifier-meter {
-    width: 80%;
+    width: 100%;
     height: 1.8rem;
     position: relative;
 
-    border: .05rem solid var(--footer-header-dark-blue);
+    border: 1px solid var(--footer-header-dark-blue);
     border-radius: .1rem;
-    margin: .5rem 0;
+}
+  
+.classifier-meter, #bpm-and-key {
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+  margin-right: 0.8rem;
 }
 
 .classifier-meter::before {
     display: flex;
     align-items: center;
 
-    background-color: var(--main-red-light);
+    background-color: var(--main-red-dark);
     width: calc(var(--meter-width, 0) * 1%);
     max-width: calc(100% - 0.3rem);
     min-width: 0;
     height: 1.4rem;
     position: absolute;
-    left: .15rem;
-    top: .15rem;
-    bottom: .15rem;
+    left: .2rem;
+    top: calc(.2rem - 1px);
 
-    padding-left: .15rem;
+    padding-left: .2rem;
 
     content: attr(data-classifier);
     text-align: center;
     font-size: 1rem;
+    color: white;
 }
 </style>

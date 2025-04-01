@@ -13,8 +13,8 @@
   </header>
 
   <div class="ui divider" style="height: 0.1rem; width: 1px"></div>
-  <div class="ui grid" id="tabular-card-menu">
-    <div class="three wide column">
+  <main class="ui grid" id="tabular-card-menu">
+    <div class="two wide column">
       <div class="ui vertical tabular menu">
         <div class="item">
           <div class="header">Demo Apps</div>
@@ -64,7 +64,7 @@
         </div>
       </div>
     </div>
-    <div class="thirteen wide stretched column">
+    <div class="fourteen wide stretched column" id="tab-view-container">
       <RouterView/>
       
       <div class="ui tab segment" data-tab="glitch-melspectrogram">
@@ -80,7 +80,7 @@
         <a href="https://glitch.com/edit/#!/essentiajs-models-workers-non-rt"></a>
       </div>
     </div>
-  </div>
+  </main>
 
   <footer class="ui centered aligned container" id="my-footer">
     <a target="_blank" href="//essentia.upf.edu">
@@ -144,14 +144,10 @@
 </script>
 
 <style scoped>
-  body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
-  #tabular-card-menu {
-    flex: 1;
+  
+  #tabular-card-menu, #tab-view-container {
+    flex-grow: 1; /* Allows the main content to grow and push the footer down if necessary */
+    /* flex: 1; */
   }
 
   h1 {
