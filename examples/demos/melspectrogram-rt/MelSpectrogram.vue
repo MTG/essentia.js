@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-import { URLFromFiles } from './util';
+import { URLFromFiles } from '../common/util';
 
 import {ref, computed, useTemplateRef, onMounted } from 'vue';
 

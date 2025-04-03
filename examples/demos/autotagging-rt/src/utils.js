@@ -23,7 +23,7 @@ class PredictionStore {
     accumFrame(predictions) {
         this.predictionsFrameCount++;
 
-        for (tag in predictions) {
+        for (let tag in predictions) {
             if (!this.predictionsAccum[tag]) {
                 this.predictionsAccum[tag] = predictions[tag];
             } else {
@@ -34,7 +34,7 @@ class PredictionStore {
 
     getAverages() {
         let averages = {};
-        for (tag in this.predictionsAccum) {
+        for (let tag in this.predictionsAccum) {
             averages[tag] = this.predictionsAccum[tag] / this.predictionsFrameCount;
         }
         return averages;

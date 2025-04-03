@@ -11,7 +11,6 @@
 
 <script setup>
 // import MicToggleButton from "./MicToggleButton.vue";
-import "./mic-toggle-button.js";
 import { createEssentiaNode } from "./essentia-worklet-node.js";
 
 import { ref, useTemplateRef } from 'vue';

@@ -1,6 +1,6 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import WaveSurfer from 'wavesurfer.js';
-import { useColors } from '../../useColors';
+import { useColors } from '../../common/useColors';
 import { Essentia, EssentiaWASM } from 'essentia.js';
 import inferenceWorkerURL from './inference.js?url';
 import { preprocess, shortenAudio } from './audioUtils.js';
