@@ -19,12 +19,14 @@
           </div>
         </div>
         <div id="title">
-          <h1><span class='highlight'>Real-time</span> music <span class='highlight'>autotagging</span></h1>
+          <h1>Real-time <span class='highlight'>music autotagging</span></h1>
           <h2>with 
-            <a href="https://github.com/jordipons/musicnn" target="_blank">MusiCNN</a> 
-            <sup>
-              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 8 8"><path d="M0 0v8h8V6H7v1H1V1h1V0H0zm4 0l1.5 1.5L3 4l1 1l2.5-2.5L8 4V0H4z" fill="#626262"/></svg>
-            </sup>
+            <a href="https://github.com/jordipons/musicnn" target="_blank">
+              MusiCNN
+              <sup>
+                <i class="icon external alternate"></i>
+              </sup>
+          </a> 
           </h2>
         </div>
       </header>
@@ -276,10 +278,6 @@ header {
 }
 
 mic-toggle-button {
-  --button-color: #E68510;
-  --button-color-active: #b3680c;
-  --text-color: white;
-  --meter-dot-color: #ffd174;
   --button-font-family: 'Poppins', sans-serif;
   margin-left: 0.4rem;
   font-size: var(--button-font-size);
@@ -305,11 +303,11 @@ mic-toggle-button {
   width: 1em;
   
   margin-left: 0.8em;
-  fill: #E68510;
+  fill: var(--main-red-light);
 }
 
 #infoIcon:hover {
-  fill: #FCA905; 
+  fill: var(--main-red-dark); 
   cursor: pointer;
 }
 
@@ -355,19 +353,11 @@ h2 {
 
 a {
   text-decoration: none;
-  color: #b3680c;
-}
-
-a:link {
-  color: #b3680c;
-}
-
-a:visited {
-  color: #724208; 
+  color: var(--main-red-light);
 }
 
 a:hover {
-  color: #E68510;
+  color: var(--main-red-dark);
 }
 
 a:active {
@@ -409,6 +399,6 @@ sup svg {
 
 span.highlight {
   /* color: #5DC1B9; */
-  color: #E68510;
+  color: var(--main-red-light);
 }
 </style>

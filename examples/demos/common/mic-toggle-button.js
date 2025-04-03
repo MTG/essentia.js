@@ -20,6 +20,7 @@ mainTemplate.innerHTML = `
 
             --button-color: #ff5a5f;
             --button-color-active: #ac4142;
+            --button-font-family: inherit;
             --text-color: #000000;
             --meter-dot-color: #eeff41;
         }
