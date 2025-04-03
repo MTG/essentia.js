@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="ui container">
     <explanation-modal title="Before you start..." main-text="Note that the autotagging model used in this demo was trained on clean digital audio files. As such, it is not designed to work with potentially noisy microphone capture of playback through speakers. You can use a virtual microphone to achieve the best results." button-text="Dismiss">
     </explanation-modal>
     <div class="wrapper">
@@ -253,6 +253,7 @@ onMounted( () => {
   --tagviz-h1-margin: 0;
   --tagviz-font-size: 1rem;
   font-family: 'Poppins', sans-serif;
+  position: relative;
 }
 
 header {
@@ -376,18 +377,6 @@ a:active {
 sup svg {
   height: 0.5rem;
   width: 0.5rem;
-}
-
-.container {
-  margin: 0 auto;
-  height: 100vh;
-  
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  
-  /* background: linear-gradient(0deg, #458F89 5%, #9fccc8d0 40%, #FFFFFF 60%); */
-  background: linear-gradient(0deg, #b3680ce5 5%, #eaa856c5 30%, #FFFFFF 50%);
 }
 
 .wrapper {

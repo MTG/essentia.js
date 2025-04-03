@@ -3,32 +3,31 @@
   template.innerHTML = `
       <style>
         :host {
-          height: 35vh;
-          width: 45vw;
+          width: 33vw;
+          height: fit-content;
           margin: auto;
-          position: fixed;
+          position: absolute;
           top: 0;
           left: 0;
           bottom: 0;
           right: 0;
           z-index: 100;
 
-          --button-color: #bfbfbf;
-          --primary-color: #E6E6E6;
-          --secondary-color: #949494;
-          --tertiary-color: #545454;
+          --button-bg-color: #E6E6E6;
+          --shadow-color: #949494;
+          --text-color: #545454;
           --transition-time: 0.24s;
           
           transition: visibility 0.5s, opacity 0.5s;
         }
 
         .container {
-          background-color: var(--primary-color);
+          background-color: white;
           padding: 0.66rem 2rem;
 
-          color: var(--tertiary-color);
+          color: var(--text-color);
           border-radius: 0.33rem;
-          box-shadow: 0px 0px 12px 1px var(--secondary-color);
+          box-shadow: 0px 0px 12px 1px var(--shadow-color);
         }
 
         h1 {
@@ -37,13 +36,11 @@
         }
 
         hr {
-          height: 1px;
-          background-color: var(--secondary-color);
-          border: 0.05rem solid var(--secondary-color);
+          color: var(--text-color);
         }
 
         p {
-          font-size: 0.8rem;
+          font-size: 0.9rem;
           text-align: justify;
         }
 
@@ -54,11 +51,11 @@
 
         #ok-button {
           display: inline;
-          background-color: var(--button-color);
+          background-color: var(--button-bg-color);
           padding: 0.3rem 0.9rem;
 
           text-decoration: none;
-          color: var(--tertiary-color);
+          color: var(--text-color);
           border-radius: 0.33rem;
           box-shadow: 0 2px 5px 0px #00000015;
 
@@ -67,8 +64,8 @@
 
         #ok-button:hover {
           cursor: pointer;
-          color: var(--primary-color);
-          background-color: var(--secondary-color);
+          color: white;
+          background-color: var(--text-color);
 
           transition: background-color var(--transition-time), color var(--transition-time);
         }
