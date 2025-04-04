@@ -8,6 +8,8 @@
 //   return logRMS * 8; // max 6 pixels wide
 // }
 
+import Chart from 'chart.js';
+
 // assuming FPS = 60Hz
 const REFRESH_RATE = 1000/60; // milliseconds
 

@@ -1,3 +1,5 @@
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+
 const KEYS = [ 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
 
 const PITCH_CLASS_COLORS = {
@@ -26,6 +28,7 @@ const CHART_CONFIG = {
         }],
         labels: KEYS
     },
+    plugins: [ChartDataLabels],
     options: {
         legend: {
             display: false
