@@ -69,13 +69,13 @@ export default {
 </script>
 
 <style lang="scss">
-    @import "node_modules/bootstrap5/scss/_functions.scss";
-    @import "node_modules/bootstrap5/scss/_variables.scss";
-    @import "node_modules/bootstrap5/scss/mixins/_gradients.scss";
-    @import "node_modules/bootstrap5/scss/mixins/_border-radius.scss";
-    @import "node_modules/bootstrap5/scss/mixins/_box-shadow.scss";
-    @import "node_modules/bootstrap5/scss/mixins/_transition.scss";
-    @import "node_modules/bootstrap5/scss/forms/_form-range.scss";
+    @import "../../../../node_modules/bootstrap5/scss/_functions.scss";
+    @import "../../../../node_modules/bootstrap5/scss/_variables.scss";
+    @import "../../../../node_modules/bootstrap5/scss/mixins/_gradients.scss";
+    @import "../../../../node_modules/bootstrap5/scss/mixins/_border-radius.scss";
+    @import "../../../../node_modules/bootstrap5/scss/mixins/_box-shadow.scss";
+    @import "../../../../node_modules/bootstrap5/scss/mixins/_transition.scss";
+    @import "../../../../node_modules/bootstrap5/scss/forms/_form-range.scss";
 
     .slider-container {
         margin-bottom: .6rem;

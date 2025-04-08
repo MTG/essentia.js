@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-modal v-model="showModal" footer-class="d-flex justify-content-center" class="w-100" title="Instructions" @close="closeModal" @hide="closeModal">
+        <BModal v-model="showModal" footer-class="d-flex justify-content-center" class="w-100" title="Instructions" @close="closeModal" @hide="closeModal">
             <div class="d-block text-center">
                 <h1>
                     <slot name="header"></slot>
@@ -11,7 +11,7 @@
             </div>
 
             <div id="instructions-carousel" class="p-3">
-                <b-carousel
+                <BCarousel
                     fade
                     :interval="interval"
                     controls
@@ -22,23 +22,23 @@
                     img-height="300"
                     ref="instructionsCarousel"
                 >
-                    <b-carousel-slide v-for="(link, index) in this.imgLink"
+                    <BCarouselSlide v-for="(link, index) in this.imgLink"
                     :key="index"
                     :img-src="link"
                     :caption="`${index+=1}.`"
-                    ></b-carousel-slide>
-                </b-carousel>
+                    ></BCarouselSlide>
+                </BCarousel>
             </div>
 
             <template slot="modal-footer">
                 <div class="d-block text-center">
-                    <b-button variant="primary" href="#" @click="closeModal">
+                    <BButton variant="primary" href="#" @click="closeModal">
                         <slot name="dismiss"></slot>
-                    </b-button>
+                    </BButton>
                 </div>
             </template>
 
-        </b-modal>
+        </BModal>
     </div>
 </template>
 

@@ -1,4 +1,9 @@
-import Vue from 'vue';
 // used for component<->component & component<->core communication
-const EventBus = new Vue();
-export default EventBus;
+import emitter from 'tiny-emitter/instance'
+
+export default {
+  $on: (...args) => emitter.on(...args),
+  $once: (...args) => emitter.once(...args),
+  $off: (...args) => emitter.off(...args),
+  $emit: (...args) => emitter.emit(...args)
+}

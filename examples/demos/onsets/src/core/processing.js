@@ -12,7 +12,7 @@ export default class DSP {
     constructor () {
         this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         // create audio worker, set up comms
-        this.audioWorker = new Worker("./audio-worker.js", {type: "module"});
+        this.audioWorker = new Worker(new URL("./audio-worker.js", import.meta.url), {type: "module"});
         this.audioWorker.postMessage({
             request: 'updateParams',
             params: {sampleRate: this.audioCtx.sampleRate}

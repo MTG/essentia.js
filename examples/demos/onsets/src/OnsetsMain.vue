@@ -10,17 +10,18 @@
         </instructions-modal>
       </div>
       <main v-show="instructionsClosed" class="d-flex flex-column align-items-center">
-        <demos-header></demos-header>
         <section id="middle-screen" class="d-flex flex-column align-items-center container-fluid">
           <browse-display></browse-display>
           <algorithm-controls :init="algorithmParameters"></algorithm-controls>
         </section>
-        <demos-footer class="mt-auto"></demos-footer>
       </main>
   </div>
 </template>
 
 <script>
+import DSP from './core/processing';
+const centralProcessing = new DSP();
+
 import EventBus from './core/event-bus';
 
 import InstructionsModal from './components/InstructionsModal.vue';
@@ -35,8 +36,11 @@ import gif2 from './assets/onset-instructions-2.gif';
 import gif3 from './assets/onset-instructions-3.gif';
 import gif4 from './assets/onset-instructions-4.gif';
 
+// Import Bootstrap and BootstrapVue CSS files (order is important)
+import './assets/styles/globals.scss';
+
 export default {
-  name: 'app',
+  name: 'OnsetsMain',
   components: { InstructionsModal, DemosFooter, DemosHeader, BrowseDisplay, AlgorithmControls },
   data () {
     return {

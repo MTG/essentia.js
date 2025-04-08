@@ -39,8 +39,7 @@
 <script>
 import EventBus from '../core/event-bus';
 import WaveSurfer from 'wavesurfer.js';
-import MarkersPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.markers';
-import RegionsPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.regions';
+import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions';
 import LicenseLogo from './LicenseLogo.vue';
 
 export default {
@@ -176,9 +175,6 @@ export default {
                 waveColor: '#631E20',
                 partialRender: true,
                 plugins: [
-                    MarkersPlugin.create({
-                        markers: []
-                    }),
                     RegionsPlugin.create()
                 ]
             });

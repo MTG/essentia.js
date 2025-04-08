@@ -15,6 +15,11 @@ import MoodClassifiers from './demos/mood-classifiers/src/MoodClassifier.vue';
 import AutoTagging from "./demos/autotagging-rt/src/AutoTagging.vue";
 import HPCPChroma from "./demos/hpcp-chroma-rt/HPCPChroma.vue";
 import PitchYinFFT from "./demos/pitchyinfft-rt/PitchYinFFT.vue";
+import OnsetsMain from "./demos/onsets/src/OnsetsMain.vue";
+
+import { createBootstrap } from 'bootstrap-vue-next';
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue-next/dist/bootstrap-vue-next.css'
 
 const routes = [
   { path: '/demos/melspectrogram-rt', component: MelSpectrogram },
@@ -22,7 +27,8 @@ const routes = [
   { path: '/demos/mood-classifiers', component: MoodClassifiers },
   { path: '/demos/autotagging-rt', component: AutoTagging},
   { path: '/demos/hpcp-chroma-rt', component: HPCPChroma},
-  { path: '/demos/pitchyinfft-rt', component: PitchYinFFT}
+  { path: '/demos/pitchyinfft-rt', component: PitchYinFFT},
+  { path: '/demos/onsets', component: OnsetsMain}
 ];
 
 const router = createRouter({
@@ -34,4 +40,8 @@ const router = createRouter({
 
 const app = createApp(LandingPage);
 app.use(router);
+// Make BootstrapVue available throughout your project
+app.use(createBootstrap());
+// // Optionally install the BootstrapVue icon components plugin
+// app.use(BootstrapVueIcons);
 app.mount("#app");

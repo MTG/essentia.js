@@ -27,7 +27,7 @@
 const tagColor = '#dee2e6dd';
 
 import ProportionTag from "./ProportionTag.vue";
-import { ref } from "@vue/composition-api";
+import { ref } from "vue";
 import { getPercentage, limitNumberWithinRange, nearestN } from "./utils.js";
 
 const formattedTagNames = {hfc: "HFC",complex: "Complex",flux: "Flux",complex_phase: "Complex Phase"};

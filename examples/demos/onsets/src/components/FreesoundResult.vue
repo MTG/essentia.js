@@ -19,7 +19,7 @@
 			</div>
 		</div>
 		<span class="not-stretchy" id="select-container">
-			<b-form-radio :value="soundResource.id" v-model="selected" size="sm"></b-form-radio>
+			<b-form-radio v-model="selected" size="sm"></b-form-radio>
 		</span>
 	</div>
 </template>
