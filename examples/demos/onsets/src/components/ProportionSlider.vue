@@ -17,7 +17,7 @@
         <BButton variant="light" size="sm" v-for="(tag, index) in tagsOff" :key="index" 
         :class="{'ml-2': buttonIsNotFirst(index) }" @click="handleTagReset(tag.name)"
         v-b-tooltip.hover :title="`Add ${tag.name} to selected functions`">
-            <b-icon icon="arrow-counterclockwise"></b-icon>
+            <IBiArrowCounterclockwise icon="arrow-counterclockwise"/>
             {{tag.name}}
         </BButton>
     </div>

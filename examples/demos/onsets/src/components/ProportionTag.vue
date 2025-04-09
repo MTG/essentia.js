@@ -15,8 +15,8 @@
         v-show="showPercentage"> {{ Math.round(width) }} % </span>
         <div class="slider-button" :style="{ ...styles.sliderButton }" 
         @pointerdown="handlePointerDown" @pointerup="handlePointerUp">
-            <b-icon icon="chevron-compact-left"></b-icon>
-            <b-icon icon="chevron-compact-right"></b-icon>
+            <IBiChevronCompactLeft/>
+            <IBiChevronCompactRight/>
         </div>
     </div>
 </template>

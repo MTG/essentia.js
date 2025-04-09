@@ -3,6 +3,8 @@ import vue from '@vitejs/plugin-vue'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 import Components from 'unplugin-vue-components/vite'
 import { BootstrapVueNextResolver } from 'bootstrap-vue-next'
+import Icons from 'unplugin-icons/vite'
+import IconsResolve from 'unplugin-icons/resolver'
 
 export default defineConfig({
   plugins: [
@@ -23,7 +25,12 @@ export default defineConfig({
       ]
     }),
     Components({
-      resolvers: [BootstrapVueNextResolver()]
+      resolvers: [BootstrapVueNextResolver(), IconsResolve()],
+      dts: true
+    }),
+    Icons({
+      compiler: 'vue3',
+      autoInstall: true
     })
   ],
   root: './',

@@ -1,8 +1,8 @@
 <template>
 	<div id="player">
 		<BButton variant="light" class="not-stretchy" size="sm" id="playbutton" @click="handlePlay">
-			<b-icon v-show="!playing" icon="play"></b-icon>
-			<b-icon v-show="playing" icon="pause"></b-icon>
+			<IBiPlay v-show="!playing"/>
+			<IBiPause v-show="playing"/>
 		</BButton>
 		<div id="middle-section">
 			<div id="title-container">
@@ -11,7 +11,7 @@
 						{{soundResource.name}}
 					</BLink>
 				</div>
-				<sup><b-icon icon="box-arrow-up-right"></b-icon></sup>
+				<sup><IBiBoxArrowUpRight/></sup>
 			</div>
 			<div id="playbar-container">
 				<BFormInput type="range" id="playbar" :max="seekMax" 

@@ -9,12 +9,12 @@
         <div class="d-flex flex-row justify-content-between my-2">
             <BButtonGroup>
                 <BButton id="play" class="px-4" @click="handlePlay" variant="light">
-                    <b-icon icon="play-fill" v-show="!isPlaying"></b-icon>
-                    <b-icon icon="pause-fill" v-show="isPlaying"></b-icon>
+                    <IBiPlayFill v-show="!isPlaying"/>
+                    <IBiPauseFill v-show="isPlaying"/>
                 </BButton>
                 <BButton id="mute" class="px-4" @click="handleMute" variant="light">
-                    <b-icon icon="volume-mute-fill" v-show="!soundOn"></b-icon>
-                    <b-icon icon="volume-up-fill" v-show="soundOn"></b-icon>
+                    <IBiVolumeMuteFill v-show="!soundOn"/>
+                    <IBiVolumeUpFill v-show="soundOn"/>
                 </BButton>
             </BButtonGroup>
             <BButtonGroup v-if="receivedSound">
@@ -28,7 +28,7 @@
             </BButtonGroup>
             <BButtonGroup>
                 <BButton id="download" @click="handleDownload" variant="light" :disabled="!downloadEnabled">
-                    <b-icon icon="download"></b-icon>
+                    <IBiDownload/>
                     Download slices
                 </BButton>
             </BButtonGroup>

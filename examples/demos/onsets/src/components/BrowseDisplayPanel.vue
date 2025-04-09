@@ -6,7 +6,7 @@
                     <BFormInput v-model="searchTerm" placeholder="Search Freesound.org" @input="window.addEventListener('keydown', searchOnEnter)"
                     v-b-tooltip.focus.bottom title="Prepend a number with # to search by Freesound ID"></BFormInput>
                     <BButton variant="light" class="px-4" @click="searchFreesound">
-                        <BIcon icon="search"></BIcon>
+                        <IBiSearch/>
                     </BButton>
                 </BInputGroup>
             </div>
@@ -15,7 +15,7 @@
                 <BInputGroup>
                     <BFormInput id="file-upload" placeholder="Upload from computer" readonly @click="uploadLabel.click()" :disabled="showFreesoundResults"></BFormInput>
                     <BButton variant="light" class="px-4" @click="uploadLabel.click()" :disabled="showFreesoundResults">
-                        <BIcon icon="upload"></BIcon>
+                        <IBiUpload/>
                     </BButton>
                 </BInputGroup>
                 <label id="file-upload-label" class="d-none">
