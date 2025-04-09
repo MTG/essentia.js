@@ -6,13 +6,17 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "npx patch-package"
   },
   "devDependencies": {
+    "@iconify-json/bi": "^1.2.2",
     "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/compiler-sfc": "^3.5.13",
     "bootstrap": "^5.3.5",
     "bootstrap5": "npm:bootstrap@^5.3.5",
     "sass-embedded": "^1.86.3",
+    "unplugin-icons": "^22.1.0",
     "unplugin-vue-components": "^28.4.1",
     "vite": "^5.4.10",
     "vue": "^3.5.13"
