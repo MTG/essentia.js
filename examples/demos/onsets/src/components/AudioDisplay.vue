@@ -4,34 +4,34 @@
         <div id="load-overlay" class="d-flex justify-content-center align-items-center w-100 display" v-if="waitingOnsets"></div>
         <div id="load-spinner" class="d-flex flex-column justify-content-center align-items-center w-100 display" v-if="waitingOnsets">
             <strong class="mb-2">{{waitingOnsetsMsg}}</strong>
-            <b-spinner variant="light"></b-spinner>
+            <BSpinner variant="light"></BSpinner>
         </div>
         <div class="d-flex flex-row justify-content-between my-2">
-            <b-button-group>
-                <b-button id="play" class="px-4" @click="handlePlay" variant="light">
+            <BButtonGroup>
+                <BButton id="play" class="px-4" @click="handlePlay" variant="light">
                     <b-icon icon="play-fill" v-show="!isPlaying"></b-icon>
                     <b-icon icon="pause-fill" v-show="isPlaying"></b-icon>
-                </b-button>
-                <b-button id="mute" class="px-4" @click="handleMute" variant="light">
+                </BButton>
+                <BButton id="mute" class="px-4" @click="handleMute" variant="light">
                     <b-icon icon="volume-mute-fill" v-show="!soundOn"></b-icon>
                     <b-icon icon="volume-up-fill" v-show="soundOn"></b-icon>
-                </b-button>
-            </b-button-group>
-            <b-button-group v-if="receivedSound">
-                <b-link v-if="soundData.fsLink !== ''" :href="soundData.fsLink" target="_blank">
+                </BButton>
+            </BButtonGroup>
+            <BButtonGroup v-if="receivedSound">
+                <BLink v-if="soundData.fsLink !== ''" :href="soundData.fsLink" target="_blank">
                     {{soundData.name}} - {{soundData.user}}
-                </b-link>
+                </BLink>
                 <p v-else>
                     {{soundData.name}}
                 </p>
-                <license-logo v-if="licenseType" :license-type="licenseType" color="#E4454A" style="margin-left: 1em;"></license-logo>
-            </b-button-group>
-            <b-button-group>
-                <b-button id="download" @click="handleDownload" variant="light" :disabled="!downloadEnabled">
+                <LicenseLogo v-if="licenseType" :license-type="licenseType" color="#E4454A" style="margin-left: 1em;"></LicenseLogo>
+            </BButtonGroup>
+            <BButtonGroup>
+                <BButton id="download" @click="handleDownload" variant="light" :disabled="!downloadEnabled">
                     <b-icon icon="download"></b-icon>
                     Download slices
-                </b-button>
-            </b-button-group>
+                </BButton>
+            </BButtonGroup>
         </div>
     </div>
 </template>

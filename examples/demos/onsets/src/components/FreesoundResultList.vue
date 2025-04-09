@@ -1,14 +1,14 @@
 <template>
     <div class="d-flex flex-column rounded border-0 bg-light mb-4">
-        <b-form-radio-group class="row w-100 mx-0"> 
+        <BFormRadioGroup class="row w-100 mx-0"> 
             <div class="col-sm w-100 me-auto" v-for="col, colIdx in soundColumns" :key="colIdx">
                 <li v-for="sound, sndIdx in col" :key="sndIdx" class="mx-auto">
-                    <freesound-result @selected="handleSelect(sound)" :soundResource="sound"></freesound-result>
+                    <FreesoundResult @selected="handleSelect(sound)" :soundResource="sound"></FreesoundResult>
                 </li>
             </div>
-        </b-form-radio-group>
+        </BFormRadioGroup>
         <div>
-            <b-button block class="mt-2" variant="outline-primary" @click="confirmChoice" v-show="selected != -1">Load "{{selectedSoundName}}"</b-button>
+            <BButton block class="mt-2" variant="outline-primary" @click="confirmChoice" v-show="selected != -1">Load "{{selectedSoundName}}"</BButton>
         </div>
     </div>
 </template>

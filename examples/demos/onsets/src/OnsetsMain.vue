@@ -1,21 +1,19 @@
 <template>
-  <div id="app">
-      <div id="instructions" v-show="!instructionsClosed">
-        <!-- using placeholder GIFs -->
-        <instructions-modal :img-link="instructionsGifs"
-                            @closed="instructionsClosed=true">
-          <template slot="header">Audio slicer fun!</template>
-          <template slot="lead">Create weighted combinations of multiple onset detection functions for different audio segmentation results.</template>
-          <template slot="dismiss">Got it!</template>
-        </instructions-modal>
-      </div>
-      <main v-show="instructionsClosed" class="d-flex flex-column align-items-center">
-        <section id="middle-screen" class="d-flex flex-column align-items-center container-fluid">
-          <browse-display></browse-display>
-          <algorithm-controls :init="algorithmParameters"></algorithm-controls>
-        </section>
-      </main>
+  <div id="instructions" v-show="!instructionsClosed">
+    <!-- using placeholder GIFs -->
+    <InstructionsModal :img-link="instructionsGifs"
+                        @closed="instructionsClosed=true">
+      <template #header>Audio slicer fun!</template>
+      <template #lead>Create weighted combinations of multiple onset detection functions for different audio segmentation results.</template>
+      <template #dismiss>Got it!</template>
+    </InstructionsModal>
   </div>
+  <main v-show="instructionsClosed" class="d-flex flex-column align-items-center">
+    <section id="middle-screen" class="d-flex flex-column align-items-center container-fluid">
+      <BrowseDisplay></BrowseDisplay>
+      <AlgorithmControls :init="algorithmParameters"></AlgorithmControls>
+    </section>
+  </main>
 </template>
 
 <script>
@@ -23,6 +21,9 @@ import DSP from './core/processing';
 const centralProcessing = new DSP();
 
 import EventBus from './core/event-bus';
+
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue-next/dist/bootstrap-vue-next.css'
 
 import InstructionsModal from './components/InstructionsModal.vue';
 import DemosFooter from './components/DemosFooter.vue';
@@ -116,11 +117,11 @@ export default {
 </script>
 
 <style lang="scss">
-  main {
-    height: 100vh;
-    width: 100vw;
-    overflow: scroll;
-  }
+  // main {
+  //   height: 100vh;
+  //   width: 100vw;
+  //   overflow: scroll;
+  // }
   #middle-screen {
     flex-grow: 1;
   }

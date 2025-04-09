@@ -18,8 +18,6 @@ import PitchYinFFT from "./demos/pitchyinfft-rt/PitchYinFFT.vue";
 import OnsetsMain from "./demos/onsets/src/OnsetsMain.vue";
 
 import { createBootstrap } from 'bootstrap-vue-next';
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue-next/dist/bootstrap-vue-next.css'
 
 const routes = [
   { path: '/demos/melspectrogram-rt', component: MelSpectrogram },

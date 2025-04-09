@@ -2,43 +2,39 @@
     <section class="mb-2 mt-4">
         <div id="audio-search-upload" class="my-2 mx-0 row justify-content-between">
             <div class="px-0 col-5">
-                <b-input-group>
-                    <b-form-input v-model="searchTerm" placeholder="Search Freesound.org" @input="window.addEventListener('keydown', searchOnEnter)"
-                    v-b-tooltip.focus.bottom title="Prepend a number with # to search by Freesound ID"></b-form-input>
-                    <b-input-group-append>
-                        <b-button variant="light" class="px-4" @click="searchFreesound">
-                            <b-icon icon="search"></b-icon>
-                        </b-button>
-                    </b-input-group-append>
-                </b-input-group>
+                <BInputGroup>
+                    <BFormInput v-model="searchTerm" placeholder="Search Freesound.org" @input="window.addEventListener('keydown', searchOnEnter)"
+                    v-b-tooltip.focus.bottom title="Prepend a number with # to search by Freesound ID"></BFormInput>
+                    <BButton variant="light" class="px-4" @click="searchFreesound">
+                        <BIcon icon="search"></BIcon>
+                    </BButton>
+                </BInputGroup>
             </div>
             <span class="my-auto col-2">Or</span>
             <div class="px-0 col-5">
-                <b-input-group>
-                    <b-form-input id="file-upload" placeholder="Upload from computer" readonly @click="uploadLabel.click()" :disabled="showFreesoundResults"></b-form-input>
-                    <b-input-group-append>
-                        <b-button variant="light" class="px-4" @click="uploadLabel.click()" :disabled="showFreesoundResults">
-                            <b-icon icon="upload"></b-icon>
-                        </b-button>
-                    </b-input-group-append>
-                </b-input-group>
+                <BInputGroup>
+                    <BFormInput id="file-upload" placeholder="Upload from computer" readonly @click="uploadLabel.click()" :disabled="showFreesoundResults"></BFormInput>
+                    <BButton variant="light" class="px-4" @click="uploadLabel.click()" :disabled="showFreesoundResults">
+                        <BIcon icon="upload"></BIcon>
+                    </BButton>
+                </BInputGroup>
                 <label id="file-upload-label" class="d-none">
                     <input type="file" accept="audio/*, .m4a" @change="handleSoundUpload">
                 </label>
             </div>
         </div>
-        <b-alert id="no-fs-results" show dismissible v-show="showNoResultsFoundBanner" @dismissed="showNoResultsFoundBanner = false; searchTerm=''">
+        <BAlert id="no-fs-results" show dismissible v-show="showNoResultsFoundBanner" @dismissed="showNoResultsFoundBanner = false; searchTerm=''">
             Sorry, no results were found for "{{searchTerm}}" on Freesound. Try something different or upload your own.
-        </b-alert>
-        <b-alert id="search-failure" show dismissible v-show="showSearchFailureBanner" @dismissed="showSearchFailureBanner = false; searchTerm=''">
+        </BAlert>
+        <BAlert id="search-failure" show dismissible v-show="showSearchFailureBanner" @dismissed="showSearchFailureBanner = false; searchTerm=''">
             Sorry, Freesound search failed. Try another search term or sound ID, or upload your own sound instead.
-        </b-alert>
-        <freesound-result-list v-if="showFreesoundResults" :class="[{ 'd-flex': showFreesoundResults }, { 'd-none': !showFreesoundResults }]"
-        :sounds="freesoundResults"></freesound-result-list>
-        <audio-display v-show="!showFreesoundResults"></audio-display>
-        <b-alert id="use-num-keys" show dismissible>
+        </BAlert>
+        <FreesoundResultList v-if="showFreesoundResults" :class="[{ 'd-flex': showFreesoundResults }, { 'd-none': !showFreesoundResults }]"
+        :sounds="freesoundResults"></FreesoundResultList>
+        <AudioDisplay v-show="!showFreesoundResults"></AudioDisplay>
+        <BAlert id="use-num-keys" show dismissible>
             🎹 Use number keys 0 - 9 to play with the first 10 slices!
-        </b-alert>
+        </BAlert>
     </section>
 </template>
 

@@ -1,7 +1,7 @@
 <template>
     <div style="height: 6em;" id="multislider-container">
         <div class="h-100 w-100 d-flex mb-2 rounded-lg flex-grow-1" id="multislider" ref="TagSliderRef">
-            <proportion-tag 
+            <ProportionTag 
             v-for="(tag, index) in tagsOn" :key="index" 
             :name="tag.name" 
             :color="tag.color" 
@@ -12,14 +12,14 @@
             @tag-clicked="removeTag"
             @pointerenter="(name) => $emit('pointerenter', name)"
             @pointerleave="$emit('pointerleave')">
-            </proportion-tag>
+            </ProportionTag>
         </div>
-        <b-button variant="light" size="sm" v-for="(tag, index) in tagsOff" :key="index" 
+        <BButton variant="light" size="sm" v-for="(tag, index) in tagsOff" :key="index" 
         :class="{'ml-2': buttonIsNotFirst(index) }" @click="handleTagReset(tag.name)"
         v-b-tooltip.hover :title="`Add ${tag.name} to selected functions`">
             <b-icon icon="arrow-counterclockwise"></b-icon>
             {{tag.name}}
-        </b-button>
+        </BButton>
     </div>
 </template>
 

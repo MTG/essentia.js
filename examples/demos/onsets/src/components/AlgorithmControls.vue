@@ -2,37 +2,37 @@
     <section class="mx-2">
         <div class="row">
             <div class="range-sliders col-3">
-                <exp-slider 
+                <ExpSlider 
                 label="frame-size" min="64" max="8192" expStep="2" :initialValue="frameSize"
                 @slider-changed="value => frameSize = value"
                 @pointerenter="name => currentlyHovered=name"
-                @pointerleave="currentlyHovered='none'"></exp-slider>
-                <linear-slider 
+                @pointerleave="currentlyHovered='none'"></ExpSlider>
+                <LinearSlider 
                 label="hop-size" min="5" max="100" step="5" :value="hopSizePercentage" unit="%"
                 @slider-changed="value => hopSizePercentage = value"
                 @pointerenter="name => currentlyHovered=name"
-                @pointerleave="currentlyHovered='none'"></linear-slider>
-                <linear-slider 
+                @pointerleave="currentlyHovered='none'"></LinearSlider>
+                <LinearSlider 
                 label="sensitivity" min="0.1" max="1" step="0.05" :value="sensitivity" unit=""
                 @slider-changed="value => sensitivity = Number(value)"
                 @pointerenter="name => currentlyHovered=name"
-                @pointerleave="currentlyHovered='none'"></linear-slider>
+                @pointerleave="currentlyHovered='none'"></LinearSlider>
             </div>
             <div class="col-6">
                 <label for="odf-ratios" @pointerenter="currentlyHovered='odf'" 
                 @pointerleave="currentlyHovered='none'"><a href="https://en.wikipedia.org/wiki/Onset_(audio)" target="_blank">Onset</a> detection functions</label>
-                <proportion-slider id="odf-ratios" @slider-changed="data => odfs = data" :tags="odfs" :tagsOrder="['hfc', 'complex', 'flux', 'complex_phase']"
+                <ProportionSlider id="odf-ratios" @slider-changed="data => odfs = data" :tags="odfs" :tagsOrder="['hfc', 'complex', 'flux', 'complex_phase']"
                 @pointerenter="name => currentlyHovered=name"
-                @pointerleave="currentlyHovered='none'"></proportion-slider>
+                @pointerleave="currentlyHovered='none'"></ProportionSlider>
             </div>
             <div class="col-3 py-2">
-                <b-card id="info-panel" class="h-100 text-secondary" :sub-title="quickHelpTitle">
-                    <b-card-text>{{quickHelpText}}</b-card-text>
-                </b-card>
+                <BCard id="info-panel" class="h-100 text-secondary" :sub-title="quickHelpTitle">
+                    <BCardText>{{quickHelpText}}</BCardText>
+                </BCard>
             </div>
         </div>
         <div>
-            <b-button block variant="primary" @click="handleFormUpdate" v-show="paramsChanged">Update</b-button>
+            <BButton block variant="primary" @click="handleFormUpdate" v-show="paramsChanged">Update</BButton>
         </div>
     </section>
 </template>

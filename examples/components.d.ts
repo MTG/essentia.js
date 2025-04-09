@@ -8,10 +8,20 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    BAlert: typeof import('bootstrap-vue-next/components/BAlert')['BAlert']
     BButton: typeof import('bootstrap-vue-next/components/BButton')['BButton']
+    BButtonGroup: typeof import('bootstrap-vue-next/components/BButton')['BButtonGroup']
+    BCard: typeof import('bootstrap-vue-next/components/BCard')['BCard']
+    BCardText: typeof import('bootstrap-vue-next/components/BCard')['BCardText']
     BCarousel: typeof import('bootstrap-vue-next/components/BCarousel')['BCarousel']
     BCarouselSlide: typeof import('bootstrap-vue-next/components/BCarousel')['BCarouselSlide']
+    BFormInput: typeof import('bootstrap-vue-next/components/BFormInput')['BFormInput']
+    BFormRadio: typeof import('bootstrap-vue-next/components/BFormRadio')['BFormRadio']
+    BFormRadioGroup: typeof import('bootstrap-vue-next/components/BFormRadio')['BFormRadioGroup']
+    BInputGroup: typeof import('bootstrap-vue-next/components/BInputGroup')['BInputGroup']
+    BLink: typeof import('bootstrap-vue-next/components/BLink')['BLink']
     BModal: typeof import('bootstrap-vue-next/components/BModal')['BModal']
+    BSpinner: typeof import('bootstrap-vue-next/components/BSpinner')['BSpinner']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

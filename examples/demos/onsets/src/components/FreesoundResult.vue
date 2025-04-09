@@ -1,25 +1,25 @@
 <template>
 	<div id="player">
-		<b-button variant="light" class="not-stretchy" size="sm" id="playbutton" @click="handlePlay">
+		<BButton variant="light" class="not-stretchy" size="sm" id="playbutton" @click="handlePlay">
 			<b-icon v-show="!playing" icon="play"></b-icon>
 			<b-icon v-show="playing" icon="pause"></b-icon>
-		</b-button>
+		</BButton>
 		<div id="middle-section">
 			<div id="title-container">
 				<div id="titleLink">
-					<b-link :href="soundResource.url" target="_blank">
+					<BLink :href="soundResource.url" target="_blank">
 						{{soundResource.name}}
-					</b-link>
+					</BLink>
 				</div>
 				<sup><b-icon icon="box-arrow-up-right"></b-icon></sup>
 			</div>
 			<div id="playbar-container">
-				<b-form-input type="range" id="playbar" :max="seekMax" 
-				v-model="playbackPosition" size="sm" step="any" @change="handleSeek" @input="handleSeek"></b-form-input>
+				<BFormInput type="range" id="playbar" :max="seekMax" 
+				v-model="playbackPosition" size="sm" step="any" @change="handleSeek" @input="handleSeek"></BFormInput>
 			</div>
 		</div>
 		<span class="not-stretchy" id="select-container">
-			<b-form-radio v-model="selected" size="sm"></b-form-radio>
+			<BFormRadio v-model="selected" size="sm"></BFormRadio>
 		</span>
 	</div>
 </template>
