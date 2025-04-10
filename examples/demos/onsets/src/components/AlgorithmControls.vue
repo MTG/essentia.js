@@ -5,24 +5,24 @@
                 <ExpSlider 
                 label="frame-size" min="64" max="8192" expStep="2" :initialValue="frameSize"
                 @slider-changed="value => frameSize = value"
-                @pointerenter="name => currentlyHovered=name"
+                @pointerenter="handleSliderHover"
                 @pointerleave="currentlyHovered='none'"></ExpSlider>
                 <LinearSlider 
                 label="hop-size" min="5" max="100" step="5" :value="hopSizePercentage" unit="%"
                 @slider-changed="value => hopSizePercentage = value"
-                @pointerenter="name => currentlyHovered=name"
+                @pointerenter="handleSliderHover"
                 @pointerleave="currentlyHovered='none'"></LinearSlider>
                 <LinearSlider 
                 label="sensitivity" min="0.1" max="1" step="0.05" :value="sensitivity" unit=""
                 @slider-changed="value => sensitivity = Number(value)"
-                @pointerenter="name => currentlyHovered=name"
+                @pointerenter="handleSliderHover"
                 @pointerleave="currentlyHovered='none'"></LinearSlider>
             </div>
             <div class="col-6">
                 <label for="odf-ratios" @pointerenter="currentlyHovered='odf'" 
                 @pointerleave="currentlyHovered='none'"><a href="https://en.wikipedia.org/wiki/Onset_(audio)" target="_blank">Onset</a> detection functions</label>
                 <ProportionSlider id="odf-ratios" @slider-changed="data => odfs = data" :tags="odfs" :tagsOrder="['hfc', 'complex', 'flux', 'complex_phase']"
-                @pointerenter="name => currentlyHovered=name"
+                @pointerenter="handleSliderHover"
                 @pointerleave="currentlyHovered='none'"></ProportionSlider>
             </div>
             <div class="col-3 py-2">
@@ -110,6 +110,14 @@ export default {
             console.info("algoparams form was updated");
             EventBus.$emit("algo-params-updated", this.params);
             this.paramsChanged = false;
+        },
+        handleSliderHover(arg) {
+            if (arg instanceof PointerEvent) {
+                // console.log('received pointer event from ', arg.target, arg.type);
+                return;
+            }
+            // console.log(`slider hover arg: ${arg}`);
+            this.currentlyHovered = arg;
         }
     }
 }

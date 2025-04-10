@@ -34,6 +34,7 @@ const formattedTagNames = {hfc: "HFC",complex: "Complex",flux: "Flux",complex_ph
 let resize;
 
 export default {
+    emits: ['pointerenter'],
     props: {
         tags: Object,
         tagsOrder: Array

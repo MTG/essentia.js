@@ -23,6 +23,7 @@
 
 <script>
 export default {
+    emits: ['pointerenter'],
     props: {
         color: String,
         width: Number,

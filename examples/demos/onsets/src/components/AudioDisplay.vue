@@ -49,7 +49,7 @@ export default {
             isPlaying: false,
             soundOn: true,
             wavesurfer: null,
-            pluginsInitialised: false,
+            regions: null,
             onsetPositions: [],
             sliceRegions: [],
             waitingOnsets: false,
@@ -78,12 +78,8 @@ export default {
             EventBus.$emit('download-slices');
         },
         drawOnsets () {
-            if (!this.pluginsInitialised) {
-                this.wavesurfer.initPlugin('markers');
-            }
-
-            this.wavesurfer.clearMarkers();
-            this.onsetPositions.forEach( (p) => this.wavesurfer.addMarker({ time: p, position: 'top' }) );
+            this.regions.clearRegions();
+            this.onsetPositions.forEach( (p) => this.regions.addRegion({ start: p }) );
         },
         drawOnsetSlices () {
             // generate region options from this.onsetPositions
@@ -106,7 +102,7 @@ export default {
                 this.sliceRegions.map( (sr) => sr.remove() );
                 this.sliceRegions = []; // clear existing regions, if any
             } 
-            slices.forEach((s) => { this.sliceRegions.push(this.wavesurfer.addRegion(s)) });
+            slices.forEach((s) => { this.sliceRegions.push(this.regions.addRegion(s)) });
 
             this.wavesurfer.on('region-click', (region, ev) => {
                 ev.stopPropagation();
@@ -115,8 +111,7 @@ export default {
         },
         redraw () {
             setTimeout(() => {
-                this.wavesurfer.clearMarkers();
-                this.wavesurfer.clearRegions();
+                this.regions.clearRegions();
                 this.drawOnsets();
                 this.drawOnsetSlices();
             }, 150);
@@ -145,6 +140,11 @@ export default {
         }
     },
     created () {
+        this.regions = RegionsPlugin.create();
+        this.regions.on('region-clicked', (region, event) => {
+            e.stopPropagation();
+            region.play();
+        })
         window.addEventListener('resize', () => {
             if (this.wavesurfer) this.redraw() 
         });
@@ -174,9 +174,7 @@ export default {
                 progressColor: '#E4454A',
                 waveColor: '#631E20',
                 partialRender: true,
-                plugins: [
-                    RegionsPlugin.create()
-                ]
+                plugins: [this.regions]
             });
 
             this.wavesurfer.loadBlob(sound.blob);
@@ -184,8 +182,6 @@ export default {
             this.wavesurfer.on("finish", setPause);
             this.wavesurfer.on("pause", setPause);
             this.wavesurfer.on("play", () => this.isPlaying = true );
-
-            this.wavesurfer.on("plugin-initialised", () => this.pluginsInitialised = true );
         });
 
         EventBus.$on("analysis-finished-onsets", (onsets) => {

@@ -18,6 +18,7 @@
 <script>
 
 export default {
+    emits: ['pointerenter'],
     props: ["label", "min", "max", "step", "unit", "value"],
     data () {
         return {
