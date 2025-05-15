@@ -42,6 +42,12 @@ import WaveSurfer from 'wavesurfer.js';
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions';
 import LicenseLogo from './LicenseLogo.vue';
 
+function colorLog(msg) {
+    console.log(`%c audio display ${msg}`, 'background: #fff; color: green;');
+}
+
+let eventRegistrationCount = 0;
+
 export default {
     components: {LicenseLogo},
     data () {
@@ -74,6 +80,9 @@ export default {
             this.isPlaying = !this.isPlaying;
             this.wavesurfer.playPause();
         },
+        setPause() {
+            if (this.isPlaying) this.isPlaying = false;
+        },
         handleDownload () {
             EventBus.$emit('download-slices');
         },
@@ -87,14 +96,17 @@ export default {
                 let endPos = this.onsetPositions[i+1];
                 // if we're on the last onset, use audio track duration (end of file) as region end:
                 if (endPos == undefined) { endPos = this.wavesurfer.getDuration(); }
+                const sliceTag = `slice-${i}`;
 
                 return {
-                    id: `slice-${i}`,
+                    id: sliceTag,
                     start: v,
                     end: endPos,
                     drag: false,
                     resize: false,
-                    color: "hsl(358 57% 79% / 0.2)"
+                    color: "hsl(358 57% 79% / 0.2)",
+                    content: sliceTag,
+                    contentEditable: true
                 };
             });
 
@@ -103,23 +115,18 @@ export default {
                 this.sliceRegions = []; // clear existing regions, if any
             } 
             slices.forEach((s) => { this.sliceRegions.push(this.regions.addRegion(s)) });
-
-            this.wavesurfer.on('region-click', (region, ev) => {
-                ev.stopPropagation();
-                region.play();
-            })
         },
         redraw () {
             setTimeout(() => {
                 this.regions.clearRegions();
-                this.drawOnsets();
+                // this.drawOnsets();
                 this.drawOnsetSlices();
             }, 150);
         }
     },
     watch: {
         onsetPositions: function () {
-            this.drawOnsets();
+            // this.drawOnsets();
             this.drawOnsetSlices();
         }
     },
@@ -140,22 +147,13 @@ export default {
         }
     },
     created () {
-        this.regions = RegionsPlugin.create();
-        this.regions.on('region-clicked', (region, event) => {
-            e.stopPropagation();
-            region.play();
-        })
+        colorLog('created')
+
         window.addEventListener('resize', () => {
             if (this.wavesurfer) this.redraw() 
         });
-    },
-    mounted () {
-        this.height = this.$el.querySelector("#audio-display").clientHeight;
-        let setPause = () => {
-            if (this.isPlaying) this.isPlaying = false;
-        };
-
         EventBus.$on("sound-read", (sound) => {
+            eventRegistrationCount += 1;
             this.waitingOnsetsMsg = "Finding onsets...";
             this.waitingOnsets = true;
             this.onsetPositions = [];
@@ -163,25 +161,12 @@ export default {
             this.soundData = sound;
             this.receivedSound = true;
 
-            if (this.wavesurfer) {
-                this.wavesurfer.destroy();
-            }
-
-            this.wavesurfer = WaveSurfer.create({
-                container: '#audio-display',
-                height: this.height,
-                responsive: true,
-                progressColor: '#E4454A',
-                waveColor: '#631E20',
-                partialRender: true,
-                plugins: [this.regions]
-            });
-
             this.wavesurfer.loadBlob(sound.blob);
 
-            this.wavesurfer.on("finish", setPause);
-            this.wavesurfer.on("pause", setPause);
+            this.wavesurfer.on("finish", this.setPause.bind(this));
+            this.wavesurfer.on("pause", this.setPause.bind(this));
             this.wavesurfer.on("play", () => this.isPlaying = true );
+            colorLog(`eventRegistrationCount: ${eventRegistrationCount}`)
         });
 
         EventBus.$on("analysis-finished-onsets", (onsets) => {
@@ -197,7 +182,44 @@ export default {
         EventBus.$on("algo-params-updated", () => {
             this.waitingOnsetsMsg = "Recalculating...";
             this.waitingOnsets = true;
-        })
+        });
+    },
+    mounted () {
+        colorLog('mounted')
+        if (!this.regions) {
+            this.regions = RegionsPlugin.create();
+            this.regions.on('region-clicked', (region, event) => {
+                event.stopPropagation();
+                region.play(true);
+            });
+        }
+
+        this.height = this.$el.querySelector("#audio-display").clientHeight;
+        if (this.wavesurfer) {
+            colorLog("destroying and nulling wavesurfer")
+            this.wavesurfer.destroy();
+            this.wavesurfer = null;
+        }
+
+        if (this.wavesurfer) return;
+
+        this.wavesurfer = WaveSurfer.create({
+            container: '#audio-display',
+            height: this.height,
+            responsive: true,
+            progressColor: '#E4454A',
+            waveColor: '#631E20',
+            partialRender: true,
+            plugins: [this.regions]
+        });
+    },
+    beforeUnmount () {
+        colorLog('beforeUnmount');
+        this.wavesurfer.destroy();
+        // this.wavesurfer = null;
+    },
+    unmounted() {
+        colorLog('unmounted');
     }
 }
 </script>

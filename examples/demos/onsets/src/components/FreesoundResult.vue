@@ -19,7 +19,8 @@
 			</div>
 		</div>
 		<span class="not-stretchy" id="select-container">
-			<BFormRadio v-model="selected" size="sm"></BFormRadio>
+			<BFormRadio v-model="selected" size="sm" name="selected-fs-result" :value="soundResource.id" @change="e => selected=e.target.value"
+			></BFormRadio>
 		</span>
 	</div>
 </template>
@@ -28,23 +29,20 @@
 import EventBus from '../core/event-bus';
 
 export default {
-    emits: ['selected'],
-    props: {
-        soundResource: Object,
-    },
-    data () {
-        return {
-            playing: false,
-            selected: -1,
+	emits: ['update:modelValue'],
+	props: {
+		soundResource: Object,
+		modelValue: Number
+	},
+	data () {
+		return {
+			playing: false,
 			audio: null,
 			seekMax: 100,
 			playbackPosition: 0
-        }
-    },
-    watch: {
-        selected (isSelected) {
-            if (isSelected == this.soundResource.id) this.$emit('selected');
-        },
+		}
+	},
+	watch: {
 		soundResource () {
 			if (this.audio) {
 				this.stopAudio();
@@ -53,7 +51,18 @@ export default {
 			}
 			this.setupAudioElement();
 		}
-    },
+	},
+	computed: {
+		selected: {
+			get() {
+				return this.modelValue
+			},
+			set(value) {
+				console.log('value set test test: ', value)
+				this.$emit('update:modelValue', value);
+			}
+		}
+	},
 	created () {
 		this.setupAudioElement();
 		EventBus.$on('sound-selected', () => {

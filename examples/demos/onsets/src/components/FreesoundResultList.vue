@@ -3,13 +3,11 @@
         <BFormRadioGroup class="row w-100 mx-0"> 
             <div class="col-sm w-100 me-auto" v-for="col, colIdx in soundColumns" :key="colIdx">
                 <li v-for="sound, sndIdx in col" :key="sndIdx" class="mx-auto">
-                    <FreesoundResult @selected="handleSelect(sound)" :soundResource="sound"></FreesoundResult>
+                    <FreesoundResult v-model="selected" :soundResource="sound"></FreesoundResult>
                 </li>
             </div>
         </BFormRadioGroup>
-        <div>
-            <BButton block class="mt-2" variant="outline-primary" @click="confirmChoice" v-show="selected != -1">Load "{{selectedSoundName}}"</BButton>
-        </div>
+        <BButton variant="outline-primary" @click="confirmChoice" v-show="selected != -1">Load <i>{{selectedSoundName}}</i></BButton>
     </div>
 </template>
 
@@ -48,10 +46,6 @@ export default {
     methods: {
         freesoundEmbedURL (soundId) {
             return `https://freesound.org/embed/sound/iframe/${soundId}/simple/small/`;
-        },
-        handleSelect (sound) {
-            console.log('select event received from: ', sound.name);
-            this.selected = sound.id;
         },
         confirmChoice () {
             const sound = this.soundData[this.selected];

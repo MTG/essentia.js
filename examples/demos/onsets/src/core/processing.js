@@ -40,6 +40,8 @@ export default class DSP {
             })
         });
         EventBus.$on("algo-params-updated", params => {
+            params.odfs = Array.from(params.odfs);
+            params.odfsWeights = Array.from(params.odfsWeights);
             this.audioWorker.postMessage({
                 request: 'updateParams',
                 params: params

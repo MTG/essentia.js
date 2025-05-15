@@ -34,7 +34,7 @@ const formattedTagNames = {hfc: "HFC",complex: "Complex",flux: "Flux",complex_ph
 let resize;
 
 export default {
-    emits: ['pointerenter'],
+    emits: ['pointerenter', 'slider-changed'],
     props: {
         tags: Object,
         tagsOrder: Array
