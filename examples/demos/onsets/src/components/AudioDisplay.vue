@@ -122,6 +122,37 @@ export default {
                 // this.drawOnsets();
                 this.drawOnsetSlices();
             }, 150);
+        },
+        handleSoundRead(sound) {
+            eventRegistrationCount += 1;
+            this.waitingOnsetsMsg = "Finding onsets...";
+            this.waitingOnsets = true;
+            this.onsetPositions = [];
+
+            this.soundData = sound;
+            this.receivedSound = true;
+
+            this.wavesurfer.loadBlob(sound.blob);
+
+            this.wavesurfer.on("finish", this.setPause.bind(this));
+            this.wavesurfer.on("pause", this.setPause.bind(this));
+            this.wavesurfer.on("play", () => this.isPlaying = true );
+            colorLog(`eventRegistrationCount: ${eventRegistrationCount}`)
+        },
+        handleAnalysisFinishedOnsets(onsets) {
+            this.onsetPositions = onsets;
+            this.waitingOnsets = false;
+        },
+        handleAnalysisFinishedEmpty() { 
+            this.onsetPositions = [];
+            this.waitingOnsets = false;
+        },
+        handleAlgoParamsUpdated() {
+            this.waitingOnsetsMsg = "Recalculating...";
+            this.waitingOnsets = true;
+        },
+        handleResize() {
+            if (this.wavesurfer) this.redraw() 
         }
     },
     watch: {
@@ -147,45 +178,13 @@ export default {
         }
     },
     created () {
-        colorLog('created')
-
-        window.addEventListener('resize', () => {
-            if (this.wavesurfer) this.redraw() 
-        });
-        EventBus.$on("sound-read", (sound) => {
-            eventRegistrationCount += 1;
-            this.waitingOnsetsMsg = "Finding onsets...";
-            this.waitingOnsets = true;
-            this.onsetPositions = [];
-
-            this.soundData = sound;
-            this.receivedSound = true;
-
-            this.wavesurfer.loadBlob(sound.blob);
-
-            this.wavesurfer.on("finish", this.setPause.bind(this));
-            this.wavesurfer.on("pause", this.setPause.bind(this));
-            this.wavesurfer.on("play", () => this.isPlaying = true );
-            colorLog(`eventRegistrationCount: ${eventRegistrationCount}`)
-        });
-
-        EventBus.$on("analysis-finished-onsets", (onsets) => {
-            this.onsetPositions = onsets;
-            this.waitingOnsets = false;
-        });
-
-        EventBus.$on("analysis-finished-empty", () => { 
-            this.onsetPositions = [];
-            this.waitingOnsets = false;
-        });
-
-        EventBus.$on("algo-params-updated", () => {
-            this.waitingOnsetsMsg = "Recalculating...";
-            this.waitingOnsets = true;
-        });
+        window.addEventListener('resize', this.handleResize);
+        EventBus.$on("sound-read", this.handleSoundRead);
+        EventBus.$on("analysis-finished-onsets", this.handleAnalysisFinishedOnsets);
+        EventBus.$on("analysis-finished-empty", this.handleAnalysisFinishedEmpty);
+        EventBus.$on("algo-params-updated", this.handleAlgoParamsUpdated);
     },
     mounted () {
-        colorLog('mounted')
         if (!this.regions) {
             this.regions = RegionsPlugin.create();
             this.regions.on('region-clicked', (region, event) => {
@@ -195,13 +194,13 @@ export default {
         }
 
         this.height = this.$el.querySelector("#audio-display").clientHeight;
-        if (this.wavesurfer) {
-            colorLog("destroying and nulling wavesurfer")
-            this.wavesurfer.destroy();
-            this.wavesurfer = null;
-        }
+        // if (this.wavesurfer) {
+        //     colorLog("destroying and nulling wavesurfer")
+        //     this.wavesurfer.destroy();
+        //     this.wavesurfer = null;
+        // }
 
-        if (this.wavesurfer) return;
+        // if (this.wavesurfer) return;
 
         this.wavesurfer = WaveSurfer.create({
             container: '#audio-display',
@@ -214,12 +213,15 @@ export default {
         });
     },
     beforeUnmount () {
-        colorLog('beforeUnmount');
-        this.wavesurfer.destroy();
-        // this.wavesurfer = null;
+        // this.wavesurfer.destroy();
+        this.wavesurfer = null;
     },
     unmounted() {
-        colorLog('unmounted');
+        window.removeEventListener("resize", this.handleResize);
+        EventBus.$off("sound-read", this.handleSoundRead);
+        EventBus.$off("analysis-finished-onsets", this.handleAnalysisFinishedOnsets);
+        EventBus.$off("analysis-finished-empty", this.handleAnalysisFinishedEmpty);
+        EventBus.$off("algo-params-updated", this.handleAlgoParamsUpdated);
     }
 }
 </script>
