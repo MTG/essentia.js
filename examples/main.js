@@ -9,7 +9,6 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 Chart.plugins.unregister(ChartDataLabels);
 
 import LandingPage from './LandingPage.vue';
-import RMS from './demos/rms-rt/RMS.vue';
 import MelSpectrogram from './demos/melspectrogram-rt/MelSpectrogram.vue';
 import MoodClassifiers from './demos/mood-classifiers/src/MoodClassifier.vue';
 import AutoTagging from "./demos/autotagging-rt/src/AutoTagging.vue";
@@ -21,7 +20,6 @@ import { createBootstrap } from 'bootstrap-vue-next';
 
 const routes = [
   { path: '/demos/melspectrogram-rt', component: MelSpectrogram },
-  { path: '/demos/rms-rt', component: RMS },
   { path: '/demos/mood-classifiers', component: MoodClassifiers },
   { path: '/demos/autotagging-rt', component: AutoTagging},
   { path: '/demos/hpcp-chroma-rt', component: HPCPChroma},

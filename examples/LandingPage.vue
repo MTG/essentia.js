@@ -20,25 +20,22 @@
           <div class="header">Demo Apps</div>
           <div class="menu" id="demo-tabs-menu">
             <RouterLink to="/demos/melspectrogram-rt" class="item">
-              Melspectrogram (Real-time)
-            </RouterLink>
-            <RouterLink to="/demos/rms-rt" class="item">
-              RMS (Real-time)
+              Melspectrogram | <i>real-time</i>
             </RouterLink>
             <RouterLink to="/demos/pitchyinfft-rt" class="item">
-              Pitch Melodia (Real-time)
+              Pitch Melodia | <i>real-time</i>
             </RouterLink>
             <RouterLink to="/demos/onsets" class="item">
               Onset Detection
             </RouterLink>
             <RouterLink to="/demos/autotagging-rt" class="item">
-              Music Autotagging (Real-time)
+              Music Autotagging | <i>real-time</i>
             </RouterLink>
             <RouterLink to="/demos/mood-classifiers" class="item">
               Mood Classification plus Key & BPM
             </RouterLink>
             <RouterLink to="/demos/hpcp-chroma-rt" class="item">
-              HPCP Chroma (Real-time)
+              HPCP Chroma | <i>real-time</i>
             </RouterLink>
             <a href="https://essentia.upf.edu/essentiajs-discogs/" class="item" target="_blank">
               Discogs Genre Autotagging (Real-time)

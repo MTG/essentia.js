@@ -1,4 +1,4 @@
-let essentia = new Essentia(Module); // where Module is EssentiaWASM object when concatenated to this code by URLFromFiles
+let essentia = new Essentia(exports.EssentiaWASM); // where Module is EssentiaWASM object when concatenated to this code by URLFromFiles
 
 /**
  * A simple demonstration of using essentia.js wasm  Modules as AudioWorkletProcessor.
@@ -6,7 +6,7 @@ let essentia = new Essentia(Module); // where Module is EssentiaWASM object when
  * @class EssentiaWorkletProcessor
  * @extends AudioWorkletProcessor
  */
-class EssentiaWorkletProcessor extends AudioWorkletProcessor {
+class RMSProcessor extends AudioWorkletProcessor {
   /**
    * @constructor
    */
@@ -46,4 +46,4 @@ class EssentiaWorkletProcessor extends AudioWorkletProcessor {
 
 }
 
-registerProcessor('essentia-worklet-processor', EssentiaWorkletProcessor);
+registerProcessor('rms-processor', RMSProcessor);

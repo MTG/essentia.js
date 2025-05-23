@@ -131,7 +131,7 @@ class MicToggleButton extends HTMLElement {
         this.audio = {
             isRecording: false,
             gumStream: null,
-            audioCtx: null,
+            ctx: null,
             nodes: {
                 mic: null,
                 analyser: null
@@ -143,7 +143,7 @@ class MicToggleButton extends HTMLElement {
     }
 
     connectedCallback() {
-        this.audio.ctx = new AudioContext();
+        if (!this.audio.ctx) this.audio.ctx = new AudioContext();
 
         navigator.mediaDevices.getUserMedia({audio: true, video: false})
         .then((stream) => {
@@ -151,6 +151,9 @@ class MicToggleButton extends HTMLElement {
             this.audio.nodes.mic = this.audio.ctx.createMediaStreamSource(this.audio.gumStream);
             this.audio.nodes.analyser = this.audio.ctx.createAnalyser();
             this.audio.nodes.analyser.fftSize = 2 * 128;
+
+            this.audio.analyserData = new Float32Array(this.audio.nodes.analyser.frequencyBinCount);
+            this.audio.nodes.mic.connect(this.audio.nodes.analyser);
         });
 
         this.button.onclick = (ev) => {
@@ -160,6 +163,16 @@ class MicToggleButton extends HTMLElement {
                 this._stopAudio();
             }
         };
+    }
+
+    disconnectedCallback() {
+        // stop mic stream
+        this.audio.gumStream.getAudioTracks().forEach((track) => {
+            track.stop();
+            this.audio.gumStream.removeTrack(track);
+        });
+        this.audio.gumStream = null;
+        this.audio.ctx.close();
     }
 
     // Private:
@@ -196,10 +209,6 @@ class MicToggleButton extends HTMLElement {
         if (this.audio.ctx.state == "suspended") {
             this.audio.ctx.resume();
         }
-
-        this.audio.analyserData = new Float32Array(this.audio.nodes.analyser.frequencyBinCount);
-            
-        this.audio.nodes.mic.connect(this.audio.nodes.analyser);
         
         this.audio.isRecording = true;
         this.buttonText.innerText = "Stop";
@@ -214,10 +223,6 @@ class MicToggleButton extends HTMLElement {
         this.buttonText.innerText = "Start";
         
         this.audio.ctx.suspend().then(() => {
-            this.audio.nodes.mic.disconnect();
-            this.audio.nodes.analyser.disconnect();
-            
-            this.audio.gumStream = null;
             cancelAnimationFrame(this.animationID);
             
             meterSides.forEach((elm) => {
