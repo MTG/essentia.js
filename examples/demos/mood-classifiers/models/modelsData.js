@@ -5,50 +5,47 @@ import effnetMoodAggressive from './effnet-based/mood_aggressive-discogs-effnet-
 import effnetDanceability from './effnet-based/danceability-discogs-effnet-1.onnx?url';
 import effnetApproachability from './effnet-based/approachability_regression-discogs-effnet-1.onnx?url';
 import effnetEngagement from './effnet-based/engagement_regression-discogs-effnet-1.onnx?url';
+import musicnnEmomusic from './emomusic-msd-musicnn-1.onnx?url';
 
 export default {
-  heads: {
-    "mood_happy": {
-      name: "Mood Happy",
-      url: {
-        effnet: effnetMoodHappy
-      }
-    },
-    "mood_sad": {
-      name: "Mood Sad",
-      url: {
-        effnet: effnetMoodSad
-      }
-    },
-    "mood_relaxed": {
-      name: "Mood Relaxed",
-      url: {
-        effnet: effnetMoodRelaxed
-      }
-    },
-    "mood_aggressive": {
-      name: "Mood Aggressive",
-      url: {
-        effnet: effnetMoodAggressive
-      }
-    },
-    "danceability": {
-      name: "Danceability",
-      url: {
-        effnet: effnetDanceability
-      }
-    },
-    "approachability": {
-      name: "Approachability",
-      url: {
-        effnet: effnetApproachability
-      }
-    },
-    "engagement": {
-      name: "Engagement",
-      url: {
-        effnet: effnetEngagement
-      }
-    }
+  "mood_happy": {
+    name: "Mood Happy",
+    url: effnetMoodHappy,
+    embeddings: "effnet"
+  },
+  "mood_sad": {
+    name: "Mood Sad",
+    url: effnetMoodSad,
+    embeddings: "effnet"
+  },
+  "mood_relaxed": {
+    name: "Mood Relaxed",
+    url: effnetMoodRelaxed,
+    embeddings: "effnet"
+  },
+  "mood_aggressive": {
+    name: "Mood Aggressive",
+    url: effnetMoodAggressive,
+    embeddings: "effnet"
+  },
+  "danceability": {
+    name: "Danceability",
+    url: effnetDanceability,
+    embeddings: "effnet"
+  },
+  "approachability": {
+    name: "Approachability",
+    url: effnetApproachability,
+    embeddings: "effnet"
+  },
+  "engagement": {
+    name: "Engagement",
+    url: effnetEngagement,
+    embeddings: "effnet"
+  },
+  "emomusic": {
+    name: "Arousal-Valence",
+    url: musicnnEmomusic,
+    embeddings: "musicnn"
   }
 }

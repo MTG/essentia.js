@@ -3,21 +3,21 @@ import modelsData from "../models/modelsData.js";
 const ALLOWED_EMBEDDINGS = ['musicnn', 'effnet'];
 
 export class HeadModelORT {
-  constructor(modelURL, embeddingsSource, modelName, ort) {
+  constructor(modelURL, modelName, ort) {
     this.url = modelURL;
     this.name = modelName;
     this.isReady = false;
     this.session = null;
-    this.embeddingsSource = embeddingsSource;
     this.ort = ort;
   }
 
-  static create (modelName, embeddingsSource, ortModule) {
+  static create (modelName, ortModule) {
+    const url = modelsData[modelName].url;
+    const embeddingsSource = modelsData[modelName].embeddings;
     if (!ALLOWED_EMBEDDINGS.includes(embeddingsSource)) {
       throw Error("embeddingsSource should be one of these: musicnn / effnet");
     }
-    const url = modelsData.heads[modelName].url[embeddingsSource];
-    return new this(url, embeddingsSource, modelName, ortModule);
+    return new this(url, modelName, ortModule);
   }
 
   async initialize () {

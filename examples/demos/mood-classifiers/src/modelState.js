@@ -24,11 +24,11 @@ export default {
       tagOrder: [true, false],
       model: null
   },
-//   'emomusic': {
-//       isLoaded: false,
-//       tagOrder: ['valence', 'arousal'],
-//       model: null
-//   },
+  'emomusic': {
+      isLoaded: false,
+      tagOrder: ['valence', 'arousal'],
+      model: null
+  },
   'approachability': {
       isLoaded: false,
       tagOrder: [true],

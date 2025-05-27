@@ -50,7 +50,7 @@ function initModels() {
   initPromiseArray.push(effnetEmbeddings.initialize());
   
   for (let n of classifiers) {
-    modelState[n].model = HeadModelORT.create(n, "effnet", ort);
+    modelState[n].model = HeadModelORT.create(n, ort);
     initPromiseArray.push(modelState[n].model.initialize());
   }
   
@@ -96,6 +96,7 @@ function runClassifiers(embeddings) {
 async function runModels() {
   const inferenceStart = performance.now();
   const embeddings = await effnetEmbeddings.predict(audioArray);
+  // TODO: add musicnn embeddings for emomusic
   // console.debug('embeddings data: ', Array.from(embeddings.data));
   // console.debug('embeddings dims: ', Array.from(embeddings.dims));
   // feed to classifier heads
