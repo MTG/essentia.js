@@ -1,5 +1,5 @@
 .<template>
-  <div class="ui statistics">
+  <div class="ui small statistics">
     <div class="statistic">
       <div class="value">
         <span id="rms-value"><slot name="rms-value">-100</slot></span> <span>dBFS</span>

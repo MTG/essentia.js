@@ -1,7 +1,7 @@
 <template>
-  <div class="ui padded grid centered">
-    <mic-toggle-button ref="mic-button" :isRecording="isRecording" @click="toggleRecording"></mic-toggle-button>
-    <RMSDisplay>
+  <div class="ui padded middle aligned grid centered">
+    <mic-toggle-button ref="mic-button" :isRecording="isRecording" @click="toggleRecording" class="two wide column"></mic-toggle-button>
+    <RMSDisplay class="three wide column">
       <template v-slot:rms-value> {{ rmsText }}</template>
     </RMSDisplay>
   </div>
@@ -41,6 +41,7 @@ const melspectogramProcessorName = melspectrogramProcessorURL.split("/").at(-1).
 let rmsAnalyser;
 
 const fontColor = "#6c6c6c";
+let animRate;
 
 // Plot Settings
 const plot = {
@@ -92,7 +93,7 @@ const axes = {
   xticks: [], 
   xtickLabels: [],
   get xtickSeparation() {
-    return this.xtimeStep*(audioCtx.sampleRate/bufferSize)*plot.wPixelRatio; // leave timeStep * frames/second * pixels each takes up between ticks
+    return this.xtimeStep*animRate*plot.wPixelRatio; // leave timeStep * frames/second * pixels each takes up between ticks
   },
   yticks: [], 
   ytickSeparation: plot.layoutHeight / 6, 
@@ -234,6 +235,34 @@ function startAudioProcessing() {
   isRecording.value = true;
 }
 
+function measureAnimationRate() {
+  let timestampHistory = [];
+  let periodArr = [];
+  let animId;
+  function promiseCallback(resolve, reject) {
+    const calculatePeriod = (timestamp) => {
+      timestampHistory.unshift(timestamp);
+
+      if (timestampHistory.length == 2) {
+        const prev = timestampHistory.pop();
+        periodArr.push(timestamp - prev);
+      }
+
+      if (periodArr.length == 5) {
+        cancelAnimationFrame(animId);
+        const averagePeriod = periodArr.reduce((prev, curr) => prev+curr) / 5;
+        resolve(1/(0.001*averagePeriod));
+        return;
+      }
+      requestAnimationFrame(calculatePeriod)
+    }
+
+    animId = requestAnimationFrame(calculatePeriod);
+  }
+
+  return new Promise(promiseCallback);
+}
+
 let animationStart;
 let elapsed;
 // draw melspectrogram frames
@@ -278,7 +307,7 @@ function drawMovingSpectro(spectrum) {
   
   if (plot.cursor == plot.canvas.width-1 && !plot.isFull) {
     plot.isFull = true;
-    console.log(`Plot is full! Elapsed time: ${elapsed} ms`);
+    // console.log(`Plot is full! Elapsed time: ${elapsed} ms`);
   }
 }
 
@@ -329,11 +358,17 @@ onMounted( async () => {
   await registerEssentiaNode(audioCtx, melspectrogramProcessorURL);
   rmsAnalyser.connectGraph(micButton.value);
   connectGraph();
+
+  animRate = await measureAnimationRate();
+  // console.log(`measured animation (aka display refresh) rate is: ${animRate} Hz`); 
   plot.init();
   axes.init();
 })
 </script>
 
 <style scoped>
-
+  mic-toggle-button {
+    font-size: 1.5em;
+    margin: auto 0;
+  }
 </style>
