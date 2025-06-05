@@ -1,23 +1,15 @@
-import EffnetEmbeddings from "./EffnetEmbeddings.js";
+import EffnetMusicnnEmbeddings from "./EffnetEmbeddings.js";
 import { HeadModelORT } from "./HeadModel.js";
 import modelState from "./modelState.js";
 
+import effnetUrl from '../models/effnet-based/discogs-effnet-bsdynamic-1.onnx?url';
+import musicnnUrl from '../models/msd-musicnn-1.onnx?url';
+
 import * as ort from 'onnxruntime-web';
 
-import wasm from "onnxruntime-web/dist/ort-wasm.wasm?url"
-import wasmThreaded from "onnxruntime-web/dist/ort-wasm-threaded.wasm?url"
-import wasmSimd from "onnxruntime-web/dist/ort-wasm-simd.wasm?url"
-import wasmSimdThreaded from "onnxruntime-web/dist/ort-wasm-simd-threaded.wasm?url"
 
-
-ort.env.wasm.wasmPaths = {
-  "ort-wasm.wasm": wasm,
-  "ort-wasm-threaded.wasm": wasmThreaded,
-  "ort-wasm-simd.wasm": wasmSimd,
-  "ort-wasm-simd-threaded.wasm": wasmSimdThreaded,
-};
-
-const effnetEmbeddings = new EffnetEmbeddings(ort);
+const effnetModel = new EffnetMusicnnEmbeddings(ort, effnetUrl, 128);
+const musicnnModel = new EffnetMusicnnEmbeddings(ort, musicnnUrl, 187);
 const classifiers = Object.keys(modelState);
 
 let audioArray = null;
@@ -47,7 +39,8 @@ function average(arr) {
 
 function initModels() {
   let initPromiseArray = [];
-  initPromiseArray.push(effnetEmbeddings.initialize());
+  initPromiseArray.push(effnetModel.initialize());
+  initPromiseArray.push(musicnnModel.initialize());
   
   for (let n of classifiers) {
     modelState[n].model = HeadModelORT.create(n, ort);
@@ -70,37 +63,40 @@ function initModels() {
 
 initModels();
 
-function runClassifiers(embeddings) {
+async function runClassifiers(effnetEmbeddings, musicnnEmbeddings) {
   // use array of promises pattern here too
   for (let n of classifiers) {
-    modelState[n].model.predict(embeddings).then(o => {
-      const name = o.modelName;
-      const outputTensor = o.activations;
-      let outputArray = outputTensor.data;
-      // console.debug(`${name} output tensor:`, Array.from(outputArray), outputTensor.dims);
-      let positivesArray = outputArray;
-      
-      // format predictions, grab only positive output
-      if (!["approachability", "engagement"].includes(name)) {
-        positivesArray = getPositives(outputTensor, name);
-      }
-      
-      const summarizedPredictions = average(positivesArray);
-      postMessage({
-        predictions: [name, summarizedPredictions]
-      });
+    let embeddings = effnetEmbeddings;
+    if (n == "emomusic") embeddings = musicnnEmbeddings;
+
+    const o = await modelState[n].model.predict(embeddings);
+    const name = o.modelName;
+    const outputTensor = o.activations;
+    let outputArray = outputTensor.data;
+    // console.debug(`${name} output tensor:`, Array.from(outputArray), outputTensor.dims);
+    let positivesArray = outputArray;
+    
+    // format predictions, grab only positive output
+    if (!["approachability", "engagement"].includes(name)) {
+      positivesArray = getPositives(outputTensor, name);
+    }
+    
+    const summarizedPredictions = average(positivesArray);
+    postMessage({
+      predictions: [name, summarizedPredictions]
     });
   }
 }
 
 async function runModels() {
   const inferenceStart = performance.now();
-  const embeddings = await effnetEmbeddings.predict(audioArray);
-  // TODO: add musicnn embeddings for emomusic
+  const melspectrogram = EffnetMusicnnEmbeddings.computeSpectrogram(audioArray)
+  const effnetEmbeddings = await effnetModel.predict(melspectrogram);
+  const musicnnEmbeddings = await musicnnModel.predict(melspectrogram);
   // console.debug('embeddings data: ', Array.from(embeddings.data));
-  // console.debug('embeddings dims: ', Array.from(embeddings.dims));
+  // console.debug('musicnn embeddings: ', Array.from(musicnnEmbeddings.data));
   // feed to classifier heads
-  runClassifiers(embeddings);
+  runClassifiers(effnetEmbeddings, musicnnEmbeddings);
   const inferenceTotal = performance.now() - inferenceStart;
   console.info(`total inference time: ${inferenceTotal}ms, for ${audioArray.length / 16000}s recording`);
 };

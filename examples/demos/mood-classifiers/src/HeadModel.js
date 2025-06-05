@@ -1,4 +1,5 @@
 import modelsData from "../models/modelsData.js";
+import { onnxBackend } from "./audioUtils.js";
 
 const ALLOWED_EMBEDDINGS = ['musicnn', 'effnet'];
 
@@ -21,31 +22,16 @@ export class HeadModelORT {
   }
 
   async initialize () {
-    this.session = await this.ort.InferenceSession.create(this.url, { executionProviders: ['wasm'] });
+    this.session = await this.ort.InferenceSession.create(this.url, { executionProviders: [onnxBackend], executionMode: "parallel" });
     console.debug(`${this.name} session`, this.session);
     this.isReady = true;
   }
 
   async predict (inputTensor) {
-    // const numBatches = inputTensor.dims[0];
-    // const numOutputValues = ["engagement", "approachability"].includes(this.name) ? 1 : 2;
-    // const outputDataShape = [numBatches, numOutputValues];
-    // // console.log(outputDataShape);
-    // const outputDataTensor = Float32Array.from(Array(numBatches*numOutputValues).fill(0));
-    // const outputTensor = new this.ort.Tensor('float32', outputDataTensor, outputDataShape);
-    // let feeds = undefined;
-    // if (["engagement", "approachability", "danceability"].includes(this.name)) {
-    //   feeds = {"activations": outputTensor};
-    // }
-    try {
-      const ortOutputTensor = await this.session.run({"embeddings": inputTensor}); //, feeds)
-      console.log(`${this.name} completed successfully`, ortOutputTensor);
-      return {"modelName": this.name, "activations": ortOutputTensor["activations"]};
-    }
-    catch (err) {
-      console.log(`${this.name} just failed with...`)
-      console.trace(err)
-    };
+    console.log(`${this.name} predict has been called`);
+    const ortOutputTensor = await this.session.run({"embeddings": inputTensor}); //, feeds)
+    console.log(`${this.name} completed successfully`, ortOutputTensor);
+    return {"modelName": this.name, "activations": ortOutputTensor["activations"]};
     // console.log(`${this.name} (${this.embeddingsSource}-based) activations: `, ortOutputTensor["activations"]);
   }
 }

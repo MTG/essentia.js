@@ -1,3 +1,5 @@
+const onnxBackend = 'wasm';
+
 function preprocess (audioBuffer) {
     if (audioBuffer instanceof AudioBuffer) {
         const mono = monomix(audioBuffer);
@@ -73,8 +75,6 @@ function shortenAudio (audioIn, keepRatio=0.5, trim=false) {
     */
     if (keepRatio < 0.15) {
         keepRatio = 0.15 // must keep at least 15% of the file
-    } else if (keepRatio > 0.66) {
-        keepRatio = 0.66 // will keep at most 2/3 of the file
     }
 
     if (trim) {
@@ -101,4 +101,22 @@ function shortenAudio (audioIn, keepRatio=0.5, trim=false) {
     return Float32Array.from(audioOut);
 }
 
-export { preprocess, shortenAudio };
+// function to enable testing and cross-debugging 
+async function mainThreadEmomusic(audio) {
+    const ort = await import('onnxruntime-web');
+    const musicnnUrl = await import('../models/msd-musicnn-1.onnx?url');
+    const HeadModelORT = await import('./HeadModel');
+    const EffnetMusicnnEmbeddings = await import('./EffnetEmbeddings.js');
+
+    const musicnnModel = new EffnetMusicnnEmbeddings(ort, musicnnUrl, 187);
+    const emomusicModel = HeadModelORT.create("emomusic", ort);
+    await musicnnModel.initialize();
+    await emomusicModel.initialize();
+    const melspectrogram = EffnetMusicnnEmbeddings.computeSpectrogram(audio)
+    const musicnnEmbeddings = await musicnnModel.predict(melspectrogram);
+    console.log({musicnnEmbeddings})
+    const emomusicPredictions = await emomusicModel.predict(musicnnEmbeddings);
+    console.log(emomusicPredictions);
+}
+
+export { preprocess, shortenAudio, mainThreadEmomusic, onnxBackend};

@@ -5,7 +5,7 @@ import effnetMoodAggressive from './effnet-based/mood_aggressive-discogs-effnet-
 import effnetDanceability from './effnet-based/danceability-discogs-effnet-1.onnx?url';
 import effnetApproachability from './effnet-based/approachability_regression-discogs-effnet-1.onnx?url';
 import effnetEngagement from './effnet-based/engagement_regression-discogs-effnet-1.onnx?url';
-import musicnnEmomusic from './emomusic-msd-musicnn-1.onnx?url';
+import musicnnEmomusic from './emomusic-msd-musicnn-2.onnx?url';
 
 export default {
   "mood_happy": {
