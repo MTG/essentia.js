@@ -49,13 +49,16 @@
           <div id="key-value">{{ keyFormatted }}</div>
         </div>
       </div>
+      <div>
+        <canvas id="arousal-valence" ref="arousalValenceElem"></canvas>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="js">
-import { ref, useTemplateRef, computed } from 'vue';
-import { useWaveformDisplay, useAnalysisResults } from './moodClassifierComposables';
+import { computed, onMounted, useTemplateRef } from 'vue';
+import { useWaveformDisplay, useAnalysisResults, setupArousalValenceChart } from './moodClassifierComposables';
 
 const classifiers = {
   danceability: { icon: '💃🏻', label: 'Danceability' },
@@ -76,6 +79,11 @@ const loaderActive = computed(() => {
 const { predictions, bpmFormatted, keyFormatted } = useAnalysisResults();
 
 const fileInput = useTemplateRef("fileInput");
+const arousalValenceElem = useTemplateRef("arousalValenceElem");
+
+onMounted(() => {
+  setupArousalValenceChart(arousalValenceElem);
+})
 
 function dropHandler (e) {
     e.preventDefault();

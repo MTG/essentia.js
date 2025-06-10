@@ -1,15 +1,16 @@
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import WaveSurfer from 'wavesurfer.js';
 import { useColors } from '../../common/useColors';
 import { Essentia, EssentiaWASM } from 'essentia.js';
 import inferenceWorkerURL from './inference.js?url';
 import { preprocess, shortenAudio } from './audioUtils.js';
+import Chart from 'chart.js';
 
 const { footerHeaderDarkBlue, mainBlueDark } = useColors();
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
-const KEEP_PERCENTAGE = 0.85; // keep only 15% of audio fil
+const KEEP_PERCENTAGE = 0.65; // keep only 15% of audio fil
 
 let essentia;
 let inferenceWorker;
@@ -49,6 +50,32 @@ function computeKeyBPM (audioSignal) {
   
   // const bpm = essentia.RhythmExtractor(vectorSignal, 1024, 1024, 256, 0.1, 208, 40, 1024, 16000, [], 0.24, true, true).bpm;
   // const bpm = essentia.RhythmExtractor2013(vectorSignal, 208, 'multifeature', 40).bpm;
+}
+
+export function setupArousalValenceChart(canvasElem) {
+  const data = {
+    datasets: [{
+      label: "Arousal/Valence (Emomusic model)",
+      data: [{"x": 0, "y": 0}]
+      // backgroundColor: someColor
+    }]
+  };
+  const config = {
+    type: "scatter",
+    data: data
+  };
+
+  const chart = new Chart(canvasElem.value, config);
+
+  watch(() => predictions.value["emomusic"], (newPreds) => {
+    console.log('new predictions: emomusic', newPreds);
+    chart.data.datasets[0].data[0] = {
+      "x": newPreds["valence"], 
+      "y": newPreds["arousal"]
+    };
+    chart.update();
+    console.log(chart);
+  })
 }
 
 export function useAnalysisResults() {

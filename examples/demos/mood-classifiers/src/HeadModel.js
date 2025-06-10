@@ -23,14 +23,14 @@ export class HeadModelORT {
 
   async initialize () {
     this.session = await this.ort.InferenceSession.create(this.url, { executionProviders: [onnxBackend], executionMode: "parallel" });
-    console.debug(`${this.name} session`, this.session);
+    // console.debug(`${this.name} session`, this.session);
     this.isReady = true;
   }
 
   async predict (inputTensor) {
-    console.log(`${this.name} predict has been called`);
+    // console.log(`${this.name} predict has been called`);
     const ortOutputTensor = await this.session.run({"embeddings": inputTensor}); //, feeds)
-    console.log(`${this.name} completed successfully`, ortOutputTensor);
+    // console.log(`${this.name} completed successfully`, ortOutputTensor);
     return {"modelName": this.name, "activations": ortOutputTensor["activations"]};
     // console.log(`${this.name} (${this.embeddingsSource}-based) activations: `, ortOutputTensor["activations"]);
   }

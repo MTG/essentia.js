@@ -36,6 +36,21 @@ function average(arr) {
   return sum/length;
 }
 
+function parseEmomusicOutput(outputTensor) {
+  const tagOrder = modelState.emomusic.tagOrder;
+  const outputArray = outputTensor.data;
+  const separatedPreds = {};
+  separatedPreds[tagOrder[0]] = [];
+  separatedPreds[tagOrder[1]] = [];
+  for (let i = 0; i < outputTensor.size; i+=2) {
+    separatedPreds[tagOrder[0]].push(outputArray[i]);
+    separatedPreds[tagOrder[1]].push(outputArray[i+1]);
+  }
+  // summarise each tag (valence, arousal)
+  separatedPreds[tagOrder[0]] = average(separatedPreds[tagOrder[0]]);
+  separatedPreds[tagOrder[1]] = average(separatedPreds[tagOrder[1]]);
+  return separatedPreds;
+}
 
 function initModels() {
   let initPromiseArray = [];
@@ -79,6 +94,14 @@ async function runClassifiers(effnetEmbeddings, musicnnEmbeddings) {
     // format predictions, grab only positive output
     if (!["approachability", "engagement"].includes(name)) {
       positivesArray = getPositives(outputTensor, name);
+    }
+
+    if (name == "emomusic") {
+      const emomusicOut = parseEmomusicOutput(outputTensor);
+      postMessage({
+        predictions: [name, emomusicOut]
+      })
+      continue;
     }
     
     const summarizedPredictions = average(positivesArray);
