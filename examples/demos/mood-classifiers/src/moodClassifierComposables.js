@@ -6,7 +6,7 @@ import inferenceWorkerURL from './inference.js?url';
 import { preprocess, shortenAudio } from './audioUtils.js';
 import Chart from 'chart.js';
 
-const { footerHeaderDarkBlue, mainBlueDark } = useColors();
+const { footerHeaderDarkBlue, mainBlueDark, mainRedDark } = useColors();
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
@@ -56,13 +56,53 @@ export function setupArousalValenceChart(canvasElem) {
   const data = {
     datasets: [{
       label: "Arousal/Valence (Emomusic model)",
-      data: [{"x": 0, "y": 0}]
-      // backgroundColor: someColor
+      data: [{"x": 0, "y": 0}],
+      backgroundColor: mainRedDark.value,
+      // xAxisID: "valence",
+      // yAxisID: "arousal"
     }]
   };
   const config = {
     type: "scatter",
-    data: data
+    data: data,
+    options: {
+      responsive: true,
+      elements: {
+        point: {
+          radius: 10
+        }
+      },
+      title: {
+        display: true,
+        text: "emomusic",
+        fontSize: 14
+      },
+      legend: {
+        display: false,
+      },
+      scales: {
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: "Valence"
+          },
+          ticks: {
+            min: 1,
+            max: 9
+          }
+        }],
+        yAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: "Arousal"
+          },
+          ticks: {
+            min: 1,
+            max: 9
+          }
+        }]
+      }
+    }
   };
 
   const chart = new Chart(canvasElem.value, config);

@@ -73,9 +73,9 @@ function shortenAudio (audioIn, keepRatio=0.5, trim=false) {
     /* 
         keepRatio applied after discarding start and end (if trim == true)
     */
-    if (keepRatio < 0.15) {
-        keepRatio = 0.15 // must keep at least 15% of the file
-    }
+    // if (keepRatio < 0.15) {
+    //     keepRatio = 0.15 // must keep at least 15% of the file
+    // }
 
     if (trim) {
         const discardSamples = Math.floor(0.1 * audioIn.length); // discard 10% on beginning and end
@@ -83,7 +83,8 @@ function shortenAudio (audioIn, keepRatio=0.5, trim=false) {
     }
 
     const ratioSampleLength = Math.ceil(audioIn.length * keepRatio);
-    const patchSampleLength = 187 * 256; // cut into patchSize chunks so there's no weird jumps in audio
+    // TODO: patchSize is now different between Effnet and MusiCNN!! shouldn't be hardcoded
+    const patchSampleLength = 128 * 256; // cut into patchSize chunks so there's no weird jumps in audio
     const numPatchesToKeep = Math.ceil(ratioSampleLength / patchSampleLength);
 
     // space patchesToKeep evenly

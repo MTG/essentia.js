@@ -50,7 +50,7 @@
         </div>
       </div>
       <div>
-        <canvas id="arousal-valence" ref="arousalValenceElem"></canvas>
+        <canvas ref="arousalValenceElem"></canvas>
       </div>
     </div>
   </div>
