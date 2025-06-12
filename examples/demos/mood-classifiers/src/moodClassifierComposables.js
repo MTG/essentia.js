@@ -5,6 +5,7 @@ import { Essentia, EssentiaWASM } from 'essentia.js';
 import inferenceWorkerURL from './inference.js?url';
 import { preprocess, shortenAudio } from './audioUtils.js';
 import Chart from 'chart.js';
+import { pointToEmoji } from './pointToEmoji.js';
 
 const { footerHeaderDarkBlue, mainBlueDark, mainRedDark } = useColors();
 
@@ -56,10 +57,12 @@ export function setupArousalValenceChart(canvasElem) {
   const data = {
     datasets: [{
       label: "Arousal/Valence (Emomusic model)",
-      data: [{"x": 0, "y": 0}],
+      data: [{"x": 5, "y": 5}],
       backgroundColor: mainRedDark.value,
-      // xAxisID: "valence",
-      // yAxisID: "arousal"
+      pointStyle: (ctx) => {
+        const point = ctx.dataset.data[0];
+        return pointToEmoji(point.x, point.y);
+      }
     }]
   };
   const config = {
@@ -67,14 +70,9 @@ export function setupArousalValenceChart(canvasElem) {
     data: data,
     options: {
       responsive: true,
-      elements: {
-        point: {
-          radius: 10
-        }
-      },
       title: {
         display: true,
-        text: "emomusic",
+        text: "Arousal / Valence - emomusic model",
         fontSize: 14
       },
       legend: {
