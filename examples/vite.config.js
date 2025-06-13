@@ -5,15 +5,19 @@ import Components from 'unplugin-vue-components/vite'
 import { BootstrapVueNextResolver } from 'bootstrap-vue-next'
 import Icons from 'unplugin-icons/vite'
 import IconsResolve from 'unplugin-icons/resolver'
+import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
+
+const customElementNames = ["mic-toggle-button"];
 
 export default defineConfig({
   plugins: [
     vue({
       template: {
         compilerOptions: {
-          // treat all tags with a dash as custom elements
-          isCustomElement: (tag) => tag.includes('-')
-        }
+          // add specific custom element names
+          isCustomElement: (tag) => customElementNames.includes(tag)
+        },
+        transformAssetUrls: transformAssetUrls
       }
     }),
     viteStaticCopy({
@@ -24,6 +28,7 @@ export default defineConfig({
         }
       ]
     }),
+    Vuetify(),
     Components({
       resolvers: [BootstrapVueNextResolver(), IconsResolve()],
       dts: true

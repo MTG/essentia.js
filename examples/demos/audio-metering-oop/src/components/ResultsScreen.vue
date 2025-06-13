@@ -5,7 +5,7 @@
       class="pa-4"
       show-arrows
     >
-      <v-slide-item
+      <v-slide-group-item
         v-for="(track, trackID) in AnalysisData"
         :key="trackID"
       >
@@ -16,7 +16,7 @@
           :refTrack="selectedAsRefID !== undefined ? AnalysisData[selectedAsRefID] : undefined"
           :refTrackID="selectedAsRefID"
         ></metering-card>
-      </v-slide-item>
+      </v-slide-group-item>
     </v-slide-group>
   </v-row>
 </template>

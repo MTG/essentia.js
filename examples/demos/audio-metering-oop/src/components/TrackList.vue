@@ -1,31 +1,26 @@
 <template>
   <v-card height="100%">
-		<v-list dense>
+		<v-list density="compact">
 			<v-toolbar flat>
-				<v-tooltip bottom>
-					<template v-slot:activator="{ on, attrs }">
-						<v-btn icon light @click="() => $emit('cancel')" v-bind="attrs" v-on="on">
-							<v-icon color="secondary darken-2">
+				<v-tooltip location="bottom">
+					<template v-slot:activator="{ props }">
+						<v-btn icon @click="() => $emit('cancel')" v-bind="props">
+							<v-icon color="secondary-darken-2">
 								mdi-arrow-left
 							</v-icon>
 						</v-btn>
 					</template>
 					<span>Cancel</span>
 				</v-tooltip>
-				<v-toolbar-title class="secondary--text text--darken-2">
+				<v-toolbar-title class="text-secondary-darken-2">
 					Selected tracks
 				</v-toolbar-title>
 			</v-toolbar>
-			<v-list-item v-for="trackName in tracks" :key="trackName" inactive>
-				<v-list-item-avatar class="my-0">
-					<v-icon>mdi-file-music-outline</v-icon>
-				</v-list-item-avatar>
-				<v-list-item-content>
-					<v-list-item-title v-text="trackName"></v-list-item-title>
-				</v-list-item-content>
+			<v-list-item v-for="trackName in tracks" :key="trackName" inactive prepend-icon="<v-icon>mdi-file-music-outline</v-icon>">
+				<v-list-item-title>{{ trackName }}</v-list-item-title>
 				<v-list-item-action class="my-0">
 					<v-btn icon @click="() => handleRemove(trackName)">
-						<v-icon>mdi-trash-can-outline</v-icon>
+						<!-- <v-icon>mdi-trash-can-outline</v-icon> -->
 					</v-btn>
 				</v-list-item-action>
 			</v-list-item>
@@ -34,20 +29,17 @@
 			absolute 
 			timeout="-1" 
 			v-model="showUndoPrompt"
-			elevation="0"
-			color="accent darken-2"
-			text
+			class="elevation-0"
+			color="accent-darken-2"
 		>
 			Removed track '{{deletedTrack}}'
-			<template v-slot:action="{ attrs }">
-        <v-tooltip top>
-					<template v-slot:activator="{ on }">
+        <v-tooltip location="top">
+					<template v-slot:activator="{ props }">
 						<v-btn
-							color="accent darken-2"
-							v-bind="attrs"
+							color="accent-darken-2"
+							v-bind="props"
 							@click="handleUndo"
-							v-on="on"
-							text
+							variant="text"
 						>
 							<v-icon>
 								mdi-undo-variant
@@ -56,7 +48,6 @@
 					</template>
 					<span>Undo</span>
 				</v-tooltip>
-      </template>
 		</v-snackbar>
   </v-card>
 </template>

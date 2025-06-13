@@ -37,6 +37,9 @@
             <RouterLink to="/demos/hpcp-chroma-rt" class="item">
               HPCP Chroma | <i>real-time</i>
             </RouterLink>
+            <RouterLink to="/demos/audio-metering" class="item">
+              Audio Metering
+            </RouterLink>
             <a href="https://essentia.upf.edu/essentiajs-discogs/" class="item" target="_blank">
               Discogs Genre Autotagging (Real-time)
             </a>

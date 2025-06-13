@@ -2,35 +2,36 @@
 	<v-card :class="[`ma-${selectedAsRefCardElevation}`, selectedAsRef === 'selected' ? 'highlight-card' : '']" 
           :elevation="selectedAsRefCardElevation" max-width="500">
 		<v-toolbar flat dense>
-			<v-btn icon color="primary" text>
-				<v-icon>mdi-tray-arrow-down</v-icon>
+			<v-btn icon color="primary" variant="text">
+				<!-- <v-icon>mdi-tray-arrow-down</v-icon> -->
 			</v-btn>
-			<v-toolbar-title class="primary--text">{{ track.name }}</v-toolbar-title>
+			<v-toolbar-title class="text-primary">{{ track.name }}</v-toolbar-title>
 			<v-spacer></v-spacer>
-      <v-tooltip bottom>
-        <template v-slot:activator="{ on, attrs }">
+      <!-- <v-tooltip location="bottom">
+        <template v-slot:activator="{ props }">
           <v-btn-toggle
             v-model="selectedAsRef"
-            @change="handleRefToggleChange"
+            @update:model-value="handleRefToggleChange"
             color="primary"
             rounded
             group
+            v-bind="props"
           >
-            <v-btn v-on="on"
-            v-bind="attrs" value="selected">
+            <v-btn 
+            value="selected">
               <v-icon :color="selectedAsRefBtnColor">mdi-compare-horizontal</v-icon>
             </v-btn>
           </v-btn-toggle>
         </template>
         <span>Use as reference track</span>
-      </v-tooltip>
+      </v-tooltip> -->
 		</v-toolbar>
 		<v-divider></v-divider>
 		<v-container fluid id="relative-container">
       <v-overlay
-        :value="showOverlay"
+        :model-value="showOverlay"
         absolute
-        color="#ffffff"
+        scrim="#ffffff"
         opacity="0.6"
       ></v-overlay>
 			<v-row dense>

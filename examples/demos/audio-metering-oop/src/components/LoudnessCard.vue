@@ -1,40 +1,36 @@
 <template>
-  <v-card elevation="0" color="secondary lighten-3">
+  <v-card elevation="0" color="secondary-lighten-3">
 		<v-card-title>Loudness</v-card-title>
 		<v-card-subtitle>EBU R128</v-card-subtitle>
-		<v-simple-table class="secondary lighten-3">
-			<template v-slot:default>
+		<v-table class="bg-secondary-lighten-3">
 				<tbody>
 					<tr>
 						<td>Integrated</td>
-						<td class="error--text">{{integrated.toFixed(3)}} LUFS</td>
-						<td v-if="refTrack !== undefined"  class="primary--text">{{refTrack.loudness.integrated.toFixed(3)}} LUFS</td>
+						<td class="text-error">{{integrated.toFixed(3)}} LUFS</td>
+						<td v-if="refTrack !== undefined"  class="text-primary">{{refTrack.loudness.integrated.toFixed(3)}} LUFS</td>
 					</tr>
 					<tr>
 						<td>Range</td>
-						<td class="error--text">{{range.toFixed(3)}} dB LU</td>
-						<td v-if="refTrack !== undefined"  class="primary--text">{{refTrack.loudness.range.toFixed(3)}} dB LU</td>
+						<td class="text-error">{{range.toFixed(3)}} dB LU</td>
+						<td v-if="refTrack !== undefined"  class="text-primary">{{refTrack.loudness.range.toFixed(3)}} dB LU</td>
 					</tr>
 				</tbody>
-			</template>
-		</v-simple-table>
+		</v-table>
 		<v-divider></v-divider>
 		<loudness-chart :data="chartData" :trackID="trackID" :colors="stdColors" :isRef="false"></loudness-chart>
 		<v-divider v-if="refTrack !== undefined"></v-divider>
 		<loudness-chart v-show="refTrack !== undefined" :data="refChartData" :trackID="refTrackID" :colors="refColors" :isRef="true"></loudness-chart>
 		<v-divider></v-divider>
 		<v-card-subtitle>RMS</v-card-subtitle>
-		<v-simple-table class="secondary lighten-3">
-			<template v-slot:default>
+		<v-table class="bg-secondary-lighten-3">
 				<tbody>
 					<tr>
 						<td>Mono mix</td>
-						<td class="error--text">{{rms.mono.toFixed(3)}} dB</td>
-						<td v-if="refTrack !== undefined" class="primary--text">{{refTrack.loudness.rms.mono.toFixed(3)}} dB</td>
+						<td class="text-error">{{rms.mono.toFixed(3)}} dB</td>
+						<td v-if="refTrack !== undefined" class="text-primary">{{refTrack.loudness.rms.mono.toFixed(3)}} dB</td>
 					</tr>
 				</tbody>
-			</template>
-		</v-simple-table>
+		</v-table>
 	</v-card>
 </template>
 

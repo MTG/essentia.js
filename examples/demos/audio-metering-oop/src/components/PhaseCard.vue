@@ -1,9 +1,9 @@
 <template>
-  <v-card elevation="0" color="secondary lighten-3">
+  <v-card elevation="0" color="secondary-lighten-3">
     <v-card-title>Phase Correlation</v-card-title>
     <v-card-text class="d-flex justify-space-between">
 		<div class="d-flex flex-column justify-center">
-            <p class="text-center error--text">{{correlation.toFixed(3)}}</p>
+            <p class="text-center text-error">{{correlation.toFixed(3)}}</p>
             <div class="canvas-container">
                 <canvas
                     ref="axes"
@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="d-flex flex-column justify-center" v-if="refTrack !== undefined">
-            <p class="text-center primary--text">{{refTrack.phase.correlation.toFixed(3)}}</p>
+            <p class="text-center text-primary">{{refTrack.phase.correlation.toFixed(3)}}</p>
             <div class="canvas-container">
                 <canvas
                     ref="refAxes"

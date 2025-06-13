@@ -13,7 +13,7 @@
       </v-card-title>
       <v-card-text>
         <v-progress-linear
-          :value="progressPercent"
+          :model-value="progressPercent"
           color="primary"
           height="25"
           stream

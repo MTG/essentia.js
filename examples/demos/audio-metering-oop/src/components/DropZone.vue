@@ -1,37 +1,41 @@
 <template>
-  <v-hover v-slot="{ hover }">
-			<v-sheet
-				id="dropzone"
-				tabindex="0"
-				:color="hover ? 'white' : 'secondary lighten-3'"
-				width="100%"
-				height="100%"
-				class="d-flex flex-column align-center rounded-lg transition-swing"
-				:elevation="hover ? 6 : 1"
-			>
-				<input type="file" accept="audio/*" style="display: none;" multiple>
-				<v-row>
-					<v-icon
-						v-if="!dragover" 
-						:color="hover ? 'primary' : 'primary darken-1'" 
-						size="5em"
-					>mdi-tray-arrow-up</v-icon>
-					<v-icon
-						v-if="dragover" 
-						:color="hover ? 'primary' : 'primary darken-1'" 
-						size="5em"
-					>mdi-plus-thick</v-icon>
-				</v-row>
-				<v-row class="ma-0">
-					<span 
-						class="title primary--text"
-						:class="hover ? 'text' : 'text--darken-1'"
-					>
-						Drop or click to upload file!
-					</span>
-				</v-row>
-			</v-sheet>
-	</v-hover>
+<v-hover>
+    <template v-slot:default="{ isHovering, props}">
+        <v-sheet
+            id="dropzone"
+            ref="dropzone"
+            tabindex="0"
+            :color="isHovering ? 'white' : 'secondary-lighten-3'"
+            class="d-flex flex-column align-center rounded-lg"
+            :elevation="isHovering ? 6 : 1"
+            v-bind="props"
+        >
+            <input type="file" accept="audio/*" style="display: none;" multiple>
+            <v-row>
+                <v-icon
+                    v-show="!dragover" 
+                    :color="isHovering ? 'primary' : 'primary-darken-1'" 
+                    size="5em"
+                    icon="mdi-tray-arrow-up"
+                ></v-icon>
+                <v-icon
+                    v-show="dragover" 
+                    :color="isHovering ? 'primary' : 'primary-darken-1'" 
+                    size="5em"
+                    icon="mdi-plus-thick"
+                ></v-icon>
+            </v-row>
+            <v-row class="ma-auto">
+                <span 
+                    class="text-h6 text-primary"
+                    :class="isHovering ? 'text' : 'text-primary-darken-1'"
+                >
+                    Drop or click to upload file!
+                </span>
+            </v-row>
+        </v-sheet>
+    </template>
+</v-hover>  
 </template>
 
 <script>
@@ -42,8 +46,9 @@ export default {
         }
     },
     mounted () {
-        const dropzone = this.$el;
-        const fileupload = this.$el.firstElementChild;
+        const dropzone = this.$refs.dropzone.$el;
+        console.log(dropzone)
+        const fileupload = dropzone.firstElementChild;
 
         if(dropzone) {
             // register all drag & drop event listeners

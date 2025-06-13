@@ -1,14 +1,14 @@
 <template>
-	<v-expansion-panels flat hover>
-		<v-expansion-panel class="secondary lighten-3" key="0">
-			<v-expansion-panel-header class="px-4" :class="headerColor">
+	<v-expansion-panels flat>
+		<v-expansion-panel class="bg-secondary-lighten-3" key="0">
+			<v-expansion-panel-title class="px-4" :class="headerColor">
 				Momentary & short-term {{isRefText}}
-			</v-expansion-panel-header>
-			<v-expansion-panel-content eager>
+			</v-expansion-panel-title>
+			<v-expansion-panel-text eager>
 				<div>
 					<svg :id="chartId"></svg>
 				</div>
-			</v-expansion-panel-content>
+			</v-expansion-panel-text>
 		</v-expansion-panel>
 	</v-expansion-panels>
 </template>

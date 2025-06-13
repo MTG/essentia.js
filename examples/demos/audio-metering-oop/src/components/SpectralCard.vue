@@ -1,5 +1,5 @@
 <template>
-  <v-card elevation="0" color="secondary lighten-3">
+  <v-card elevation="0" color="secondary-lighten-3">
     <v-card-title>Spectral profile</v-card-title>
 
     <v-card-text>
