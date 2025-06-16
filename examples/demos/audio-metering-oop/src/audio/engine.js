@@ -38,7 +38,9 @@ class AudioEngine {
         let idx = 0;
         for (const b of buffers) {
             const data = [b.getChannelData(0), b.getChannelData(1)];
+            console.debug('got channel data');
             const analysisData = await analyser.analyseTrack(data);
+            console.debug('got analysis data', analysisData);
             console.info(`analysed track #${idx}:`);
             this.progress = `${idx + 1}/${buffers.length}`;
             const progressEvent = new CustomEvent('progress', {detail: this.progress});
@@ -53,7 +55,7 @@ class AudioEngine {
         }
 
         console.timeEnd('tracks-analysis');
-        await analyser.shutdown();
+        // await analyser.shutdown();
         return analysis;
     }
 }

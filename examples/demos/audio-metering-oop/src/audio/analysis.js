@@ -1,6 +1,4 @@
-import AnalysisWorker from './worker.js?worker';
-
-const worker = new AnalysisWorker();
+const worker = new Worker(new URL("./worker.js", import.meta.url), {type: "module"});
 
 function analyseTrack (audioChannelData) {
     return new Promise( (resolve, reject) => {
@@ -12,7 +10,6 @@ function analyseTrack (audioChannelData) {
 
         worker.addEventListener('message', messageHandler);
         worker.addEventListener('error', reject);
-
         worker.postMessage({
             audioData: audioChannelData
         })

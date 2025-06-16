@@ -9,12 +9,12 @@
       <v-stepper-header elevation="0">
         <v-stepper-item 
           value="1"
-          :complete="step > 1"
+          :complete="step > 0"
         >Upload files</v-stepper-item>
         <v-divider></v-divider>
         <v-stepper-item 
           value="2"
-          :complete="step > 2">
+          :complete="step > 1">
           Audio analysis
         </v-stepper-item>
         <v-divider></v-divider>
@@ -65,11 +65,11 @@ export default {
   },
   methods: {
     triggerAnalysis (tracks) {
-      this.step = 2;
+      this.step = 1;
       audioEngine.batchProcess(tracks).then( analysis => {
         console.info('analysis finished');
         console.info('ready to visualise');
-        this.step = 3;
+        this.step = 2;
         this.analysis = analysis;
       })
     }

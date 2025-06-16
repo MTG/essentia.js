@@ -7,7 +7,7 @@
 			</v-btn>
 			<v-toolbar-title class="text-primary">{{ track.name }}</v-toolbar-title>
 			<v-spacer></v-spacer>
-      <!-- <v-tooltip location="bottom">
+      <v-tooltip location="bottom">
         <template v-slot:activator="{ props }">
           <v-btn-toggle
             v-model="selectedAsRef"
@@ -24,7 +24,7 @@
           </v-btn-toggle>
         </template>
         <span>Use as reference track</span>
-      </v-tooltip> -->
+      </v-tooltip>
 		</v-toolbar>
 		<v-divider></v-divider>
 		<v-container fluid id="relative-container">

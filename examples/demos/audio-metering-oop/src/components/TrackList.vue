@@ -5,9 +5,7 @@
 				<v-tooltip location="bottom">
 					<template v-slot:activator="{ props }">
 						<v-btn icon @click="() => $emit('cancel')" v-bind="props">
-							<v-icon color="secondary-darken-2">
-								mdi-arrow-left
-							</v-icon>
+							<v-icon icon="mdi-arrow-left" color="secondary-darken-2"></v-icon>
 						</v-btn>
 					</template>
 					<span>Cancel</span>
@@ -16,11 +14,11 @@
 					Selected tracks
 				</v-toolbar-title>
 			</v-toolbar>
-			<v-list-item v-for="trackName in tracks" :key="trackName" inactive prepend-icon="<v-icon>mdi-file-music-outline</v-icon>">
+			<v-list-item v-for="trackName in tracks" :key="trackName" inactive prepend-icon="<v-icon icon='mdi-file-music-outline'></v-icon>">
 				<v-list-item-title>{{ trackName }}</v-list-item-title>
 				<v-list-item-action class="my-0">
 					<v-btn icon @click="() => handleRemove(trackName)">
-						<!-- <v-icon>mdi-trash-can-outline</v-icon> -->
+						<v-icon icon="mdi-trash-can-outline"></v-icon>
 					</v-btn>
 				</v-list-item-action>
 			</v-list-item>
