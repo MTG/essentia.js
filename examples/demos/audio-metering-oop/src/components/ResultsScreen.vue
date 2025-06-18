@@ -6,14 +6,14 @@
       show-arrows
     >
       <v-slide-group-item
-        v-for="(track, trackID) in AnalysisData"
+        v-for="(track, trackID) in analysisData"
         :key="trackID"
       >
         <metering-card 
           :track="track" 
           :uuid="trackID" 
           @ref-selected="handleRefSelected" @ref-unselected="handleRefUnselected"
-          :refTrack="selectedAsRefID !== undefined ? AnalysisData[selectedAsRefID] : undefined"
+          :refTrack="selectedAsRefID !== undefined ? analysisData[selectedAsRefID] : undefined"
           :refTrackID="selectedAsRefID"
         ></metering-card>
       </v-slide-group-item>
@@ -27,7 +27,7 @@ import MeteringCard from './MeteringCard.vue';
 export default {
 	components: { MeteringCard },
 	props: {
-		AnalysisData: Object[Object],
+		analysisData: Object[Object],
 	},
 	data () {
 		return {

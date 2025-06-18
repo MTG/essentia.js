@@ -7,3 +7,4 @@ builds/
 dist/
 coverage/
 package-lock.json
+cypress
