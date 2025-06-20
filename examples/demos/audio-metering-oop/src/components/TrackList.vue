@@ -14,13 +14,13 @@
 					Selected tracks
 				</v-toolbar-title>
 			</v-toolbar>
-			<v-list-item v-for="trackName in tracks" :key="trackName" inactive prepend-icon="<v-icon icon='mdi-file-music-outline'></v-icon>">
+			<v-list-item v-for="trackName in tracks" :key="trackName" inactive prepend-icon="mdi-file-music-outline">
 				<v-list-item-title>{{ trackName }}</v-list-item-title>
-				<v-list-item-action class="my-0">
-					<v-btn icon @click="() => handleRemove(trackName)">
-						<v-icon icon="mdi-trash-can-outline"></v-icon>
-					</v-btn>
-				</v-list-item-action>
+				<template v-slot:append>
+					<v-list-item-action class="my-0">
+						<v-btn icon="mdi-trash-can-outline" @click="() => handleRemove(trackName)"></v-btn>
+					</v-list-item-action>
+				</template>
 			</v-list-item>
 		</v-list>
 		<v-snackbar 
