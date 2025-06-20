@@ -11,6 +11,7 @@
 <script>
 import * as d3 from 'd3';
 import LineChart from './LineChart.js';
+import { useTheme } from 'vuetify';
 
 // const barkBandFrequencies = [1, 100, 200, 300, 400, 510, 630, 770, 920, 1080, 1270, 1480, 1720, 2000, 2320, 2700, 3150, 3700, 4400, 5300, 6400, 7700, 9500, 12000, 15500, 20500, 27000];
 
@@ -28,6 +29,10 @@ function linspace(x0, xN, n){
 }
 
 export default {
+  setup() {
+    const vuetifyTheme = useTheme();
+    return { vuetifyTheme }
+  },
   props: {
     spectralData: Array, 
     trackID: String, 
@@ -83,8 +88,8 @@ export default {
     },
     colors () {
       return {
-        darkRed: this.$root.$vuetify.theme.themes.light.error,
-        primaryRed: this.$root.$vuetify.theme.themes.light.primary
+        darkRed: this.vuetifyTheme.themes.value.essentiajsTheme.colors.error,
+        primaryRed: this.vuetifyTheme.themes.value.essentiajsTheme.colors.primary
       }
     }
   },

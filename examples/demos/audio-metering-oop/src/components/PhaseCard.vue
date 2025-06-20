@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import { useTheme } from 'vuetify';
 function deg2rad (degrees) {
   return degrees * Math.PI / 180;
 }
@@ -48,6 +49,10 @@ const ALPHAS = ['10', '07', '05', '03', '01'];
 const sampleSkip = 256;
 
 export default {
+    setup() {
+        const vuetifyTheme = useTheme();
+        return { vuetifyTheme }
+    },
 	props: {
 		leftCh: Float32Array,
 		rightCh: Float32Array,
@@ -69,8 +74,8 @@ export default {
         refTrack(newVal) {
             if (newVal !== undefined) {
                 this.$nextTick(() => {
-                    this.drawRef(this.$root.$vuetify.theme.themes.light.primary);
-					// this.drawMain(this.$root.$vuetify.theme.themes.light.accent);
+                    this.drawRef(this.vuetifyTheme.themes.value.essentiajsTheme.colors.primary);
+					// this.drawMain(this.vuetifyTheme.themes.value.essentiajsTheme.colors.accent);
                 })
             }
         }
@@ -78,7 +83,7 @@ export default {
 	mounted () {
 		// console.info('drawing phase native');
 		// console.time('draw-phase'); '#F50E00'
-		this.drawMain(this.$root.$vuetify.theme.themes.light.error);
+		this.drawMain(this.vuetifyTheme.themes.value.essentiajsTheme.colors.error);
 		// console.timeEnd('draw-phase');
 	},
     methods: {
