@@ -22,7 +22,7 @@
         >
           <strong>{{ progress }} tracks</strong>
         </v-progress-linear>
-        This could take up to 3min, please be patient.
+        This could take around 1-2min...
       </v-card-text>
     </div>
   </v-sheet>

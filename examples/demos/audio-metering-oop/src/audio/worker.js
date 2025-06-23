@@ -111,27 +111,29 @@ function phaseCorrelation (L, R) {
 	const n = L.length;
 	if (n == 0) return null;
 
-    const vectorMultiply = new BinaryOperator("multiply");
-    const leftVector = arrayToVector(L);
-    const rightVector = arrayToVector(R);
-
-    const leftRightVector = vectorMultiply.compute(leftVector, rightVector).array;
-    const left2Vector = vectorMultiply.compute(leftVector, leftVector).array;
-    const right2Vector = vectorMultiply.compute(rightVector, rightVector).array;
-
-	let sumL = L.reduce( (accum, elem) => accum+elem ),
-		sumR = R.reduce( (accum, elem) => accum+elem ),
-		sumLR = accumVector(leftRightVector),
-		sumL2 = accumVector(left2Vector),
-		sumR2 = accumVector(right2Vector);
+	let sumL = 0,
+		sumR = 0,
+		sumLR = 0,
+		sumL2 = 0,
+		sumR2 = 0;
 	
-    cleanup([vectorMultiply, leftVector, rightVector, leftRightVector, left2Vector, right2Vector]);
+
+    // compute sums
+    L.map( (leftSamp, idx) => {
+        const rightSamp = R[idx];
+        sumL += leftSamp;
+        sumR += rightSamp;
+        sumLR += leftSamp * rightSamp;
+        sumL2 += leftSamp * leftSamp;
+        sumR2 += rightSamp * rightSamp;
+    })
 
     console.timeEnd('phase-correlation');
 	return (n * sumLR - sumL * sumR) / Math.sqrt((n * sumL2 - sumL * sumL) * (n * sumR2 - sumR * sumR));
 }
 
 function getSpectralProfile (monoMix) {
+    console.time('spectral-profile');
 
     const spectralExtractor = new SpectralProfileWASM.SpectralProfile(self.frameSize, self.hopSize, 'median');
     // arrayToVector implementations differ between essentia.js and custom extractors
@@ -144,5 +146,6 @@ function getSpectralProfile (monoMix) {
 
     spectralInputVector.delete();
     spectralExtractor.shutdown();
+    console.timeEnd('spectral-profile');
     return spectralSummary;
 }
