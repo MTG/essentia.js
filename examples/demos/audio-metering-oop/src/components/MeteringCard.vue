@@ -2,35 +2,37 @@
 	<v-card :class="[`ma-${selectedAsRefCardElevation}`, selectedAsRef === 'selected' ? 'highlight-card' : '']" 
           :elevation="selectedAsRefCardElevation" max-width="500">
 		<v-toolbar flat dense>
-			<v-btn icon color="primary" variant="text">
-				<!-- <v-icon>mdi-tray-arrow-down</v-icon> -->
-			</v-btn>
+			<template v-slot:prepend>
+        <v-btn icon color="primary" variant="text">
+          <v-icon>mdi-tray-arrow-down</v-icon>
+        </v-btn>
+      </template>
 			<v-toolbar-title class="text-primary">{{ track.name }}</v-toolbar-title>
 			<v-spacer></v-spacer>
-      <v-tooltip location="bottom">
-        <template v-slot:activator="{ props }">
-          <v-btn-toggle
-            v-model="selectedAsRef"
-            @update:model-value="handleRefToggleChange"
-            color="primary"
-            rounded
-            group
-            v-bind="props"
-          >
-            <v-btn 
-            value="selected">
-              <v-icon :color="selectedAsRefBtnColor">mdi-compare-horizontal</v-icon>
-            </v-btn>
-          </v-btn-toggle>
-        </template>
-        <span>Use as reference track</span>
-      </v-tooltip>
+      <template v-slot:append>
+        <v-tooltip location="bottom">
+          <template v-slot:activator="{ props }">
+            <v-btn-toggle
+              v-model="selectedAsRef"
+              @update:model-value="handleRefToggleChange"
+              color="primary"
+              rounded
+              v-bind="props"
+            >
+              <v-btn value="selected">
+                <v-icon :color="selectedAsRefBtnColor">mdi-compare-horizontal</v-icon>
+              </v-btn>
+            </v-btn-toggle>
+          </template>
+          <span>Use as reference track</span>
+        </v-tooltip>
+      </template>
 		</v-toolbar>
 		<v-divider></v-divider>
 		<v-container fluid id="relative-container">
       <v-overlay
         :model-value="showOverlay"
-        absolute
+        contained
         scrim="#ffffff"
         opacity="0.6"
       ></v-overlay>
@@ -93,7 +95,7 @@ export default {
   watch: {
     selectedAsRef (newVal) {
       if (newVal === "selected") {
-        this.selectedAsRefBtnColor = 'primary';
+        this.selectedAsRefBtnColor = 'error';
         this.selectedAsRefCardElevation = "0";
       }
       if (newVal === undefined) {
