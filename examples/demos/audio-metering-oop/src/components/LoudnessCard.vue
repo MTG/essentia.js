@@ -36,6 +36,13 @@
 
 <script>
 import LoudnessChart from './LoudnessChart.vue';
+import { useColors } from '../../../common/useColors';
+const essentiaColors = useColors();
+
+// consider swapping this conversion pipeline for color2k: light, better documented and more succint
+import { darken, HexToRGB, RGBtoHex } from 'vuetify/lib/util/colorUtils.mjs';
+const rgbYellow = HexToRGB(essentiaColors.accentYellow.value)
+const rgbDarkenedAccentYellow = darken(rgbYellow, 2);
 
 const timestampFromFramePosition = (framePos, frameSize) => {
 	let time = framePos * 0.1 + frameSize*0.5; // loudness EBU default hopsize = 0.1
@@ -83,8 +90,16 @@ export default {
 	data () {
 		return {
 			chartData: getChartData(this.momentary, this.shortTerm),
-			refColors: {'momentary': '#E3E05B', 'short-term': '#E4454A', 'header': 'primary'},
-			stdColors: {'momentary': '#C4C24F', 'short-term': '#961E22', 'header': 'error'}
+			refColors: {
+				'momentary': essentiaColors.accentYellow.value, 
+				'short-term': essentiaColors.mainRedLight.value, 
+				'header': 'primary'
+			},
+			stdColors: {
+				'momentary': RGBtoHex(rgbDarkenedAccentYellow), 
+				'short-term': essentiaColors.mainRedDark.value, 
+				'header': 'error'
+			}
 		}
 	},
 	computed: {

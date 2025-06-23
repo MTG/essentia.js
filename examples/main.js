@@ -2,7 +2,8 @@ import "semantic-ui-css/semantic.min.css";
 import { createApp } from 'vue';
 import { createWebHistory, createRouter } from 'vue-router';
 
-import './demos/common/mic-toggle-button.js'
+import './demos/common/mic-toggle-button.js';
+import { useColors } from "./demos/common/useColors.js";
 
 import Chart from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels';
@@ -24,15 +25,17 @@ import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 
+const essentiaColors = useColors();
+
 const essentiajsTheme = {
   dark: false,
   colors: {
-    primary: '#E4454A',
+    primary: essentiaColors.mainRedLight.value,
     secondary: '#9E9E9E',
-    accent: '#E3E05B',
-    error: '#961E22',
-    info: '#2DA0E3',
-    success: '#44E36E'
+    accent: essentiaColors.accentYellow.value,
+    error: essentiaColors.mainRedDark.value,
+    info: essentiaColors.mainBlueDark.value,
+    success: essentiaColors.mainBlueLight.value
   }
 };
 
