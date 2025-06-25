@@ -41,7 +41,7 @@ export class RMSAnalyser {
   }
   
   async registerNode() {
-    registerEssentiaNode(this.ctx, processorUrl);
+    await registerEssentiaNode(this.ctx, processorUrl);
   }
 
   connectGraph(inputSource) {

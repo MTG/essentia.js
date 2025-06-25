@@ -351,15 +351,20 @@ function stopAudioProcessing() {
   console.log("Stopped recording ...");
 }
 
-onMounted( async () => {
+onMounted( () => {
   audioCtx = micButton.value.audio.ctx;
   rmsAnalyser = new RMSAnalyser(audioCtx, rmsText);
-  await rmsAnalyser.registerNode();
-  await registerEssentiaNode(audioCtx, melspectrogramProcessorURL);
-  rmsAnalyser.connectGraph(micButton.value);
-  connectGraph();
+  Promise.all([
+    rmsAnalyser.registerNode(), 
+    registerEssentiaNode(audioCtx, melspectrogramProcessorURL),
+    measureAnimationRate()
+  ])
+  .then( (_0, _1, animMeasure) => {
+    animRate = animMeasure;
+    rmsAnalyser.connectGraph(micButton.value);
+    connectGraph();
+  })
 
-  animRate = await measureAnimationRate();
   // console.log(`measured animation (aka display refresh) rate is: ${animRate} Hz`); 
   plot.init();
   axes.init();
