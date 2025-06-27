@@ -19,12 +19,6 @@
         <div class="item">
           <div class="header">Demo Apps</div>
           <div class="menu" id="demo-tabs-menu">
-            <RouterLink to="/demos/melspectrogram-rt" class="item">
-              Melspectrogram | <i>real-time</i>
-            </RouterLink>
-            <RouterLink to="/demos/pitchyinfft-rt" class="item">
-              Pitch Melodia | <i>real-time</i>
-            </RouterLink>
             <RouterLink to="/demos/onsets" class="item">
               Onset Detection
             </RouterLink>
@@ -32,16 +26,23 @@
               Music Autotagging | <i>real-time</i>
             </RouterLink>
             <RouterLink to="/demos/mood-classifiers" class="item">
-              Mood Classification plus Key & BPM
-            </RouterLink>
-            <RouterLink to="/demos/hpcp-chroma-rt" class="item">
-              HPCP Chroma | <i>real-time</i>
+              Mood Classification, Key & BPM
             </RouterLink>
             <RouterLink to="/demos/audio-metering" class="item">
               Audio Metering
             </RouterLink>
+            <RouterLink to="/demos/hpcp-chroma-rt" class="item">
+              HPCP Chroma | <i>real-time</i>
+            </RouterLink>
+            <RouterLink to="/demos/pitchyinfft-rt" class="item">
+              Pitch Melodia | <i>real-time</i>
+            </RouterLink>
+            <RouterLink to="/demos/melspectrogram-rt" class="item">
+              Melspectrogram | <i>real-time</i>
+            </RouterLink>
             <a href="https://essentia.upf.edu/essentiajs-discogs/" class="item" target="_blank">
-              Discogs Genre Autotagging (Real-time)
+              Discogs Genre Autotagging | <i>real-time</i>
+              <sup><i class="external alternate icon"></i></sup>
             </a>
           </div>
         </div>
@@ -95,52 +96,6 @@
 </template>
 
 <script setup>
-
-
-
-// async function handleTabLoad(path, params, historyEvent) {
-//   const currentUrl = location.href;
-//   // early return checks
-//   if (path.includes("glitch")) return;
-//   if (!currentUrl.includes("#")) return;
-//   console.log('checks cleared');
-
-//   // configure request path
-//   let correctedPath = path;
-//   // fix paths for demos with a build step
-//   if (path == "onsets") correctedPath = "onsets/public";
-//   if (path == "mood-classifiers") correctedPath = "mood-classifiers/dist";
-
-//   const hashlessUrl = currentUrl.split("#")[0];
-//   const reqUrl = new URL(`demos/${correctedPath}/index.html`, hashlessUrl);
-//   console.log('path configured', reqUrl);
-
-//   // retrieve index.html
-//   const resp = await fetch(reqUrl);
-//   const htmlText = await resp.text();
-//   console.log('request successfull', htmlText);
-
-//   const parser = new DOMParser();
-//   const doc = parser.parseFromString(htmlText, "text/html");
-
-//   console.log($(`.tab.segment[data-tab="${path}"]`))
-//   $(`.tab.segment[data-tab="${path}"]`).empty().append(doc.body.innerHTML);
-//   // are associated resources loaded with html (js, css, etc)?
-//     // may have to load whole demo into iframe
-//   console.log('handleTabLoad done!');
-// }
-
-// $(document).ready(function () {
-//   $('.tabular .menu .item').tab({
-//     auto: false,
-//     history: true,
-//     historyType: 'hash',
-//     // context: "parent",
-//     cache: false, // temporary?
-//     onLoad: handleTabLoad,
-//     evaluateScripts: 'once'
-//   });
-// })
 </script>
 
 <style scoped>
@@ -148,6 +103,10 @@
   #tabular-card-menu, #tab-view-container {
     flex-grow: 1; /* Allows the main content to grow and push the footer down if necessary */
     /* flex: 1; */
+  }
+
+  #demo-tabs-menu .item {
+    line-height: 1.25;
   }
 
   h1 {
