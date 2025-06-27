@@ -3,7 +3,7 @@
     <!-- using placeholder GIFs -->
     <InstructionsModal :img-link="instructionsGifs"
                         @closed="instructionsClosed=true">
-      <template #header>Audio slicer fun!</template>
+      <template #header>Slice audio at onsets</template>
       <template #lead>Create weighted combinations of multiple onset detection functions for different audio segmentation results.</template>
       <template #dismiss>Got it!</template>
     </InstructionsModal>

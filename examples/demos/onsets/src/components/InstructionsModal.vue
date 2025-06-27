@@ -33,7 +33,6 @@
             <div class="d-block text-center">
                 <BButton variant="primary" href="#" @click="closeModal">
                     <slot name="dismiss"></slot>
-                    Hello world
                 </BButton>
             </div>
         </template>
