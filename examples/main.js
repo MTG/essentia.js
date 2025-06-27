@@ -18,6 +18,11 @@ import PitchYinFFT from "./demos/pitchyinfft-rt/PitchYinFFT.vue";
 import OnsetsMain from "./demos/onsets/src/OnsetsMain.vue";
 import AudioMetering from "./demos/audio-metering-oop/src/AudioMetering.vue";
 
+import GlitchMelspectrogram from "./snippet-components/GlitchMelspectrogram.vue";
+import GlitchPitch from "./snippet-components/GlitchPitch.vue";
+import GlitchChroma from "./snippet-components/GlitchChroma.vue";
+import GlitchAutotagging from "./snippet-components/GlitchAutotagging.vue";
+
 import 'vuetify/styles';
 import { createVuetify } from 'vuetify';
 import '@mdi/font/css/materialdesignicons.css';
@@ -48,7 +53,11 @@ const routes = [
   { path: '/demos/hpcp-chroma-rt', component: HPCPChroma},
   { path: '/demos/pitchyinfft-rt', component: PitchYinFFT},
   { path: '/demos/onsets', component: OnsetsMain},
-  { path: '/demos/audio-metering', component: AudioMetering }
+  { path: '/demos/audio-metering', component: AudioMetering },
+  { path: '/snippets/glitch-melspectrogram', component: GlitchMelspectrogram },
+  { path: '/snippets/glitch-pitch', component: GlitchPitch },
+  { path: '/snippets/glitch-chroma', component: GlitchChroma },
+  { path: '/snippets/glitch-autotagging', component: GlitchAutotagging }
 ];
 
 const router = createRouter({

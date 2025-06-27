@@ -14,7 +14,7 @@
 
   <div class="ui divider" style="height: 0.1rem; width: 1px"></div>
   <main class="ui grid" id="tabular-card-menu">
-    <div class="two wide column">
+    <div class="three wide column">
       <div class="ui vertical tabular menu">
         <div class="item">
           <div class="header">Demo Apps</div>
@@ -49,23 +49,23 @@
         <div class="item">
           <div class="header">Code Snippets</div>
           <div class="menu" id="code-tabs-menu">
-            <a data-tab="glitch-melspectrogram" class="item">
+            <RouterLink to="/snippets/glitch-melspectrogram" class="item">
               Melspectrogram
-            </a>
-            <a data-tab="glitch-pitch-melodia" class="item">
+            </RouterLink>
+            <RouterLink to="/snippets/glitch-pitch" class="item">
               Pitch Melodia 
-            </a>
-            <a data-tab="glitch-hpcp-chroma" class="item">
+            </RouterLink>
+            <RouterLink to="/snippets/glitch-chroma" class="item">
               HPCP Chroma
-            </a>
-            <a data-tab="glitch-autotagging" class="item">
+            </RouterLink>
+            <RouterLink to="/snippets/glitch-autotagging" class="item">
               Music Autotagging 
-            </a>
+            </RouterLink>
           </div>
         </div>
       </div>
     </div>
-    <div class="fourteen wide stretched column" id="tab-view-container">
+    <div class="thirteen wide column" id="tab-view-container">
       <RouterView/>
       
       <div class="ui tab segment" data-tab="glitch-melspectrogram">
@@ -102,11 +102,10 @@
   
   #tabular-card-menu, #tab-view-container {
     flex-grow: 1; /* Allows the main content to grow and push the footer down if necessary */
-    /* flex: 1; */
   }
 
   #demo-tabs-menu .item {
-    line-height: 1.25;
+    line-height: 1.3;
   }
 
   h1 {
