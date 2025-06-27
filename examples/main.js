@@ -47,14 +47,15 @@ const essentiajsTheme = {
 import { createBootstrap } from 'bootstrap-vue-next';
 
 const routes = [
+  { path: '/', redirect: '/demos/'},
   { path: '/demos/melspectrogram-rt', component: MelSpectrogram },
-  { path: '/demos/mood-classifiers', component: MoodClassifiers },
+  { path: '/demos/mood-classifiers', component: MoodClassifiers, alias: '/demos/' },
   { path: '/demos/autotagging-rt', component: AutoTagging},
   { path: '/demos/hpcp-chroma-rt', component: HPCPChroma},
   { path: '/demos/pitchyinfft-rt', component: PitchYinFFT},
   { path: '/demos/onsets', component: OnsetsMain},
   { path: '/demos/audio-metering', component: AudioMetering },
-  { path: '/snippets/glitch-melspectrogram', component: GlitchMelspectrogram },
+  { path: '/snippets/glitch-melspectrogram', component: GlitchMelspectrogram, alias: '/snippets/' },
   { path: '/snippets/glitch-pitch', component: GlitchPitch },
   { path: '/snippets/glitch-chroma', component: GlitchChroma },
   { path: '/snippets/glitch-autotagging', component: GlitchAutotagging }
