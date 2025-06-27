@@ -1,8 +1,15 @@
 <template>
-  <div class="ui container">
-    <explanation-modal title="Before you start..." main-text="Note that the autotagging model used in this demo was trained on clean digital audio files. As such, it is not designed to work with potentially noisy microphone capture of playback through speakers. You can use a virtual microphone to achieve the best results." button-text="Dismiss">
-    </explanation-modal>
-    <div class="wrapper">
+  <div class="ui container" style="position: relative;">
+    <div class="wrapper" id="at-wrapper">
+      <div class="ui mini modal" :class="{active: modalIsActive}" id="autotagging-modal">
+        <div class="ui header">Info</div>
+        <div class="content">
+          <p>The autotagging model used in this demo was trained on clean digital audio files. As such, it is not designed to work with potentially noisy microphone capture of playback through speakers. You can use a virtual microphone to achieve the best results.</p>
+        </div>
+        <div class="actions">
+          <div class="ui ok button" @click="modalIsActive = false">Dismiss</div>
+        </div>
+      </div>
       <header>
         <div id="controls">
           <mic-toggle-button 
@@ -12,7 +19,7 @@
             :disabled="buttonDisabled"
           >{{ buttonText }}</mic-toggle-button>
           <div id="info">
-            <svg id="infoIcon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" viewBox="0 0 16 16" preserveAspectRatio="xMidYMid meet">
+            <svg id="infoIcon" @click="modalIsActive = true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" viewBox="0 0 16 16" preserveAspectRatio="xMidYMid meet">
               <g><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.496 6.033h.825c.138 0 .248-.113.266-.25c.09-.656.54-1.134 1.342-1.134c.686 0 1.314.343 1.314 1.168c0 .635-.374.927-.965 1.371c-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486c.609-.463 1.244-.977 1.244-2.056c0-1.511-1.276-2.241-2.673-2.241c-1.267 0-2.655.59-2.75 2.286a.237.237 0 0 0 .241.247zm2.325 6.443c.61 0 1.029-.394 1.029-.927c0-.552-.42-.94-1.029-.94c-.584 0-1.009.388-1.009.94c0 .533.425.927 1.01.927z"/></g>
             </svg>
             <div id="infoText">Music autotagging will help you categorize music automatically. Play a song and click 'Start Autotagging' to see what music genre it is!</div>
@@ -37,10 +44,7 @@
 
 <script setup>
 import { createTagVisualisers, PredictionStore } from "/demos/autotagging-rt/src/utils.js";
-import './explanation-modal'
-// import './mic-toggle-button'
 import './tagviz-component'
-import { URLFromFiles } from '../../common/util';
 import { onMounted, ref, computed } from "vue";
 
 const audioCtxOptions = {
@@ -50,9 +54,11 @@ const audioCtxOptions = {
 const isRecording = ref(false);
 const buttonDisabled = ref(false);
 const buttonText = computed( () => {
-  if (isRecording) return "Stop";
+  if (isRecording.value) return "Stop";
   return "Start"
 })
+
+const modalIsActive = ref(false);
 
 // audio globals
 let gumStream;
@@ -212,12 +218,8 @@ function activateTagVisualizers(predictions) {
   }
 }
 
-function resetTagVisualizers() {
-  // let grid = document.querySelector('#matrix');
-  // grid.classList.toggle('overlay');
-  for (elem of document.querySelectorAll('music-tag-viz')) {
-    elem.reset();
-  }
+function handleDismissModal() {
+  modalIsActive.value = !modalIsActive.value;
 }
 
 
@@ -235,6 +237,11 @@ function main() {
 
 onMounted( () => {
   main();
+  // $('.ui.modal').modal('show',{
+  //   context: "#at-wrapper",
+  //   centered: true,
+  //   detachable: false
+  // });
 })
 </script>
 
@@ -400,5 +407,12 @@ sup svg {
 span.highlight {
   /* color: #5DC1B9; */
   color: var(--main-red-light);
+}
+
+#autotagging-modal {
+  height: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>
