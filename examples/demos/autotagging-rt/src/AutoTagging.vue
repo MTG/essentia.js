@@ -1,5 +1,4 @@
 <template>
-  <div class="ui container" style="position: relative;">
     <div class="wrapper" id="at-wrapper">
       <div class="ui mini modal" :class="{active: modalIsActive}" id="autotagging-modal">
         <div class="ui header">Info</div>
@@ -39,7 +38,6 @@
       </header>
       <div id="matrix"></div>
     </div>
-  </div>
 </template>
 
 <script setup>
