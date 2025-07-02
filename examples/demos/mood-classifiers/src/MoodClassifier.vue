@@ -37,7 +37,11 @@
     <div id="results">
       <div v-for="(classifier, key) in classifiers" :key="key" class="results-row">
         <span class="icon-span">{{ classifier.icon }}</span>
-        <div class="classifier-meter" :data-classifier="classifier.label" :style="{'--meter-width': predictions[key]*100}"></div>
+        <div class="classifier-meter" 
+             :data-classifier="classifier.label" 
+             :style="{'--meter-width': predictions[key]*100}" 
+             :class="{'filled': predictions[key] != null}"
+        ></div>
       </div>
       <div id="bpm-and-key">
         <div id="bpm" class="results-row">
@@ -159,15 +163,6 @@ a#essentia-header-link:active {
 
 /* RESULTS AREA */
 
-#results {
-    /* height: 100%;
-    max-width: 80%;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly; */
-}
-
 .controls {
     display: flex;
     flex-direction: row;
@@ -192,17 +187,12 @@ a#essentia-header-link:active {
 
 .results-row {
     display: flex;
-    /* align-items: center; */
-    /* justify-content: flex-start; */
 }
 
 #bpm-and-key {
-    /* margin-top: 1.8rem; */
     height: 1.8rem;
     display: flex;
     justify-content: end;
-    /* display: grid; */
-    /* grid-template-columns: 1fr 1fr; */
 }
 
 span {
@@ -234,6 +224,11 @@ span {
 
     border: 1px solid var(--footer-header-dark-blue);
     border-radius: .1rem;
+
+    color: black;
+    &.filled {
+      color: white;
+    }
 }
   
 .classifier-meter, #bpm-and-key {
@@ -248,18 +243,17 @@ span {
 
     background-color: var(--main-red-dark);
     width: calc(var(--meter-width, 0) * 1%);
-    max-width: calc(100% - 0.3rem);
-    min-width: 0;
-    height: 1.4rem;
+    max-width: calc(100% - 0.4rem);
+
+    height: calc(100% - 0.4rem);
     position: absolute;
     left: .2rem;
-    top: calc(.2rem - 1px);
+    top: .2rem;
 
     padding-left: .2rem;
 
     content: attr(data-classifier);
     text-align: center;
     font-size: 1rem;
-    color: white;
 }
 </style>
