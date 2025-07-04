@@ -216,11 +216,6 @@ function activateTagVisualizers(predictions) {
   }
 }
 
-function handleDismissModal() {
-  modalIsActive.value = !modalIsActive.value;
-}
-
-
 function main() {
   createTagVisualisers();
   
@@ -235,11 +230,6 @@ function main() {
 
 onMounted( () => {
   main();
-  // $('.ui.modal').modal('show',{
-  //   context: "#at-wrapper",
-  //   centered: true,
-  //   detachable: false
-  // });
 })
 </script>
 
@@ -407,10 +397,4 @@ span.highlight {
   color: var(--main-red-light);
 }
 
-#autotagging-modal {
-  height: auto;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
 </style>
