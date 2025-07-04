@@ -4,7 +4,7 @@
       <div class="ui container">
           <button
             id="record-button"
-            class="ui inverted big button record-button"
+            class="ui inverted big button"
             :class="{recording: isRecording}"
             :disabled="buttonDisabled"
             @click="handleButtonClick"

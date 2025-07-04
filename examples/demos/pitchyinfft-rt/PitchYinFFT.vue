@@ -1,22 +1,23 @@
 <template>
   <div class="ui container">
     <div class="ui padded grid centered">
-      <div class="one column centered row">
-      <button 
-        id="pitchfft-record-button" 
-        class="ui red basic big button" 
-        role="switch"
-        :class="{recording: isRecording}"
-        :disabled="buttonDisabled"
-        @click="onRecordClickHandler">
+      <div class="ui container">
+        <button
+          id="record-button"
+          class="ui inverted big button" 
+          role="switch"
+          :class="{recording: isRecording}"
+          :disabled="buttonDisabled"
+          @click="onRecordClickHandler"
+        >
           {{ buttonText }} &nbsp;&nbsp;
           <i class="microphone icon"></i>
         </button>
       </div>
       <canvas
-      ref="pitchfft-axes-div"
-      class="ui centered"
-      style="width: 800px; height: 388px;"
+        ref="pitchfft-axes-div"
+        class="ui centered"
+        style="width: 800px; height: 388px;"
       ></canvas>
     </div>
   </div>
@@ -58,11 +59,6 @@ onMounted( () => {
     "options": OPTIONS
   });
 })
-
-// Utils:
-function arraySum(total, num) {
-  return total + num;
-}
 
 function resetChartData() {
   rmsPointer.value = RMS_ARRAY;
@@ -154,12 +150,8 @@ function setupAudioGraph() {
   requestAnimationFrame(animatePitch); // start plot animation
 }
 
-let animationStart = 0;
-let elapsed;
 // draw melspectrogram frames
-function animatePitch(timestamp) {
-  // if (animationStart === undefined)
-  
+function animatePitch() {
   animationId = requestAnimationFrame(animatePitch);
   
   analyserNode.getFloatTimeDomainData(pitchBuffer);
@@ -220,5 +212,8 @@ function stopMicRecordStream() {
 </script>
 
 <style scoped>
-
+#record-button {
+  background-color: var(--main-red-light);
+  margin-bottom: 1rem;
+}
 </style>

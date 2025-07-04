@@ -16,7 +16,7 @@
             <i class="backward icon"></i>
             Backward
           </button>
-          <button @click="controls.togglePlayPause" :disabled="!controlsEnabled" class="ui primary labeled icon button">
+          <button @click="controls.togglePlayPause" :disabled="!controlsEnabled" class="ui bg-primary labeled icon button">
             <i class="icon" :class="{play: !isPlaying, pause: isPlaying}"></i>
             {{ isPlaying ? 'Pause' : 'Play' }}
           </button>
