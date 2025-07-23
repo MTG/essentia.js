@@ -6,6 +6,7 @@ import { BootstrapVueNextResolver } from 'bootstrap-vue-next'
 import Icons from 'unplugin-icons/vite'
 import IconsResolve from 'unplugin-icons/resolver'
 import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
+import { basePath } from './config.js';
 
 const customElementNames = ["mic-toggle-button"];
 
@@ -39,7 +40,7 @@ export default defineConfig({
     })
   ],
   root: './',
-  base: '/',
+  base: basePath,
   publicDir: '../public',
   // assetsInclude: ["**/*.wasm"]
 })

@@ -1,6 +1,7 @@
 import "semantic-ui-css/semantic.min.css";
 import { createApp } from 'vue';
 import { createWebHistory, createRouter } from 'vue-router';
+import { basePath } from './config.js';
 
 import './demos/common/mic-toggle-button.js';
 import { useColors } from "./demos/common/useColors.js";
@@ -62,7 +63,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(basePath),
   routes,
   linkActiveClass: "active"
 });
