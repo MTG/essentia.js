@@ -1,0 +1,57 @@
+name: Deploy Demos on GH Pages
+
+on:
+  push:
+    branches:
+      - demos-redesign
+
+
+# Sets the GITHUB_TOKEN permissions to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  # Single deploy job since we're just deploying
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy_to_pages.outputs.github_pages_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.3
+          cache: 'npm'
+      # should happen inside /examples
+      - name: Change directory to examples
+        run: cd examples
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      # - name: Setup Pages
+      #   uses: actions/configure-pages@v5
+      - name: Upload Artifacts 🔺 # The project is then uploaded as an artifact named 'site'.
+        uses: actions/upload-artifact@v1
+        with:
+          name: built-demos
+          path: ./dist
+      - name: Download Artifacts 🔻 # The built project is downloaded into the 'site' folder.
+        uses: actions/download-artifact@v1
+        with:
+          name: built-demos
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: "built-demos" # The folder the action should deploy.
+          target_folder: "examples"
