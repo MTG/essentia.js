@@ -142,7 +142,7 @@ function stopMicRecordStream() {
   });
 }
 
-// ScriptNodeProcessor callback function to extract pitchyin feature using essentia.js and plotting it on the front-end
+// ScriptNodeProcessor callback function to extract hpcp feature using essentia.js and plotting it on the front-end
 function onRecordEssentiaFeatureExtractor(event) {
 
   let audioBuffer = event.inputBuffer.getChannelData(0);

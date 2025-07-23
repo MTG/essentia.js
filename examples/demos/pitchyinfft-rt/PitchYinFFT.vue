@@ -26,6 +26,7 @@
 <script setup>
 import { onMounted, useTemplateRef, ref, computed } from 'vue';
 import { URLFromFiles } from '../common/util';
+import pitchProcessorURL from './pitchyinfft-processor.js?url';
 
 import Chart from 'chart.js';
 import { DATA, OPTIONS, NUM_ANALYSIS_FRAMES, AXES_PITCHES, RMS_ARRAY, rmsPointer, getTimeLabels } from "./resources/chartConfig.js";
@@ -109,7 +110,7 @@ function startAudioProcessing(stream) {
     
     let codeForProcessorModule = ["https://cdn.jsdelivr.net/npm/essentia.js@0.1.3/dist/essentia-wasm.umd.js", 
     "https://cdn.jsdelivr.net/npm/essentia.js@0.1.3/dist/essentia.js-core.umd.js", 
-    "/demos/pitchyinfft-rt/pitchyinfft-processor.js"];
+    pitchProcessorURL];
     
     // inject Essentia.js code into AudioWorkletGlobalScope context, then setup audio graph and start animation
     URLFromFiles(codeForProcessorModule)

@@ -1,8 +1,5 @@
-import { EssentiaWASM } from "./lib/essentia-wasm.module.js";
-import { EssentiaTFInputExtractor}  from "./lib/essentia.js-model.es.js";
+import { EssentiaWASM, EssentiaModel, Essentia } from "essentia.js"
 import { RingBuffer } from "./lib/wasm-audio-helper.js";
-
-// const EssentiaWASM = Module;
 
 class PatchHop {
     constructor(patchSize, ratio) {
@@ -40,8 +37,8 @@ class FeatureExtractProcessor extends AudioWorkletProcessor {
         this._hopSize = 256;
         this._channelCount = 1;
         this._patchHop = new PatchHop(187, 1/3); // if patchSize at 16kHz and 256 hopSize corresponds to about 3s of audio, this would jump by 1s
-        this._extractor = new EssentiaTFInputExtractor(EssentiaWASM, 'musicnn');
-        this.essentia = new EssentiaWASM.EssentiaJS(false);
+        this._extractor = new EssentiaModel.EssentiaTFInputExtractor(EssentiaWASM.EssentiaWASM, 'musicnn');
+        this.essentia = new Essentia(EssentiaWASM.EssentiaWASM, false);
         this._features = {
             melSpectrum: getZeroMatrix(187, 96), // init melSpectrum 187x96 matrix with zeros
             frameSize: 187, // new EssentiaModels API calls this `frameSize`: i.e. how many frames in this batch (in this case always a full patch, 187 frames)

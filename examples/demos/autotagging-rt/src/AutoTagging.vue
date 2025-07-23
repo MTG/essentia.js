@@ -41,9 +41,12 @@
 </template>
 
 <script setup>
-import { createTagVisualisers, PredictionStore } from "/demos/autotagging-rt/src/utils.js";
-import './tagviz-component'
+import { createTagVisualisers, PredictionStore } from "./utils.js";
+import './tagviz-component.js';
 import { onMounted, ref, computed } from "vue";
+
+import featureExtractProcessorURL from './feature-extract-processor.js?url';
+import inferenceWorkerURL from './inference-worker.js?url';
 
 const audioCtxOptions = {
   sampleRate: 16000
@@ -73,10 +76,7 @@ let predictionStore = new PredictionStore;
 async function createAudioProcessor(audioContext) {
   try {
     await audioContext.resume();
-    // let url = await URLFromFile("./src/feature-extract-processor.js");
-    // let url = './build/processor.js';
-    let url = '/demos/autotagging-rt/src/feature-extract-processor.js';
-    await audioContext.audioWorklet.addModule(url);
+    await audioContext.audioWorklet.addModule(featureExtractProcessorURL);
   } catch(e) {
     console.log('There was an error loading the worklet processor:\n', e);
     return null;
@@ -86,7 +86,7 @@ async function createAudioProcessor(audioContext) {
 }
 
 function createInferenceWorker() {
-  inferenceWorker = new Worker('/demos/autotagging-rt/src/inference-worker.js');
+  inferenceWorker = new Worker(inferenceWorkerURL, {type: 'module'});
   inferenceWorker.onmessage = function listenToWorker(msg) {
     if (msg.data.port) {
       // listen out for port transfer

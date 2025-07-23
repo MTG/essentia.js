@@ -1,5 +1,5 @@
-importScripts('/demos/autotagging-rt/src/lib/tf.min.3.5.0.js');
-importScripts('/demos/autotagging-rt/src/lib/essentia.js-model.js');
+import * as tf from '@tensorflow/tfjs'
+import { EssentiaModel } from 'essentia.js'
 
 const modelURL = '../data/msd-musicnn-1/model.json';
 let model = new EssentiaModel.TensorflowMusiCNN(tf, modelURL);
@@ -25,10 +25,6 @@ async function modelPredict(features) {
         predictions = predictions[0]; // model.predict returns a [Array(50)]
         let taggedPredictions = {};
         predictions.map( (p, i) => { taggedPredictions[msdTags[i]] = p; return 0} );
-        // get top 3 labels
-        predictions.sort();
-        let topPredictions = predictions.slice(-5);
-        let taggedTopPredictions = msdTags.filter(label => topPredictions.includes(taggedPredictions[label]))
         // output to main thread
         outputPredictions(taggedPredictions);
     }
