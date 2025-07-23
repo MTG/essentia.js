@@ -24,6 +24,9 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy_to_pages.outputs.github_pages_url }}
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: /examples
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,9 +36,6 @@ jobs:
           node-version: 20.19.3
           cache: 'npm'
           cache-dependency-path: examples/package-lock.json
-      # should happen inside /examples
-      - name: Change directory to examples
-        run: cd examples
       - name: Install dependencies
         run: npm ci
       - name: Build
@@ -46,7 +46,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: built-demos
-          path: ./dist
+          path: /examples/dist
       - name: Download Artifacts 🔻 # The built project is downloaded into the 'site' folder.
         uses: actions/download-artifact@v4
         with:
