@@ -7,4 +7,5 @@ builds/
 dist/
 coverage/
 package-lock.json
+!examples/package-lock.json
 cypress
