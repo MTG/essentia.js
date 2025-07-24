@@ -51,10 +51,11 @@ jobs:
           path: ./examples/dist/
       - name: Download Artifacts 🔻 # The built project is downloaded into the 'site' folder.
         uses: actions/download-artifact@v4
+        id: artifact-download
         with:
           name: built-demos
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: "built-demos" # The folder the action should deploy.
-          target_folder: "examples"
+          folder: ${{ steps.artifact-download.outputs.download-path }} # The folder the action should deploy.
+          target-folder: "examples"
