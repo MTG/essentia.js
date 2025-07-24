@@ -43,7 +43,7 @@ import EventBus from '../core/event-bus';
 import AudioDisplay from './AudioDisplay.vue';
 import FreesoundResultList from './FreesoundResultList.vue';
 import freesound from 'freesound';
-import apiKey from '../.env/key';
+const apiKey = import.meta.env.VITE_FREESOUND_API_KEY;  
 
 export default {
     components: { AudioDisplay, FreesoundResultList },

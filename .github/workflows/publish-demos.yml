@@ -40,6 +40,8 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+        env:
+          VITE_FREESOUND_API_KEY: ${{ secrets.FREESOUND_API_KEY }}
       # - name: Setup Pages
       #   uses: actions/configure-pages@v5
       - name: Upload Artifacts 🔺 # The project is then uploaded as an artifact named 'site'.
