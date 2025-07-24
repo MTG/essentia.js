@@ -1,0 +1,24 @@
+/* footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+} */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  /* min-height: 100vh; */
+}
+
+button.ui.button.primary {
+  background-color: var(--main-blue-dark);
+}
+
+header,footer {
+  flex-shrink: 0;
+  flex-grow: 0;
+}

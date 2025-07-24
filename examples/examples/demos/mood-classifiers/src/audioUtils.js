@@ -1,0 +1,123 @@
+const onnxBackend = 'wasm';
+
+function preprocess (audioBuffer) {
+    if (audioBuffer instanceof AudioBuffer) {
+        const mono = monomix(audioBuffer);
+        // downmix to mono, and downsample to 16kHz sr for essentia tensorflow models
+        return downsampleArray(mono, audioBuffer.sampleRate, 16000);
+    } else {
+        throw new TypeError("Input to audio preprocessing is not of type AudioBuffer");
+    }
+}
+
+function monomix(buffer) {
+    // downmix to mono
+    let monoAudio;
+    if (buffer.numberOfChannels > 1) {
+        console.log('mixing down to mono...');
+        const leftCh = buffer.getChannelData(0);
+        const rightCh = buffer.getChannelData(1);
+        monoAudio = leftCh.map( (sample, i) => 0.5 * (sample + rightCh[i]) );
+    } else {
+        monoAudio = buffer.getChannelData(0);
+    }
+
+    return monoAudio;
+}
+
+function downsampleArray(audioIn, sampleRateIn, sampleRateOut) {
+    if (sampleRateOut === sampleRateIn) {
+      return audioIn;
+    }
+    let sampleRateRatio = sampleRateIn / sampleRateOut;
+    let newLength = Math.round(audioIn.length / sampleRateRatio);
+    let result = new Float32Array(newLength);
+    let offsetResult = 0;
+    let offsetAudioIn = 0;
+
+    console.log(`Downsampling to ${sampleRateOut} kHz...`);
+    while (offsetResult < result.length) {
+        let nextOffsetAudioIn = Math.round((offsetResult + 1) * sampleRateRatio);
+        let accum = 0,
+            count = 0;
+        for (let i = offsetAudioIn; i < nextOffsetAudioIn && i < audioIn.length; i++) {
+            accum += audioIn[i];
+            count++;
+        }
+        result[offsetResult] = accum / count;
+        offsetResult++;
+        offsetAudioIn = nextOffsetAudioIn;
+    }
+
+    return result;
+}
+
+function downsample(audioBuffer, sourceSR, targetSR) {
+    const offlineCtx = new OfflineAudioContext(audioBuffer.numberOfChannels,
+        audioBuffer.duration * targetSR,
+        targetSR);
+
+    // Play it from the beginning.
+    const offlineSource = offlineCtx.createBufferSource();
+    offlineSource.buffer = audioBuffer;
+    offlineSource.connect(offlineCtx.destination);
+    offlineSource.start();
+    offlineCtx.startRendering().then((resampled) => {
+    // `resampled` contains an AudioBuffer resampled at 16000Hz.
+    // use resampled.getChannelData(x) to get an Float32Array for channel x.
+    })
+}
+
+
+function shortenAudio (audioIn, keepRatio=0.5, trim=false) {
+    /* 
+        keepRatio applied after discarding start and end (if trim == true)
+    */
+    // if (keepRatio < 0.15) {
+    //     keepRatio = 0.15 // must keep at least 15% of the file
+    // }
+
+    if (trim) {
+        const discardSamples = Math.floor(0.1 * audioIn.length); // discard 10% on beginning and end
+        audioIn = audioIn.subarray(discardSamples, audioIn.length - discardSamples); // create new view of buffer without beginning and end
+    }
+
+    const ratioSampleLength = Math.ceil(audioIn.length * keepRatio);
+    // TODO: patchSize is now different between Effnet and MusiCNN!! shouldn't be hardcoded
+    const patchSampleLength = 128 * 256; // cut into patchSize chunks so there's no weird jumps in audio
+    const numPatchesToKeep = Math.ceil(ratioSampleLength / patchSampleLength);
+
+    // space patchesToKeep evenly
+    const skipSize = Math.floor( (audioIn.length - ratioSampleLength) / (numPatchesToKeep - 1) );
+
+    let audioOut = [];
+    let startIndex = 0;
+    for (let i = 0; i < numPatchesToKeep; i++) {
+        let endIndex = startIndex + patchSampleLength;
+        let chunk = audioIn.slice(startIndex, endIndex);
+        audioOut.push(...chunk);
+        startIndex = endIndex + skipSize; // discard even space
+    }
+
+    return Float32Array.from(audioOut);
+}
+
+// function to enable testing and cross-debugging 
+async function mainThreadEmomusic(audio) {
+    const ort = await import('onnxruntime-web');
+    const musicnnUrl = await import('../models/msd-musicnn-1.onnx?url');
+    const HeadModelORT = await import('./HeadModel');
+    const EffnetMusicnnEmbeddings = await import('./EffnetEmbeddings.js');
+
+    const musicnnModel = new EffnetMusicnnEmbeddings(ort, musicnnUrl, 187);
+    const emomusicModel = HeadModelORT.create("emomusic", ort);
+    await musicnnModel.initialize();
+    await emomusicModel.initialize();
+    const melspectrogram = EffnetMusicnnEmbeddings.computeSpectrogram(audio)
+    const musicnnEmbeddings = await musicnnModel.predict(melspectrogram);
+    console.log({musicnnEmbeddings})
+    const emomusicPredictions = await emomusicModel.predict(musicnnEmbeddings);
+    console.log(emomusicPredictions);
+}
+
+export { preprocess, shortenAudio, mainThreadEmomusic, onnxBackend};

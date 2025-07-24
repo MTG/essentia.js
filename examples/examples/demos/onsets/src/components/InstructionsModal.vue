@@ -1,0 +1,61 @@
+<template>
+    <BModal v-model="showModal" title="Instructions" @close="closeModal" @hide="closeModal">
+        <div class="d-block text-center">
+            <h1>
+                <slot name="header"></slot>
+            </h1>  
+            <p class="my-4">
+                <slot name="lead"></slot>
+            </p>
+        </div>
+
+        <div id="instructions-carousel" class="p-3">
+            <BCarousel
+                fade
+                :interval="interval"
+                controls
+                indicators
+                background="#ababab"
+                label-next=""
+                label-prev=""
+                img-height="300"
+                ref="instructionsCarousel"
+            >
+                <BCarouselSlide v-for="(link, index) in this.imgLink"
+                :key="index"
+                :img-src="link"
+                :caption="`${index+=1}.`"
+                ></BCarouselSlide>
+            </BCarousel>
+        </div>
+
+        <template v-slot:footer>
+            <div class="d-block text-center">
+                <BButton variant="primary" href="#" @click="closeModal">
+                    <slot name="dismiss"></slot>
+                </BButton>
+            </div>
+        </template>
+
+    </BModal>
+</template>
+
+<script>
+
+export default {
+    props: ['img-link'],
+    data () {
+        return {
+            showModal: true,
+            interval: 0
+        };
+    },
+    methods: {
+        closeModal () {
+            this.showModal = false;
+            this.$emit('closed');
+        }   
+    }
+}
+
+</script>

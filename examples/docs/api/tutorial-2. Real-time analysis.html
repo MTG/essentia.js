@@ -1,0 +1,342 @@
+<!-- start:readme.hbs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+		<title>2. Real-time analysis</title>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: black;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: black;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: black;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: black;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":false,"dateFormat":"Do MMM YYYY","systemName":"Essentia.js","systemSummary":"JavaScript library for Music/Audio analysis, powered by Essentia WebAssembly backend.","systemLogo":"","systemColor":"black","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"https://essentia.upf.edu","copyright":"Copyright (C) 2006-2021  Music Technology Group - Universitat Pompeu Fabra","linenums":true,"collapseSymbols":true,"inverseNav":true,"inlineNav":false,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":false,"favicon":null,"stylesheets":[],"scripts":[],"monospaceLinks":false,"cleverLinks":true};
+			window.DOCLET_TOC_ENABLED = true;
+			window.DOCLET_AFILTER_ENABLED = false;
+		</script>
+</head>
+<body>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="index.html">
+					Essentia.js
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+								
+								<li class="dropdown">
+									<a href="list_class.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+									<ul class="dropdown-menu">
+											<li><a href="Essentia.html">Essentia</a></li>
+											<li><a href="EssentiaTensorflowJSModel.html">EssentiaTensorflowJSModel</a></li>
+											<li><a href="EssentiaTFInputExtractor.html">EssentiaTFInputExtractor</a></li>
+											<li><a href="TensorflowMusiCNN.html">TensorflowMusiCNN</a></li>
+											<li><a href="TensorflowVGGish.html">TensorflowVGGish</a></li>
+											<li><a href="EssentiaExtractor.html">EssentiaExtractor</a></li>
+                                            <li><a href="EssentiaPlot.html">EssentiaPlot</a></li>
+											<li><a href="PlotHeatmap.html">PlotHeatmap</a></li>
+											<li><a href="PlotMelodyContour.html">PlotMelodyContour</a></li>
+									</ul>
+								</li>
+								<li class="dropdown">
+									<a href="list_tutorial.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
+									<ul class="dropdown-menu">
+											<li><a href="tutorial-1. Getting started.html">1. Getting started</a></li>
+											<li><a href="tutorial-2. Real-time analysis.html">2. Real-time analysis</a></li>
+											<li><a href="tutorial-3. Machine learning inference with Essentia.js.html">3. Machine learning inference with Essentia.js</a></li>
+											<li><a href="tutorial-4. Building from source.html">4. Building from source</a></li>
+									</ul>
+								</li>
+				</ul>
+			</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">tutorial</span>
+				<h1><span class="title">2. Real-time analysis</span></h1>
+			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-9 main-content">
+						<ol class="breadcrumb">
+							<li><a href="index.html">Home</a></li>
+							<li><a href="list_tutorial.html">Tutorials</a></li>
+							<li class="active">2. Real-time analysis</li>
+						</ol>
+		<section class="tutorial-section">
+			<article><h1>Realtime audio analysis</h1>
+<h2>Using the Web Audio API with <a href="https://developer.mozilla.org/en-US/docs/Web/API/ScriptProcessorNode">ScriptProcessorNode</a>.</h2>
+<p>One way to use <code>essentia.js</code> in real-time is using the deprecated, but still widely supported, <code>ScriptProcessorNode</code> interface of the Web Audio API. The following is a basic snippet showing how.</p>
+<ol>
+<li>First we define the global variables needed for audio, as well as for UI (in this case, a simple button and a <code>&lt;div&gt;</code> to show results).</li>
+</ol>
+<pre class="prettyprint source lang-javascript"><code>// global var to load essentia instance from wasm build
+let essentia;
+let isEssentiaInstance = false;
+// global audio vars
+let audioCtx;
+let bufferSize = 1024; // buffer size for mic stream and ScriptProcessorNode
+let mic = null;
+let scriptNode = null;
+let gumStream;
+
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+audioCtx = new AudioContext();
+
+let plotDiv = document.querySelector('#plotDiv'); // html div to print our results to
+let recordButton = document.querySelector('#recordButton');
+</code></pre>
+<ol start="2">
+<li>Next, we define a function to be called by the <code>ScriptProcessorNode</code> every time its input buffer is ready to be processed (i.e. it will handle the <code>AudioProcessingEvent</code>). In it we get the audio from the input channel, convert it to a <code>VectorFloat</code> type that Essentia can use, and we feed that to the RMS algorithm, in this particular case.</li>
+</ol>
+<pre class="prettyprint source lang-javascript"><code>// ScriptNodeProcessor callback function to calculate RMS using essentia.js
+function essentiaExtractorCallback(audioProcessingEvent) {
+    // convert the float32 audio data into std::vector&lt;float> for using with essentia algos
+    var vectorSignal = essentia.arrayToVector( audioProcessingEvent.inputBuffer.getChannelData(0) );
+    if (!vectorSignal) {
+        throw &quot;onRecordingError: empty audio signal input found!&quot;;
+    }
+
+    // check https://mtg.github.io/essentia.js/docs/api/Essentia.html#RMS
+    let algoOutput = essentia.RMS(vectorSignal);
+    // convert the output to js arrray
+    let rmsValue = algoOutput.rms;
+
+    plotDiv.innerText = rmsValue;
+}
+</code></pre>
+<ol start="3">
+<li>In order to use this in real time, we need to define a function that will request access to the microphone for live input. With the requested stream, we can create the necessary Web Audio nodes, one of them using our <code>essentiaExtractorCallback</code>, and connect them to each other to form our audio processing graph.</li>
+</ol>
+<pre class="prettyprint source lang-javascript"><code>function startMicRecordStream(btnCallback) {
+    if (audioCtx.state === &quot;suspended&quot;) audioCtx.resume(); 
+    if (navigator.mediaDevices.getUserMedia) {
+        console.log(&quot;Initializing audio...&quot;);
+        navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+            .then((stream) => {
+                gumStream = stream;
+                if (gumStream.active) {
+                    mic = audioCtx.createMediaStreamSource(stream);
+
+                    if (audioCtx.state == &quot;suspended&quot;) {
+                        audioCtx.resume();
+                    }
+                    
+                    scriptNode = audioCtx.createScriptProcessor(bufferSize, 1, 1);
+                    // onprocess callback (where we perform our analysis with essentia.js)
+                    scriptNode.onaudioprocess = essentiaExtractorCallback;
+                    mic.connect(scriptNode);
+                    scriptNode.connect(audioCtx.destination);
+
+                    btnCallback(); // restore button state
+                } else {
+                    throw &quot;Mic stream not active&quot;;
+                }
+            }
+        ).catch((message) => {
+            throw &quot;Could not access microphone - &quot; + message;
+        });
+
+    } else {
+    throw &quot;Could not access microphone - getUserMedia not available&quot;;
+    }
+}
+</code></pre>
+<ol start="4">
+<li>We also define a function that will run when we click the &quot;Stop&quot; button, to stop the live microphone input (and do some minimal UI state changes). It's important to disconnect the audio nodes at this stage, otherwise the previous <code>mic</code> and <code>scriptNode</code> nodes will remain connected, consume unnecessary memory and CPU, and cause our displayed results to glitch, since they will be using the same AudioProcessingEvent callback.</li>
+</ol>
+<pre class="prettyprint source lang-javascript"><code>function stopMicRecordStream() {
+    audioCtx.suspend().then(() => {
+        // stop mic stream
+        gumStream.getAudioTracks().forEach(function(track) {
+            track.stop();
+        });
+        recordButton.classList.remove(&quot;recording&quot;);
+        recordButton.innerHTML = 'Mic &nbsp;&nbsp;&lt;i class=&quot;microphone icon&quot;>&lt;/i>';
+        
+        mic.disconnect();
+        scriptNode.disconnect();
+        plotDiv.innerText = &quot;&quot;;
+    });
+}
+</code></pre>
+<ol start="5">
+<li>Lastly, we specify a click event handler for our Start/Stop button, which asynchronously loads the <code>essentia.js</code> backend, uses it to instantiate the core API, and triggers our previously defined <code>startMicRecordStream</code> to capture live audio from the user's microphone and start the analysis.</li>
+</ol>
+<pre class="prettyprint source lang-javascript"><code>window.onload = () => {
+    recordButton.onclick = function() {
+        var recording = this.classList.contains(&quot;recording&quot;);
+        if (!recording) {
+            this.setAttribute(&quot;disabled&quot;, true);
+
+            EssentiaWASM().then(function(essentiaModule) {
+                if (!isEssentiaInstance) {
+                    essentia = new Essentia(essentiaModule);
+                    isEssentiaInstance = true;
+                }
+                startMicRecordStream(enableButton); // `enableButton` is just a function that re-enables the Start/Stop button
+            });
+        } else {
+            stopMicRecordStream();
+        }
+    };
+}
+</code></pre>
+<p>For a more full-fledged example, take a look at our <a href="https://github.com/MTG/essentia.js/blob/dev/examples/hpcp-chroma-rt/index.html">HPCP Chroma RT demo</a>, which uses this technique.</p>
+<hr>
+<h2>Using the Web Audio API with <a href="https://developer.mozilla.org/en-US/docs/Web/API/AudioWorklet">AudioWorklets</a>.</h2>
+<p>Another option for high-performance real-time audio on the web, more efficient, and non-deprecated, is AudioWorklets. Our <a href="https://mtg.github.io/essentia.js/examples/rms-rt/">online demo for real-time RMS</a> level detection uses this approach. You can check out the code <a href="https://github.com/MTG/essentia.js/tree/dev/examples/rms-rt">here</a>, but the following snippets will go over the main differences from using <code>ScriptProcessorNode</code>:</p>
+<ol>
+<li>Getting a live audio stream from the user's microphone is done as above (using <code>navigator.mediaDevices.getUserMedia</code>), as is setting up the audio graph, connecting the nodes.</li>
+<li>When setting up the audio graph, we have to create an <a href="https://developer.mozilla.org/en-US/docs/Web/API/AudioWorkletNode"><code>AudioWorkletNode</code></a> instead of a <code>ScriptProcessorNode</code>. This will allow us to run our custom audio code on its own rendering thread, separate from the UI. The following code returns one such node:</li>
+</ol>
+<pre class="prettyprint source lang-javascript"><code>// main.js
+const workletProcessorCode = &quot;essentia-worklet-processor.js&quot;;
+
+export async function createEssentiaNode (audioCtx) {
+  try {
+    await audioCtx.audioWorklet.addModule(workletProcessorCode); // add our custom code to the worklet scope and register our processor as `essentia-worklet-processor`
+  } catch(e) {
+    console.log(e);
+  }
+  return new AudioWorkletNode(audioCtx, 'essentia-worklet-processor'); // instantiate our custom processor as an AudioWorkletNode
+}
+</code></pre>
+<ol start="3">
+<li>This is used in the audio graph setup function as follows:</li>
+</ol>
+<pre class="prettyprint source lang-javascript"><code>    micNode = audioContext.createMediaStreamSource(gumStream);
+    // ...
+    // create essentia node only once (avoid registering processor repeatedly)
+    if (!essentiaNode) {
+        essentiaNode = await createEssentiaNode(audioContext);
+    }
+
+    micNode.connect(essentiaNode);
+</code></pre>
+<ol start="4">
+<li>Finally, this is our custom audio code, defined inside <em>essentia-worklet-processor.js</em> (which we used in <code>createEssentiaNode</code>). It inherits from <a href="https://developer.mozilla.org/en-US/docs/Web/API/AudioWorkletProcessor"><code>AudioWorkletProcessor</code></a>:</li>
+</ol>
+<pre class="prettyprint source lang-javascript"><code>// essentia-worklet-processor.js
+import { EssentiaWASM } from &quot;https://cdn.jsdelivr.net/npm/essentia.js@&lt;version>/dist/essentia-wasm.es.js&quot;;
+import Essentia from &quot;https://cdn.jsdelivr.net/npm/essentia.js@&lt;version>/dist/essentia.js-core.es.js&quot;;
+
+let essentia = new Essentia(EssentiaWASM);
+
+class EssentiaWorkletProcessor extends AudioWorkletProcessor {
+  constructor() {
+    super();
+    this.essentia = essentia;
+    console.log('Backend - essentia:' + this.essentia.version + '- http://essentia.upf.edu'); 
+  }
+  
+  //System-invoked process callback function.
+  process(inputs, outputs, parameters) {
+
+    // &lt;inputs> and &lt;outputs> will have as many as were specified in the options passed to the AudioWorkletNode constructor, each subsequently spanning potentially multiple channels
+    let input = inputs[0];
+    let output = outputs[0];
+    
+    // convert the input audio frame array from channel 0 to a std::vector&lt;float> type for using it in essentia
+    let vectorInput = this.essentia.arrayToVector(input[0]);
+
+    // In this case we compute the Root Mean Square of every input audio frame
+    // check https://mtg.github.io/essentia.js/docs/api/Essentia.html#RMS 
+    let rmsFrame = this.essentia.RMS(vectorInput) // input audio frame
+
+    output[0][0] = rmsFrame.rms;
+
+    return true; // keep the process running
+  }
+}
+
+registerProcessor('essentia-worklet-processor', EssentiaWorkletProcessor); // must use the same name we gave our processor in `createEssentiaNode`
+</code></pre>
+<h3>Cross-browser support</h3>
+<p>Since the <code>fetch</code> or <code>XHR</code> APIs are not available in the Worklets' scope, and ES6 module imports in AudioWorklets are only available in Chrome, we need some alternative way of loading <code>essentia.js</code> inside AudioWorklets. The async <code>URLFromFiles()</code> function used in <a href="https://github.com/padenot/ringbuf.js/blob/master/example/utils.js">ringbuf.js</a> can be used to fetch and concatenate our custom code together with the <code>essentia.js</code> library on the main thread, where AudioWorkletNode is created. This code allows our custom processing to work also on Firefox and Edge.</p>
+<pre class="prettyprint source lang-javascript"><code>// main.js
+const workletProcessorCode = [&quot;https://cdn.jsdelivr.net/npm/essentia.js@&lt;version>/dist/essentia-wasm.umd.js&quot;, &quot;https://cdn.jsdelivr.net/npm/essentia.js@&lt;version>/dist/essentia.js-core.es.js&quot;, &quot;essentia-worklet-processor.js&quot;];
+
+export async function createEssentiaNode (audioCtx) {
+  try {
+    let concatenatedCode = await URLFromFiles(workletProcessorCode)
+    await audioCtx.audioWorklet.addModule(concatenatedCode); // add our custom code to the worklet scope
+  } catch(e) {
+    console.log(e);
+  }
+  return new AudioWorkletNode(audioCtx, 'essentia-worklet-processor');
+}
+</code></pre>
+<p>And the import inside our custom processor code would look like this:</p>
+<pre class="prettyprint source lang-javascript"><code>// essentia-worklet-processor.js
+let essentia = new Essentia(EssentiaWASM);
+</code></pre>
+<hr>
+<p><br>
+You can find more real-time analysis examples in our <a href="https://mtg.github.io/essentia.js/examples">online demos</a>.</p>
+<!-- #### On Glitch platform (editable)
+
+[https://glitch.com/@albincorreya/essentia-js-examples](https://glitch.com/@albincorreya/essentia-js-examples) --></article>
+		</section>
+			</div>
+				<div class="col-md-3 side-content">
+					<nav class="toc hidden-print hidden-sm hidden-xs"></nav>
+				</div>
+		</div>
+	</div>
+	<footer>
+				<div class="footer-option">https://essentia.upf.edu</div>
+				<div class="copyright">Copyright (C) 2006-2021  Music Technology Group - Universitat Pompeu Fabra</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+	
+</body>
+</html>
+<!-- end:readme.hbs -->

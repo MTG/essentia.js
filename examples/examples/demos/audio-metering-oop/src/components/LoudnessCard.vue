@@ -1,0 +1,121 @@
+<template>
+  <v-card elevation="0" color="secondary-lighten-3">
+		<v-card-title>Loudness</v-card-title>
+		<v-card-subtitle>EBU R128</v-card-subtitle>
+		<v-table class="bg-secondary-lighten-3">
+				<tbody>
+					<tr>
+						<td>Integrated</td>
+						<td class="text-error">{{integrated.toFixed(3)}} LUFS</td>
+						<td v-if="refTrack !== undefined"  class="text-primary">{{refTrack.loudness.integrated.toFixed(3)}} LUFS</td>
+					</tr>
+					<tr>
+						<td>Range</td>
+						<td class="text-error">{{range.toFixed(3)}} dB LU</td>
+						<td v-if="refTrack !== undefined"  class="text-primary">{{refTrack.loudness.range.toFixed(3)}} dB LU</td>
+					</tr>
+				</tbody>
+		</v-table>
+		<v-divider></v-divider>
+		<loudness-chart :data="chartData" :trackID="trackID" :colors="stdColors" :isRef="false"></loudness-chart>
+		<v-divider v-if="refTrack !== undefined"></v-divider>
+		<loudness-chart v-show="refTrack !== undefined" :data="refChartData" :trackID="refTrackID" :colors="refColors" :isRef="true"></loudness-chart>
+		<v-divider></v-divider>
+		<v-card-subtitle>RMS</v-card-subtitle>
+		<v-table class="bg-secondary-lighten-3">
+				<tbody>
+					<tr>
+						<td>Mono mix</td>
+						<td class="text-error">{{rms.mono.toFixed(3)}} dB</td>
+						<td v-if="refTrack !== undefined" class="text-primary">{{refTrack.loudness.rms.mono.toFixed(3)}} dB</td>
+					</tr>
+				</tbody>
+		</v-table>
+	</v-card>
+</template>
+
+<script>
+import LoudnessChart from './LoudnessChart.vue';
+import { useColors } from '../../../common/useColors';
+const essentiaColors = useColors();
+
+// consider swapping this conversion pipeline for color2k: light, better documented and more succint
+import { darken, HexToRGB, RGBtoHex } from 'vuetify/lib/util/colorUtils.mjs';
+const rgbYellow = HexToRGB(essentiaColors.accentYellow.value)
+const rgbDarkenedAccentYellow = darken(rgbYellow, 2);
+
+const timestampFromFramePosition = (framePos, frameSize) => {
+	let time = framePos * 0.1 + frameSize*0.5; // loudness EBU default hopsize = 0.1
+	if (framePos !== 0) time += 1E-15;
+	let minutes = Math.floor(time / 60);
+	let remainder = String(time % 60).split('.');
+	let milliseconds = remainder[1] ? remainder[1].slice(0, 3) : '000';
+	let seconds = remainder[0]
+	return `${minutes}:${seconds.length > 1 ? seconds : '0'+seconds}:${milliseconds}`;
+}
+
+const getChartData = (momentary, shortTerm) => {
+	let chartData = [];
+	momentary.map( (val, i) => {
+		chartData.push({
+			time: timestampFromFramePosition(i, 0.4),
+			dBs: val,
+			measurement: 'momentary'
+		});
+	})
+	shortTerm.map( (val, i) => {
+		chartData.push({
+			time: timestampFromFramePosition(i, 3),
+			dBs: val,
+			measurement: 'short-term'
+		});
+	})
+	return chartData;
+};
+
+export default {
+	props: {
+		'integrated': Number,
+		'range': Number,
+		'rms': Object,
+		'momentary': Array,
+		'shortTerm': Array,
+		'trackID': String,
+		refTrack: {
+			default: undefined,
+			required: true
+		}
+	},
+	components: { LoudnessChart },
+	data () {
+		return {
+			chartData: getChartData(this.momentary, this.shortTerm),
+			refColors: {
+				'momentary': essentiaColors.accentYellow.value, 
+				'short-term': essentiaColors.mainRedLight.value, 
+				'header': 'primary'
+			},
+			stdColors: {
+				'momentary': RGBtoHex(rgbDarkenedAccentYellow), 
+				'short-term': essentiaColors.mainRedDark.value, 
+				'header': 'error'
+			}
+		}
+	},
+	computed: {
+		refChartData () {
+			if (this.refTrack) {
+				return getChartData(this.refTrack.loudness.momentary, this.refTrack.loudness.shortTerm);
+			}
+			return [];
+		},
+		refTrackID () {
+			if (this.refTrack) return this.refTrack.uuid;
+			return '';
+		}
+	}
+}
+</script>
+
+<style>
+</style>

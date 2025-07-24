@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
+    />
+    <title>essentia.js with Web Audio API ScriptNodeProcessor example</title>
+  </head>
+  <body style="background-color:  #000000!important;">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+    <script src="essentia-custom-extractor.web.js"></script>
+
+    <div class="ui main_wrapper landing-image">
+      <div class="ui header centered" id="header">
+        <a href="index.html">
+          <img
+            id="header-img"
+            src="https://github.com/MTG/essentia.js/blob/master/src/assets/img/essentiajsbanner.png?raw=true"
+          />
+        </a>
+        <div>
+          <h2 class="ui header white-text" style="color: azure;">
+            Example of a custom cross-compiled essentia C++ extractor
+          </h2>
+          <h3 class="ui header white-text" style="color: azure;">
+            LogMelSpectrogram
+          </h3>
+          <button id="analyzeButton">Analyze</button>
+        </div>
+
+
+      <center>
+        <div class="footer" style="margin-top: 30px; height: 20%;">
+          <a class="demo_logo" target="_blank" href="//essentia.upf.edu">
+            <img
+              id="logo"
+              src="https://essentia.upf.edu/documentation/_static/essentia_logo.svg"
+              alt="MTG Logo"
+              style="margin-left: 40px; height: 70px;"
+            />
+          </a>
+          <a target="_blank" href="https://www.upf.edu/web/mtg">
+            <img
+              class="essnt-footer_mtg-logo"
+              src="https://mtg.github.io/assets/img/upflogo.png"
+              alt="mtg logo"
+              style="width:300px; height: 70px;"
+            />
+          </a>
+        </div>
+      </center>
+      <script>
+        let essentia;
+        // global var for web audio API AudioContext
+        let audioCtx;
+        let gumStream;
+      </script>
+
+      <script type="module"> 
+
+        import { LogMelSpectrumNodeFactory } from "./essentia-extractor-node.js";
+
+        essentia = LogMelSpectrumNodeFactory;
+
+    
+        // init Web Audio API AudioContext
+        function initAudioContext() {
+            try {  
+                unlockAudioContext();
+            } catch (e) {
+                throw 'Could not instantiate AudioContext: ' + e.message;
+            }
+        }
+
+        // cross-browser fallback to initiate WebAudio API with user gesture if required
+        function unlockAudioContext() {
+            if (typeof(audioCtx) === "undefined") {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state !== ("suspended")) return;
+            const b = document.body;
+            const events = ["touchstart", "touchend", "mousedown", "keydown"];
+            events.forEach(e => b.addEventListener(e, unlock, false));
+            function unlock() {audioCtx.resume().then(clean);}
+            function clean() {
+                events.forEach(e => b.removeEventListener(e, unlock));
+            }
+        }
+       
+        // connect the nodes
+        async function startEssentiaAnalyser(audioContext) {
+            // cross-browser support
+            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || 
+                                                    navigator.mozGetUserMedia || navigator.msGetUserMedia;           
+            window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL
+            if (navigator.getUserMedia) {
+              console.log(".................................")
+              console.log('Initializing mic input stream ...')
+              navigator.getUserMedia({audio: true, video: false}, async function(stream) {
+                gumStream = stream;
+                if (gumStream.active) {
+                  console.log('Sample Rate = ' + audioContext.sampleRate);
+                  var micNode = audioContext.createMediaStreamSource(stream);
+                  // create essentia node factory
+                  console.log("Creating EssentiaNodeFactory instance ...")
+                  let essentiaNode = await LogMelSpectrumNodeFactory.create(audioContext);
+
+                  console.log("Mic => essentiaWorklet => audioContext.destination ....");
+                  console.log("Computing log mel spectrogram on mic input ....");
+                  // connect mic stream to essentia node
+                  micNode.connect(essentiaNode);
+                  // If it isn't connected to destination, the worklet is not executed
+                  essentiaNode.connect(audioContext.destination);
+                } else {throw 'Mic stream not active';}
+              }, function(message) {
+                throw 'Could not access microphone - ' + message;
+              });
+            } else {throw 'Could not access microphone - getUserMedia not available';}
+        }
+
+        $(document).ready(function() {
+          $('#analyzeButton').click(function() {
+            if(!audioCtx) {
+                initAudioContext();
+                startEssentiaAnalyser(audioCtx).then(()=>console.log('essentia analyzer started'));
+                return;
+            }
+            if(audioCtx.state === 'running') {
+                console.log('Suspending audio context ...');
+                audioCtx.suspend().then(function() {
+                    // Audio suspended
+                });
+            } else if(audioCtx.state === 'suspended') {
+                console.log('resuming audio context');
+                audioCtx.resume().then(function() {
+                  startEssentiaAnalyser(audioContext).then(()=>console.log('essentia analyzer started'));   
+                  // Audio resumed
+                  return
+                });
+            }
+          });
+        });
+
+      </script>
+    </div>
+  </body>
+</html>
