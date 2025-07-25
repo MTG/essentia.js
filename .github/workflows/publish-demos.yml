@@ -46,6 +46,8 @@ jobs:
       # move ./examples/dist to ./examples/ (overwrite)
       - name: Move dist to examples root
         run: |
+          shopt -s extglob
+          rm -rf !(dist)
           mv -f ./dist/* ./
           rmdir ./dist || true
       - name: Erase everything but examples and readme on working dir
