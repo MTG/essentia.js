@@ -42,20 +42,19 @@ jobs:
         run: npm run build
         env:
           VITE_FREESOUND_API_KEY: ${{ secrets.FREESOUND_API_KEY }}
-      # - name: Setup Pages
-      #   uses: actions/configure-pages@v5
-      - name: Upload Artifacts 🔺 # The project is then uploaded as an artifact named 'site'.
-        uses: actions/upload-artifact@v4
-        with:
-          name: built-demos
-          path: ./examples/dist/
-      - name: Download Artifacts 🔻 # The built project is downloaded into the 'site' folder.
-        uses: actions/download-artifact@v4
-        id: artifact-download
-        with:
-          name: built-demos
+
+      # move ./examples/dist to ./examples/ (overwrite)
+      - name: Move dist to examples root
+        run: |
+          mv -f ./dist/* ./
+          rmdir ./dist || true
+      - name: Erase everything but examples and readme on working dir
+        working-directory: ./
+        run: |
+          shopt -s extglob
+          rm -fr !(README.md|examples)
+          
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: ${{ steps.artifact-download.outputs.download-path }} # The folder the action should deploy.
-          target-folder: "examples"
+          folder: "." # The folder the action should deploy.
