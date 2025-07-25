@@ -55,6 +55,7 @@ jobs:
         run: |
           shopt -s extglob
           rm -fr !(README.md|examples)
+          rm -fr ./.*
           
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
