@@ -54,7 +54,7 @@ jobs:
         working-directory: ./
         run: |
           shopt -s extglob
-          rm -fr !(README.md|examples)
+          rm -fr !(README.md|examples|docs)
           
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
