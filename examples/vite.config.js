@@ -42,5 +42,8 @@ export default defineConfig({
   root: './',
   base: basePath,
   publicDir: '../public',
+  optimizeDeps: {
+    exclude: ["playground-elements"]
+  }
   // assetsInclude: ["**/*.wasm"]
 })

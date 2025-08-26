@@ -39,6 +39,7 @@
     "freesound": "^0.0.4",
     "jszip": "^3.10.1",
     "onnxruntime-web": "1.22",
+    "playground-elements": "^0.20.0",
     "semantic-ui-css": "^2.5.0",
     "tiny-emitter": "^2.1.0",
     "uuid": "^11.1.0",

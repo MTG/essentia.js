@@ -19,6 +19,8 @@ import PitchYinFFT from "./demos/pitchyinfft-rt/PitchYinFFT.vue";
 import OnsetsMain from "./demos/onsets/src/OnsetsMain.vue";
 import AudioMetering from "./demos/audio-metering-oop/src/AudioMetering.vue";
 
+import * as playgroundElements from "playground-elements";
+
 import GlitchMelspectrogram from "./snippet-components/GlitchMelspectrogram.vue";
 import GlitchPitch from "./snippet-components/GlitchPitch.vue";
 import GlitchChroma from "./snippet-components/GlitchChroma.vue";

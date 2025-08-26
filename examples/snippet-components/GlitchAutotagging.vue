@@ -1,11 +1,49 @@
 <template>
-  <div class="glitch-embed-wrap" style="height: 420px; width: 100%;">
-    <iframe
-      src="https://glitch.com/embed/#!/embed/essentiajs-models-workers-non-rt?path=README.md&previewSize=0&attributionHidden=true&sidebarCollapsed=false"
-      title="essentiajs-models-workers-non-rt on Glitch"
-      allow="geolocation; microphone; camera; midi; encrypted-media; xr-spatial-tracking; fullscreen"
-      allowFullScreen
-      style="height: 100%; width: 100%; border: 0;">
-    </iframe>
+  <div>
+    <playground-ide editable-file-system line-numbers resizable ref="autotagging-ide">
+    </playground-ide>
   </div>
 </template>
+
+<script setup>
+import { onMounted, useTemplateRef } from 'vue';
+import scriptJs from "./autotagging/app.js?raw";
+import indexHtml from "./autotagging/index.html?raw";
+import inferenceWorkerJs from "./autotagging/inference-worker.js?raw";
+import extractorWorkerJs from "./autotagging/extractor-worker.js?raw";
+import audioUtilsJs from "./autotagging/audio-utils.js?raw";
+import modelJson from "./autotagging/msd-musicnn-1/model.json?raw";
+import modelBinURL from "./autotagging/msd-musicnn-1/group1-shard1of1.bin?url";
+
+const ide = useTemplateRef('autotagging-ide');
+
+onMounted( () => {
+  ide.value.config = {
+    files: {
+      'index.html': {
+        content: indexHtml
+      },
+      'app.js': {
+        content: scriptJs
+      },
+      'inference-worker.js': {
+        content: inferenceWorkerJs
+      },
+      'extractor-worker.js': {
+        content: extractorWorkerJs
+      },
+      'audio-utils.js': {
+        content: audioUtilsJs
+      },
+      'model.json': {
+        content: modelJson,
+      },
+      [modelBinURL]: {
+        hidden: false,
+        contentType: 'application/octet-stream',
+        label: "group1-shard1of1.bin"
+      }
+    }
+  }
+})
+</script>
