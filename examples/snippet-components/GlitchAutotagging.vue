@@ -13,7 +13,8 @@ import inferenceWorkerJs from "./autotagging/inference-worker.js?raw";
 import extractorWorkerJs from "./autotagging/extractor-worker.js?raw";
 import audioUtilsJs from "./autotagging/audio-utils.js?raw";
 import modelJson from "./autotagging/msd-musicnn-1/model.json?raw";
-import modelBinURL from "./autotagging/msd-musicnn-1/group1-shard1of1.bin?url";
+// import modelBinURL from "./autotagging/msd-musicnn-1/group1-shard1of1.bin?url";
+import modelBinContent from "./autotagging/msd-musicnn-1/group1-shard1of1.bin?raw";
 
 const ide = useTemplateRef('autotagging-ide');
 
@@ -38,10 +39,10 @@ onMounted( () => {
       'model.json': {
         content: modelJson,
       },
-      [modelBinURL]: {
+      "group1-shard1of1.bin": {
         hidden: false,
+        content: modelBinContent,
         contentType: 'application/octet-stream',
-        label: "group1-shard1of1.bin"
       }
     }
   }
