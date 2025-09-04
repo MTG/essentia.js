@@ -28,6 +28,28 @@ class TestMusicnn extends EssentiaModel.TensorflowMusiCNN {
     });
     this.isReady = true;
   }
+  
+  async predict(inputFeature, zeroPadding) {
+
+    let featureTensor = this.arrayToTensorAsBatches(
+      inputFeature.melSpectrum, 
+      [inputFeature.frameSize, inputFeature.melBandsSize], 
+      inputFeature.patchSize,
+      zeroPadding
+    );
+    // Get default model input variables
+    let modelInputs = this.disambiguateExtraInputs();
+    // add the input feature tensor to the model inputs
+    modelInputs.push(featureTensor);
+    // Run inference
+    let results = this.model.execute(modelInputs);
+    // free tensors
+    featureTensor.dispose();
+    // decode the output activations as array with a promise
+    let resultsArray = await results.array();
+    results.dispose();
+    return resultsArray;
+  }
 }
 const musiCNN = new TestMusicnn(tf, modelURL);
 
@@ -37,6 +59,7 @@ musiCNN.initialize()
 console.log(`Using TF ${tf.getBackend()} backend`);
 
 self.onmessage = e => {
+  console.log('received data: ', e.data)
   musiCNN.predict(e.data, true)
   .then((predictions) => self.postMessage(predictions));
   // post the predictions as message to the main thread

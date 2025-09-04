@@ -1,5 +1,5 @@
 let essentiaExtractor;
-let audioURL = "https://freesound.org/data/previews/328/328857_230356-lq.mp3";
+let audioURL = "https://cdn.freesound.org/previews/328/328857_230356-lq.mp3";
 
 let audioData;
 // fallback for cross-browser Web Audio API BaseAudioContext
@@ -66,7 +66,7 @@ EssentiaWASM().then(async function(WasmModule) {
 
   // essentia version log to html div
   $("#logDiv").html(
-    "<h5> essentia-" + essentiaExtractor.version + " wasm backend loaded ... </h5>"
+    "<h5> essentia.js wasm backend loaded ... </h5>"
   );
 
   $("#logDiv").append(

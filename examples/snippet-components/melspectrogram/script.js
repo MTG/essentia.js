@@ -1,5 +1,5 @@
 let essentiaExtractor;
-let audioURL = "https://freesound.org/data/previews/328/328857_230356-lq.mp3";
+let audioURL = "https://cdn.freesound.org/previews/328/328857_230356-lq.mp3";
 
 let audioData;
 let audioCtx = new AudioContext();
@@ -68,9 +68,9 @@ EssentiaWASM().then(async function(WasmModule) {
   essentiaExtractor = new EssentiaExtractor(WasmModule);
 
   // essentia version log to html div
-  $("#logDiv").html("<h5> essentia-" + essentiaExtractor.version + " wasm backend loaded ... </h5><br>");
+  $("#logDiv").html("<h5> essentia.js wasm backend loaded ... </h5><br>");
 
-  $("#logDiv").append('<button id="btn" class="ui white inverted button">Compute Log-Mel-Spectrogram </button>');
+  $("#logDiv").append('<button id="btn" class="ui white inverted button">Compute Log-Mel Spectrogram </button>');
 
   var button = document.getElementById("btn");
 
