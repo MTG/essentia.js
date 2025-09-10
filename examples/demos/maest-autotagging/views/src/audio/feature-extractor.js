@@ -33,19 +33,22 @@ function getZeroMatrix(x, y) {
     return matrix;
 }
 
+const maest5sPatchSize = 316;
+const maest5sPatchHopSize = 313;
+
 class FeatureExtractProcessor extends AudioWorkletProcessor {
     constructor() {
         super();
         this._frameSize = 512;
         this._hopSize = 256;
         this._channelCount = 1;
-        this._patchHop = new PatchHop(128, 0.5); // if patchSize at 16kHz and 256 hopSize corresponds to about 3s of audio, this would jump by 1s
+        this._patchHop = new PatchHop(maest5sPatchSize, maest5sPatchHopSize/maest5sPatchSize); // if patchSize at 16kHz and 256 hopSize corresponds to about 3s of audio, this would jump by 1s
         this._extractor = new EssentiaModel.EssentiaTFInputExtractor(EssentiaWASM, 'musicnn'); 
         this._features = {
-            melSpectrum: getZeroMatrix(128, 96), // init melSpectrum 187x96 matrix with zeros
-            frameSize: 128,
+            melSpectrum: getZeroMatrix(maest5sPatchSize, 96), // init melSpectrum 187x96 matrix with zeros
+            frameSize: maest5sPatchSize,
             melBandsSize: 96,
-            patchSize: 128
+            patchSize: maest5sPatchSize
         };
         
         // buffersize mismatch helpers
