@@ -94,12 +94,13 @@ class FeatureExtractProcessor extends AudioWorkletProcessor {
                 this._features.melSpectrum.push(this._extractor.compute(this._frameData[0]).melSpectrum);
                 this._features.melSpectrum.shift();
                 this._patchHop.incrementFrame();
+                // console.log('feature-extract-processor: new melSpectrum patch');
                 if (this._patchHop.readyToHop() && this._workerPort) {
                     // send features to Worker for inference
                     // console.info('Computed new patch of features\n', this._features);
                     this._workerPort.postMessage({
                         request: "features",
-                        features: this._features
+                        melspectra: this._features.melSpectrum
                     });
                 }
             }

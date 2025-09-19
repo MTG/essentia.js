@@ -1,15 +1,21 @@
 // debugger;
-import * as tf from '@tensorflow/tfjs';
-import { EssentiaModel } from 'essentia.js';
+// import * as ort from 'onnxruntime-web';
 import activationSmoother from './ActivationSmoother.js';
-import modelURL from './model-tfjs/model.json?url';
+import modelURL from './discogs-maest-5s-pw-2.onnx?url';
+import * as ort from 'onnxruntime-web';
+import MAEST from "./MAEST.js";
+// import { getExternalData } from "./externalData.js";
 console.info('Worker: imports went ok')
 // console.log({activationSmoother});
 
-let model = new EssentiaModel.TensorflowMusiCNN(tf, modelURL);
+const patchSize = 316;
+let model = null;
 let modelReady = false;
 
 async function loadModel() {
+    // let externalData = await getExternalData();
+    // console.log({externalData});
+    model = new MAEST(ort, modelURL, null, patchSize);
     await model.initialize();
     modelReady = true;
     console.log('Model loaded!');
@@ -23,13 +29,8 @@ async function modelWarmUp() {
         console.error('worker: model not initialised');
         return;
     }
-    let zeroFeatures = {
-        melSpectrum: Array(128).fill( Array(96).fill(0) ),
-        melBandsSize: 96,
-        patchSize: 128,
-        frameSize: 128
-    };
-    await model.predict(zeroFeatures);
+    let zeroMelSpectra = Array(patchSize).fill( Array(96).fill(0) );
+    await model.predict(zeroMelSpectra);
 }
 
 function outputPredictions(p) {
@@ -42,9 +43,8 @@ function outputPredictions(p) {
 async function modelPredict(features) {
     if (modelReady) {
         let predictions = await model.predict(features);
-        predictions = predictions[0]; // model.predict returns a [Array(50)]
         // median smoothing
-        const smoothedPredictions = activationSmoother.push(predictions);
+        const smoothedPredictions = activationSmoother.push(predictions.cpuData);
         // output to main thread
         // console.log({smoothedPredictions});
         outputPredictions(smoothedPredictions);
@@ -65,7 +65,7 @@ port1.onmessage = async function listenToAudioWorklet(msg) {
             console.log(`Received ${msg.data.check} from AudioWorkletProcessor`);
             break;
         case 'features':
-            await modelPredict(msg.data.features);
+            await modelPredict(msg.data.melspectra);
             break;
         default:
             break;
