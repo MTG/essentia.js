@@ -1,10 +1,16 @@
 import EventBus from '../event-bus.js';
 import InferenceWorker from './inference.js?worker';
-import workletURL from './feature-extractor.js?url';
+import workletURL from './feature-resynth.js?url';
 import { URLFromFiles } from '../utils.js';
 // import essentiaURL from '../../node_modules/essentia.js/index?url';
 import audiohelperURL from './wasm-audio-helper.js?url';
 import eventBus from '../event-bus.js';
+
+import { EssentiaWASM } from "https://cdn.jsdelivr.net/npm/essentia.js@0.1.3/dist/essentia-wasm.es.js";
+import Essentia from "https://cdn.jsdelivr.net/npm/essentia.js@0.1.3/dist/essentia.js-core.es.js";
+
+window.essentia = new Essentia(EssentiaWASM);
+console.log('manager: Essentia loaded');
 
 const audioCtxOptions = {
     sampleRate: 16000
@@ -26,13 +32,13 @@ let dataIsAvailable = false;
 async function createAudioProcessor(audioContext) {
     let node;
     try {
-        node = new AudioWorkletNode(audioContext, "feature-extract-processor");
+        node = new AudioWorkletNode(audioContext, "feature-resynth-processor");
     } catch(e) {
         try {
             const concatenadedCode = await URLFromFiles([audiohelperURL, workletURL]);
             await audioContext.audioWorklet.addModule(concatenadedCode);
             console.log('audio worklet registered');
-            node = new AudioWorkletNode(audioContext, "feature-extract-processor");
+            node = new AudioWorkletNode(audioContext, "feature-resynth-processor");
         } catch (e) {
             console.log('There was an error creating the feature extractor AudioWorklet:\n', e);
             return null;
@@ -106,7 +112,7 @@ async function handleActiveStream () {
 async function connectAudioGraph () {
     mic = audioCtx.createMediaStreamSource(audioStream);          
     gain = audioCtx.createGain();
-    gain.gain.setValueAtTime(0, audioCtx.currentTime);
+    gain.gain.setValueAtTime(1, audioCtx.currentTime);
     featureExtractorNode = await createAudioProcessor(audioCtx);
 
     featureExtractorNode.port.postMessage({

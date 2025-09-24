@@ -19,8 +19,8 @@ async function loadModel() {
     await model.initialize();
     modelReady = true;
     console.log('Model loaded!');
-    await modelWarmUp();
-    console.log('Model warmed up!')
+    // await modelWarmUp();
+    // console.log('Model warmed up!')
 }
 
 async function modelWarmUp() {
@@ -41,13 +41,13 @@ function outputPredictions(p) {
 }
 
 async function modelPredict(features) {
+    // console.log('worker: received features, running model inference...', features);
     if (modelReady) {
         let predictions = await model.predict(features);
         // median smoothing
-        const smoothedPredictions = activationSmoother.push(predictions.cpuData);
+        // const smoothedPredictions = activationSmoother.push(predictions.cpuData);
         // output to main thread
-        // console.log({smoothedPredictions});
-        outputPredictions(smoothedPredictions);
+        outputPredictions(Array.from(predictions.cpuData));
     }
 }
 

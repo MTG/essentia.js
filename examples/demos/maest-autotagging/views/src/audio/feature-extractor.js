@@ -59,6 +59,7 @@ class FeatureExtractProcessor extends AudioWorkletProcessor {
 
         // init zero-pad frameData so we have 512 values upon the very first 256 samples we get in
         this._hopData[0].fill(0);
+        this.testArr = [];
 
         // setup worker comms
         this._workerPort = undefined;
@@ -71,14 +72,50 @@ class FeatureExtractProcessor extends AudioWorkletProcessor {
                 this._workerPort.postMessage({request: "check", check: "Received 2-way port from worker" });
             }
         }
+
+        this.startTime = null;
+        this.printedTestArr = false;
+        this.iteration = -1;
+        console.log('starting sampleRate, currentTime, currentFrame: ', sampleRate, currentTime, currentFrame);
     }
 
-    process(inputList) {
+    process(inputList, outputList) {
+        this.iteration++;
         let input = inputList[0];
+        let output = outputList[0];
+
         if (!input[0]) {
             console.info("worklet: empty input buffer");
             return true;
         }
+
+        if (this.iteration === 0) return true;
+        // START COUNTING FROM SECOND ITERATION
+        // it seems to skip a few thousand samples after the first iteration.
+        // if (this.startTime === null && this.iteration === 1) {
+        //     this.startTime = currentTime;
+        //     console.log('worklet: starting counting at time, frame', this.startTime, currentFrame);
+        //     console.log(Array.from(input[0]));
+        // }
+        
+        // if (currentTime - this.startTime < 1) {
+        //     this.testArr.push(Array.from(input[0]));
+        //     console.log('worklet: pushing to testArr at time, frame, iteration', currentTime, currentFrame, this.iteration);
+        // } else if (!this.printedTestArr) {
+        //     console.log({testArr: Array.from(this.testArr)});
+        //     console.log('worklet: printed testArr at time, frame', currentTime, currentFrame);
+        //     this.printedTestArr = true;
+        // }
+
+        // just pass the input to the output unchanged
+        for (let channel = 0; channel < output.length; channel++) {
+            for (let i = 0; i < input[channel].length; i++) {
+                let sample = input[channel][i];
+
+                output[channel][i] = sample;
+            }
+        }
+        return true;
 
         this._hopRingBuffer.push(input);
 
