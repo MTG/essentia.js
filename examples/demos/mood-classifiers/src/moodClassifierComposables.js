@@ -2,7 +2,6 @@ import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import WaveSurfer from 'wavesurfer.js';
 import { useColors } from '../../common/useColors';
 import { Essentia, EssentiaWASM } from 'essentia.js';
-import inferenceWorkerURL from './inference.js?url';
 import { preprocess, shortenAudio } from './audioUtils.js';
 import Chart from 'chart.js';
 import { pointToEmoji } from './pointToEmoji.js';
@@ -119,7 +118,7 @@ export function setupArousalValenceChart(canvasElem) {
 export function useAnalysisResults() {
   
   function createInferenceWorker() {
-    inferenceWorker = new Worker(inferenceWorkerURL, {type: "module"});
+    inferenceWorker = new Worker(new URL("./inference.js", import.meta.url), {type: "module"});
     inferenceWorker.onmessage = function listenToWorker(msg) {
       // listen out for model output
       if (msg.data.predictions) {

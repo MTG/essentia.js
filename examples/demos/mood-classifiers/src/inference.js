@@ -7,7 +7,6 @@ import musicnnUrl from '../models/msd-musicnn-1.onnx?url';
 
 import * as ort from 'onnxruntime-web';
 
-
 const effnetModel = new EffnetMusicnnEmbeddings(ort, effnetUrl, 128);
 const musicnnModel = new EffnetMusicnnEmbeddings(ort, musicnnUrl, 187);
 const classifiers = Object.keys(modelState);
