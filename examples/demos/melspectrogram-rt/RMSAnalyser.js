@@ -37,7 +37,7 @@ export class RMSAnalyser {
     this.essentiaNode;
     this.animationID;
     
-    this.processorName = processorUrl.split("/").at(-1).split(".")[0];
+    this.processorName = "rms-processor";
   }
   
   async registerNode() {

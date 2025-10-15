@@ -37,7 +37,7 @@ const rmsText = ref("-100");
 let melspectrogramNode;
 let analyserNode;
 let melspectrumBuffer;
-const melspectogramProcessorName = melspectrogramProcessorURL.split("/").at(-1).split(".")[0];
+const melspectogramProcessorName = "melspectrogram-processor";
 let rmsAnalyser;
 
 const fontColor = "#6c6c6c";

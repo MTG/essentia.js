@@ -44,6 +44,14 @@ export default defineConfig({
   publicDir: '../public',
   optimizeDeps: {
     exclude: ["playground-elements"]
-  }
+  },
+  build: {
+    assetsInlineLimit: (filepath, content) => {
+      if (filepath.includes('processor.js')) {
+        return false; // 1MB
+      }
+      return undefined; // default 4kb
+    }
+  },
   // assetsInclude: ["**/*.wasm"]
 })
