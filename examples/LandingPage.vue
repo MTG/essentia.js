@@ -31,6 +31,9 @@
             <RouterLink to="/demos/audio-metering" class="item">
               Audio Metering
             </RouterLink>
+            <RouterLink to="/demos/genre-tagging" class="item">
+              Genre Tagging
+            </RouterLink>
             <RouterLink to="/demos/hpcp-chroma-rt" class="item">
               HPCP Chroma | <i>real-time</i>
             </RouterLink>
@@ -39,7 +42,7 @@
             </RouterLink>
             <RouterLink to="/demos/melspectrogram-rt" class="item">
               Melspectrogram | <i>real-time</i>
-            </RouterLink>
+            </RouterLink>            
             <a href="https://essentia.upf.edu/essentiajs-discogs/" class="item" target="_blank">
               Discogs Genre Autotagging | <i>real-time</i>
               <sup><i class="external alternate icon"></i></sup>

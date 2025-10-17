@@ -18,6 +18,7 @@ import HPCPChroma from "./demos/hpcp-chroma-rt/HPCPChroma.vue";
 import PitchYinFFT from "./demos/pitchyinfft-rt/PitchYinFFT.vue";
 import OnsetsMain from "./demos/onsets/src/OnsetsMain.vue";
 import AudioMetering from "./demos/audio-metering-oop/src/AudioMetering.vue";
+import GenreTagging from "./demos/genre-tagging/src/GenreTagging.vue";
 
 import * as playgroundElements from "playground-elements";
 
@@ -58,6 +59,7 @@ const routes = [
   { path: '/demos/pitchyinfft-rt', component: PitchYinFFT},
   { path: '/demos/onsets', component: OnsetsMain},
   { path: '/demos/audio-metering', component: AudioMetering },
+  { path: '/demos/genre-tagging', component: GenreTagging },
   { path: '/snippets/glitch-melspectrogram', component: GlitchMelspectrogram, alias: '/snippets/' },
   { path: '/snippets/glitch-pitch', component: GlitchPitch },
   { path: '/snippets/glitch-chroma', component: GlitchChroma },
