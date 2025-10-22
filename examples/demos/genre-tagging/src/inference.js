@@ -82,7 +82,7 @@ async function runClassifiers(effnetEmbeddings) {
 
 async function runModels() {
   const inferenceStart = performance.now();
-  const melspectrogram = EffnetMusicnnEmbeddings.computeSpectrogram(audioArray)
+  const melspectrogram = EffnetMusicnnEmbeddings.computeSpectrogram(audioArray);
   const effnetEmbeddings = await effnetModel.predict(melspectrogram);
   // console.debug('embeddings data: ', Array.from(embeddings.data));
   // console.debug('musicnn embeddings: ', Array.from(musicnnEmbeddings.data));
@@ -105,7 +105,14 @@ self.onmessage = async (msg) => {
       runModels();
 
       break;
-  
+      
+    case 'features':
+      console.info('worker received features');
+      console.log('features data:', msg.data.features);
+      // melspectrogram data received from main thread
+      runModels(msg.data.features);
+      break;
+
     default:
       break;
   }

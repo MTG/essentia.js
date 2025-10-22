@@ -38,24 +38,14 @@ function processFile(arrayBuffer) {
       await audioCtx.suspend();
       
       // reduce amount of audio to analyse
-      let audioData = shortenAudio(prepocessedAudio, KEEP_PERCENTAGE, true); // <-- TRIMMED start/end
-      // create audio elem to audition shortened audio
-      const shortenedAudioBuffer = audioCtx.createBuffer(1, audioData.length, 16000);
-      shortenedAudioBuffer.copyToChannel(audioData, 0, 0);
-      const testSource = audioCtx.createBufferSource();
-      testSource.buffer = shortenedAudioBuffer;
-      testSource.connect(audioCtx.destination);
-      audioCtx.resume().then(() => {
-        testSource.start();
-      });
-      window.testSource = testSource; // expose to window for debugging
+      let shortenedAudio = shortenAudio(prepocessedAudio, KEEP_PERCENTAGE, true); // <-- TRIMMED start/end
 
       // send for feature extraction
       inferenceWorker.postMessage({
-        arrayBuffer: audioData.buffer,
+        arrayBuffer: shortenedAudio.buffer,
         type: "audio"
-      }, [audioData.buffer]);
-      audioData = null;
+      }, [shortenedAudio.buffer]);
+      shortenedAudio = null;
     })
   })
 }
