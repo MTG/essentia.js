@@ -55,8 +55,9 @@ export default class EffnetMusicnnEmbeddings {
     for (let f=0; f < melspectrogram.length; f++) {
       const melbandsFrame = melspectrogram[f];
       for (let b=0; b < melbandsFrame.length; b++) {
+        const offset = f * this.numMelBands;
         const bandValue = melbandsFrame[b]
-        flattenedMelspectrogram[f+b] = bandValue;
+        flattenedMelspectrogram[offset+b] = bandValue;
       }
     }
 

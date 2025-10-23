@@ -41,7 +41,8 @@ export function pointToEmoji(x, y) {
     return img;
   }
 
-  const angle = 360 + (Math.atan2(y-centerVal, x-centerVal) * 180/Math.PI); // in degrees
+  let angle = Math.atan2(y-centerVal, x-centerVal) * 180/Math.PI; // in degrees
+  if (angle < 0) angle += 360;
   const clockPos = Math.floor(angle/30);
   img.src = emojis[clockPos]
   return img;
