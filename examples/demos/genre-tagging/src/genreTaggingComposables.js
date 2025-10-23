@@ -2,7 +2,7 @@ import { ref, computed, onMounted, onUnmounted, nextTick, watch, useTemplateRef 
 import WaveSurfer from 'wavesurfer.js';
 import { useColors } from '../../common/useColors.js';
 import { Essentia, EssentiaWASM } from 'essentia.js';
-import { preprocess, shortenAudio } from './audioUtils.js';
+import { preprocess, shortenAudio } from '../../common/audio/audioUtils.js';
 import Chart from 'chart.js';
 
 import discogsTags from '../models/discogsTags.js';

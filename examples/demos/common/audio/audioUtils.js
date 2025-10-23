@@ -105,7 +105,7 @@ function shortenAudio (audioIn, keepRatio=0.5, trim=false) {
 // function to enable testing and cross-debugging 
 async function mainThreadEmomusic(audio) {
     const ort = await import('onnxruntime-web');
-    const HeadModelORT = await import('./HeadModel.js');
+    const HeadModelORT = await import('../../genre-tagging/src/HeadModel.js');
     const EffnetMusicnnEmbeddings = await import('./EffnetEmbeddings.js');
 
     const musicnnModel = new EffnetMusicnnEmbeddings(ort, musicnnUrl, 187);

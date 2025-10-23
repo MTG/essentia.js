@@ -1,5 +1,5 @@
 import modelsData from "../models/modelsData.js";
-import { onnxBackend } from "./audioUtils.js";
+import { onnxBackend } from "../../common/audio/audioUtils.js";
 
 const ALLOWED_EMBEDDINGS = ['musicnn', 'effnet'];
 

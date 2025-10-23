@@ -1,4 +1,4 @@
-import EffnetMusicnnEmbeddings from "./EffnetEmbeddings.js";
+import EffnetMusicnnEmbeddings from "../../common/audio/EffnetEmbeddings.js";
 import { HeadModelORT } from "./HeadModel.js";
 
 import effnetUrl from '../models/effnet-based/discogs-effnet-bsdynamic-1.onnx?url';

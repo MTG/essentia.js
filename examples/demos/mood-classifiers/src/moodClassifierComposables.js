@@ -2,7 +2,7 @@ import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import WaveSurfer from 'wavesurfer.js';
 import { useColors } from '../../common/useColors';
 import { Essentia, EssentiaWASM } from 'essentia.js';
-import { preprocess, shortenAudio } from './audioUtils.js';
+import { preprocess, shortenAudio } from '../../common/audio/audioUtils.js';
 import Chart from 'chart.js';
 import { pointToEmoji } from './pointToEmoji.js';
 
