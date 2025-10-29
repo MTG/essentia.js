@@ -34,9 +34,14 @@
         <div class="indeterminate text loader">Analyzing track... This may take a few seconds.</div>
       </div>
     </div>
-    <div id="results">
-      <div v-for="(classifier, key) in classifiers" :key="key">
-        <h2 class="ui header">{{ classifier.label }}</h2>
+    <div id="results" class="ui grid">
+      <div v-for="(classifier, key) in classifiers" :key="key" class="eight wide column">
+        <h2 class="ui header">
+          {{ classifier.label }}
+          <div class="sub header">
+            with <i><a :href="classifier.url" target="_blank" rel="noopener noreferrer">{{ classifier.urlName }}</a></i>
+          </div>
+        </h2>
         <prediction-set v-if="predictions[key]" :tags="predictions[key]"/>
       </div>
     </div>
@@ -44,13 +49,13 @@
 </template>
 
 <script setup lang="js">
-import { computed, onMounted, useTemplateRef } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 import { useWaveformDisplay, useAnalysisResults } from './genreTaggingComposables';
 import PredictionSet from './PredictionSet.vue';
 
 const classifiers = {
-  'genre_discogs': { label: 'Genre (Discogs)', icon: '🎸' },
-  'mtt': { label: 'MTT', icon: '🎶' }
+  'genre_discogs': { label: 'Music style classification', urlName: 'Genre Discogs400', url: 'https://essentia.upf.edu/models.html#genre-discogs400' },
+  'mtt': { label: 'Music automatic tagging', urlName: 'MagnaTagATune', url: 'https://essentia.upf.edu/models.html#magnatagatune' }
 };
 
 const { isPlaying, isMuted, handleFileUpload, controls, controlsEnabled, displayMode} = useWaveformDisplay();
