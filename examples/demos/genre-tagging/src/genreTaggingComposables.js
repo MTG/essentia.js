@@ -1,10 +1,19 @@
-import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, nextTick, watch, useTemplateRef } from 'vue';
 import WaveSurfer from 'wavesurfer.js';
-import { useColors } from '../../common/useColors';
+import { useColors } from '../../common/useColors.js';
 import { Essentia, EssentiaWASM } from 'essentia.js';
 import { preprocess, shortenAudio } from '../../common/audio/audioUtils.js';
 import Chart from 'chart.js';
-import { pointToEmoji } from './pointToEmoji.js';
+
+import discogsTags from '../models/discogsTags.js';
+import mttTags from '../models/mttTags.js';
+
+const LABELS = {
+  'genre_discogs': discogsTags,
+  'mtt': mttTags
+};
+
+const MAX_TAGS_DISPLAY = 10;
 
 const { footerHeaderDarkBlue, mainBlueDark, mainRedDark } = useColors();
 
@@ -17,6 +26,8 @@ let inferenceWorker;
 
 const predictions = ref({});
 const essentiaAnalysis = ref({keyData: null, bpm: null});
+let resultsElem = document.getElementById('genre-tagging-container');
+console.log({resultsElem});
 
 function processFile(arrayBuffer) {
   audioCtx.resume().then(() => {
@@ -26,19 +37,15 @@ function processFile(arrayBuffer) {
       const prepocessedAudio = preprocess(audioBuffer);
       await audioCtx.suspend();
       
-      if (essentia) {
-        computeKeyBPM(prepocessedAudio);
-      }
-      
       // reduce amount of audio to analyse
-      let audioData = shortenAudio(prepocessedAudio, KEEP_PERCENTAGE, true); // <-- TRIMMED start/end
-      
+      let shortenedAudio = shortenAudio(prepocessedAudio, KEEP_PERCENTAGE, true); // <-- TRIMMED start/end
+
       // send for feature extraction
       inferenceWorker.postMessage({
-        arrayBuffer: audioData.buffer,
+        arrayBuffer: shortenedAudio.buffer,
         type: "audio"
-      }, [audioData.buffer]);
-      audioData = null;
+      }, [shortenedAudio.buffer]);
+      shortenedAudio = null;
     })
   })
 }
@@ -52,67 +59,56 @@ function computeKeyBPM (audioSignal) {
   // const bpm = essentia.RhythmExtractor2013(vectorSignal, 208, 'multifeature', 40).bpm;
 }
 
-export function setupArousalValenceChart(canvasElem) {
-  const data = {
-    datasets: [{
-      label: "Arousal/Valence (Emomusic model)",
-      data: [{"x": 5, "y": 5}],
-      backgroundColor: mainRedDark.value,
-      pointStyle: (ctx) => {
-        const point = ctx.dataset.data[0];
-        return pointToEmoji(point.x, point.y);
-      }
-    }]
-  };
-  const config = {
-    type: "scatter",
-    data: data,
-    options: {
-      responsive: true,
-      title: {
-        display: true,
-        text: "Arousal / Valence - emomusic model",
-        fontSize: 14
-      },
-      legend: {
-        display: false,
-      },
-      scales: {
-        xAxes: [{
-          scaleLabel: {
-            display: true,
-            labelString: "Valence"
-          },
-          ticks: {
-            min: 1,
-            max: 9
-          }
-        }],
-        yAxes: [{
-          scaleLabel: {
-            display: true,
-            labelString: "Arousal"
-          },
-          ticks: {
-            min: 1,
-            max: 9
-          }
-        }]
-      }
-    }
-  };
-
-  const chart = new Chart(canvasElem.value, config);
-
-  watch(() => predictions.value["emomusic"], (newPreds) => {
-    console.log('new predictions: emomusic', newPreds);
-    chart.data.datasets[0].data[0] = {
-      "x": newPreds["valence"], 
-      "y": newPreds["arousal"]
+// from discogs-tagging demo
+function normalizeActivations (activationsMap) {
+  // normalize activation values
+  const activationsArray = activationsMap.map( t => t.score );
+  const activationMax = activationsArray.reduce( (a, b) => {
+    return Math.max(a, b);
+  }, 0);
+  const activationMin = activationsArray.reduce( (a, b) => {
+    return Math.min(a, b);
+  }, 1);
+  
+  const activationsRange = activationMax - activationMin;
+  
+  return activationsMap.map( tag => {
+    const normActivation = (tag.score - activationMin) / activationsRange;
+    return {
+      parentGenre: tag.parentGenre ? tag.parentGenre : null,
+      name: tag.name,
+      score: normActivation
     };
-    chart.update();
-    console.log(chart);
-  })
+  });
+}
+
+function getTopPredictions(predictions, modelName) {
+  // activations array --> map to corresponding tags
+  let scoreTagMap;
+  if (modelName == "genre_discogs") {
+    scoreTagMap = predictions.map( (score, index) => {
+      const [genre, subgenre] = LABELS[modelName][index].split('---');
+      return {
+        parentGenre: genre,
+        name: subgenre,
+        score: score
+      }
+    });
+  } else if (modelName == "mtt") {
+    scoreTagMap = predictions.map( (score, index) => {
+      return {
+        name: LABELS[modelName][index],
+        score: score
+      }
+    });
+  }
+  
+  scoreTagMap.sort( (a, b) => b.score - a.score); // descending sort
+  
+  // grab top N
+  let topTags = scoreTagMap.slice(0, MAX_TAGS_DISPLAY);
+  // normalize top N
+  return normalizeActivations(topTags);
 }
 
 export function useAnalysisResults() {
@@ -123,7 +119,8 @@ export function useAnalysisResults() {
       // listen out for model output
       if (msg.data.predictions) {
         const modelName = msg.data.predictions[0];
-        predictions.value[modelName] = msg.data.predictions[1];
+        predictions.value[modelName] = getTopPredictions(msg.data.predictions[1], modelName);
+        // get top predictions and labels
         console.log(`received predictions for ${modelName}`);
       }
     };

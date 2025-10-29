@@ -45,5 +45,6 @@ export function pointToEmoji(x, y) {
   if (angle < 0) angle += 360;
   const clockPos = Math.floor(angle/30);
   img.src = emojis[clockPos]
+  console.log('new emoji image element:', img);
   return img;
 }

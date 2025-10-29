@@ -1,7 +1,15 @@
-import modelsData from "../models/modelsData.js";
 import { onnxBackend } from "../../common/audio/audioUtils.js";
 
-const ALLOWED_EMBEDDINGS = ['musicnn', 'effnet'];
+const feedNames = {
+  "genre_discogs": {
+    inputName: "serving_default_model_Placeholder:0",
+    outputName: "PartitionedCall:0"
+  },
+  "mtt": {
+    inputName: "embeddings",
+    outputName: "activations"
+  }
+}
 
 export class HeadModelORT {
   constructor(modelURL, modelName, ort) {
@@ -12,26 +20,22 @@ export class HeadModelORT {
     this.ort = ort;
   }
 
-  static create (modelName, ortModule) {
-    const url = modelsData[modelName].url;
-    const embeddingsSource = modelsData[modelName].embeddings;
-    if (!ALLOWED_EMBEDDINGS.includes(embeddingsSource)) {
-      throw Error("embeddingsSource should be one of these: musicnn / effnet");
-    }
-    return new this(url, modelName, ortModule);
+  static create (modelData, ortModule) {
+    const url = modelData.url;
+    return new this(url, modelData.name, ortModule);
   }
 
   async initialize () {
     this.session = await this.ort.InferenceSession.create(this.url, { executionProviders: [onnxBackend], executionMode: "parallel" });
-    // console.debug(`${this.name} session`, this.session);
+    console.debug(`${this.name} session`, this.session);
     this.isReady = true;
   }
 
   async predict (inputTensor) {
     // console.log(`${this.name} predict has been called`);
-    const ortOutputTensor = await this.session.run({"embeddings": inputTensor}); //, feeds)
+    const ortOutputTensor = await this.session.run({[feedNames[this.name].inputName]: inputTensor}); //, feeds)
     // console.log(`${this.name} completed successfully`, ortOutputTensor);
-    return {"modelName": this.name, "activations": ortOutputTensor["activations"]};
+    return {"modelName": this.name, "activations": ortOutputTensor[feedNames[this.name].outputName]};
     // console.log(`${this.name} (${this.embeddingsSource}-based) activations: `, ortOutputTensor["activations"]);
   }
 }

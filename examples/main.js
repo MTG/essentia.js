@@ -18,6 +18,7 @@ import HPCPChroma from "./demos/hpcp-chroma-rt/HPCPChroma.vue";
 import PitchYinFFT from "./demos/pitchyinfft-rt/PitchYinFFT.vue";
 import OnsetsMain from "./demos/onsets/src/OnsetsMain.vue";
 import AudioMetering from "./demos/audio-metering-oop/src/AudioMetering.vue";
+import GenreTagging from "./demos/genre-tagging/src/GenreTagging.vue";
 
 import * as playgroundElements from "playground-elements";
 
@@ -51,13 +52,14 @@ import { createBootstrap } from 'bootstrap-vue-next';
 
 const routes = [
   { path: '/', redirect: '/demos/'},
-  { path: '/demos/melspectrogram-rt', component: MelSpectrogram },
-  { path: '/demos/mood-classifiers', component: MoodClassifiers, alias: '/demos/' },
-  { path: '/demos/autotagging-rt', component: AutoTagging},
-  { path: '/demos/hpcp-chroma-rt', component: HPCPChroma},
-  { path: '/demos/pitchyinfft-rt', component: PitchYinFFT},
-  { path: '/demos/onsets', component: OnsetsMain},
-  { path: '/demos/audio-metering', component: AudioMetering },
+  { path: '/demos/melspectrogram-rt', component: MelSpectrogram, name: "Melspectrogram | real-time" },
+  { path: '/demos/mood-classifiers', component: MoodClassifiers, alias: '/demos/', name: "Mood Classification, Key & BPM" },
+  { path: '/demos/autotagging-rt', component: AutoTagging, name: "Music Autotagging | real-time" },
+  { path: '/demos/hpcp-chroma-rt', component: HPCPChroma, name: "HPCP Chroma | real-time" },
+  { path: '/demos/pitchyinfft-rt', component: PitchYinFFT, name: "Pitch Melodia | real-time" },
+  { path: '/demos/onsets', component: OnsetsMain, name: "Onset Detection" },
+  { path: '/demos/audio-metering', component: AudioMetering, name: "Audio Metering" },
+  { path: '/demos/genre-tagging', component: GenreTagging, name: "Genre Tagging" },
   { path: '/snippets/glitch-melspectrogram', component: GlitchMelspectrogram, alias: '/snippets/' },
   { path: '/snippets/glitch-pitch', component: GlitchPitch },
   { path: '/snippets/glitch-chroma', component: GlitchChroma },
