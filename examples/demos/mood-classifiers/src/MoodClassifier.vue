@@ -35,13 +35,15 @@
       </div>
     </div>
     <div id="results">
-      <div v-for="(classifier, key) in classifiers" :key="key" class="results-row">
-        <span class="icon-span">{{ classifier.icon }}</span>
-        <div class="classifier-meter" 
-             :data-classifier="classifier.label" 
-             :style="{'--meter-width': predictions[key]*100}" 
-             :class="{'filled': predictions[key] != null}"
-        ></div>
+      <div class="ui two column centered grid">
+        <div class="row" v-for="(classifier, key) in classifiers" :key="key">
+          <span class="icon-span one wide column">{{ classifier.icon }}</span>
+          <div class="classifier-meter fourteen wide column" 
+              :data-classifier="classifier.label" 
+              :style="{'--meter-width': predictions[key]*100}" 
+              :class="{'filled': predictions[key] != null}"
+          ></div>
+        </div>
       </div>
       <div id="bpm-and-key">
         <div id="bpm" class="results-row">
@@ -196,8 +198,8 @@ a#essentia-header-link:active {
 }
 
 span {
-  margin: auto .8rem;
   &.tag {
+    margin: auto .8rem;
     font-weight: bold;
     font-size: 1rem;
   }
@@ -218,8 +220,8 @@ span {
 }
 
 .classifier-meter {
-    width: 100%;
-    height: 1.8rem;
+    /* width: 100%; */
+    height: 2rem;
     position: relative;
 
     border: 1px solid var(--footer-header-dark-blue);
@@ -231,7 +233,7 @@ span {
     }
 }
   
-.classifier-meter, #bpm-and-key {
+#bpm-and-key {
   margin-top: .5rem;
   margin-bottom: .5rem;
   margin-right: 0.8rem;
