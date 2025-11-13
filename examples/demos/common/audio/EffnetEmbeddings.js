@@ -68,6 +68,6 @@ export default class EffnetMusicnnEmbeddings {
 
     console.log(`embeddings tensor for ${this.url}:`, ortOutputTensor);
     
-    return ortOutputTensor.embeddings;
+    return ortOutputTensor.activations;
   }
 }

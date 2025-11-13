@@ -40,6 +40,9 @@
           <RouterLink to="/demos/genre-tagging" class="item">
             Genre Tagging
           </RouterLink>
+          <RouterLink to="/demos/maest" class="item">
+            MAEST Tagging
+          </RouterLink>
           <RouterLink to="/demos/hpcp-chroma-rt" class="item">
             HPCP Chroma | <i>real-time</i>
           </RouterLink>

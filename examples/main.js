@@ -19,6 +19,7 @@ import PitchYinFFT from "./demos/pitchyinfft-rt/PitchYinFFT.vue";
 import OnsetsMain from "./demos/onsets/src/OnsetsMain.vue";
 import AudioMetering from "./demos/audio-metering-oop/src/AudioMetering.vue";
 import GenreTagging from "./demos/genre-tagging/src/GenreTagging.vue";
+import MaestTagging from "./demos/maest/src/MaestTagging.vue";
 
 import * as playgroundElements from "playground-elements";
 
@@ -60,6 +61,7 @@ const routes = [
   { path: '/demos/onsets', component: OnsetsMain, name: "Onset Detection" },
   { path: '/demos/audio-metering', component: AudioMetering, name: "Audio Metering" },
   { path: '/demos/genre-tagging', component: GenreTagging, name: "Genre Tagging" },
+  { path: '/demos/maest', component: MaestTagging, name: "MAEST Tagging" },
   { path: '/snippets/glitch-melspectrogram', component: GlitchMelspectrogram, alias: '/snippets/' },
   { path: '/snippets/glitch-pitch', component: GlitchPitch },
   { path: '/snippets/glitch-chroma', component: GlitchChroma },
