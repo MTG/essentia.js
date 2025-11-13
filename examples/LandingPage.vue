@@ -28,18 +28,22 @@
           <RouterLink to="/demos/mood-classifiers" class="item">
             Mood Classification, Key & BPM
           </RouterLink>
+          <RouterLink to="/demos/tagging" class="item">
+            Tagging
+          </RouterLink>
           <RouterLink to="/demos/onsets" class="item">
             Onset Detection
-          </RouterLink>
-          <RouterLink to="/demos/autotagging-rt" class="item">
-            Music Autotagging | <i>real-time</i>
           </RouterLink>
           <RouterLink to="/demos/audio-metering" class="item">
             Audio Metering
           </RouterLink>
-          <RouterLink to="/demos/genre-tagging" class="item">
-            Genre Tagging
+          <RouterLink to="/demos/autotagging-rt" class="item">
+            Music Autotagging | <i>real-time</i>
           </RouterLink>
+          <a href="https://essentia.upf.edu/essentiajs-discogs/" class="item" target="_blank">
+            Discogs Genre Autotagging | <i>real-time</i>
+            <sup><i class="external alternate icon"></i></sup>
+          </a>
           <RouterLink to="/demos/hpcp-chroma-rt" class="item">
             HPCP Chroma | <i>real-time</i>
           </RouterLink>
@@ -48,11 +52,7 @@
           </RouterLink>
           <RouterLink to="/demos/melspectrogram-rt" class="item">
             Melspectrogram | <i>real-time</i>
-          </RouterLink>            
-          <a href="https://essentia.upf.edu/essentiajs-discogs/" class="item" target="_blank">
-            Discogs Genre Autotagging | <i>real-time</i>
-            <sup><i class="external alternate icon"></i></sup>
-          </a>
+          </RouterLink>
         </div>
       </div>
       <div class="item">
@@ -119,6 +119,10 @@ const selectedDemoName = computed(() => {
     flex-grow: 1; /* Allows the main content to grow and push the footer down if necessary */
   }
 
+  #tabular-card-menu .ui.menu .item {
+    user-select: text;
+  }
+  
   #demo-tabs-menu .item {
     line-height: 1.3;
   }

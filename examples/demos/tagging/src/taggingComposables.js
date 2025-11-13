@@ -15,7 +15,7 @@ const LABELS = {
 
 const MAX_TAGS_DISPLAY = 10;
 
-const { footerHeaderDarkBlue, mainBlueDark, mainRedDark } = useColors();
+const { footerHeaderDarkBlue, mainBlueDark } = useColors();
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
@@ -48,15 +48,6 @@ function processFile(arrayBuffer) {
       shortenedAudio = null;
     })
   })
-}
-
-function computeKeyBPM (audioSignal) {
-  let vectorSignal = essentia.arrayToVector(audioSignal);
-  essentiaAnalysis.value.keyData = essentia.KeyExtractor(vectorSignal, true, 4096, 4096, 12, 3500, 60, 25, 0.2, 'bgate', 16000, 0.0001, 440, 'cosine', 'hann');
-  essentiaAnalysis.value.bpm = essentia.PercivalBpmEstimator(vectorSignal, 1024, 2048, 128, 128, 210, 50, 16000).bpm;
-  
-  // const bpm = essentia.RhythmExtractor(vectorSignal, 1024, 1024, 256, 0.1, 208, 40, 1024, 16000, [], 0.24, true, true).bpm;
-  // const bpm = essentia.RhythmExtractor2013(vectorSignal, 208, 'multifeature', 40).bpm;
 }
 
 // from discogs-tagging demo

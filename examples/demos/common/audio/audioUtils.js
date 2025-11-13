@@ -102,21 +102,4 @@ function shortenAudio (audioIn, keepRatio=0.5, trim=false) {
     return Float32Array.from(audioOut);
 }
 
-// function to enable testing and cross-debugging 
-async function mainThreadEmomusic(audio) {
-    const ort = await import('onnxruntime-web');
-    const HeadModelORT = await import('../../genre-tagging/src/HeadModel.js');
-    const EffnetMusicnnEmbeddings = await import('./EffnetEmbeddings.js');
-
-    const musicnnModel = new EffnetMusicnnEmbeddings(ort, musicnnUrl, 187);
-    const emomusicModel = HeadModelORT.create("emomusic", ort);
-    await musicnnModel.initialize();
-    await emomusicModel.initialize();
-    const melspectrogram = EffnetMusicnnEmbeddings.computeSpectrogram(audio)
-    const musicnnEmbeddings = await musicnnModel.predict(melspectrogram);
-    console.log({musicnnEmbeddings})
-    const emomusicPredictions = await emomusicModel.predict(musicnnEmbeddings);
-    console.log(emomusicPredictions);
-}
-
-export { preprocess, shortenAudio, mainThreadEmomusic, onnxBackend};
+export { preprocess, shortenAudio, onnxBackend};

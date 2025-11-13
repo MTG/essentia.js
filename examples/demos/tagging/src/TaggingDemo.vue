@@ -50,12 +50,12 @@
 
 <script setup lang="js">
 import { computed, useTemplateRef } from 'vue';
-import { useWaveformDisplay, useAnalysisResults } from './genreTaggingComposables';
+import { useWaveformDisplay, useAnalysisResults } from './taggingComposables';
 import PredictionSet from './PredictionSet.vue';
 
 const classifiers = {
   'genre_discogs': { label: 'Music style classification', urlName: 'Genre Discogs400', url: 'https://essentia.upf.edu/models.html#genre-discogs400' },
-  'mtt': { label: 'Music automatic tagging', urlName: 'MagnaTagATune', url: 'https://essentia.upf.edu/models.html#magnatagatune' }
+  'mtt': { label: 'Music tagging', urlName: 'MagnaTagATune', url: 'https://essentia.upf.edu/models.html#magnatagatune' }
 };
 
 const { isPlaying, isMuted, handleFileUpload, controls, controlsEnabled, displayMode} = useWaveformDisplay();
