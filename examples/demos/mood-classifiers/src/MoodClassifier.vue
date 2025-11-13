@@ -41,7 +41,6 @@
           <div class="classifier-meter fourteen wide column" 
               :data-classifier="classifier.label" 
               :style="{'--meter-width': predictions[key]*100}" 
-              :class="{'filled': predictions[key] != null}"
           ></div>
         </div>
       </div>
@@ -228,9 +227,6 @@ span {
     border-radius: .1rem;
 
     color: black;
-    &.filled {
-      color: white;
-    }
 }
   
 #bpm-and-key {
@@ -243,7 +239,7 @@ span {
     display: flex;
     align-items: center;
 
-    background-color: var(--main-red-dark);
+    background-color: var(--main-red-light);
     width: calc(var(--meter-width, 0) * 1%);
     max-width: calc(100% - 0.4rem);
 
