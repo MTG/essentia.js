@@ -3,7 +3,6 @@ import WaveSurfer from 'wavesurfer.js';
 import { useColors } from '../../common/useColors.js';
 import { Essentia, EssentiaWASM } from 'essentia.js';
 import { preprocess, shortenAudio } from '../../common/audio/audioUtils.js';
-import Chart from 'chart.js';
 
 import discogsTags from '../models/discogsTags.js';
 import mttTags from '../models/mttTags.js';
@@ -68,7 +67,8 @@ function normalizeActivations (activationsMap) {
     return {
       parentGenre: tag.parentGenre ? tag.parentGenre : null,
       name: tag.name,
-      score: normActivation
+      normScore: normActivation,
+      score: tag.score
     };
   });
 }
