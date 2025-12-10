@@ -1,5 +1,6 @@
 <template>
   <div class="ui container">
+    <AnalysisInfoMessage />
     <div id="file-select-area">
       <input type="file" ref="fileInput" @change="handleFileUpload" style="display: none"/>
       <div id="file-drop-area"
@@ -64,6 +65,7 @@
 <script setup lang="js">
 import { computed, onMounted, useTemplateRef } from 'vue';
 import { useWaveformDisplay, useAnalysisResults, setupArousalValenceChart } from './moodClassifierComposables';
+import AnalysisInfoMessage from '../../common/AnalysisInfoMessage.vue';
 
 const classifiers = {
   danceability: { icon: '💃🏻', label: 'Danceability' },

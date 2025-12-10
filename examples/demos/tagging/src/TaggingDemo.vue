@@ -1,5 +1,6 @@
 <template>
   <div class="ui container" id="genre-tagging-container">
+    <AnalysisInfoMessage />
     <div id="file-select-area">
       <input type="file" ref="fileInput" @change="handleFileUpload" style="display: none"/>
       <div id="file-drop-area"
@@ -52,6 +53,7 @@
 import { computed, useTemplateRef } from 'vue';
 import { useWaveformDisplay, useAnalysisResults } from './taggingComposables';
 import PredictionSet from './PredictionSet.vue';
+import AnalysisInfoMessage from '../../common/AnalysisInfoMessage.vue';
 
 const classifiers = {
   'genre_discogs': { label: 'Music style classification', urlName: 'Genre Discogs400', url: 'https://essentia.upf.edu/models.html#genre-discogs400' },
